@@ -1,9 +1,11 @@
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import include, path
 from django.views.generic import RedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("healthz/", lambda request: HttpResponse("ok"), name="healthz"),
     path("api/", include("config.urls_api")),
     path("", include("scheduling.urls.public")),
     path("dashboard/", include("scheduling.urls.dashboard")),

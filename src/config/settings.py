@@ -7,6 +7,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DEBUG=(bool, False),
     SECRET_KEY=(str, "django-insecure-change-me"),
+    USE_SECURE_PROXY_SSL_HEADER=(bool, True),
+    USE_X_FORWARDED_HOST=(bool, True),
 )
 env_file = BASE_DIR.parent / ".env"
 if env_file.exists():
@@ -17,6 +19,12 @@ SECRET_KEY = env("SECRET_KEY")
 
 ALLOWED_HOSTS: list[str] = env.list("ALLOWED_HOSTS", default=["*"])
 CSRF_TRUSTED_ORIGINS: list[str] = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
+# Honra cabeçalhos de proxy reverso (Easypanel/NGINX)
+if env("USE_SECURE_PROXY_SSL_HEADER"):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+USE_X_FORWARDED_HOST = env("USE_X_FORWARDED_HOST")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
