@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Agendamento{% endblock %} - {{ tenant.name }}</title>
+    <style>
+        :root {
+            --brand-primary: {{ tenant.color_primary|default:"#D97706" }};
+            --brand-contrast: {{ tenant.color_secondary|default:"#1F2937" }};
+        }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background-color: #f7fafc;
+            color: #1f2937;
+        }
+        header {
+            background: var(--brand-primary);
+            color: #fff;
+            padding: 24px 16px;
+            text-align: center;
+        }
+        main {
+            max-width: 960px;
+            margin: 24px auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+        .card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
+        }
+        a.button {
+            display: inline-block;
+            padding: 10px 16px;
+            background: var(--brand-primary);
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .slot-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        }
+        .slot-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            background: #f9fafb;
+        }
+        .messages {
+            margin-bottom: 16px;
+        }
+        .messages li {
+            list-style: none;
+            margin: 4px 0;
+            padding: 10px 14px;
+            border-radius: 6px;
+            background: #fef3c7;
+            color: #92400e;
+        }
+        form label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        form input, form select, form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+        form button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            background: var(--brand-primary);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+<header>
+    <h1>{{ tenant.name }}</h1>
+    <p>{% block header_subtitle %}Escolha o melhor horario para voce{% endblock %}</p>
+</header>
+<main>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>

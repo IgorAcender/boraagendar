@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Acesso{% endblock %} · Barbearia Agenda</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: linear-gradient(160deg, #0f172a, #1f2937);
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .auth-card {
+            background: rgba(15, 23, 42, 0.85);
+            border-radius: 14px;
+            padding: 32px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 24px 64px rgba(15, 23, 42, 0.45);
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 16px;
+        }
+        .messages li {
+            background: rgba(248, 113, 113, 0.15);
+            border: 1px solid rgba(248, 113, 113, 0.45);
+            color: #fecaca;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(15, 23, 42, 0.55);
+            color: #e2e8f0;
+            font-size: 1rem;
+            outline: none;
+        }
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+        }
+        a {
+            color: #38bdf8;
+        }
+        {% block extra_head %}{% endblock %}
+    </style>
+</head>
+<body>
+<section class="auth-card">
+    {% block content %}{% endblock %}
+</section>
+</body>
+</html>

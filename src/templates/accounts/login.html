@@ -1,0 +1,49 @@
+{% extends "base_auth.html" %}
+{% block title %}Entrar{% endblock %}
+{% block content %}
+<h1>Entrar no painel</h1>
+<p style="text-align:center; margin-bottom:24px; color:#94a3b8;">
+    Acesse o painel para gerenciar agendamentos e clientes.
+    </p>
+{% if form.errors %}
+    <ul class="messages">
+        {% for field in form %}
+            {% for error in field.errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    <div style="margin-bottom:16px;">
+        <label for="{{ form.username.id_for_label }}" style="display:block; font-weight:600; margin-bottom:6px;">
+            Usuario
+        </label>
+        {{ form.username }}
+    </div>
+    <div style="margin-bottom:8px;">
+        <label for="{{ form.password.id_for_label }}" style="display:block; font-weight:600; margin-bottom:6px;">
+            Senha
+        </label>
+        {{ form.password }}
+    </div>
+    <button type="submit" style="
+        width:100%;
+        padding:12px 16px;
+        border:none;
+        border-radius:10px;
+        background:#38bdf8;
+        color:#0f172a;
+        font-weight:700;
+        cursor:pointer;
+        margin-top:12px;
+    ">Entrar</button>
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+</form>
+{% endblock %}

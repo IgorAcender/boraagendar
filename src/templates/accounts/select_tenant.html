@@ -1,0 +1,79 @@
+{% extends "base_auth.html" %}
+{% block title %}Selecionar empresa{% endblock %}
+{% block content %}
+<h1>Escolha a empresa</h1>
+<p style="text-align:center; margin-bottom:24px; color:#94a3b8;">
+    Selecione qual empresa deseja gerenciar antes de acessar o painel.
+</p>
+{% if errors %}
+    <ul class="messages">
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if tenants %}
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <div style="display:grid; gap:12px; margin-bottom:16px;">
+        {% if is_superuser %}
+            {% for tenant in tenants %}
+            <label style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                padding:14px 16px;
+                border-radius:12px;
+                background:rgba(148, 163, 184, 0.08);
+                border:1px solid rgba(148, 163, 184, 0.2);
+                cursor:pointer;
+            ">
+                <input type="radio" name="tenant_id" value="{{ tenant.id }}" {% if tenant.id|stringformat:"s" == selected_tenant_id %}checked{% endif %}>
+                <span style="flex:1;">
+                    <strong>{{ tenant.name }}</strong>
+                    {% if tenant.slug %}
+                        <br><small style="color:#cbd5f5;">{{ tenant.slug }}</small>
+                    {% endif %}
+                </span>
+            </label>
+            {% endfor %}
+        {% else %}
+            {% for membership in memberships %}
+            <label style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                padding:14px 16px;
+                border-radius:12px;
+                background:rgba(148, 163, 184, 0.08);
+                border:1px solid rgba(148, 163, 184, 0.2);
+                cursor:pointer;
+            ">
+                <input type="radio" name="tenant_id" value="{{ membership.tenant_id }}" {% if membership.tenant_id|stringformat:"s" == selected_tenant_id %}checked{% endif %}>
+                <span style="flex:1;">
+                    <strong>{{ membership.tenant.name }}</strong>
+                    <br><small style="color:#cbd5f5;">Papel: {{ membership.get_role_display }}</small>
+                </span>
+            </label>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <button type="submit" style="
+        width:100%;
+        padding:12px 16px;
+        border:none;
+        border-radius:10px;
+        background:#38bdf8;
+        color:#0f172a;
+        font-weight:700;
+        cursor:pointer;
+    ">Continuar</button>
+</form>
+{% else %}
+    <p style="text-align:center; color:#fca5a5;">
+        Nenhuma empresa disponivel no momento. Solicite acesso a um administrador.
+    </p>
+{% endif %}
+{% endblock %}

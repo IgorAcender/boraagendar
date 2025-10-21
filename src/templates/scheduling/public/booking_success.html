@@ -1,0 +1,7 @@
+﻿{% extends "base_public.html" %}
+{% block title %}Sucesso{% endblock %}
+{% block content %}
+    <h2>Agendamento confirmado!</h2>
+    <p>Obrigado por escolher {{ tenant.name }}. Voce recebera uma confirmacao em breve.</p>
+    <a class="button" href="{% url 'public:booking_start' tenant_slug=tenant.slug %}">Agendar outro horario</a>
+{% endblock %}

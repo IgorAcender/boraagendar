@@ -1,0 +1,15 @@
+﻿{% extends "base_dashboard.html" %}
+{% block title %}Agendamento #{{ booking.id }}{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Agendamento #{{ booking.id }}</h2>
+    <p><strong>Cliente:</strong> {{ booking.customer_name }} ({{ booking.customer_phone }})</p>
+    <p><strong>Servico:</strong> {{ booking.service.name }}</p>
+    <p><strong>Profissional:</strong> {{ booking.professional.display_name }}</p>
+    <p><strong>Data:</strong> {{ booking.scheduled_for|date:"d/m/Y H:i" }}</p>
+    <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+    {% if booking.notes %}
+        <p><strong>Observacoes:</strong> {{ booking.notes }}</p>
+    {% endif %}
+</div>
+{% endblock %}

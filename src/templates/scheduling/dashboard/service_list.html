@@ -1,0 +1,48 @@
+﻿{% extends "base_dashboard.html" %}
+{% block title %}Servicos{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Novo servico</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Servicos cadastrados</h2>
+    {% if services %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Duracao</th>
+                    <th>Preco</th>
+                    <th>Profissionais</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for service in services %}
+                <tr>
+                    <td>{{ service.name }}</td>
+                    <td>{{ service.duration_minutes }} min</td>
+                    <td>R$ {{ service.price }}</td>
+                    <td>
+                        {% for professional in service.professionals.all %}
+                            {{ professional.display_name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Nenhum vinculo
+                        {% endfor %}
+                    </td>
+                    <td>{{ service.is_active|yesno:"Ativo,Inativo" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum servico cadastrado.</p>
+    {% endif %}
+</div>
+{% endblock %}

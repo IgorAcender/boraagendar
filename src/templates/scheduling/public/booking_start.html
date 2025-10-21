@@ -1,0 +1,26 @@
+﻿{% extends "base_public.html" %}
+{% block title %}Agendar{% endblock %}
+{% block content %}
+    <h2>Escolha um servico</h2>
+    <form method="get" class="card">
+        {{ form.as_p }}
+        <button type="submit">Buscar horarios</button>
+    </form>
+
+    {% if available_slots %}
+        <h3>Horarios disponiveis</h3>
+        <div class="slot-grid">
+            {% for slot in available_slots %}
+                <div class="slot-card">
+                    <strong>{{ slot.start|date:"d/m" }} - {{ slot.start|time:"H:i" }}</strong>
+                    <p>{{ slot.professional.display_name }}</p>
+                    <a class="button" href="{% url 'public:booking_confirm' tenant_slug=tenant.slug %}?service={{ selected_service.id }}{% if slot.professional %}&professional={{ slot.professional.id }}{% endif %}&start={{ slot.start|date:'c' }}">
+                        Reservar
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% elif selected_service %}
+        <p>Nenhum horario disponivel para o dia escolhido.</p>
+    {% endif %}
+{% endblock %}

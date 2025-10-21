@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Painel{% endblock %} - {{ tenant.name }}</title>
+    <style>
+        :root {
+            --brand-primary: {{ tenant.color_primary|default:"#D97706" }};
+            --brand-contrast: {{ tenant.color_secondary|default:"#111827" }};
+        }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        header {
+            background: var(--brand-primary);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 16px;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+        .card {
+            background: #111827;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.45);
+            margin-bottom: 24px;
+        }
+        .card h2 {
+            margin-top: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        table th, table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            text-align: left;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 18px;
+            background: var(--brand-primary);
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        form label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        form input, form select, form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        form button {
+            margin-top: 16px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            background: var(--brand-primary);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .messages {
+            list-style: none;
+            padding: 0;
+        }
+        .messages li {
+            margin-bottom: 8px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+<header>
+    <h1>{{ tenant.name }} - Painel</h1>
+    <nav>
+        <a href="{% url 'dashboard:index' %}">Resumo</a>
+        <a href="{% url 'dashboard:calendar' %}">Agenda</a>
+        <a href="{% url 'dashboard:service_list' %}">Servicos</a>
+        <a href="{% url 'dashboard:professional_list' %}">Profissionais</a>
+        <a href="{% url 'accounts:profile' %}">Perfil</a>
+        <a href="{% url 'accounts:logout' %}">Sair</a>
+    </nav>
+</header>
+<div class="container">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

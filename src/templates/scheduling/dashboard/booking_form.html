@@ -1,0 +1,12 @@
+﻿{% extends "base_dashboard.html" %}
+{% block title %}Novo agendamento{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Novo agendamento</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+{% endblock %}

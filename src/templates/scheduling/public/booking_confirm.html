@@ -1,0 +1,32 @@
+﻿{% extends "base_public.html" %}
+{% block title %}Confirmar{% endblock %}
+{% block content %}
+    <h2>Confirmar agendamento</h2>
+    <div class="card" style="margin-bottom: 24px;">
+        <p><strong>Servico:</strong> {{ service.name }}</p>
+        {% if professional %}
+            <p><strong>Profissional:</strong> {{ professional.display_name }}</p>
+        {% endif %}
+        <p><strong>Data:</strong> {{ start_datetime|date:"d/m/Y" }}</p>
+        <p><strong>Hora:</strong> {{ start_datetime|time:"H:i" }}</p>
+        <p><strong>Valor:</strong> R$ {{ service.price }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="start" value="{{ start_datetime|date:'c' }}">
+        {{ form.service }}
+        {{ form.professional }}
+        {{ form.date }}
+        {{ form.time }}
+        <label for="id_customer_name">Seu nome</label>
+        {{ form.customer_name }}
+        <label for="id_customer_phone">Telefone/WhatsApp</label>
+        {{ form.customer_phone }}
+        <label for="id_customer_email">E-mail</label>
+        {{ form.customer_email }}
+        <label for="id_notes">Observacoes</label>
+        {{ form.notes }}
+        <button type="submit">Confirmar agendamento</button>
+    </form>
+{% endblock %}

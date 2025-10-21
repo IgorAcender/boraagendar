@@ -1,0 +1,56 @@
+﻿{% extends "base_dashboard.html" %}
+{% block title %}Resumo{% endblock %}
+{% block content %}
+<div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2>Indicadores</h2>
+        <a class="button" href="{% url 'dashboard:booking_create' %}">Novo agendamento</a>
+    </div>
+    <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:160px;">
+            <strong>Total de agendamentos</strong>
+            <p style="font-size:2rem; margin:8px 0 0;">{{ totals.bookings }}</p>
+        </div>
+        <div style="flex:1; min-width:160px;">
+            <strong>Servicos ativos</strong>
+            <p style="font-size:2rem; margin:8px 0 0;">{{ totals.services }}</p>
+        </div>
+        <div style="flex:1; min-width:160px;">
+            <strong>Profissionais</strong>
+            <p style="font-size:2rem; margin:8px 0 0;">{{ totals.professionals }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Ultimos agendamentos</h2>
+    {% if bookings %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Servico</th>
+                    <th>Profissional</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.customer_name }}</td>
+                    <td>{{ booking.service.name }}</td>
+                    <td>{{ booking.professional.display_name }}</td>
+                    <td>{{ booking.scheduled_for|date:"d/m/Y H:i" }}</td>
+                    <td>{{ booking.get_status_display }}</td>
+                    <td><a class="button" href="{% url 'dashboard:booking_detail' booking.pk %}">Detalhes</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Sem agendamentos recentes.</p>
+    {% endif %}
+</div>
+{% endblock %}

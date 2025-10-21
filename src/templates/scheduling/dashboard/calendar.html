@@ -1,0 +1,35 @@
+﻿{% extends "base_dashboard.html" %}
+{% block title %}Agenda{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Agenda</h2>
+    {% if bookings %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Horario</th>
+                    <th>Cliente</th>
+                    <th>Servico</th>
+                    <th>Profissional</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.scheduled_for|date:"d/m/Y" }}</td>
+                    <td>{{ booking.scheduled_for|time:"H:i" }}</td>
+                    <td>{{ booking.customer_name }}</td>
+                    <td>{{ booking.service.name }}</td>
+                    <td>{{ booking.professional.display_name }}</td>
+                    <td>{{ booking.get_status_display }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum agendamento cadastrado.</p>
+    {% endif %}
+</div>
+{% endblock %}
