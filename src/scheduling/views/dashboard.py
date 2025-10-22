@@ -158,11 +158,16 @@ def professional_list(request: HttpRequest) -> HttpResponse:
     else:
         form = ProfessionalForm(tenant=tenant)
 
-    professionals = Professional.objects.filter(tenant=tenant).order_by("display_name")
+    professionals = Professional.objects.filter(tenant=tenant).select_related("user").order_by("display_name")
+    totals = {
+        "professionals": professionals.count(),
+        "active": professionals.filter(is_active=True).count(),
+        "services": Service.objects.filter(tenant=tenant).count(),
+    }
     return render(
         request,
         "scheduling/dashboard/professional_list.html",
-        {"tenant": tenant, "professionals": professionals, "form": form},
+        {"tenant": tenant, "professionals": professionals, "form": form, "totals": totals},
     )
 
 

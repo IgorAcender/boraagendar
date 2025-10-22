@@ -1,40 +1,157 @@
-﻿{% extends "base_dashboard.html" %}
+{% extends "base_dashboard.html" %}
 {% block title %}Profissionais{% endblock %}
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .header-gradient{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:1.5rem;border-radius:14px;margin-bottom:1rem;box-shadow:0 8px 32px rgba(102,126,234,.3)}
+    .header-content{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+    .header-title{display:flex;align-items:center;gap:1rem}
+    .header-icon{background:rgba(255,255,255,.2);padding:.75rem;border-radius:12px;font-size:1.5rem}
+    .btn{padding:.6rem 1rem;border:none;border-radius:10px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+    .btn-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:1rem 0}
+    .stat-card{background:#111827;border-radius:12px;padding:1rem;border-top:3px solid rgba(255,255,255,.2);display:flex;justify-content:space-between;align-items:center}
+    .stat-value{font-size:1.8rem;font-weight:700;color:#fff}
+    .stat-label{color:#cbd5e1;font-size:.85rem}
+    .glass-card{background:#0b1220;border-radius:14px;border:1px solid #223148;padding:1rem}
+    .professionals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
+    .professional-card{background:#111827;border:1px solid #223148;border-radius:12px;padding:1rem}
+    .professional-header{display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem}
+    .professional-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .status-badge{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:700}
+    .status-ativo{background:#10b981;color:#06281d}
+    .status-inativo{background:#ef4444;color:#3c0a0a}
+    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);align-items:center;justify-content:center;z-index:1000}
+    .modal.active{display:flex}
+    .modal-content{background:#111827;border:1px solid #223148;border-radius:14px;max-width:520px;width:92%;max-height:90vh;overflow-y:auto;padding:1rem}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+    label{font-weight:600;color:#cbd5e1;font-size:.9rem}
+    input,select,textarea{width:100%;padding:.6rem;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#e2e8f0}
+    .actions{display:flex;gap:.8rem;margin-top:1rem}
+    .actions .btn{flex:1}
+</style>
+{% endblock %}
 {% block content %}
-<div class="card">
-    <h2>Novo profissional</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Salvar</button>
-    </form>
+
+<div class="header-gradient">
+  <div class="header-content">
+    <div class="header-title">
+      <div class="header-icon"><i class="fas fa-users"></i></div>
+      <div>
+        <h2 style="margin:0">Profissionais</h2>
+        <p class="subtitle" style="opacity:.9">Gerencie a equipe da sua empresa</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-plus"></i>Novo Profissional</button>
+  </div>
 </div>
 
-<div class="card">
-    <h2>Equipe</h2>
-    {% if professionals %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>E-mail</th>
-                    <th>Cor</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for professional in professionals %}
-                <tr>
-                    <td>{{ professional.display_name }}</td>
-                    <td>{% if professional.user %}{{ professional.user.email }}{% else %}-{% endif %}</td>
-                    <td><span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:{{ professional.color }};"></span> {{ professional.color }}</td>
-                    <td>{{ professional.is_active|yesno:"Ativo,Inativo" }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>Nenhum profissional cadastrado.</p>
-    {% endif %}
+<div class="stats-grid">
+  <div class="stat-card" style="border-color:#667eea">
+    <div>
+      <div class="stat-label">Total de profissionais</div>
+      <div class="stat-value">{{ totals.professionals }}</div>
+    </div>
+    <div class="stat-icon"><i class="fas fa-users"></i></div>
+  </div>
+  <div class="stat-card" style="border-color:#10b981">
+    <div>
+      <div class="stat-label">Ativos</div>
+      <div class="stat-value">{{ totals.active }}</div>
+    </div>
+    <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+  </div>
+  <div class="stat-card" style="border-color:#f59e0b">
+    <div>
+      <div class="stat-label">Serviços</div>
+      <div class="stat-value">{{ totals.services }}</div>
+    </div>
+    <div class="stat-icon"><i class="fas fa-spa"></i></div>
+  </div>
 </div>
+
+<div class="glass-card">
+  <div class="professionals-grid">
+    {% for p in professionals %}
+    <div class="professional-card">
+      <div class="professional-header">
+        <div class="professional-avatar" style="background: {{ p.color }};">{{ p.display_name|first|upper }}</div>
+        <div class="professional-info">
+          <h3 style="margin:0">{{ p.display_name }}</h3>
+          <span class="status-badge status-{% if p.is_active %}ativo{% else %}inativo{% endif %}">
+            {% if p.is_active %}ativo{% else %}inativo{% endif %}
+          </span>
+        </div>
+      </div>
+      <div class="professional-details" style="color:#cbd5e1;font-size:.95rem">
+        <div><i class="fas fa-envelope"></i> {% if p.user %}{{ p.user.email }}{% else %}-{% endif %}</div>
+        <div><i class="fas fa-phone"></i> {% if p.user and p.user.phone_number %}{{ p.user.phone_number }}{% else %}-{% endif %}</div>
+        <div><i class="fas fa-id-card"></i> {{ p.bio|default:"—" }}</div>
+      </div>
+    </div>
+    {% empty %}
+      <p>Nenhum profissional cadastrado.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Modal de cadastro -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">Novo Profissional</h3>
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="create_user" value="on">
+      <div class="form-row">
+        <div>
+          <label>Nome completo</label>
+          <input type="text" name="new_user_full_name" required>
+        </div>
+        <div>
+          <label>E-mail</label>
+          <input type="email" name="new_user_email" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Telefone</label>
+          <input type="tel" name="new_user_phone_number">
+        </div>
+        <div>
+          <label>Senha inicial (opcional)</label>
+          <input type="password" name="new_user_password" placeholder="gero automático se vazio">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Nome de exibição</label>
+          <input type="text" name="display_name" placeholder="Ex.: Ana Lima">
+        </div>
+        <div>
+          <label>Cor na agenda</label>
+          <input type="color" name="color" value="#2563EB">
+        </div>
+      </div>
+      <div>
+        <label>Bio/Especialidade</label>
+        <textarea name="bio" rows="3" placeholder="Ex.: Cabeleireira, visagismo"></textarea>
+      </div>
+      <label style="margin-top:.5rem"><input type="checkbox" name="is_active" checked> Ativo</label>
+      <div class="actions">
+        <button type="button" class="btn" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openModal(){ document.getElementById('modal').classList.add('active'); }
+  function closeModal(){ document.getElementById('modal').classList.remove('active'); }
+  document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+</script>
 {% endblock %}
