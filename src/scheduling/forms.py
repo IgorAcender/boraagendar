@@ -96,7 +96,7 @@ class ProfessionalForm(TenantAwareForm):
             full_name = self.cleaned_data.get("new_user_full_name").strip()
             first_name, last_name = (full_name.split(" ", 1) + [""])[:2]
             phone = self.cleaned_data.get("new_user_phone_number") or ""
-            password = self.cleaned_data.get("new_user_password") or secrets.token_urlsafe(8)
+            password = self.cleaned_data.get("new_user_password") or secrets.token_urlsafe(12)
 
             if User.objects.filter(email__iexact=email).exists():
                 raise ValidationError({"new_user_email": "Já existe um usuário com este e-mail."})
@@ -108,6 +108,9 @@ class ProfessionalForm(TenantAwareForm):
                 last_name=last_name if last_name else "",
                 phone_number=phone,
             )
+
+            # guarda para exibir no messages da view (apenas nessa resposta)
+            self.generated_credentials = {"email": email, "password": password}
 
             # Cria o vínculo com o tenant como PROFESSIONAL
             TenantMembership.objects.get_or_create(

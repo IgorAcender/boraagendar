@@ -140,6 +140,17 @@ def professional_list(request: HttpRequest) -> HttpResponse:
             professional = form.save(commit=False)
             professional.tenant = tenant
             professional.save()
+            # Se um novo usuário foi criado no form, mostre credenciais temporárias
+            creds = getattr(form, "generated_credentials", None)
+            if creds:
+                messages.info(
+                    request,
+                    (
+                        "Usuário criado: %s | Senha temporária: %s. "
+                        "Peça para o funcionário alterar a senha em Perfil."
+                    )
+                    % (creds["email"], creds["password"]),
+                )
             messages.success(request, "Profissional salvo com sucesso.")
             return redirect("dashboard:professional_list")
     else:

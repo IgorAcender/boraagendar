@@ -1,4 +1,9 @@
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordChangeView,
+    PasswordChangeDoneView,
+)
 from django.urls import path
 
 from .forms import EmailAuthenticationForm
@@ -24,4 +29,14 @@ urlpatterns = [
     ),
     path("selecionar-empresa/", select_tenant_view, name="select_tenant"),
     path("perfil/", dashboard_profile_view, name="profile"),
+    path(
+        "password/change/",
+        PasswordChangeView.as_view(template_name="accounts/password_change.html"),
+        name="password_change",
+    ),
+    path(
+        "password/change/done/",
+        PasswordChangeDoneView.as_view(template_name="accounts/password_change_done.html"),
+        name="password_change_done",
+    ),
 ]
