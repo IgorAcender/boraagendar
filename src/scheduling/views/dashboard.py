@@ -552,3 +552,169 @@ def my_schedule(request: HttpRequest) -> HttpResponse:
             "timeoffs": timeoffs,
         },
     )
+
+
+@login_required
+def professional_services(request: HttpRequest, pk: int) -> HttpResponse:
+    """Manage professional's services and prices (owner/manager only)"""
+    from ..models import ProfessionalService
+
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager"],
+    )
+    if redirect_response:
+        return redirect_response
+
+    tenant = membership.tenant
+    professional = get_object_or_404(Professional, pk=pk, tenant=tenant)
+
+    if request.method == "POST":
+        action = request.POST.get('action')
+
+        if action == 'add_service':
+            service_id = request.POST.get('service_id')
+            custom_price = request.POST.get('custom_price') or None
+            custom_duration = request.POST.get('custom_duration') or None
+
+            service = get_object_or_404(Service, pk=service_id, tenant=tenant)
+
+            ProfessionalService.objects.get_or_create(
+                professional=professional,
+                service=service,
+                defaults={
+                    'price': custom_price,
+                    'duration_minutes': custom_duration,
+                }
+            )
+            messages.success(request, f"Serviço '{service.name}' adicionado.")
+
+        elif action == 'update_service':
+            ps_id = request.POST.get('ps_id')
+            custom_price = request.POST.get('custom_price') or None
+            custom_duration = request.POST.get('custom_duration') or None
+
+            ps = get_object_or_404(ProfessionalService, pk=ps_id, professional__tenant=tenant)
+            ps.price = custom_price
+            ps.duration_minutes = custom_duration
+            ps.save()
+            messages.success(request, "Serviço atualizado.")
+
+        elif action == 'remove_service':
+            ps_id = request.POST.get('ps_id')
+            ProfessionalService.objects.filter(pk=ps_id, professional__tenant=tenant).delete()
+            messages.success(request, "Serviço removido.")
+
+        return redirect('dashboard:professional_services', pk=pk)
+
+    # Get professional's services
+    professional_services = ProfessionalService.objects.filter(
+        professional=professional
+    ).select_related('service')
+
+    # Get available services not yet assigned
+    assigned_service_ids = [ps.service.id for ps in professional_services]
+    available_services = Service.objects.filter(
+        tenant=tenant,
+        is_active=True
+    ).exclude(id__in=assigned_service_ids)
+
+    return render(
+        request,
+        "scheduling/dashboard/professional_services.html",
+        {
+            "tenant": tenant,
+            "professional": professional,
+            "professional_services": professional_services,
+            "available_services": available_services,
+        },
+    )
+
+
+@login_required
+def my_services(request: HttpRequest) -> HttpResponse:
+    """Professional manages their own services and prices"""
+    from ..models import ProfessionalService
+
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["professional"],
+    )
+    if redirect_response:
+        return redirect_response
+
+    tenant = membership.tenant
+
+    try:
+        professional = Professional.objects.get(user=request.user, tenant=tenant)
+    except Professional.DoesNotExist:
+        messages.error(request, "Você não está cadastrado como profissional.")
+        return redirect('dashboard:index')
+
+    if request.method == "POST":
+        action = request.POST.get('action')
+
+        if action == 'add_service':
+            service_id = request.POST.get('service_id')
+            custom_price = request.POST.get('custom_price') or None
+            custom_duration = request.POST.get('custom_duration') or None
+
+            service = get_object_or_404(Service, pk=service_id, tenant=tenant)
+
+            ProfessionalService.objects.get_or_create(
+                professional=professional,
+                service=service,
+                defaults={
+                    'price': custom_price,
+                    'duration_minutes': custom_duration,
+                }
+            )
+            messages.success(request, f"Serviço '{service.name}' adicionado.")
+
+        elif action == 'update_service':
+            ps_id = request.POST.get('ps_id')
+            custom_price = request.POST.get('custom_price') or None
+            custom_duration = request.POST.get('custom_duration') or None
+
+            ps = get_object_or_404(
+                ProfessionalService,
+                pk=ps_id,
+                professional=professional,
+                professional__tenant=tenant
+            )
+            ps.price = custom_price
+            ps.duration_minutes = custom_duration
+            ps.save()
+            messages.success(request, "Serviço atualizado.")
+
+        elif action == 'remove_service':
+            ps_id = request.POST.get('ps_id')
+            ProfessionalService.objects.filter(
+                pk=ps_id,
+                professional=professional,
+                professional__tenant=tenant
+            ).delete()
+            messages.success(request, "Serviço removido.")
+
+        return redirect('dashboard:my_services')
+
+    professional_services = ProfessionalService.objects.filter(
+        professional=professional
+    ).select_related('service')
+
+    assigned_service_ids = [ps.service.id for ps in professional_services]
+    available_services = Service.objects.filter(
+        tenant=tenant,
+        is_active=True
+    ).exclude(id__in=assigned_service_ids)
+
+    return render(
+        request,
+        "scheduling/dashboard/my_services.html",
+        {
+            "tenant": tenant,
+            "professional": professional,
+            "professional_services": professional_services,
+            "available_services": available_services,
+        },
+    )
