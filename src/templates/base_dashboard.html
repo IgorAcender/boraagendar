@@ -582,6 +582,16 @@
                         </ul>
                     </li>
 
+                    <!-- Meus Horários (Profissional Only) -->
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:my_schedule' %}" class="nav-link">
+                            <div class="nav-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <span class="nav-text">Meus Horários</span>
+                        </a>
+                    </li>
+
                     <!-- Perfil -->
                     <li class="nav-item has-submenu">
                         <button class="nav-link submenu-toggle">
@@ -597,12 +607,6 @@
                                 <a href="{% url 'accounts:profile' %}" class="submenu-link">
                                     <i class="fas fa-edit submenu-icon"></i>
                                     <span class="submenu-text">Editar Perfil</span>
-                                </a>
-                            </li>
-                            <li class="submenu-item">
-                                <a href="{% url 'dashboard:my_schedule' %}" class="submenu-link">
-                                    <i class="fas fa-clock submenu-icon"></i>
-                                    <span class="submenu-text">Meus Horários</span>
                                 </a>
                             </li>
                         </ul>
