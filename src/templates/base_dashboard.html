@@ -112,7 +112,6 @@
         <a href="{% url 'dashboard:calendar' %}">Agenda</a>
         <a href="{% url 'dashboard:service_list' %}">Servicos</a>
         <a href="{% url 'dashboard:professional_list' %}">Profissionais</a>
-        <a href="{% url 'dashboard:team_list' %}">Equipe</a>
         <a href="{% url 'accounts:profile' %}">Perfil</a>
         <form action="{% url 'accounts:logout' %}" method="post" style="display:inline; margin:0;">
             {% csrf_token %}
