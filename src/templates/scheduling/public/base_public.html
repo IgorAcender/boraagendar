@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Agendar{% endblock %} - {{ tenant.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-primary: {{ tenant.color_primary|default:"#667eea" }};
+            --brand-secondary: {{ tenant.color_secondary|default:"#764ba2" }};
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .public-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .company-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            transition: width 0.3s ease;
+            z-index: 1;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-circle {
+            border-color: var(--brand-primary);
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .step.completed .step-circle {
+            border-color: #10b981;
+            background: #10b981;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .step.active .step-label {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        /* Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            padding: 2rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .company-name {
+                font-size: 1.5rem;
+            }
+
+            .progress-steps {
+                margin-bottom: 2rem;
+            }
+
+            .step-label {
+                font-size: 0.75rem;
+            }
+
+            .glass-card {
+                padding: 1.5rem;
+            }
+        }
+
+        {% block extra_head %}{% endblock %}
+    </style>
+</head>
+<body class="animate-fade-in">
+    <div class="container">
+        <!-- Header -->
+        <div class="public-header">
+            <div class="logo">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <h1 class="company-name">{{ tenant.name }}</h1>
+            <p class="company-subtitle">Agende seu horário online</p>
+        </div>
+
+        <!-- Progress Steps -->
+        {% block progress %}{% endblock %}
+
+        <!-- Main Content -->
+        <div class="glass-card animate-slide-up">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

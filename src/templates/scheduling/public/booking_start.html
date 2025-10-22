@@ -1,26 +1,293 @@
-﻿{% extends "base_public.html" %}
-{% block title %}Agendar{% endblock %}
-{% block content %}
-    <h2>Escolha um servico</h2>
-    <form method="get" class="card">
-        {{ form.as_p }}
-        <button type="submit">Buscar horarios</button>
-    </form>
+{% extends "scheduling/public/base_public.html" %}
+{% block title %}Agendar Horário{% endblock %}
 
-    {% if available_slots %}
-        <h3>Horarios disponiveis</h3>
-        <div class="slot-grid">
-            {% for slot in available_slots %}
-                <div class="slot-card">
-                    <strong>{{ slot.start|date:"d/m" }} - {{ slot.start|time:"H:i" }}</strong>
-                    <p>{{ slot.professional.display_name }}</p>
-                    <a class="button" href="{% url 'public:booking_confirm' tenant_slug=tenant.slug %}?service={{ selected_service.id }}{% if slot.professional %}&professional={{ slot.professional.id }}{% endif %}&start={{ slot.start|date:'c' }}">
-                        Reservar
-                    </a>
-                </div>
-            {% endfor %}
+{% block progress %}
+<div class="progress-steps">
+    <div class="progress-line" style="width: {% if selected_service and available_slots %}66%{% elif selected_service %}33%{% else %}0%{% endif %};"></div>
+
+    <div class="step {% if not selected_service %}active{% else %}completed{% endif %}">
+        <div class="step-circle">
+            {% if selected_service %}<i class="fas fa-check"></i>{% else %}1{% endif %}
         </div>
-    {% elif selected_service %}
-        <p>Nenhum horario disponivel para o dia escolhido.</p>
-    {% endif %}
+        <div class="step-label">Escolher Serviço</div>
+    </div>
+
+    <div class="step {% if selected_service and not available_slots %}active{% elif available_slots %}completed{% endif %}">
+        <div class="step-circle">
+            {% if available_slots %}<i class="fas fa-check"></i>{% else %}2{% endif %}
+        </div>
+        <div class="step-label">Escolher Data</div>
+    </div>
+
+    <div class="step {% if available_slots %}active{% endif %}">
+        <div class="step-circle">3</div>
+        <div class="step-label">Confirmar</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-group select,
+    .form-group input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.2s;
+        background: white;
+        color: #1e293b;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-search {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Available Slots */
+    .slots-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e2e8f0;
+    }
+
+    .slots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .slot-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .slot-card:hover {
+        border-color: var(--brand-primary);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+    }
+
+    .slot-time {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .slot-date {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+    }
+
+    .slot-professional {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+    }
+
+    .professional-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .btn-book {
+        width: 100%;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+
+    .btn-book:hover {
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #9ca3af;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Form Section -->
+<div class="form-section">
+    <h2 class="section-title">
+        <div class="section-icon">
+            <i class="fas fa-search"></i>
+        </div>
+        Buscar Horários Disponíveis
+    </h2>
+
+    <form method="get">
+        <div class="form-group">
+            <label for="id_service">Escolha o Serviço</label>
+            {{ form.service }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_professional">Profissional (Opcional)</label>
+            {{ form.professional }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_date">Data Desejada</label>
+            {{ form.date }}
+        </div>
+
+        <button type="submit" class="btn-search">
+            <i class="fas fa-calendar-search"></i>
+            Buscar Horários
+        </button>
+    </form>
+</div>
+
+<!-- Available Slots Section -->
+{% if available_slots %}
+<div class="slots-section">
+    <h2 class="section-title">
+        <div class="section-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        Horários Disponíveis
+    </h2>
+
+    <div class="slots-grid">
+        {% for slot in available_slots %}
+        <div class="slot-card">
+            <div class="slot-time">{{ slot.start|time:"H:i" }}</div>
+            <div class="slot-date">{{ slot.start|date:"d/m/Y - l" }}</div>
+
+            {% if slot.professional %}
+            <div class="slot-professional">
+                <div class="professional-dot" style="background: {{ slot.professional.color }};"></div>
+                <span>{{ slot.professional.display_name }}</span>
+            </div>
+            {% endif %}
+
+            <a class="btn-book"
+               href="{% url 'public:booking_confirm' tenant_slug=tenant.slug %}?service={{ selected_service.id }}{% if slot.professional %}&professional={{ slot.professional.id }}{% endif %}&start={{ slot.start|date:'c' }}">
+                Reservar
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% elif selected_service %}
+<div class="slots-section">
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-calendar-times"></i>
+        </div>
+        <h3>Nenhum horário disponível</h3>
+        <p>Não encontramos horários disponíveis para a data selecionada. Tente outra data.</p>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
