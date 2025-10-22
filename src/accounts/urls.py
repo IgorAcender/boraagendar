@@ -19,7 +19,7 @@ urlpatterns = [
     ),
     path(
         "logout/",
-        LogoutView.as_view(),
+        LogoutView.as_view(next_page="accounts:login"),
         name="logout",
     ),
     path("selecionar-empresa/", select_tenant_view, name="select_tenant"),

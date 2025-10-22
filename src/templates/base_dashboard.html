@@ -113,7 +113,7 @@
         <a href="{% url 'dashboard:service_list' %}">Servicos</a>
         <a href="{% url 'dashboard:professional_list' %}">Profissionais</a>
         <a href="{% url 'accounts:profile' %}">Perfil</a>
-        <a href="{% url 'accounts:logout' %}">Sair</a>
+        <a href="{% url 'accounts:logout' %}?next={% url 'accounts:login' %}">Sair</a>
     </nav>
 </header>
 <div class="container">
