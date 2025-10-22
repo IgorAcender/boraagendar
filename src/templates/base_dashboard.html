@@ -529,6 +529,25 @@
                 </ul>
             </div>
 
+            <!-- Link de Agendamento -->
+            <div class="nav-section">
+                <h3 class="section-title">
+                    <i class="fas fa-circle section-indicator"></i>
+                    <span>Compartilhar</span>
+                </h3>
+
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <button class="nav-link" onclick="copyBookingLink()" style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                            <div class="nav-icon" style="background: rgba(255, 255, 255, 0.2);">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            <span class="nav-text">Link de Agendamento</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
             <!-- Seção Gerenciamento -->
             <div class="nav-section">
                 <h3 class="section-title">
@@ -643,6 +662,74 @@
 
     <!-- JavaScript -->
     <script>
+        // Copiar link de agendamento
+        function copyBookingLink() {
+            const link = window.location.origin + '/agendar/{{ tenant.slug }}/';
+
+            // Copiar para clipboard
+            navigator.clipboard.writeText(link).then(function() {
+                showNotification('Link copiado!', link, 'success');
+            }).catch(function(err) {
+                // Fallback para navegadores antigos
+                const textarea = document.createElement('textarea');
+                textarea.value = link;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showNotification('Link copiado!', link, 'success');
+            });
+        }
+
+        // Mostrar notificação
+        function showNotification(title, message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                max-width: 400px;
+                padding: 1.25rem 1.5rem;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #667eea, #764ba2)'};
+                color: white;
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                z-index: 10000;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: start; gap: 1rem;">
+                    <div style="font-size: 1.5rem;">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem;">${title}</div>
+                        <div style="font-size: 0.875rem; opacity: 0.95; word-break: break-all;">${message}</div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Adicionar animações
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(400px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
