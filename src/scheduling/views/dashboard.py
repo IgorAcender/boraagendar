@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from tenants.services import TenantSelectionRequired, ensure_membership_for_request
+from tenants.forms import TeamMemberCreateForm, TeamMemberUpdateForm
+from tenants.models import TenantMembership
 
 from ..forms import BookingForm, ProfessionalForm, ServiceForm
 from ..models import Booking, Professional, Service
@@ -171,3 +173,66 @@ def _membership_or_redirect(request: HttpRequest, allowed_roles: list[str]):
         select_url = f"{reverse('accounts:select_tenant')}?next={request.get_full_path()}"
         return None, redirect(select_url)
     return membership, None
+
+
+@login_required
+def team_list(request: HttpRequest) -> HttpResponse:
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+
+    if request.method == "POST":
+        form = TeamMemberCreateForm(request.POST, tenant=tenant)
+        if form.is_valid():
+            user, member = form.save()
+            msg = f"Membro adicionado: {user.email} ({member.get_role_display()})."
+            if form.generated_password:
+                msg += f" Senha inicial: {form.generated_password}"
+            messages.success(request, msg)
+            return redirect("dashboard:team_list")
+    else:
+        form = TeamMemberCreateForm(tenant=tenant)
+
+    members = (
+        TenantMembership.objects.filter(tenant=tenant)
+        .select_related("user")
+        .order_by("-is_active", "user__first_name", "user__email")
+    )
+    return render(
+        request,
+        "scheduling/dashboard/team_list.html",
+        {"tenant": tenant, "members": members, "form": form},
+    )
+
+
+@login_required
+def team_update(request: HttpRequest, pk: int) -> HttpResponse:
+    membership, redirect_response = _membership_or_redirect(request, allowed_roles=["owner"]) 
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+    member = get_object_or_404(TenantMembership, pk=pk, tenant=tenant)
+    if request.method == "POST":
+        form = TeamMemberUpdateForm(request.POST, instance=member)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Membro atualizado.")
+    return redirect("dashboard:team_list")
+
+
+@login_required
+def team_remove(request: HttpRequest, pk: int) -> HttpResponse:
+    membership, redirect_response = _membership_or_redirect(request, allowed_roles=["owner"]) 
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+    member = get_object_or_404(TenantMembership, pk=pk, tenant=tenant)
+    if request.method == "POST":
+        member.is_active = False
+        member.save(update_fields=["is_active"])
+        messages.success(request, "Membro desativado.")
+    return redirect("dashboard:team_list")

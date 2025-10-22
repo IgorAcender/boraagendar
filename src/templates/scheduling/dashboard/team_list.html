@@ -1,0 +1,61 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Equipe{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Novo membro</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Adicionar</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Membros</h2>
+  {% if members %}
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>E-mail</th>
+        <th>Papel</th>
+        <th>Ativo</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in members %}
+      <tr>
+        <td>{{ m.user.get_full_name|default:m.user.email }}</td>
+        <td>{{ m.user.email }}</td>
+        <td>
+          <form action="{% url 'dashboard:team_update' m.id %}" method="post" style="display:inline">
+            {% csrf_token %}
+            <select name="role">
+              {% for v,lbl in m.Role.choices %}
+                <option value="{{ v }}" {% if m.role == v %}selected{% endif %}>{{ lbl }}</option>
+              {% endfor %}
+            </select>
+            <label style="margin-left:8px;">
+              <input type="checkbox" name="is_active" value="on" {% if m.is_active %}checked{% endif %}>
+              ativo
+            </label>
+            <button type="submit">Salvar</button>
+          </form>
+        </td>
+        <td>{{ m.is_active|yesno:"Sim,Não" }}</td>
+        <td>
+          <form action="{% url 'dashboard:team_remove' m.id %}" method="post" style="display:inline">
+            {% csrf_token %}
+            <button type="submit">Desativar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p>Nenhum membro cadastrado.</p>
+  {% endif %}
+</div>
+{% endblock %}
