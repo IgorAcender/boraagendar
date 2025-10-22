@@ -1,35 +1,45 @@
-﻿{% extends "base_dashboard.html" %}
+{% extends "base_dashboard.html" %}
 {% block title %}Agenda{% endblock %}
+{% block extra_head %}
+<style>
+  .header-gradient{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:1.5rem;border-radius:14px;margin-bottom:1rem}
+  .list-card{background:#111827;border:1px solid #223148;border-radius:12px;padding:1rem;margin-top:1rem}
+</style>
+{% endblock %}
 {% block content %}
-<div class="card">
-    <h2>Agenda</h2>
-    {% if bookings %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Horario</th>
-                    <th>Cliente</th>
-                    <th>Servico</th>
-                    <th>Profissional</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for booking in bookings %}
-                <tr>
-                    <td>{{ booking.scheduled_for|date:"d/m/Y" }}</td>
-                    <td>{{ booking.scheduled_for|time:"H:i" }}</td>
-                    <td>{{ booking.customer_name }}</td>
-                    <td>{{ booking.service.name }}</td>
-                    <td>{{ booking.professional.display_name }}</td>
-                    <td>{{ booking.get_status_display }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>Nenhum agendamento cadastrado.</p>
-    {% endif %}
+
+<div class="header-gradient">
+  <h2 style="margin:0">Agenda</h2>
+</div>
+
+<div class="list-card">
+  {% if bookings %}
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Horário</th>
+          <th>Cliente</th>
+          <th>Serviço</th>
+          <th>Profissional</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for booking in bookings %}
+        <tr>
+          <td>{{ booking.scheduled_for|date:"d/m/Y" }}</td>
+          <td>{{ booking.scheduled_for|time:"H:i" }}</td>
+          <td>{{ booking.customer_name }}</td>
+          <td>{{ booking.service.name }}</td>
+          <td>{{ booking.professional.display_name }}</td>
+          <td>{{ booking.get_status_display }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Nenhum agendamento cadastrado.</p>
+  {% endif %}
 </div>
 {% endblock %}
