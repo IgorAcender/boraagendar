@@ -17,7 +17,7 @@
             <thead>
                 <tr>
                     <th>Nome</th>
-                    <th>Usuario</th>
+                    <th>E-mail</th>
                     <th>Cor</th>
                     <th>Status</th>
                 </tr>
@@ -26,7 +26,7 @@
             {% for professional in professionals %}
                 <tr>
                     <td>{{ professional.display_name }}</td>
-                    <td>{% if professional.user %}{{ professional.user.username }}{% else %}—{% endif %}</td>
+                    <td>{% if professional.user %}{{ professional.user.email }}{% else %}-{% endif %}</td>
                     <td><span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:{{ professional.color }};"></span> {{ professional.color }}</td>
                     <td>{{ professional.is_active|yesno:"Ativo,Inativo" }}</td>
                 </tr>

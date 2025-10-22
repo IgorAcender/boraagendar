@@ -14,7 +14,7 @@ User = get_user_model()
 class BookingApiTest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username="owner", password="pass123")
+        self.user = User.objects.create_user(email="owner@example.com", password="pass123")
         self.tenant = Tenant.objects.create(name="Studio 1", slug="studio-1")
         TenantMembership.objects.create(
             tenant=self.tenant,

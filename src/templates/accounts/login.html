@@ -21,7 +21,7 @@
     {% csrf_token %}
     <div style="margin-bottom:16px;">
         <label for="{{ form.username.id_for_label }}" style="display:block; font-weight:600; margin-bottom:6px;">
-            Usuario
+            E-mail
         </label>
         {{ form.username }}
     </div>
@@ -46,4 +46,7 @@
         <input type="hidden" name="next" value="{{ next }}">
     {% endif %}
 </form>
+<p style="margin-top:16px; text-align:center; font-size:0.95rem; color:#cbd5f5;">
+    Ainda não tem conta? <a href="{% url 'accounts:signup' %}" style="color:#38bdf8;">Criar conta</a>
+</p>
 {% endblock %}

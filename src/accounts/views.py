@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
@@ -11,6 +12,28 @@ from tenants.services import (
     ensure_membership,
     ensure_membership_for_request,
 )
+
+from .forms import SignupForm
+
+
+def signup_view(request: HttpRequest) -> HttpResponse:
+    if request.user.is_authenticated:
+        return redirect(settings.LOGIN_REDIRECT_URL)
+
+    next_url = request.GET.get("next") or settings.LOGIN_REDIRECT_URL
+
+    if request.method == "POST":
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user, tenant = form.save()
+            login(request, user)
+            request.session["active_tenant_id"] = tenant.id
+            redirect_to = request.POST.get("next") or next_url
+            return redirect(redirect_to)
+    else:
+        form = SignupForm()
+
+    return render(request, "accounts/signup.html", {"form": form, "next": next_url})
 
 
 @login_required

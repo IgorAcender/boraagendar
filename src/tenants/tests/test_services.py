@@ -16,7 +16,7 @@ User = get_user_model()
 class MembershipServiceTest(TestCase):
     def setUp(self):
         self.tenant = Tenant.objects.create(name="Studio", slug="studio")
-        self.user = User.objects.create_user(username="user1", password="pass123")
+        self.user = User.objects.create_user(email="user1@example.com", password="pass123")
         self.membership = TenantMembership.objects.create(
             tenant=self.tenant,
             user=self.user,

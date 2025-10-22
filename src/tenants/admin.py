@@ -22,4 +22,4 @@ class TenantAdmin(admin.ModelAdmin):
 class TenantMembershipAdmin(admin.ModelAdmin):
     list_display = ("tenant", "user", "role", "is_active", "created_at")
     list_filter = ("role", "is_active", "tenant")
-    search_fields = ("tenant__name", "user__username", "user__email")
+    search_fields = ("tenant__name", "user__email", "user__first_name", "user__last_name")

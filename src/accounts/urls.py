@@ -1,16 +1,19 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
 
-from .views import dashboard_profile_view, select_tenant_view
+from .forms import EmailAuthenticationForm
+from .views import dashboard_profile_view, select_tenant_view, signup_view
 
 app_name = "accounts"
 
 urlpatterns = [
+    path("signup/", signup_view, name="signup"),
     path(
         "login/",
         LoginView.as_view(
             template_name="accounts/login.html",
             redirect_authenticated_user=True,
+            authentication_form=EmailAuthenticationForm,
         ),
         name="login",
     ),
