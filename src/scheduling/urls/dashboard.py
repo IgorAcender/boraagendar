@@ -9,6 +9,7 @@ urlpatterns = [
     path("agenda/", dashboard_views.calendar_view, name="calendar"),
     path("agendamentos/<int:pk>/", dashboard_views.booking_detail, name="booking_detail"),
     path("agendamentos/novo/", dashboard_views.booking_create, name="booking_create"),
+    path("agendamentos/<int:pk>/mover/", dashboard_views.booking_move, name="booking_move"),
     path("servicos/", dashboard_views.service_list, name="service_list"),
     path("profissionais/", dashboard_views.professional_list, name="professional_list"),
     path("equipe/", dashboard_views.team_list, name="team_list"),
