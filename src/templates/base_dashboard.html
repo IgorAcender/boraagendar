@@ -113,7 +113,10 @@
         <a href="{% url 'dashboard:service_list' %}">Servicos</a>
         <a href="{% url 'dashboard:professional_list' %}">Profissionais</a>
         <a href="{% url 'accounts:profile' %}">Perfil</a>
-        <a href="{% url 'accounts:logout' %}?next={% url 'accounts:login' %}">Sair</a>
+        <form action="{% url 'accounts:logout' %}" method="post" style="display:inline; margin:0;">
+            {% csrf_token %}
+            <button type="submit" style="background:none;border:none;color:#fff;font-weight:600;cursor:pointer;">Sair</button>
+        </form>
     </nav>
 </header>
 <div class="container">
