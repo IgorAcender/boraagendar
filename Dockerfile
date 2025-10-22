@@ -16,7 +16,11 @@ RUN pip install --upgrade pip && pip install -r /tmp/requirements.txt
 
 COPY ./src /app
 
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Expõe a porta utilizada pelo gunicorn
 EXPOSE 8000
 
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
