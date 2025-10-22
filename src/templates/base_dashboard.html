@@ -1,133 +1,698 @@
-﻿<!DOCTYPE html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Painel{% endblock %} - {{ tenant.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --brand-primary: {{ tenant.color_primary|default:"#D97706" }};
-            --brand-contrast: {{ tenant.color_secondary|default:"#111827" }};
+            --brand-primary: {{ tenant.color_primary|default:"#667eea" }};
+            --brand-secondary: {{ tenant.color_secondary|default:"#764ba2" }};
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            margin: 0;
-            font-family: "Segoe UI", Tahoma, sans-serif;
-            background-color: #0f172a;
-            color: #e2e8f0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        header {
-            background: var(--brand-primary);
-            padding: 20px 24px;
+
+        /* ========== SIDEBAR ========== */
+        .sidebar-container {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: #e2e8f0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
-        header h1 {
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-container {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .brand-text .brand-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
             margin: 0;
-            font-size: 1.4rem;
         }
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            margin-right: 16px;
-            font-weight: 600;
+
+        .brand-text .brand-subtitle {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin: 0;
         }
-        .container {
-            max-width: 1100px;
-            margin: 32px auto;
-            padding: 0 16px;
-        }
-        .card {
-            background: #111827;
-            border-radius: 14px;
-            padding: 24px;
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.45);
-            margin-bottom: 24px;
-        }
-        .card h2 {
-            margin-top: 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 16px;
-        }
-        table th, table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-            text-align: left;
-        }
-        .button {
-            display: inline-block;
-            padding: 10px 18px;
-            background: var(--brand-primary);
-            color: #fff;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        form label {
-            display: block;
-            margin-top: 12px;
-            margin-bottom: 4px;
-            font-weight: 600;
-        }
-        form input, form select, form textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: #e2e8f0;
-        }
-        form button {
-            margin-top: 16px;
-            padding: 10px 18px;
+
+        .compact-toggle {
+            background: rgba(255, 255, 255, 0.1);
             border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
-            background: var(--brand-primary);
-            color: #fff;
-            font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        .messages {
+
+        .compact-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Navegação */
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-indicator {
+            font-size: 0.4rem;
+            color: var(--brand-primary);
+        }
+
+        .nav-menu {
             list-style: none;
             padding: 0;
         }
-        .messages li {
-            margin-bottom: 8px;
-            padding: 10px 14px;
-            border-radius: 8px;
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
+
+        .nav-item {
+            margin: 0.25rem 0.75rem;
         }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            border: none;
+            background: none;
+            width: 100%;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .nav-link.active .nav-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        /* Submenu */
+        .has-submenu .submenu-arrow {
+            margin-left: auto;
+            font-size: 0.75rem;
+            transition: transform 0.3s;
+        }
+
+        .has-submenu.open .submenu-arrow {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            list-style: none;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .has-submenu.open .submenu {
+            max-height: 500px;
+        }
+
+        .submenu-item {
+            margin-left: 1rem;
+        }
+
+        .submenu-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 1rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .submenu-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+        }
+
+        .submenu-icon {
+            font-size: 0.875rem;
+        }
+
+        /* Perfil do usuário */
+        .user-profile {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+
+        .profile-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem;
+            border-radius: 10px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            position: relative;
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border: 2px solid #0f172a;
+            border-radius: 50%;
+        }
+
+        .profile-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .profile-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .profile-email {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .profile-action {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .profile-action:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .logout-form {
+            display: inline;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Mobile Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.25rem;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .mobile-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: white;
+            border-radius: 2px;
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+        }
+
+        /* ========== CONTENT STYLES ========== */
+        .content-wrapper {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 12px 35px rgba(31, 38, 135, 0.12);
+            transform: translateY(-2px);
+        }
+
+        /* Messages */
+        .messages {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .messages li {
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+            color: #166534;
+            font-weight: 500;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1023px) {
+            .sidebar-container {
+                transform: translateX(-100%);
+            }
+
+            .sidebar-container.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+
+            .compact-toggle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .content-wrapper {
+                padding: 1rem;
+            }
+        }
+
+        {% block extra_head %}{% endblock %}
     </style>
-    {% block extra_head %}{% endblock %}
 </head>
-<body>
-<header>
-    <h1>{{ tenant.name }} - Painel</h1>
-    <nav>
-        <a href="{% url 'dashboard:index' %}">Resumo</a>
-        <a href="{% url 'dashboard:calendar' %}">Agenda</a>
-        <a href="{% url 'dashboard:service_list' %}">Servicos</a>
-        <a href="{% url 'dashboard:professional_list' %}">Profissionais</a>
-        <a href="{% url 'accounts:profile' %}">Perfil</a>
-        <form action="{% url 'accounts:logout' %}" method="post" style="display:inline; margin:0;">
-            {% csrf_token %}
-            <button type="submit" style="background:none;border:none;color:#fff;font-weight:600;cursor:pointer;">Sair</button>
-        </form>
-    </nav>
-</header>
-<div class="container">
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% block content %}{% endblock %}
-</div>
+<body class="animate-fade-in">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar-container">
+        <!-- Header -->
+        <div class="sidebar-header">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="brand-text">
+                    <h2 class="brand-name">{{ tenant.name }}</h2>
+                    <p class="brand-subtitle">Sistema de Agendamentos</p>
+                </div>
+            </div>
+            <button class="compact-toggle" title="Recolher menu">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <!-- Navegação -->
+        <nav class="sidebar-nav">
+            <!-- Seção Principal -->
+            <div class="nav-section">
+                <h3 class="section-title">
+                    <i class="fas fa-circle section-indicator"></i>
+                    <span>Principal</span>
+                </h3>
+
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:index' %}" class="nav-link">
+                            <div class="nav-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:calendar' %}" class="nav-link">
+                            <div class="nav-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <span class="nav-text">Calendário</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Seção Gerenciamento -->
+            <div class="nav-section">
+                <h3 class="section-title">
+                    <i class="fas fa-circle section-indicator"></i>
+                    <span>Gerenciamento</span>
+                </h3>
+
+                <ul class="nav-menu">
+                    <!-- Cadastros -->
+                    <li class="nav-item has-submenu">
+                        <button class="nav-link submenu-toggle">
+                            <div class="nav-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <span class="nav-text">Cadastros</span>
+                            <i class="fas fa-chevron-down submenu-arrow"></i>
+                        </button>
+
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="{% url 'dashboard:professional_list' %}" class="submenu-link">
+                                    <i class="fas fa-user-tie submenu-icon"></i>
+                                    <span class="submenu-text">Profissionais</span>
+                                </a>
+                            </li>
+                            <li class="submenu-item">
+                                <a href="{% url 'dashboard:service_list' %}" class="submenu-link">
+                                    <i class="fas fa-concierge-bell submenu-icon"></i>
+                                    <span class="submenu-text">Serviços</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Perfil -->
+                    <li class="nav-item has-submenu">
+                        <button class="nav-link submenu-toggle">
+                            <div class="nav-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <span class="nav-text">Meu Perfil</span>
+                            <i class="fas fa-chevron-down submenu-arrow"></i>
+                        </button>
+
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="{% url 'accounts:profile' %}" class="submenu-link">
+                                    <i class="fas fa-edit submenu-icon"></i>
+                                    <span class="submenu-text">Editar Perfil</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Perfil do Usuário -->
+        <div class="user-profile">
+            <div class="profile-content">
+                <div class="profile-avatar">
+                    {{ user.full_name|first|upper }}
+                    <div class="online-indicator"></div>
+                </div>
+
+                <div class="profile-info">
+                    <h4 class="profile-name">{{ user.full_name }}</h4>
+                    <p class="profile-email">{{ user.email }}</p>
+                </div>
+
+                <div class="profile-actions">
+                    <a href="{% url 'accounts:profile' %}" class="profile-action" title="Editar Perfil">
+                        <i class="fas fa-user-edit"></i>
+                    </a>
+                    <form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="profile-action" title="Sair">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Overlay para Mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- Botão Mobile -->
+    <button id="mobile-toggle" class="mobile-toggle">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-wrapper">
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const submenuToggles = document.querySelectorAll('.submenu-toggle');
+
+            // Mobile toggle
+            mobileToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('show');
+            });
+
+            // Overlay click
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+            });
+
+            // Submenu toggles
+            submenuToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const parent = this.closest('.has-submenu');
+                    const wasOpen = parent.classList.contains('open');
+
+                    // Fechar outros submenus
+                    document.querySelectorAll('.has-submenu.open').forEach(item => {
+                        if (item !== parent) {
+                            item.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle atual
+                    parent.classList.toggle('open');
+                });
+            });
+
+            // Marcar menu ativo baseado na URL
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-link, .submenu-link').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+
+                    // Se for submenu, abrir o pai
+                    const parent = link.closest('.has-submenu');
+                    if (parent) {
+                        parent.classList.add('open');
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
