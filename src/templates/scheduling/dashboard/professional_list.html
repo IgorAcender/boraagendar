@@ -610,6 +610,10 @@
                     <span>{{ p.bio|default:"Sem especialidade definida" }}</span>
                 </div>
             </div>
+
+            <a href="{% url 'dashboard:professional_schedule' p.id %}" style="display: block; margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
+                <i class="fas fa-clock"></i> Configurar Horários
+            </a>
         </div>
         {% endfor %}
     </div>

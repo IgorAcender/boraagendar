@@ -367,3 +367,188 @@ def booking_move(request: HttpRequest, pk: int) -> JsonResponse:
         return JsonResponse({"success": False, "error": f"Invalid date/time format: {str(e)}"}, status=400)
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+
+@login_required
+def professional_schedule(request: HttpRequest, pk: int) -> HttpResponse:
+    """Manage professional's working hours (owner/manager only)"""
+    from ..models import AvailabilityRule, TimeOff
+
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager"],
+    )
+    if redirect_response:
+        return redirect_response
+
+    tenant = membership.tenant
+    professional = get_object_or_404(Professional, pk=pk, tenant=tenant)
+
+    # Handle form submissions
+    if request.method == "POST":
+        action = request.POST.get('action')
+
+        if action == 'add_availability':
+            weekday = int(request.POST.get('weekday'))
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+            break_start = request.POST.get('break_start') or None
+            break_end = request.POST.get('break_end') or None
+
+            AvailabilityRule.objects.create(
+                tenant=tenant,
+                professional=professional,
+                weekday=weekday,
+                start_time=start_time,
+                end_time=end_time,
+                break_start=break_start,
+                break_end=break_end,
+                is_active=True
+            )
+            messages.success(request, "Horário adicionado com sucesso.")
+
+        elif action == 'delete_availability':
+            rule_id = request.POST.get('rule_id')
+            AvailabilityRule.objects.filter(pk=rule_id, tenant=tenant).delete()
+            messages.success(request, "Horário removido.")
+
+        elif action == 'add_timeoff':
+            from datetime import datetime
+            name = request.POST.get('name')
+            start = request.POST.get('start')
+            end = request.POST.get('end')
+
+            TimeOff.objects.create(
+                tenant=tenant,
+                professional=professional,
+                name=name,
+                start=datetime.fromisoformat(start),
+                end=datetime.fromisoformat(end)
+            )
+            messages.success(request, "Folga adicionada com sucesso.")
+
+        elif action == 'delete_timeoff':
+            timeoff_id = request.POST.get('timeoff_id')
+            TimeOff.objects.filter(pk=timeoff_id, tenant=tenant).delete()
+            messages.success(request, "Folga removida.")
+
+        return redirect('dashboard:professional_schedule', pk=pk)
+
+    availability_rules = AvailabilityRule.objects.filter(
+        tenant=tenant,
+        professional=professional,
+        is_active=True
+    ).order_by('weekday', 'start_time')
+
+    from datetime import datetime
+    timeoffs = TimeOff.objects.filter(
+        tenant=tenant,
+        professional=professional,
+        end__gte=datetime.now()
+    ).order_by('start')
+
+    return render(
+        request,
+        "scheduling/dashboard/professional_schedule.html",
+        {
+            "tenant": tenant,
+            "professional": professional,
+            "availability_rules": availability_rules,
+            "timeoffs": timeoffs,
+        },
+    )
+
+
+@login_required
+def my_schedule(request: HttpRequest) -> HttpResponse:
+    """Professional manages their own schedule"""
+    from ..models import AvailabilityRule, TimeOff
+
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["professional"],
+    )
+    if redirect_response:
+        return redirect_response
+
+    tenant = membership.tenant
+
+    try:
+        professional = Professional.objects.get(user=request.user, tenant=tenant)
+    except Professional.DoesNotExist:
+        messages.error(request, "Você não está cadastrado como profissional.")
+        return redirect('dashboard:index')
+
+    if request.method == "POST":
+        action = request.POST.get('action')
+
+        if action == 'add_availability':
+            weekday = int(request.POST.get('weekday'))
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+            break_start = request.POST.get('break_start') or None
+            break_end = request.POST.get('break_end') or None
+
+            AvailabilityRule.objects.create(
+                tenant=tenant,
+                professional=professional,
+                weekday=weekday,
+                start_time=start_time,
+                end_time=end_time,
+                break_start=break_start,
+                break_end=break_end,
+                is_active=True
+            )
+            messages.success(request, "Horário adicionado com sucesso.")
+
+        elif action == 'delete_availability':
+            rule_id = request.POST.get('rule_id')
+            AvailabilityRule.objects.filter(pk=rule_id, tenant=tenant, professional=professional).delete()
+            messages.success(request, "Horário removido.")
+
+        elif action == 'add_timeoff':
+            from datetime import datetime
+            name = request.POST.get('name')
+            start = request.POST.get('start')
+            end = request.POST.get('end')
+
+            TimeOff.objects.create(
+                tenant=tenant,
+                professional=professional,
+                name=name,
+                start=datetime.fromisoformat(start),
+                end=datetime.fromisoformat(end)
+            )
+            messages.success(request, "Folga adicionada com sucesso.")
+
+        elif action == 'delete_timeoff':
+            timeoff_id = request.POST.get('timeoff_id')
+            TimeOff.objects.filter(pk=timeoff_id, tenant=tenant, professional=professional).delete()
+            messages.success(request, "Folga removida.")
+
+        return redirect('dashboard:my_schedule')
+
+    availability_rules = AvailabilityRule.objects.filter(
+        tenant=tenant,
+        professional=professional,
+        is_active=True
+    ).order_by('weekday', 'start_time')
+
+    from datetime import datetime
+    timeoffs = TimeOff.objects.filter(
+        tenant=tenant,
+        professional=professional,
+        end__gte=datetime.now()
+    ).order_by('start')
+
+    return render(
+        request,
+        "scheduling/dashboard/my_schedule.html",
+        {
+            "tenant": tenant,
+            "professional": professional,
+            "availability_rules": availability_rules,
+            "timeoffs": timeoffs,
+        },
+    )
