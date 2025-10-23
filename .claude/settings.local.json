@@ -7,7 +7,12 @@
       "Bash(python -m py_compile:*)",
       "Bash(python manage.py check:*)",
       "Bash(python manage.py shell:*)",
+<<<<<<< HEAD
+      "Bash(del schedulingmigrations0002_add_professional_avatar.py)",
+      "Bash(python manage.py makemigrations:*)"
+=======
       "Bash(del schedulingmigrations0002_add_professional_avatar.py)"
+>>>>>>> e5bbb4b (1)
     ],
     "deny": [],
     "ask": []

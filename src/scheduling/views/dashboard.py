@@ -1,10 +1,16 @@
+from collections import defaultdict
+from datetime import datetime, time, timedelta
+from zoneinfo import ZoneInfo
+import json
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.timezone import make_aware, now
 from django.views.decorators.http import require_POST
-import json
 
 from tenants.services import TenantSelectionRequired, ensure_membership_for_request
 from tenants.forms import TeamMemberCreateForm, TeamMemberUpdateForm
@@ -39,9 +45,6 @@ def index(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def calendar_view(request: HttpRequest) -> HttpResponse:
-    from datetime import datetime, timedelta, time
-    from collections import defaultdict
-
     membership, redirect_response = _membership_or_redirect(
         request,
         allowed_roles=["owner", "manager", "staff", "professional"],
@@ -49,10 +52,11 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
     if redirect_response:
         return redirect_response
     tenant = membership.tenant
+    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
 
     # Get week offset (default to current week)
     week_offset = int(request.GET.get('week_offset', 0))
-    today = datetime.now().date()
+    today = now().astimezone(tz).date()
     start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
     end_of_week = start_of_week + timedelta(days=6)
 
@@ -75,8 +79,8 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
             hours.append(f"{hour:02d}:30")
 
     # Get bookings for this week
-    week_start_dt = datetime.combine(start_of_week, time.min)
-    week_end_dt = datetime.combine(end_of_week, time.max)
+    week_start_dt = make_aware(datetime.combine(start_of_week, time.min), tz)
+    week_end_dt = make_aware(datetime.combine(end_of_week, time.max), tz)
     bookings_raw = Booking.objects.filter(
         tenant=tenant,
         scheduled_for__range=(week_start_dt, week_end_dt)
@@ -85,12 +89,13 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
     # Process bookings for template
     bookings_by_cell = defaultdict(list)
     for booking in bookings_raw:
-        date = booking.scheduled_for.date()
-        hour = booking.scheduled_for.strftime('%H:%M')
+        local_scheduled_for = booking.scheduled_for.astimezone(tz)
+        date = local_scheduled_for.date()
+        hour = local_scheduled_for.strftime('%H:%M')
         # Calculate height based on duration (60px per hour)
         height = (booking.duration_minutes / 60) * 100
         # Calculate offset within the cell
-        minutes = booking.scheduled_for.minute
+        minutes = local_scheduled_for.minute
         offset = (minutes / 60) * 100 if minutes != 0 else 0
 
         bookings_by_cell[(date, hour[:5])].append({
@@ -98,7 +103,7 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
             'customer_name': booking.customer_name,
             'service': booking.service,
             'professional': booking.professional,
-            'scheduled_for': booking.scheduled_for,
+            'scheduled_for': local_scheduled_for,
             'status': booking.status,
             'height': min(height, 200),  # Limit to 2 cells max
             'offset': offset,
@@ -349,8 +354,6 @@ def team_remove(request: HttpRequest, pk: int) -> HttpResponse:
 @require_POST
 def booking_move(request: HttpRequest, pk: int) -> JsonResponse:
     """Move booking to new date/time via drag & drop"""
-    from datetime import datetime
-
     membership, redirect_response = _membership_or_redirect(
         request,
         allowed_roles=["owner", "manager", "staff"],
@@ -360,6 +363,7 @@ def booking_move(request: HttpRequest, pk: int) -> JsonResponse:
 
     tenant = membership.tenant
     booking = get_object_or_404(Booking, pk=pk, tenant=tenant)
+    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
 
     try:
         data = json.loads(request.body)
@@ -371,7 +375,8 @@ def booking_move(request: HttpRequest, pk: int) -> JsonResponse:
 
         # Parse new datetime
         new_datetime_str = f"{new_date} {new_time}"
-        new_datetime = datetime.strptime(new_datetime_str, "%Y-%m-%d %H:%M")
+        naive_datetime = datetime.strptime(new_datetime_str, "%Y-%m-%d %H:%M")
+        new_datetime = make_aware(naive_datetime, tz)
 
         # Update booking
         booking.scheduled_for = new_datetime
@@ -409,6 +414,7 @@ def professional_schedule(request: HttpRequest, pk: int) -> HttpResponse:
 
     tenant = membership.tenant
     professional = get_object_or_404(Professional, pk=pk, tenant=tenant)
+    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
 
     # Handle form submissions
     if request.method == "POST":
@@ -439,7 +445,6 @@ def professional_schedule(request: HttpRequest, pk: int) -> HttpResponse:
             messages.success(request, "Horário removido.")
 
         elif action == 'add_timeoff':
-            from datetime import datetime
             name = request.POST.get('name')
             start = request.POST.get('start')
             end = request.POST.get('end')
@@ -448,8 +453,8 @@ def professional_schedule(request: HttpRequest, pk: int) -> HttpResponse:
                 tenant=tenant,
                 professional=professional,
                 name=name,
-                start=datetime.fromisoformat(start),
-                end=datetime.fromisoformat(end)
+                start=make_aware(datetime.fromisoformat(start), tz),
+                end=make_aware(datetime.fromisoformat(end), tz)
             )
             messages.success(request, "Folga adicionada com sucesso.")
 
@@ -466,11 +471,10 @@ def professional_schedule(request: HttpRequest, pk: int) -> HttpResponse:
         is_active=True
     ).order_by('weekday', 'start_time')
 
-    from datetime import datetime
     timeoffs = TimeOff.objects.filter(
         tenant=tenant,
         professional=professional,
-        end__gte=datetime.now()
+        end__gte=now()
     ).order_by('start')
 
     return render(
@@ -498,6 +502,7 @@ def my_schedule(request: HttpRequest) -> HttpResponse:
         return redirect_response
 
     tenant = membership.tenant
+    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
 
     try:
         professional = Professional.objects.get(user=request.user, tenant=tenant)
@@ -533,7 +538,6 @@ def my_schedule(request: HttpRequest) -> HttpResponse:
             messages.success(request, "Horário removido.")
 
         elif action == 'add_timeoff':
-            from datetime import datetime
             name = request.POST.get('name')
             start = request.POST.get('start')
             end = request.POST.get('end')
@@ -542,8 +546,8 @@ def my_schedule(request: HttpRequest) -> HttpResponse:
                 tenant=tenant,
                 professional=professional,
                 name=name,
-                start=datetime.fromisoformat(start),
-                end=datetime.fromisoformat(end)
+                start=make_aware(datetime.fromisoformat(start), tz),
+                end=make_aware(datetime.fromisoformat(end), tz)
             )
             messages.success(request, "Folga adicionada com sucesso.")
 
@@ -560,11 +564,10 @@ def my_schedule(request: HttpRequest) -> HttpResponse:
         is_active=True
     ).order_by('weekday', 'start_time')
 
-    from datetime import datetime
     timeoffs = TimeOff.objects.filter(
         tenant=tenant,
         professional=professional,
-        end__gte=datetime.now()
+        end__gte=now()
     ).order_by('start')
 
     return render(
