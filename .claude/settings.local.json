@@ -6,7 +6,8 @@
       "Bash(python manage.py migrate:*)",
       "Bash(python -m py_compile:*)",
       "Bash(python manage.py check:*)",
-      "Bash(python manage.py shell:*)"
+      "Bash(python manage.py shell:*)",
+      "Bash(del schedulingmigrations0002_add_professional_avatar.py)"
     ],
     "deny": [],
     "ask": []

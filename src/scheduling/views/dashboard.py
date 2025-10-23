@@ -239,7 +239,7 @@ def professional_list(request: HttpRequest) -> HttpResponse:
         return redirect_response
     tenant = membership.tenant
     if request.method == "POST":
-        form = ProfessionalForm(tenant=tenant, data=request.POST, files=request.FILES)
+        form = ProfessionalForm(tenant=tenant, data=request.POST)
         if form.is_valid():
             professional = form.save(commit=False)
             professional.tenant = tenant

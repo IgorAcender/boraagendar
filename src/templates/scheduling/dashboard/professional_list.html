@@ -586,8 +586,8 @@
         {% for p in professionals %}
         <div class="professional-card">
             <div class="professional-header">
-                <div class="professional-avatar" style="background: {{ p.color }}; {% if p.avatar and p.avatar.url %}background-image: url('{{ p.avatar.url }}'); background-size: cover; background-position: center;{% endif %}">
-                    {% if not p.avatar or not p.avatar.url %}{{ p.display_name|first|upper }}{% endif %}
+                <div class="professional-avatar" style="background: {{ p.color }};">
+                    {{ p.display_name|first|upper }}
                 </div>
                 <div class="professional-info">
                     <h3>{{ p.display_name }}</h3>
@@ -643,7 +643,7 @@
             <h3 id="modalTitle">Novo Profissional</h3>
             <button class="close-modal" onclick="closeModal()">&times;</button>
         </div>
-        <form method="post" enctype="multipart/form-data">
+        <form method="post">
             {% csrf_token %}
             <input type="hidden" name="create_user" value="on">
 
@@ -656,11 +656,6 @@
                     <label for="new_user_email">E-mail *</label>
                     <input type="email" id="new_user_email" name="new_user_email" required placeholder="ana@exemplo.com">
                 </div>
-            </div>
-
-            <div>
-                <label for="avatar">Foto do Profissional</label>
-                <input type="file" id="avatar" name="avatar" accept="image/*">
             </div>
 
             <div class="form-row">

@@ -65,7 +65,7 @@ class ProfessionalForm(TenantAwareForm):
 
     class Meta:
         model = Professional
-        fields = ["user", "display_name", "avatar", "bio", "color", "is_active"]
+        fields = ["user", "display_name", "bio", "color", "is_active"]
 
     def clean(self):
         cleaned = super().clean()
