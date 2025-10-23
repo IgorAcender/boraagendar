@@ -587,7 +587,11 @@
         <div class="professional-card">
             <div class="professional-header">
                 <div class="professional-avatar" style="background: {{ p.color }};">
-                    {{ p.display_name|first|upper }}
+                    {% if p.photo %}
+                        <img src="{{ p.photo.url }}" alt="{{ p.display_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    {% else %}
+                        {{ p.display_name|first|upper }}
+                    {% endif %}
                 </div>
                 <div class="professional-info">
                     <h3>{{ p.display_name }}</h3>
@@ -643,7 +647,7 @@
             <h3 id="modalTitle">Novo Profissional</h3>
             <button class="close-modal" onclick="closeModal()">&times;</button>
         </div>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="create_user" value="on">
 
@@ -677,6 +681,13 @@
                 <div>
                     <label for="color">Cor na Agenda</label>
                     <input type="color" id="color" name="color" value="#667eea">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="id_photo">Foto</label>
+                    <input type="file" name="photo" id="id_photo">
                 </div>
             </div>
 
