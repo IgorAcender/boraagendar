@@ -74,63 +74,6 @@ class ProfessionalUpdateForm(TenantAwareForm):
         fields = ["display_name", "photo", "bio", "color", "is_active"]
 
 
-    def clean(self):
-        cleaned = super().clean()
-        create_user = cleaned.get("create_user")
-        user = cleaned.get("user")
-        email = cleaned.get("new_user_email")
-        full_name = cleaned.get("new_user_full_name")
-
-        if not user and not create_user:
-            raise ValidationError("Selecione um usuário existente ou marque 'Criar novo usuário'.")
-
-        if create_user:
-            if not email:
-                self.add_error("new_user_email", "Informe um e-mail.")
-            if not full_name:
-                self.add_error("new_user_full_name", "Informe o nome completo.")
-            # Se não informar nome de exibição, usa o nome completo
-            if not cleaned.get("display_name") and full_name:
-                cleaned["display_name"] = full_name
-
-        return cleaned
-
-    def save(self, commit=True):
-        user = self.cleaned_data.get("user")
-        if not user and self.cleaned_data.get("create_user"):
-            User = get_user_model()
-            email = self.cleaned_data.get("new_user_email").lower()
-            full_name = self.cleaned_data.get("new_user_full_name").strip()
-            first_name, last_name = (full_name.split(" ", 1) + [""])[:2]
-            phone = self.cleaned_data.get("new_user_phone_number") or ""
-            password = self.cleaned_data.get("new_user_password") or secrets.token_urlsafe(12)
-
-            if User.objects.filter(email__iexact=email).exists():
-                raise ValidationError({"new_user_email": "Já existe um usuário com este e-mail."})
-
-            user = User.objects.create_user(
-                email=email,
-                password=password,
-                first_name=first_name,
-                last_name=last_name if last_name else "",
-                phone_number=phone,
-            )
-
-            # guarda para exibir no messages da view (apenas nessa resposta)
-            self.generated_credentials = {"email": email, "password": password}
-
-            # Cria o vínculo com o tenant como PROFESSIONAL
-            TenantMembership.objects.get_or_create(
-                tenant=self.tenant,
-                user=user,
-                defaults={"role": TenantMembership.Role.PROFESSIONAL, "is_active": True},
-            )
-
-            # Atribui o usuário recém-criado ao Professional
-            self.instance.user = user
-
-        return super().save(commit=commit)
-
 
 class BookingForm(TenantAwareForm):
     date = forms.DateField(label="Data", initial=date.today)
