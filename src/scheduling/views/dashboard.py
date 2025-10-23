@@ -205,6 +205,31 @@ def service_list(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+def service_update(request: HttpRequest, pk: int) -> HttpResponse:
+    """Update existing service"""
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+    service = get_object_or_404(Service, pk=pk, tenant=tenant)
+
+    if request.method == "POST":
+        service.name = request.POST.get("name")
+        service.description = request.POST.get("description", "")
+        service.price = request.POST.get("price")
+        service.duration_minutes = request.POST.get("duration_minutes")
+        service.is_active = request.POST.get("is_active") == "on"
+        service.save()
+        messages.success(request, "Serviço atualizado com sucesso.")
+        return redirect("dashboard:service_list")
+
+    return redirect("dashboard:service_list")
+
+
+@login_required
 def professional_list(request: HttpRequest) -> HttpResponse:
     membership, redirect_response = _membership_or_redirect(
         request,
