@@ -38,14 +38,31 @@ def signup_view(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def dashboard_profile_view(request: HttpRequest) -> HttpResponse:
+    from django.contrib import messages
+    from scheduling.models import Professional
+
     try:
         membership = ensure_membership_for_request(request)
     except TenantSelectionRequired:
         return redirect(_build_selection_url(request))
+
+    # Handle professional profile update
+    professional = None
+    if hasattr(request.user, 'professional_profile'):
+        professional = request.user.professional_profile
+
+    if request.method == "POST" and professional:
+        # Update professional avatar
+        if 'avatar' in request.FILES:
+            professional.avatar = request.FILES['avatar']
+            professional.save()
+            messages.success(request, "Foto atualizada com sucesso!")
+            return redirect("accounts:profile")
+
     return render(
         request,
         "accounts/profile.html",
-        {"tenant": membership.tenant},
+        {"tenant": membership.tenant, "professional": professional},
     )
 
 

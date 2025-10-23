@@ -1,13 +1,212 @@
-﻿{% extends "base_dashboard.html" %}
+{% extends "base_dashboard.html" %}
 {% block title %}Perfil{% endblock %}
+
+{% block extra_head %}
+<style>
+    .profile-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+    }
+
+    .profile-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(15px);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    }
+
+    .profile-card h2 {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.5rem;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .profile-info-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .profile-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .profile-label {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .profile-value {
+        color: #1e293b;
+        font-weight: 500;
+    }
+
+    .avatar-section {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .avatar-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 0 auto 1rem auto;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        background-size: cover;
+        background-position: center;
+    }
+
+    .upload-btn {
+        position: relative;
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .upload-btn input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .btn-link {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.2s;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .btn-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="card">
-    <h2>Meu perfil</h2>
-    <p><strong>Nome:</strong> {{ request.user.get_full_name|default:request.user.email }}</p>
-    <p><strong>Email:</strong> {{ request.user.email }}</p>
-    <p><strong>Telefone:</strong> {{ request.user.phone_number|default:"-" }}</p>
-    <p><strong>Idioma:</strong> {{ request.user.locale }}</p>
-    <p><strong>Fuso horario:</strong> {{ request.user.timezone }}</p>
-    <p><a class="button" href="{% url 'accounts:password_change' %}">Alterar senha</a></p>
+<div class="profile-container">
+    <!-- User Information -->
+    <div class="profile-card">
+        <h2>
+            <i class="fas fa-user-circle"></i>
+            Informações Pessoais
+        </h2>
+
+        <div class="profile-info-item">
+            <span class="profile-label">Nome</span>
+            <span class="profile-value">{{ request.user.get_full_name|default:request.user.email }}</span>
+        </div>
+
+        <div class="profile-info-item">
+            <span class="profile-label">Email</span>
+            <span class="profile-value">{{ request.user.email }}</span>
+        </div>
+
+        <div class="profile-info-item">
+            <span class="profile-label">Telefone</span>
+            <span class="profile-value">{{ request.user.phone_number|default:"-" }}</span>
+        </div>
+
+        <div class="profile-info-item">
+            <span class="profile-label">Idioma</span>
+            <span class="profile-value">{{ request.user.locale }}</span>
+        </div>
+
+        <div class="profile-info-item">
+            <span class="profile-label">Fuso horário</span>
+            <span class="profile-value">{{ request.user.timezone }}</span>
+        </div>
+
+        <a class="btn-link" href="{% url 'accounts:password_change' %}">
+            <i class="fas fa-key"></i> Alterar Senha
+        </a>
+    </div>
+
+    <!-- Professional Profile (only for professionals) -->
+    {% if professional %}
+    <div class="profile-card">
+        <h2>
+            <i class="fas fa-id-badge"></i>
+            Perfil Profissional
+        </h2>
+
+        <div class="avatar-section">
+            <div class="avatar-preview" style="{% if professional.avatar %}background-image: url('{{ professional.avatar.url }}');{% else %}background: {{ professional.color }};{% endif %}">
+                {% if not professional.avatar %}
+                    {{ professional.display_name|first|upper }}
+                {% endif %}
+            </div>
+
+            <form method="post" enctype="multipart/form-data" id="avatarForm">
+                {% csrf_token %}
+                <label class="upload-btn">
+                    <i class="fas fa-camera"></i> Alterar Foto
+                    <input type="file" name="avatar" accept="image/*" onchange="document.getElementById('avatarForm').submit()">
+                </label>
+            </form>
+        </div>
+
+        <div class="profile-info-item">
+            <span class="profile-label">Nome de Exibição</span>
+            <span class="profile-value">{{ professional.display_name }}</span>
+        </div>
+
+        <div class="profile-info-item">
+            <span class="profile-label">Especialidade</span>
+            <span class="profile-value">{{ professional.bio|default:"Não definida" }}</span>
+        </div>
+
+        <div class="profile-info-item">
+            <span class="profile-label">Cor na Agenda</span>
+            <span class="profile-value">
+                <span style="display: inline-block; width: 30px; height: 30px; background: {{ professional.color }}; border-radius: 50%; vertical-align: middle;"></span>
+                {{ professional.color }}
+            </span>
+        </div>
+
+        <div class="profile-info-item">
+            <span class="profile-label">Status</span>
+            <span class="profile-value">
+                {% if professional.is_active %}
+                    <span style="color: #059669; font-weight: 700;">✓ Ativo</span>
+                {% else %}
+                    <span style="color: #dc2626; font-weight: 700;">✗ Inativo</span>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
