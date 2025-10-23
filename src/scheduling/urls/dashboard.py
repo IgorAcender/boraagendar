@@ -13,6 +13,7 @@ urlpatterns = [
     path("servicos/", dashboard_views.service_list, name="service_list"),
     path("servicos/<int:pk>/editar/", dashboard_views.service_update, name="service_update"),
     path("profissionais/", dashboard_views.professional_list, name="professional_list"),
+    path("profissionais/<int:pk>/editar/", dashboard_views.professional_update, name="professional_update"),
     path("profissionais/<int:pk>/horarios/", dashboard_views.professional_schedule, name="professional_schedule"),
     path("profissionais/<int:pk>/servicos/", dashboard_views.professional_services, name="professional_services"),
     path("meus-horarios/", dashboard_views.my_schedule, name="my_schedule"),

@@ -67,6 +67,13 @@ class ProfessionalForm(TenantAwareForm):
         model = Professional
         fields = ["user", "display_name", "photo", "bio", "color", "is_active"]
 
+
+class ProfessionalUpdateForm(TenantAwareForm):
+    class Meta:
+        model = Professional
+        fields = ["display_name", "photo", "bio", "color", "is_active"]
+
+
     def clean(self):
         cleaned = super().clean()
         create_user = cleaned.get("create_user")

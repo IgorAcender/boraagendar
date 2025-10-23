@@ -278,6 +278,34 @@ def professional_list(request: HttpRequest) -> HttpResponse:
     )
 
 
+@login_required
+def professional_update(request: HttpRequest, pk: int) -> HttpResponse:
+    """Update existing professional"""
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+    professional = get_object_or_404(Professional, pk=pk, tenant=tenant)
+
+    if request.method == "POST":
+        form = ProfessionalUpdateForm(tenant=tenant, data=request.POST, files=request.FILES, instance=professional)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profissional atualizado com sucesso.")
+            return redirect("dashboard:professional_list")
+    else:
+        form = ProfessionalUpdateForm(tenant=tenant, instance=professional)
+
+    return render(
+        request,
+        "scheduling/dashboard/professional_form.html",
+        {"tenant": tenant, "form": form, "professional": professional},
+    )
+
+
 def _membership_or_redirect(request: HttpRequest, allowed_roles: list[str]):
     try:
         membership = ensure_membership_for_request(request, allowed_roles=allowed_roles)
