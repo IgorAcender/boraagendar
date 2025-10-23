@@ -38,18 +38,20 @@ def signup_view(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def dashboard_profile_view(request: HttpRequest) -> HttpResponse:
-    from django.contrib import messages
-    from scheduling.models import Professional
-
     try:
         membership = ensure_membership_for_request(request)
     except TenantSelectionRequired:
         return redirect(_build_selection_url(request))
 
     # Handle professional profile update
+    from django.contrib import messages
+    from scheduling.models import Professional
+
     professional = None
-    if hasattr(request.user, 'professional_profile'):
+    try:
         professional = request.user.professional_profile
+    except (AttributeError, Professional.DoesNotExist):
+        pass
 
     if request.method == "POST" and professional:
         # Update professional avatar

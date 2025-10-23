@@ -243,9 +243,6 @@ def professional_list(request: HttpRequest) -> HttpResponse:
         if form.is_valid():
             professional = form.save(commit=False)
             professional.tenant = tenant
-            # Handle avatar upload
-            if 'avatar' in request.FILES:
-                professional.avatar = request.FILES['avatar']
             professional.save()
             # Se um novo usuário foi criado no form, mostre credenciais temporárias
             creds = getattr(form, "generated_credentials", None)
