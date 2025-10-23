@@ -55,7 +55,7 @@ class Professional(models.Model):
         verbose_name="Usuario",
     )
     display_name = models.CharField(max_length=120, verbose_name="Nome de exibicao")
-    photo = models.ImageField(
+    foto = models.ImageField(
         upload_to='professionals/',
         verbose_name="Foto",
         null=True,
