@@ -586,8 +586,8 @@
         {% for p in professionals %}
         <div class="professional-card">
             <div class="professional-header">
-                <div class="professional-avatar" style="background: {{ p.color }}; {% if p.avatar %}background-image: url('{{ p.avatar.url }}'); background-size: cover; background-position: center;{% endif %}">
-                    {% if not p.avatar %}{{ p.display_name|first|upper }}{% endif %}
+                <div class="professional-avatar" style="background: {{ p.color }}; {% if p.avatar and p.avatar.url %}background-image: url('{{ p.avatar.url }}'); background-size: cover; background-position: center;{% endif %}">
+                    {% if not p.avatar or not p.avatar.url %}{{ p.display_name|first|upper }}{% endif %}
                 </div>
                 <div class="professional-info">
                     <h3>{{ p.display_name }}</h3>

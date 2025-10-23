@@ -163,8 +163,8 @@
         </h2>
 
         <div class="avatar-section">
-            <div class="avatar-preview" style="{% if professional.avatar %}background-image: url('{{ professional.avatar.url }}');{% else %}background: {{ professional.color }};{% endif %}">
-                {% if not professional.avatar %}
+            <div class="avatar-preview" style="{% if professional.avatar and professional.avatar.url %}background-image: url('{{ professional.avatar.url }}');{% else %}background: {{ professional.color }};{% endif %}">
+                {% if not professional.avatar or not professional.avatar.url %}
                     {{ professional.display_name|first|upper }}
                 {% endif %}
             </div>
