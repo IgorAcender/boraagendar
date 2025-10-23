@@ -15,6 +15,11 @@ class Tenant(models.Model):
     color_primary = models.CharField("Cor primaria", max_length=7, default="#D97706")
     color_secondary = models.CharField("Cor secundaria", max_length=7, default="#1F2937")
     avatar = models.ImageField("Logo", upload_to="tenants/logo/", blank=True)
+    # Labels personalizáveis
+    label_professional_singular = models.CharField("Label Profissional (singular)", max_length=50, default="Profissional")
+    label_professional_plural = models.CharField("Label Profissional (plural)", max_length=50, default="Profissionais")
+    label_service_singular = models.CharField("Label Serviço (singular)", max_length=50, default="Serviço")
+    label_service_plural = models.CharField("Label Serviço (plural)", max_length=50, default="Serviços")
     is_active = models.BooleanField("Ativo", default=True)
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
     updated_at = models.DateTimeField("Atualizado em", auto_now=True)
