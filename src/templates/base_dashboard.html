@@ -556,9 +556,7 @@
                 </h3>
 
                 <ul class="nav-menu">
-                    <!-- Cadastros (Apenas para Donos/Gerentes) -->
-                    {% with membership=user.get_active_membership %}
-                    {% if membership and membership.role in 'owner,manager' %}
+                    <!-- Cadastros -->
                     <li class="nav-item has-submenu">
                         <button class="nav-link submenu-toggle">
                             <div class="nav-icon">
@@ -583,10 +581,8 @@
                             </li>
                         </ul>
                     </li>
-                    {% endif %}
 
-                    <!-- Meus Horários (Apenas para Profissionais) -->
-                    {% if membership and membership.role == 'professional' %}
+                    <!-- Meus Horários -->
                     <li class="nav-item">
                         <a href="{% url 'dashboard:my_schedule' %}" class="nav-link">
                             <div class="nav-icon">
@@ -596,7 +592,7 @@
                         </a>
                     </li>
 
-                    <!-- Meus Serviços (Apenas para Profissionais) -->
+                    <!-- Meus Serviços -->
                     <li class="nav-item">
                         <a href="{% url 'dashboard:my_services' %}" class="nav-link">
                             <div class="nav-icon">
@@ -605,8 +601,6 @@
                             <span class="nav-text">Meus Serviços e Preços</span>
                         </a>
                     </li>
-                    {% endif %}
-                    {% endwith %}
 
                     <!-- Perfil -->
                     <li class="nav-item has-submenu">
