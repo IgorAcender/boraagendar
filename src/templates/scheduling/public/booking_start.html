@@ -265,6 +265,17 @@
         box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
     }
 
+    .professional-card.selected {
+        border-color: var(--brand-primary);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        transform: translateY(-5px);
+    }
+
+    .professional-card.selected .btn-select-professional {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
     .professional-card-avatar {
         width: 80px;
         height: 80px;
@@ -461,16 +472,28 @@
     document.addEventListener('DOMContentLoaded', function() {
         const serviceSelect = document.getElementById('id_service');
         const tenantSlug = '{{ tenant.slug }}';
+        let selectedProfessionalId = null;
+        let selectedServiceId = null;
 
         if (serviceSelect) {
             serviceSelect.addEventListener('change', function() {
                 const serviceId = this.value;
+                selectedServiceId = serviceId;
+                selectedProfessionalId = null;
 
                 if (!serviceId) {
-                    // Se deselecionou, limpar profissionais
+                    // Se deselecionou, limpar profissionais e calendário
                     const professionalsSection = document.querySelector('.professionals-section');
                     if (professionalsSection) {
                         professionalsSection.remove();
+                    }
+                    const dateSection = document.querySelector('.date-selection-section');
+                    if (dateSection) {
+                        dateSection.remove();
+                    }
+                    const slotsSection = document.querySelector('.slots-section');
+                    if (slotsSection) {
+                        slotsSection.remove();
                     }
                     return;
                 }
@@ -492,6 +515,16 @@
             let professionalsSection = document.querySelector('.professionals-section');
             if (professionalsSection) {
                 professionalsSection.remove();
+            }
+
+            // Remover calendário e horários também
+            const dateSection = document.querySelector('.date-selection-section');
+            if (dateSection) {
+                dateSection.remove();
+            }
+            const slotsSection = document.querySelector('.slots-section');
+            if (slotsSection) {
+                slotsSection.remove();
             }
 
             if (professionals.length === 0) {
@@ -516,9 +549,9 @@
 
             const grid = document.getElementById('professionalsGrid');
             professionals.forEach(prof => {
-                const card = document.createElement('a');
-                card.href = `?service=${serviceId}&professional=${prof.id}`;
+                const card = document.createElement('div');
                 card.className = 'professional-card';
+                card.dataset.professionalId = prof.id;
 
                 let avatarContent = '';
                 if (prof.photo_base64) {
@@ -540,8 +573,146 @@
                     </div>
                 `;
 
+                // Adicionar evento de clique
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    selectProfessional(prof.id, serviceId);
+                });
+
                 grid.appendChild(card);
             });
+        }
+
+        function selectProfessional(professionalId, serviceId) {
+            selectedProfessionalId = professionalId;
+
+            // Remover classe selected de todos os cards
+            document.querySelectorAll('.professional-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Adicionar classe selected ao card clicado
+            const selectedCard = document.querySelector(`[data-professional-id="${professionalId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+
+            // Mostrar seção de data
+            showDateSelection(serviceId, professionalId);
+        }
+
+        function showDateSelection(serviceId, professionalId) {
+            // Remover seção antiga se existir
+            let dateSection = document.querySelector('.date-selection-section');
+            if (dateSection) {
+                dateSection.remove();
+            }
+
+            // Remover horários antigos
+            const slotsSection = document.querySelector('.slots-section');
+            if (slotsSection) {
+                slotsSection.remove();
+            }
+
+            // Criar seção de data
+            const professionalsSection = document.querySelector('.professionals-section');
+            dateSection = document.createElement('div');
+            dateSection.className = 'date-selection-section';
+            dateSection.style.marginTop = '3rem';
+            dateSection.style.paddingTop = '2rem';
+            dateSection.style.borderTop = '2px solid #e2e8f0';
+            dateSection.innerHTML = `
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    Escolha a Data
+                </h2>
+                <div class="form-group">
+                    <label for="date_picker">Qual data você prefere?</label>
+                    <input type="date" id="date_picker" class="form-control"
+                           style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem;"
+                           min="${new Date().toISOString().split('T')[0]}">
+                </div>
+            `;
+
+            professionalsSection.parentNode.insertBefore(dateSection, professionalsSection.nextSibling);
+
+            // Adicionar evento ao date picker
+            const datePicker = document.getElementById('date_picker');
+            datePicker.addEventListener('change', function() {
+                const selectedDate = this.value;
+                if (selectedDate) {
+                    loadAvailableSlots(serviceId, professionalId, selectedDate);
+                }
+            });
+        }
+
+        function loadAvailableSlots(serviceId, professionalId, date) {
+            // Fazer requisição AJAX para carregar horários
+            fetch(`/agendar/${tenantSlug}/api/horarios/?service_id=${serviceId}&professional_id=${professionalId}&date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderSlots(data.slots, serviceId, professionalId);
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar horários:', error);
+                });
+        }
+
+        function renderSlots(slots, serviceId, professionalId) {
+            // Remover seção antiga se existir
+            let slotsSection = document.querySelector('.slots-section');
+            if (slotsSection) {
+                slotsSection.remove();
+            }
+
+            // Criar nova seção
+            const dateSection = document.querySelector('.date-selection-section');
+            slotsSection = document.createElement('div');
+            slotsSection.className = 'slots-section';
+
+            if (slots.length === 0) {
+                slotsSection.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <h3>Nenhum horário disponível</h3>
+                        <p>Não encontramos horários disponíveis para a data selecionada. Tente outra data.</p>
+                    </div>
+                `;
+            } else {
+                slotsSection.innerHTML = `
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        Horários Disponíveis
+                    </h2>
+                    <div class="slots-grid" id="slotsGrid"></div>
+                `;
+
+                dateSection.parentNode.insertBefore(slotsSection, dateSection.nextSibling);
+
+                const grid = document.getElementById('slotsGrid');
+                slots.forEach(slot => {
+                    const slotCard = document.createElement('div');
+                    slotCard.className = 'slot-card';
+                    slotCard.innerHTML = `
+                        <div class="slot-time">${slot.time}</div>
+                        <div class="slot-date">${slot.date}</div>
+                        <a class="btn-book" href="/agendar/${tenantSlug}/confirmar/?service=${serviceId}&professional=${professionalId}&start=${slot.start}">
+                            Reservar
+                        </a>
+                    `;
+                    grid.appendChild(slotCard);
+                });
+
+                return;
+            }
+
+            dateSection.parentNode.insertBefore(slotsSection, dateSection.nextSibling);
         }
     });
 </script>

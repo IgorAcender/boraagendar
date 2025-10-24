@@ -146,3 +146,40 @@ def get_service_professionals(request: HttpRequest, tenant_slug: str) -> JsonRes
         return JsonResponse({'professionals': professionals_data})
     except Service.DoesNotExist:
         return JsonResponse({'professionals': []})
+
+
+def get_available_slots(request: HttpRequest, tenant_slug: str) -> JsonResponse:
+    """API endpoint para retornar horários disponíveis em JSON"""
+    tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
+    service_id = request.GET.get('service_id')
+    professional_id = request.GET.get('professional_id')
+    date_str = request.GET.get('date')
+
+    if not service_id or not professional_id or not date_str:
+        return JsonResponse({'slots': []})
+
+    try:
+        from datetime import datetime
+        service = Service.objects.get(pk=service_id, tenant=tenant, is_active=True)
+        professional = Professional.objects.get(pk=professional_id, tenant=tenant, is_active=True)
+        target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+        availability_service = AvailabilityService(tenant=tenant)
+        available_slots = availability_service.get_available_slots(
+            service=service,
+            professional=professional,
+            target_date=target_date,
+        )
+
+        slots_data = []
+        for slot in available_slots:
+            slot_data = {
+                'start': slot.start.isoformat(),
+                'time': slot.start.strftime('%H:%M'),
+                'date': slot.start.strftime('%d/%m/%Y - %A'),
+            }
+            slots_data.append(slot_data)
+
+        return JsonResponse({'slots': slots_data})
+    except (Service.DoesNotExist, Professional.DoesNotExist):
+        return JsonResponse({'slots': []})
