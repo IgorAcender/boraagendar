@@ -137,7 +137,9 @@ class Booking(models.Model):
 
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="bookings")
     service = models.ForeignKey(Service, on_delete=models.PROTECT, related_name="bookings")
-    professional = models.ForeignKey(Professional, on_delete=models.PROTECT, related_name="bookings")
+    professional = models.ForeignKey(
+        Professional, on_delete=models.PROTECT, related_name="bookings", null=True, blank=True
+    )
     customer_name = models.CharField(max_length=150, verbose_name="Cliente")
     customer_phone = models.CharField(max_length=32, verbose_name="Telefone")
     customer_email = models.EmailField(blank=True, verbose_name="E-mail")
