@@ -127,11 +127,40 @@
         cursor: pointer;
         font-weight: 500;
         transition: all 0.2s;
+        text-decoration: none;
     }
 
     .btn-today:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* View Toggle Buttons */
+    .view-toggle-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .view-toggle-btn:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: var(--brand-primary);
+        border-color: var(--brand-primary);
+    }
+
+    .view-toggle-btn.active {
+        background: var(--brand-primary);
+        color: white;
+        border-color: var(--brand-primary);
     }
 
     /* Calendar Grid */
@@ -528,6 +557,16 @@
             <a href="?{% if request.GET.week_offset %}week_offset={{ request.GET.week_offset }}{% endif %}" class="btn-today">
                 <i class="fas fa-calendar-day"></i> Hoje
             </a>
+
+            <!-- View Toggle -->
+            <div style="display: flex; gap: 0.5rem; margin-left: 1rem; padding-left: 1rem; border-left: 1px solid #e5e7eb;">
+                <a href="{% url 'dashboard:calendar' %}" class="view-toggle-btn active">
+                    <i class="fas fa-calendar-week"></i> Semana
+                </a>
+                <a href="{% url 'dashboard:calendar_day' %}" class="view-toggle-btn">
+                    <i class="fas fa-calendar-day"></i> Dia
+                </a>
+            </div>
         </div>
     </div>
 

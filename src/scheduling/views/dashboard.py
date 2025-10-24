@@ -175,6 +175,116 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+def calendar_day_view(request: HttpRequest) -> HttpResponse:
+    """Visualização diária mostrando todos os profissionais em colunas"""
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff", "professional"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+
+    # Get day offset (default to today)
+    day_offset = int(request.GET.get('day_offset', 0))
+    today = now().astimezone(tz).date()
+    selected_date = today + timedelta(days=day_offset)
+
+    # Day name
+    day_names = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+    day_name = day_names[selected_date.weekday()]
+
+    # Generate hours (0:00 to 23:00 - todas as 24 horas)
+    hours = []
+    for hour in range(0, 24):
+        hours.append(f"{hour:02d}:00")
+
+    # Get all active professionals
+    professionals = Professional.objects.filter(tenant=tenant, is_active=True).order_by('display_name')
+
+    # Get bookings for this day for all professionals
+    day_start_dt = make_aware(datetime.combine(selected_date, time.min), tz)
+    day_end_dt = make_aware(datetime.combine(selected_date, time.max), tz)
+    bookings_query = Booking.objects.filter(
+        tenant=tenant,
+        scheduled_for__range=(day_start_dt, day_end_dt)
+    ).select_related('service', 'professional').order_by('scheduled_for')
+
+    # Process bookings by professional and hour
+    bookings_by_professional_hour = defaultdict(lambda: defaultdict(list))
+    for booking in bookings_query:
+        local_scheduled_for = booking.scheduled_for.astimezone(tz)
+        hour_base = local_scheduled_for.strftime('%H:00')
+
+        # Calculate height based on duration (altura proporcional em %)
+        height = (booking.duration_minutes / 60) * 100
+        # Calculate offset within the cell (posição vertical dentro da célula em %)
+        minutes = local_scheduled_for.minute
+        offset = (minutes / 60) * 100
+
+        bookings_by_professional_hour[booking.professional.id][hour_base].append({
+            'id': booking.pk,
+            'customer_name': booking.customer_name,
+            'service': booking.service,
+            'professional': booking.professional,
+            'scheduled_for': local_scheduled_for,
+            'status': booking.status,
+            'height': height,
+            'offset': offset,
+            'time_display': local_scheduled_for.strftime('%H:%M'),
+        })
+
+    # Get availability rules for each professional
+    from ..models import AvailabilityRule
+    availability_by_professional = {}
+
+    for professional in professionals:
+        # Tentar pegar regras específicas do profissional, senão usa as padrão da empresa
+        rules = AvailabilityRule.objects.filter(
+            tenant=tenant,
+            professional=professional,
+            is_active=True,
+            weekday=selected_date.weekday()
+        )
+
+        if not rules.exists():
+            # Usar regras padrão da empresa
+            rules = AvailabilityRule.objects.filter(
+                tenant=tenant,
+                professional__isnull=True,
+                is_active=True,
+                weekday=selected_date.weekday()
+            )
+
+        availability_by_professional[professional.id] = [
+            {
+                'start_time': rule.start_time,
+                'end_time': rule.end_time,
+                'break_start': rule.break_start,
+                'break_end': rule.break_end,
+            }
+            for rule in rules
+        ]
+
+    return render(
+        request,
+        "scheduling/dashboard/calendar_day.html",
+        {
+            "tenant": tenant,
+            "professionals": professionals,
+            "hours": hours,
+            "selected_date": selected_date,
+            "day_name": day_name,
+            "day_offset": day_offset,
+            "bookings_by_professional_hour": dict(bookings_by_professional_hour),
+            "availability_by_professional": availability_by_professional,
+            "is_today": selected_date == today,
+        },
+    )
+
+
+@login_required
 def booking_detail(request: HttpRequest, pk: int) -> HttpResponse:
     membership, redirect_response = _membership_or_redirect(
         request,

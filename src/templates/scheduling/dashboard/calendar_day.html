@@ -1,0 +1,674 @@
+{% extends "base_dashboard.html" %}
+{% load calendar_filters %}
+{% block title %}Agenda do Dia{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Page Container */
+    .calendar-day-page {
+        padding: 1rem;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Hero Header */
+    .hero-header {
+        background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .hero-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .hero-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .hero-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .hero-title h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .date-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-top: 0.25rem;
+    }
+
+    /* Live Clock */
+    .live-clock {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 0.875rem 1.25rem;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .clock-time {
+        font-size: 1.75rem;
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+        margin-bottom: 0.25rem;
+    }
+
+    .clock-date {
+        font-size: 0.875rem;
+        opacity: 0.9;
+    }
+
+    /* Calendar Controls */
+    .calendar-controls {
+        background: white;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .nav-buttons {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .nav-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.1);
+        border: none;
+        color: var(--brand-primary);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-btn:hover {
+        background: var(--brand-primary);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .view-toggle {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .toggle-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        font-size: 0.875rem;
+    }
+
+    .toggle-btn:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: var(--brand-primary);
+        border-color: var(--brand-primary);
+    }
+
+    .toggle-btn.active {
+        background: var(--brand-primary);
+        color: white;
+        border-color: var(--brand-primary);
+    }
+
+    /* Calendar Grid */
+    .calendar-container {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        min-width: 800px;
+    }
+
+    .day-grid {
+        display: grid;
+        grid-template-columns: 60px repeat({{ professionals|length }}, minmax(150px, 1fr));
+        position: relative;
+    }
+
+    /* Header Row */
+    .header-cell {
+        padding: 1rem;
+        text-align: center;
+        font-weight: 600;
+        border-bottom: 2px solid #e5e7eb;
+        background: #f9fafb;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .header-cell.time-header {
+        border-right: 2px solid #e5e7eb;
+    }
+
+    .professional-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .professional-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.875rem;
+    }
+
+    .professional-name {
+        font-size: 0.875rem;
+        color: #374151;
+    }
+
+    /* Time Column */
+    .time-cell {
+        padding: 0.5rem;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #6b7280;
+        border-right: 2px solid #e5e7eb;
+        border-bottom: 1px solid #f3f4f6;
+        background: #f9fafb;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+    }
+
+    /* Day Cells */
+    .day-cell {
+        border-bottom: 1px solid #f3f4f6;
+        border-right: 1px solid #f3f4f6;
+        height: 60px;
+        position: relative;
+        transition: background 0.2s;
+    }
+
+    .day-cell.available {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
+    }
+
+    .day-cell.available:hover {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.25));
+    }
+
+    .day-cell.unavailable {
+        background: repeating-linear-gradient(
+            45deg,
+            rgba(156, 163, 175, 0.05),
+            rgba(156, 163, 175, 0.05) 10px,
+            rgba(156, 163, 175, 0.02) 10px,
+            rgba(156, 163, 175, 0.02) 20px
+        );
+    }
+
+    .day-cell.break-time {
+        background: repeating-linear-gradient(
+            45deg,
+            rgba(251, 191, 36, 0.1),
+            rgba(251, 191, 36, 0.1) 10px,
+            rgba(251, 191, 36, 0.05) 10px,
+            rgba(251, 191, 36, 0.05) 20px
+        );
+    }
+
+    /* Bookings */
+    .booking {
+        position: absolute;
+        left: 2px;
+        right: 2px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 6px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+    }
+
+    .booking:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        z-index: 20;
+    }
+
+    .booking.status-confirmed {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .booking.status-pending {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .booking.status-cancelled {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        opacity: 0.6;
+    }
+
+    .booking-time {
+        font-weight: 600;
+        font-size: 0.7rem;
+    }
+
+    .booking-customer {
+        font-size: 0.65rem;
+        opacity: 0.9;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Current Time Indicator */
+    #current-time-indicator {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #ef4444;
+        z-index: 1000;
+        pointer-events: none;
+        box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Modal */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+        position: relative;
+        background: white;
+        border-radius: 20px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.1);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #6b7280;
+        transition: all 0.2s;
+        z-index: 10;
+    }
+
+    .modal-close:hover {
+        background: rgba(0, 0, 0, 0.2);
+        transform: rotate(90deg);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .calendar-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .day-grid {
+            grid-template-columns: 60px repeat({{ professionals|length }}, minmax(120px, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="calendar-day-page">
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-content">
+            <div class="hero-title">
+                <div class="hero-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div>
+                    <h1>Agenda do Dia</h1>
+                    <div class="date-subtitle">
+                        {{ day_name }}, {{ selected_date|date:"d/m/Y" }}
+                        {% if is_today %}(Hoje){% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Clock -->
+            <div class="live-clock">
+                <div class="clock-time" id="liveTime">--:--:--</div>
+                <div class="clock-date" id="liveDate">--/--/----</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Controls -->
+    <div class="calendar-controls">
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="navigateDay(-1)" title="Dia Anterior">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="nav-btn" onclick="navigateDay(0)" title="Hoje">
+                <i class="fas fa-calendar-day"></i>
+            </button>
+            <button class="nav-btn" onclick="navigateDay(1)" title="Próximo Dia">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="view-toggle">
+            <a href="{% url 'dashboard:calendar' %}" class="toggle-btn">
+                <i class="fas fa-calendar-week"></i> Semana
+            </a>
+            <a href="{% url 'dashboard:calendar_day' %}" class="toggle-btn active">
+                <i class="fas fa-calendar-day"></i> Dia
+            </a>
+        </div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="calendar-container">
+        <div class="day-grid">
+            <!-- Header Row -->
+            <div class="header-cell time-header">Hora</div>
+            {% for professional in professionals %}
+            <div class="header-cell">
+                <div class="professional-header">
+                    <div class="professional-avatar">
+                        {{ professional.display_name|slice:":2"|upper }}
+                    </div>
+                    <div class="professional-name">{{ professional.display_name }}</div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Time Rows -->
+            {% for hour in hours %}
+                <!-- Time Label -->
+                <div class="time-cell">{{ hour }}</div>
+
+                <!-- Cells for each professional -->
+                {% for professional in professionals %}
+                <div class="day-cell"
+                     data-professional="{{ professional.id }}"
+                     data-hour="{{ hour }}">
+
+                    <!-- Bookings for this professional at this hour -->
+                    {% for booking in bookings_by_professional_hour|get_item:professional.id|get_item:hour %}
+                    <div class="booking status-{{ booking.status }}"
+                         style="top: {{ booking.offset|stringformat:'f' }}%; height: {{ booking.height|stringformat:'f' }}%; min-height: 35px;"
+                         onclick="openBookingModal({{ booking.id }})">
+                        <div class="booking-time">{{ booking.time_display }}</div>
+                        <div class="booking-customer">{{ booking.customer_name }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Booking Details -->
+<div id="bookingModal" class="modal">
+    <div class="modal-overlay" onclick="closeBookingModal()"></div>
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeBookingModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div id="modalBody">
+            <p style="padding: 2rem; text-align: center; color: #6b7280;">Carregando...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Navigation
+function navigateDay(offset) {
+    const currentOffset = {{ day_offset }};
+    const newOffset = offset === 0 ? 0 : currentOffset + offset;
+    window.location.href = `?day_offset=${newOffset}`;
+}
+
+// Modal functions
+function openBookingModal(bookingId) {
+    const modal = document.getElementById('bookingModal');
+    const modalBody = document.getElementById('modalBody');
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #6b7280;">Carregando...</p>';
+
+    fetch(`/dashboard/agendamentos/${bookingId}/`)
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const content = doc.querySelector('.booking-details, .card, main, .content') || doc.body;
+            modalBody.innerHTML = content.innerHTML;
+        })
+        .catch(error => {
+            modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Erro ao carregar agendamento.</p>';
+            console.error('Error loading booking:', error);
+        });
+}
+
+function closeBookingModal() {
+    const modal = document.getElementById('bookingModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+// Close modal with ESC key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeBookingModal();
+    }
+});
+
+// Update clock in real-time
+function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+
+    document.getElementById('liveTime').textContent = `${hours}:${minutes}:${seconds}`;
+    document.getElementById('liveDate').textContent = `${day}/${month}/${year}`;
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+
+// Add current time indicator
+function updateTimeIndicator() {
+    {% if is_today %}
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinutes = now.getMinutes();
+
+    // Remove previous indicator
+    const oldIndicator = document.getElementById('current-time-indicator');
+    if (oldIndicator) {
+        oldIndicator.remove();
+    }
+
+    const dayGrid = document.querySelector('.day-grid');
+    if (dayGrid) {
+        const indicator = document.createElement('div');
+        indicator.id = 'current-time-indicator';
+
+        // Calculate position: header row (1) + current time position
+        // Each hour cell is 60px, plus header
+        const headerHeight = 80; // Approximate header height
+        const topPosition = headerHeight + (currentHour * 60) + (currentMinutes * 60 / 60);
+        indicator.style.top = `${topPosition}px`;
+
+        // Add red dot
+        const dot = document.createElement('div');
+        dot.style.cssText = `
+            position: absolute;
+            left: 30px;
+            top: -5px;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        `;
+        indicator.appendChild(dot);
+
+        dayGrid.appendChild(indicator);
+    }
+    {% endif %}
+}
+
+// Mark availability on cells
+{{ availability_by_professional|json_script:"availability-data" }}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const availabilityData = JSON.parse(document.getElementById('availability-data').textContent);
+
+    document.querySelectorAll('.day-cell').forEach(cell => {
+        const professionalId = parseInt(cell.dataset.professional);
+        const hourStr = cell.dataset.hour;
+        const availability = availabilityData[professionalId] || [];
+
+        let isAvailable = false;
+        let isBreakTime = false;
+
+        availability.forEach(rule => {
+            const startTime = rule.start_time;
+            const endTime = rule.end_time;
+
+            if (hourStr >= startTime && hourStr < endTime) {
+                if (rule.break_start && rule.break_end) {
+                    if (hourStr >= rule.break_start && hourStr < rule.break_end) {
+                        isBreakTime = true;
+                        return;
+                    }
+                }
+                isAvailable = true;
+            }
+        });
+
+        if (isBreakTime) {
+            cell.classList.add('break-time');
+        } else if (isAvailable) {
+            cell.classList.add('available');
+        } else {
+            cell.classList.add('unavailable');
+        }
+    });
+
+    // Update time indicator
+    updateTimeIndicator();
+    setInterval(updateTimeIndicator, 60000);
+});
+</script>
+{% endblock %}
