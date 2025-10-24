@@ -99,11 +99,9 @@ class ProfessionalUpdateForm(TenantAwareForm):
         return email
 
     def save(self, commit=True):
-        professional = super().save(commit=False)
-
-        # Atualizar dados do usuário se existir
-        if professional.user:
-            user = professional.user
+        # Atualizar dados do usuário ANTES de salvar o professional
+        if self.instance.user:
+            user = self.instance.user
 
             # Atualizar nome completo
             full_name = self.cleaned_data.get("user_full_name", "").strip()
@@ -130,10 +128,8 @@ class ProfessionalUpdateForm(TenantAwareForm):
             if commit:
                 user.save()
 
-        if commit:
-            professional.save()
-
-        return professional
+        # Agora salva o professional normalmente (incluindo arquivos como photo)
+        return super().save(commit=commit)
 
 
 
