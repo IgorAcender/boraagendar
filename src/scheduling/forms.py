@@ -69,9 +69,71 @@ class ProfessionalForm(TenantAwareForm):
 
 
 class ProfessionalUpdateForm(TenantAwareForm):
+    # Campos para editar dados do usuário vinculado
+    user_full_name = forms.CharField(label="Nome completo", max_length=150, required=False)
+    user_email = forms.EmailField(label="E-mail", required=False)
+    user_phone_number = forms.CharField(label="Telefone", max_length=32, required=False)
+    user_password = forms.CharField(label="Nova senha (deixe em branco para manter a atual)", widget=forms.PasswordInput, required=False)
+
     class Meta:
         model = Professional
         fields = ["user", "display_name", "photo", "bio", "color", "is_active"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Preencher campos com dados do usuário atual se existir
+        if self.instance and self.instance.pk and self.instance.user:
+            user = self.instance.user
+            self.fields["user_full_name"].initial = user.get_full_name()
+            self.fields["user_email"].initial = user.email
+            self.fields["user_phone_number"].initial = user.phone_number
+
+    def clean_user_email(self):
+        email = self.cleaned_data.get("user_email", "").strip()
+        if email:
+            User = get_user_model()
+            # Verificar se o email já existe (exceto o usuário atual)
+            existing_user = User.objects.filter(email=email).first()
+            if existing_user and self.instance.user and existing_user.pk != self.instance.user.pk:
+                raise ValidationError("Este e-mail já está em uso por outro usuário.")
+        return email
+
+    def save(self, commit=True):
+        professional = super().save(commit=False)
+
+        # Atualizar dados do usuário se existir
+        if professional.user:
+            user = professional.user
+
+            # Atualizar nome completo
+            full_name = self.cleaned_data.get("user_full_name", "").strip()
+            if full_name:
+                name_parts = full_name.split(" ", 1)
+                user.first_name = name_parts[0]
+                user.last_name = name_parts[1] if len(name_parts) > 1 else ""
+
+            # Atualizar email
+            email = self.cleaned_data.get("user_email", "").strip()
+            if email:
+                user.email = email
+
+            # Atualizar telefone
+            phone = self.cleaned_data.get("user_phone_number", "").strip()
+            if phone:
+                user.phone_number = phone
+
+            # Atualizar senha se fornecida
+            password = self.cleaned_data.get("user_password", "").strip()
+            if password:
+                user.set_password(password)
+
+            if commit:
+                user.save()
+
+        if commit:
+            professional.save()
+
+        return professional
 
 
 

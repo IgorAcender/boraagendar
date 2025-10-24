@@ -11,8 +11,66 @@
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+
+        <h3 style="margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid #ddd; padding-bottom: 0.5rem;">Dados do Usuário</h3>
+        {{ form.user_full_name.errors }}
+        <p>
+            <label for="{{ form.user_full_name.id_for_label }}">{{ form.user_full_name.label }}</label>
+            {{ form.user_full_name }}
+        </p>
+
+        {{ form.user_email.errors }}
+        <p>
+            <label for="{{ form.user_email.id_for_label }}">{{ form.user_email.label }}</label>
+            {{ form.user_email }}
+        </p>
+
+        {{ form.user_phone_number.errors }}
+        <p>
+            <label for="{{ form.user_phone_number.id_for_label }}">{{ form.user_phone_number.label }}</label>
+            {{ form.user_phone_number }}
+        </p>
+
+        {{ form.user_password.errors }}
+        <p>
+            <label for="{{ form.user_password.id_for_label }}">{{ form.user_password.label }}</label>
+            {{ form.user_password }}
+        </p>
+
+        <h3 style="margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid #ddd; padding-bottom: 0.5rem;">Dados do Profissional</h3>
+        {{ form.display_name.errors }}
+        <p>
+            <label for="{{ form.display_name.id_for_label }}">{{ form.display_name.label }}</label>
+            {{ form.display_name }}
+        </p>
+
+        {{ form.photo.errors }}
+        <p>
+            <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
+            {{ form.photo }}
+        </p>
+
+        {{ form.bio.errors }}
+        <p>
+            <label for="{{ form.bio.id_for_label }}">{{ form.bio.label }}</label>
+            {{ form.bio }}
+        </p>
+
+        {{ form.color.errors }}
+        <p>
+            <label for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
+            {{ form.color }}
+        </p>
+
+        {{ form.is_active.errors }}
+        <p>
+            <label for="{{ form.is_active.id_for_label }}">{{ form.is_active.label }}</label>
+            {{ form.is_active }}
+        </p>
+
+        {{ form.user.as_hidden }}
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">Salvar Alterações</button>
     </form>
 </div>
 {% endblock %}
