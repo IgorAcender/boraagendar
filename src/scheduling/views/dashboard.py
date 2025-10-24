@@ -16,7 +16,7 @@ from tenants.services import TenantSelectionRequired, ensure_membership_for_requ
 from tenants.forms import TeamMemberCreateForm, TeamMemberUpdateForm
 from tenants.models import TenantMembership
 
-from ..forms import BookingForm, ProfessionalForm, ServiceForm
+from ..forms import BookingForm, ProfessionalForm, ProfessionalUpdateForm, ServiceForm
 from ..models import Booking, Professional, Service
 from ..services.notification_dispatcher import send_booking_confirmation
 
