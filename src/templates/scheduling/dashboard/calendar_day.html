@@ -521,6 +521,9 @@
     </div>
 </div>
 
+<!-- Availability Data -->
+{{ availability_by_professional|json_script:"availability-data" }}
+
 <script>
 // Navigation
 function navigateDay(offset) {
@@ -606,7 +609,18 @@ function updateTimeIndicator() {
         // Each hour cell is 60px, plus header
         const headerHeight = 80; // Approximate header height
         const topPosition = headerHeight + (currentHour * 60) + (currentMinutes * 60 / 60);
-        indicator.style.top = `${topPosition}px`;
+
+        indicator.style.cssText = `
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ef4444;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+            top: ${topPosition}px;
+        `;
 
         // Add red dot
         const dot = document.createElement('div');
@@ -629,8 +643,6 @@ function updateTimeIndicator() {
 }
 
 // Mark availability on cells
-{{ availability_by_professional|json_script:"availability-data" }}
-
 document.addEventListener('DOMContentLoaded', function() {
     const availabilityData = JSON.parse(document.getElementById('availability-data').textContent);
 
