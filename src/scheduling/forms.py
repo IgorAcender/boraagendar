@@ -152,12 +152,15 @@ class ProfessionalUpdateForm(TenantAwareForm):
             # Adicionar o prefixo do tipo MIME
             content_type = photo.content_type or 'image/jpeg'
             self.instance.photo_base64 = f"data:{content_type};base64,{photo_base64}"
-            print(f"DEBUG - photo_base64 salvo! Tamanho: {len(photo_base64)}")
+            print(f"DEBUG - photo_base64 definido na instância! Tamanho: {len(photo_base64)}")
+            print(f"DEBUG - Primeiros 50 chars: {self.instance.photo_base64[:50]}")
         else:
             print("DEBUG - Nenhuma foto nova foi enviada ou não tem método read()")
 
         # Agora salva o professional normalmente (incluindo arquivos como photo)
-        return super().save(commit=commit)
+        result = super().save(commit=commit)
+        print(f"DEBUG - Após super().save(), photo_base64 no banco: {result.photo_base64[:50] if result.photo_base64 else 'VAZIO!!!'}")
+        return result
 
 
 
