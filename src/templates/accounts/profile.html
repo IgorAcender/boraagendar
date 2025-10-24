@@ -2,104 +2,611 @@
 {% block title %}Perfil{% endblock %}
 {% block content %}
 
+<style>
+    /* Hero Header com gradiente moderno */
+    .hero-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="1000,100 1000,0 0,100"/></svg>');
+        background-size: cover;
+        z-index: 0;
+    }
+
+    .hero-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
+
+    .hero-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        flex-shrink: 0;
+    }
+
+    .hero-title h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .hero-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        margin: 0.25rem 0 0 0;
+    }
+
+    /* Glass Card */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Profile Photo Section */
+    .profile-photo-section {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        border-radius: 16px;
+    }
+
+    .profile-photo-wrapper {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .profile-photo {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        border: 4px solid white;
+    }
+
+    .profile-photo-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        border: 4px solid white;
+    }
+
+    /* Form Sections */
+    .form-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: rgba(248, 250, 252, 0.5);
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+    }
+
+    .form-section h3 {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.25rem;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-section h3 i {
+        color: #667eea;
+    }
+
+    /* Form Grid */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-field label {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-field label i {
+        color: #94a3b8;
+        font-size: 0.875rem;
+    }
+
+    .form-field input[type="text"],
+    .form-field input[type="email"],
+    .form-field input[type="tel"],
+    .form-field input[type="password"],
+    .form-field input[type="color"],
+    .form-field textarea,
+    .form-field select {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.9375rem;
+        transition: all 0.2s;
+        background: white;
+        color: #1e293b;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-field textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-field input[type="color"] {
+        height: 50px;
+        cursor: pointer;
+    }
+
+    .form-field input[type="file"] {
+        border: 2px dashed #e2e8f0;
+        padding: 1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .form-field input[type="file"]:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    /* Checkbox field */
+    .checkbox-field {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .checkbox-field:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .checkbox-field input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .checkbox-field label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    /* Error messages */
+    .errorlist {
+        list-style: none;
+        margin: 0.5rem 0 0 0;
+        padding: 0.75rem;
+        background: #fee2e2;
+        border-left: 4px solid #ef4444;
+        border-radius: 8px;
+        color: #b91c1c;
+        font-size: 0.875rem;
+    }
+
+    /* Action Buttons */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary {
+        flex: 1;
+        min-width: 200px;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        flex: 1;
+        min-width: 200px;
+        padding: 1rem 2rem;
+        background: #6b7280;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+        transform: translateY(-2px);
+    }
+
+    /* Info Card (para não profissionais) */
+    .info-card {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(248, 250, 252, 0.5);
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+    }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #667eea;
+        font-size: 1.25rem;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: #1e293b;
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title h1 {
+            font-size: 1.5rem;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            width: 100%;
+        }
+    }
+</style>
+
 {% if professional %}
 {# Se for profissional, mostrar formulário de edição #}
-<div class="card">
-    <h2>Editar Meu Perfil Profissional</h2>
 
-    {% if form.photo_base64 or professional.photo %}
-    <div style="margin-bottom: 2rem; text-align: center;">
-        {% if professional.photo_base64 %}
-            <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-        {% elif professional.photo %}
-            <img src="{{ professional.photo.url }}" alt="{{ professional.display_name }}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-        {% endif %}
+<!-- Hero Header -->
+<div class="hero-header animate-fade-in">
+    <div class="hero-title">
+        <div class="hero-icon">
+            <i class="fas fa-user-edit"></i>
+        </div>
+        <div>
+            <h1>Editar Meu Perfil</h1>
+            <p class="hero-subtitle">Mantenha suas informações sempre atualizadas</p>
+        </div>
     </div>
-    {% endif %}
+</div>
+
+<!-- Form Card -->
+<div class="glass-card animate-slide-up">
+    <!-- Profile Photo Section -->
+    <div class="profile-photo-section">
+        <div class="profile-photo-wrapper">
+            {% if professional.photo_base64 %}
+                <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}" class="profile-photo">
+            {% elif professional.photo %}
+                <img src="{{ professional.photo.url }}" alt="{{ professional.display_name }}" class="profile-photo">
+            {% else %}
+                <div class="profile-photo-placeholder">
+                    {{ professional.display_name|first|upper }}
+                </div>
+            {% endif %}
+        </div>
+        <h3 style="margin: 0; color: #1e293b;">{{ professional.display_name }}</h3>
+        <p style="margin: 0.5rem 0 0 0; color: #64748b;">{{ request.user.email }}</p>
+    </div>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <h3>Dados do Usuário</h3>
+        <!-- Dados do Usuário -->
+        <div class="form-section">
+            <h3><i class="fas fa-user"></i> Dados do Usuário</h3>
 
-        {{ form.user_full_name.errors }}
-        <p>
-            <label for="{{ form.user_full_name.id_for_label }}">{{ form.user_full_name.label }}</label>
-            {{ form.user_full_name }}
-        </p>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="{{ form.user_full_name.id_for_label }}">
+                        <i class="fas fa-signature"></i>
+                        {{ form.user_full_name.label }}
+                    </label>
+                    {{ form.user_full_name }}
+                    {{ form.user_full_name.errors }}
+                </div>
 
-        {{ form.user_email.errors }}
-        <p>
-            <label for="{{ form.user_email.id_for_label }}">{{ form.user_email.label }}</label>
-            {{ form.user_email }}
-        </p>
+                <div class="form-field">
+                    <label for="{{ form.user_email.id_for_label }}">
+                        <i class="fas fa-envelope"></i>
+                        {{ form.user_email.label }}
+                    </label>
+                    {{ form.user_email }}
+                    {{ form.user_email.errors }}
+                </div>
 
-        {{ form.user_phone_number.errors }}
-        <p>
-            <label for="{{ form.user_phone_number.id_for_label }}">{{ form.user_phone_number.label }}</label>
-            {{ form.user_phone_number }}
-        </p>
+                <div class="form-field">
+                    <label for="{{ form.user_phone_number.id_for_label }}">
+                        <i class="fas fa-phone"></i>
+                        {{ form.user_phone_number.label }}
+                    </label>
+                    {{ form.user_phone_number }}
+                    {{ form.user_phone_number.errors }}
+                </div>
 
-        {{ form.user_password.errors }}
-        <p>
-            <label for="{{ form.user_password.id_for_label }}">{{ form.user_password.label }}</label>
-            {{ form.user_password }}
-        </p>
+                <div class="form-field">
+                    <label for="{{ form.user_password.id_for_label }}">
+                        <i class="fas fa-lock"></i>
+                        {{ form.user_password.label }}
+                    </label>
+                    {{ form.user_password }}
+                    {{ form.user_password.errors }}
+                </div>
+            </div>
+        </div>
 
-        <h3 style="margin-top: 2rem;">Dados do Profissional</h3>
+        <!-- Dados do Profissional -->
+        <div class="form-section">
+            <h3><i class="fas fa-briefcase"></i> Dados Profissionais</h3>
 
-        {{ form.display_name.errors }}
-        <p>
-            <label for="{{ form.display_name.id_for_label }}">{{ form.display_name.label }}</label>
-            {{ form.display_name }}
-        </p>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="{{ form.display_name.id_for_label }}">
+                        <i class="fas fa-id-badge"></i>
+                        {{ form.display_name.label }}
+                    </label>
+                    {{ form.display_name }}
+                    {{ form.display_name.errors }}
+                </div>
 
-        {{ form.photo.errors }}
-        <p>
-            <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
-            {{ form.photo }}
-            {% if professional.photo %}
-                <small>Foto atual: <a href="{{ professional.photo.url }}" target="_blank">{{ professional.photo.name }}</a></small>
-            {% endif %}
-        </p>
+                <div class="form-field">
+                    <label for="{{ form.color.id_for_label }}">
+                        <i class="fas fa-palette"></i>
+                        {{ form.color.label }}
+                    </label>
+                    {{ form.color }}
+                    {{ form.color.errors }}
+                </div>
+            </div>
 
-        {{ form.bio.errors }}
-        <p>
-            <label for="{{ form.bio.id_for_label }}">{{ form.bio.label }}</label>
-            {{ form.bio }}
-        </p>
+            <div class="form-grid" style="margin-top: 1.5rem;">
+                <div class="form-field">
+                    <label for="{{ form.photo.id_for_label }}">
+                        <i class="fas fa-camera"></i>
+                        {{ form.photo.label }}
+                    </label>
+                    {{ form.photo }}
+                    {{ form.photo.errors }}
+                </div>
 
-        {{ form.color.errors }}
-        <p>
-            <label for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
-            {{ form.color }}
-        </p>
+                <div class="form-field">
+                    <label for="{{ form.bio.id_for_label }}">
+                        <i class="fas fa-align-left"></i>
+                        {{ form.bio.label }}
+                    </label>
+                    {{ form.bio }}
+                    {{ form.bio.errors }}
+                </div>
+            </div>
 
-        {{ form.is_active.errors }}
-        <p>
-            <label for="{{ form.is_active.id_for_label }}">
-                {{ form.is_active }} {{ form.is_active.label }}
-            </label>
-        </p>
+            <div style="margin-top: 1.5rem;">
+                <div class="checkbox-field">
+                    {{ form.is_active }}
+                    <label for="{{ form.is_active.id_for_label }}">
+                        <i class="fas fa-toggle-on"></i>
+                        {{ form.is_active.label }}
+                    </label>
+                </div>
+                {{ form.is_active.errors }}
+            </div>
+        </div>
 
-        <p>
-            <button type="submit" class="button">Salvar Alterações</button>
-            <a href="{% url 'accounts:password_change' %}" class="button" style="background: #6b7280;">Alterar Senha</a>
-        </p>
+        <!-- Action Buttons -->
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i>
+                Salvar Alterações
+            </button>
+            <a href="{% url 'accounts:password_change' %}" class="btn-secondary">
+                <i class="fas fa-key"></i>
+                Alterar Senha
+            </a>
+        </div>
     </form>
 </div>
 
 {% else %}
 {# Se não for profissional, mostrar apenas informações básicas #}
-<div class="card">
-    <h2>Meu perfil</h2>
-    <p><strong>Nome:</strong> {{ request.user.get_full_name|default:request.user.email }}</p>
-    <p><strong>Email:</strong> {{ request.user.email }}</p>
-    <p><strong>Telefone:</strong> {{ request.user.phone_number|default:"-" }}</p>
-    <p><strong>Idioma:</strong> {{ request.user.locale }}</p>
-    <p><strong>Fuso horario:</strong> {{ request.user.timezone }}</p>
-    <p><a class="button" href="{% url 'accounts:password_change' %}">Alterar senha</a></p>
+
+<!-- Hero Header -->
+<div class="hero-header animate-fade-in">
+    <div class="hero-title">
+        <div class="hero-icon">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <div>
+            <h1>Meu Perfil</h1>
+            <p class="hero-subtitle">Suas informações pessoais</p>
+        </div>
+    </div>
 </div>
+
+<!-- Info Card -->
+<div class="glass-card animate-slide-up">
+    <div class="info-card">
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-label">Nome</div>
+                <div class="info-value">{{ request.user.get_full_name|default:request.user.email }}</div>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-label">E-mail</div>
+                <div class="info-value">{{ request.user.email }}</div>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-label">Telefone</div>
+                <div class="info-value">{{ request.user.phone_number|default:"-" }}</div>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-language"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-label">Idioma</div>
+                <div class="info-value">{{ request.user.locale }}</div>
+            </div>
+        </div>
+
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-label">Fuso Horário</div>
+                <div class="info-value">{{ request.user.timezone }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a href="{% url 'accounts:password_change' %}" class="btn-primary">
+            <i class="fas fa-key"></i>
+            Alterar Senha
+        </a>
+    </div>
+</div>
+
 {% endif %}
 
 {% endblock %}
