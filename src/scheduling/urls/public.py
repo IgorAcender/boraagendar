@@ -16,4 +16,9 @@ urlpatterns = [
         public_views.booking_success,
         name="booking_success",
     ),
+    path(
+        "agendar/<slug:tenant_slug>/api/profissionais/",
+        public_views.get_service_professionals,
+        name="get_service_professionals",
+    ),
 ]

@@ -457,16 +457,90 @@
 {% endif %}
 
 <script>
-    // Auto-submit quando trocar o serviço
+    // Carregar profissionais via AJAX quando trocar o serviço
     document.addEventListener('DOMContentLoaded', function() {
         const serviceSelect = document.getElementById('id_service');
-        const serviceForm = document.getElementById('serviceForm');
+        const tenantSlug = '{{ tenant.slug }}';
 
-        if (serviceSelect && serviceForm) {
+        if (serviceSelect) {
             serviceSelect.addEventListener('change', function() {
-                if (this.value) {
-                    serviceForm.submit();
+                const serviceId = this.value;
+
+                if (!serviceId) {
+                    // Se deselecionou, limpar profissionais
+                    const professionalsSection = document.querySelector('.professionals-section');
+                    if (professionalsSection) {
+                        professionalsSection.remove();
+                    }
+                    return;
                 }
+
+                // Fazer requisição AJAX
+                fetch(`/agendar/${tenantSlug}/api/profissionais/?service_id=${serviceId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        renderProfessionals(data.professionals, serviceId);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar profissionais:', error);
+                    });
+            });
+        }
+
+        function renderProfessionals(professionals, serviceId) {
+            // Remover seção antiga se existir
+            let professionalsSection = document.querySelector('.professionals-section');
+            if (professionalsSection) {
+                professionalsSection.remove();
+            }
+
+            if (professionals.length === 0) {
+                return;
+            }
+
+            // Criar nova seção
+            const formSection = document.querySelector('.form-section');
+            professionalsSection = document.createElement('div');
+            professionalsSection.className = 'professionals-section';
+            professionalsSection.innerHTML = `
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    Escolha o Profissional
+                </h2>
+                <div class="professionals-grid" id="professionalsGrid"></div>
+            `;
+
+            formSection.parentNode.insertBefore(professionalsSection, formSection.nextSibling);
+
+            const grid = document.getElementById('professionalsGrid');
+            professionals.forEach(prof => {
+                const card = document.createElement('a');
+                card.href = `?service=${serviceId}&professional=${prof.id}`;
+                card.className = 'professional-card';
+
+                let avatarContent = '';
+                if (prof.photo_base64) {
+                    avatarContent = `<img src="${prof.photo_base64}" alt="${prof.display_name}">`;
+                } else if (prof.photo_url) {
+                    avatarContent = `<img src="${prof.photo_url}" alt="${prof.display_name}">`;
+                } else {
+                    avatarContent = prof.display_name.charAt(0).toUpperCase();
+                }
+
+                card.innerHTML = `
+                    <div class="professional-card-avatar" style="background: ${prof.color};">
+                        ${avatarContent}
+                    </div>
+                    <div class="professional-card-name">${prof.display_name}</div>
+                    ${prof.bio ? `<div class="professional-card-bio">${prof.bio}</div>` : ''}
+                    <div class="btn-select-professional">
+                        <i class="fas fa-calendar-check"></i> Selecionar
+                    </div>
+                `;
+
+                grid.appendChild(card);
             });
         }
     });

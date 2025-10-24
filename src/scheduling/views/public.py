@@ -1,7 +1,8 @@
 ﻿from datetime import datetime
 from zoneinfo import ZoneInfo
+import json
 
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from tenants.models import Tenant
@@ -116,3 +117,32 @@ def booking_success(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         "scheduling/public/booking_success.html",
         {"tenant": tenant},
     )
+
+
+def get_service_professionals(request: HttpRequest, tenant_slug: str) -> JsonResponse:
+    """API endpoint para retornar profissionais de um serviço em JSON"""
+    tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
+    service_id = request.GET.get('service_id')
+
+    if not service_id:
+        return JsonResponse({'professionals': []})
+
+    try:
+        service = Service.objects.get(pk=service_id, tenant=tenant, is_active=True)
+        professionals = service.professionals.filter(is_active=True).order_by('display_name')
+
+        professionals_data = []
+        for prof in professionals:
+            prof_data = {
+                'id': prof.id,
+                'display_name': prof.display_name,
+                'bio': prof.bio or '',
+                'color': prof.color,
+                'photo_base64': prof.photo_base64 or '',
+                'photo_url': prof.photo.url if prof.photo else '',
+            }
+            professionals_data.append(prof_data)
+
+        return JsonResponse({'professionals': professionals_data})
+    except Service.DoesNotExist:
+        return JsonResponse({'professionals': []})
