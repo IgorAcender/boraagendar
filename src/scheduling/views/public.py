@@ -63,22 +63,66 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     professional_id = request.GET.get("professional") or request.POST.get("professional")
     start_iso = request.GET.get("start") or request.POST.get("start")
 
+    print(f"DEBUG - booking_confirm chamado:")
+    print(f"  service_id: {service_id}")
+    print(f"  professional_id: {professional_id}")
+    print(f"  start_iso: {start_iso}")
+
     if not service_id or not start_iso:
+        print("DEBUG - Parâmetros faltando, redirecionando...")
         return redirect("public:booking_start", tenant_slug=tenant.slug)
 
-    service = get_object_or_404(Service, pk=service_id, tenant=tenant, is_active=True)
-    professional = None
-    if professional_id:
-        professional = get_object_or_404(Professional, pk=professional_id, tenant=tenant, is_active=True)
-    start_datetime = datetime.fromisoformat(start_iso)
-    if start_datetime.tzinfo is None:
-        start_datetime = start_datetime.replace(tzinfo=tz)
-    else:
-        start_datetime = start_datetime.astimezone(tz)
+    try:
+        service = get_object_or_404(Service, pk=service_id, tenant=tenant, is_active=True)
+        professional = None
+        if professional_id:
+            professional = get_object_or_404(Professional, pk=professional_id, tenant=tenant, is_active=True)
 
-    availability_service = AvailabilityService(tenant=tenant)
-    if not availability_service.is_slot_available(service, professional, start_datetime):
-        return redirect("public:booking_start", tenant_slug=tenant.slug)
+        print(f"DEBUG - Service: {service.name}")
+        print(f"DEBUG - Professional: {professional.display_name if professional else 'None'}")
+        print(f"DEBUG - Tentando fazer parse do datetime: {start_iso}")
+
+        # Tentar diferentes formatos de parse
+        try:
+            start_datetime = datetime.fromisoformat(start_iso)
+        except ValueError as e:
+            print(f"DEBUG - Erro no fromisoformat: {e}")
+            # Tentar remover os dois pontos do timezone (-03:00 -> -0300)
+            start_iso_fixed = start_iso.replace(':', '', 2)  # Remove apenas os primeiros 2 ':'
+            # Se tiver timezone com :, corrigir
+            if start_iso.count(':') >= 3:  # Tem pelo menos hora:minuto:segundo:timezone
+                parts = start_iso.rsplit(':', 1)
+                if len(parts) == 2 and (parts[1].startswith('+') or parts[1].startswith('-')):
+                    start_iso_fixed = start_iso[:-3] + start_iso[-2:]
+                else:
+                    # Formato normal, tentar com strptime
+                    start_datetime = datetime.strptime(start_iso.split('+')[0].split('-')[0], '%Y-%m-%dT%H:%M:%S')
+                    start_datetime = start_datetime.replace(tzinfo=tz)
+            else:
+                start_datetime = datetime.strptime(start_iso.split('+')[0].split('T')[0] + 'T' + start_iso.split('T')[1].split('-')[0], '%Y-%m-%dT%H:%M:%S')
+                start_datetime = start_datetime.replace(tzinfo=tz)
+
+        print(f"DEBUG - Datetime parseado: {start_datetime}")
+
+        if start_datetime.tzinfo is None:
+            start_datetime = start_datetime.replace(tzinfo=tz)
+        else:
+            start_datetime = start_datetime.astimezone(tz)
+
+        print(f"DEBUG - Datetime com timezone: {start_datetime}")
+
+        availability_service = AvailabilityService(tenant=tenant)
+        is_available = availability_service.is_slot_available(service, professional, start_datetime)
+        print(f"DEBUG - Slot disponível: {is_available}")
+
+        if not is_available:
+            print("DEBUG - Slot não disponível, redirecionando...")
+            return redirect("public:booking_start", tenant_slug=tenant.slug)
+    except Exception as e:
+        print(f"DEBUG - ERRO GERAL: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
 
     if request.method == "POST":
         form = BookingForm(tenant=tenant, data=request.POST, hide_schedule_fields=True)
