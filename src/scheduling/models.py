@@ -56,6 +56,7 @@ class Professional(models.Model):
     )
     display_name = models.CharField(max_length=120, verbose_name="Nome de exibicao")
     photo = models.ImageField(upload_to='professionals/', null=True, blank=True, verbose_name="Foto")
+    photo_base64 = models.TextField(null=True, blank=True, verbose_name="Foto (Base64)")
     bio = models.TextField(blank=True, verbose_name="Bio")
     color = models.CharField(max_length=7, default="#2563EB", verbose_name="Cor na agenda")
     is_active = models.BooleanField(default=True, verbose_name="Ativo")
