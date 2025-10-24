@@ -1,6 +1,96 @@
 {% extends "base_dashboard.html" %}
 {% block title %}Perfil{% endblock %}
 {% block content %}
+
+{% if professional %}
+{# Se for profissional, mostrar formulário de edição #}
+<div class="card">
+    <h2>Editar Meu Perfil Profissional</h2>
+
+    {% if form.photo_base64 or professional.photo %}
+    <div style="margin-bottom: 2rem; text-align: center;">
+        {% if professional.photo_base64 %}
+            <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+        {% elif professional.photo %}
+            <img src="{{ professional.photo.url }}" alt="{{ professional.display_name }}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h3>Dados do Usuário</h3>
+
+        {{ form.user_full_name.errors }}
+        <p>
+            <label for="{{ form.user_full_name.id_for_label }}">{{ form.user_full_name.label }}</label>
+            {{ form.user_full_name }}
+        </p>
+
+        {{ form.user_email.errors }}
+        <p>
+            <label for="{{ form.user_email.id_for_label }}">{{ form.user_email.label }}</label>
+            {{ form.user_email }}
+        </p>
+
+        {{ form.user_phone_number.errors }}
+        <p>
+            <label for="{{ form.user_phone_number.id_for_label }}">{{ form.user_phone_number.label }}</label>
+            {{ form.user_phone_number }}
+        </p>
+
+        {{ form.user_password.errors }}
+        <p>
+            <label for="{{ form.user_password.id_for_label }}">{{ form.user_password.label }}</label>
+            {{ form.user_password }}
+        </p>
+
+        <h3 style="margin-top: 2rem;">Dados do Profissional</h3>
+
+        {{ form.display_name.errors }}
+        <p>
+            <label for="{{ form.display_name.id_for_label }}">{{ form.display_name.label }}</label>
+            {{ form.display_name }}
+        </p>
+
+        {{ form.photo.errors }}
+        <p>
+            <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
+            {{ form.photo }}
+            {% if professional.photo %}
+                <small>Foto atual: <a href="{{ professional.photo.url }}" target="_blank">{{ professional.photo.name }}</a></small>
+            {% endif %}
+        </p>
+
+        {{ form.bio.errors }}
+        <p>
+            <label for="{{ form.bio.id_for_label }}">{{ form.bio.label }}</label>
+            {{ form.bio }}
+        </p>
+
+        {{ form.color.errors }}
+        <p>
+            <label for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
+            {{ form.color }}
+        </p>
+
+        {{ form.is_active.errors }}
+        <p>
+            <label for="{{ form.is_active.id_for_label }}">
+                {{ form.is_active }} {{ form.is_active.label }}
+            </label>
+        </p>
+
+        <p>
+            <button type="submit" class="button">Salvar Alterações</button>
+            <a href="{% url 'accounts:password_change' %}" class="button" style="background: #6b7280;">Alterar Senha</a>
+        </p>
+    </form>
+</div>
+
+{% else %}
+{# Se não for profissional, mostrar apenas informações básicas #}
 <div class="card">
     <h2>Meu perfil</h2>
     <p><strong>Nome:</strong> {{ request.user.get_full_name|default:request.user.email }}</p>
@@ -10,4 +100,6 @@
     <p><strong>Fuso horario:</strong> {{ request.user.timezone }}</p>
     <p><a class="button" href="{% url 'accounts:password_change' %}">Alterar senha</a></p>
 </div>
+{% endif %}
+
 {% endblock %}

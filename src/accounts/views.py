@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -42,11 +43,43 @@ def dashboard_profile_view(request: HttpRequest) -> HttpResponse:
         membership = ensure_membership_for_request(request)
     except TenantSelectionRequired:
         return redirect(_build_selection_url(request))
-    return render(
-        request,
-        "accounts/profile.html",
-        {"tenant": membership.tenant},
-    )
+
+    tenant = membership.tenant
+
+    # Verificar se o usuário é um profissional
+    try:
+        from scheduling.models import Professional
+        professional = Professional.objects.get(user=request.user, tenant=tenant)
+
+        # Se for profissional, permitir edição do perfil
+        if request.method == "POST":
+            from scheduling.forms import ProfessionalUpdateForm
+            form = ProfessionalUpdateForm(
+                tenant=tenant,
+                data=request.POST,
+                files=request.FILES,
+                instance=professional
+            )
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Perfil atualizado com sucesso!")
+                return redirect("accounts:profile")
+        else:
+            from scheduling.forms import ProfessionalUpdateForm
+            form = ProfessionalUpdateForm(tenant=tenant, instance=professional)
+
+        return render(
+            request,
+            "accounts/profile.html",
+            {"tenant": tenant, "form": form, "professional": professional},
+        )
+    except Professional.DoesNotExist:
+        # Se não for profissional, mostrar apenas informações básicas
+        return render(
+            request,
+            "accounts/profile.html",
+            {"tenant": tenant},
+        )
 
 
 @login_required
