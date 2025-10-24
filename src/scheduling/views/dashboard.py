@@ -104,24 +104,26 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
     for booking in bookings_raw:
         local_scheduled_for = booking.scheduled_for.astimezone(tz)
         date = local_scheduled_for.date()
-        hour = local_scheduled_for.strftime('%H:%M')
-        # Calculate height based on duration (60px per hour)
+        # Usar apenas a hora (sem minutos) para agrupar na célula correta
+        hour_base = local_scheduled_for.strftime('%H:00')
+        # Calculate height based on duration (altura proporcional em %)
         height = (booking.duration_minutes / 60) * 100
-        # Calculate offset within the cell
+        # Calculate offset within the cell (posição vertical dentro da célula em %)
         minutes = local_scheduled_for.minute
-        offset = (minutes / 60) * 100 if minutes != 0 else 0
+        offset = (minutes / 60) * 100
 
-        bookings_by_cell[(date, hour[:5])].append({
+        bookings_by_cell[(date, hour_base)].append({
             'id': booking.pk,
             'customer_name': booking.customer_name,
             'service': booking.service,
             'professional': booking.professional,
             'scheduled_for': local_scheduled_for,
             'status': booking.status,
-            'height': min(height, 200),  # Limit to 2 cells max
-            'offset': offset,
+            'height': height,  # Altura em %
+            'offset': offset,  # Offset em %
             'date': date,
-            'hour': hour[:5],  # HH:MM format
+            'hour': hour_base,  # HH:00 format (hora base da célula)
+            'time_display': local_scheduled_for.strftime('%H:%M'),  # Hora exata para exibir
         })
 
     # Get all professionals for filter

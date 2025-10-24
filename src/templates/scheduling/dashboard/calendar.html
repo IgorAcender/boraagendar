@@ -196,7 +196,7 @@
     .day-cell {
         border-bottom: 1px solid #e2e8f0;
         border-right: 1px solid #e2e8f0;
-        min-height: 60px;
+        height: 60px;  /* Altura fixa para posicionamento correto */
         position: relative;
         background: white;
         transition: background 0.2s;
@@ -237,7 +237,7 @@
         position: absolute;
         left: 2px;
         right: 2px;
-        top: 2px;
+        /* top é definido inline via style="top: X%" */
         background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
         color: white;
         border-radius: 6px;
@@ -440,8 +440,12 @@
                         {% if booking.date == day.date and booking.hour == hour %}
                         <a href="{% url 'dashboard:booking_detail' booking.id %}"
                            class="booking status-{{ booking.status }}"
-                           title="{{ booking.customer_name }} - {{ booking.service.name }}">
-                            <div class="booking-customer">{{ booking.customer_name }}</div>
+                           style="top: {{ booking.offset }}%; height: {{ booking.height }}%; min-height: 35px;"
+                           title="{{ booking.customer_name }} - {{ booking.service.name }} - {{ booking.time_display }}">
+                            <div class="booking-customer">
+                                <i class="fas fa-clock" style="font-size: 0.65rem; opacity: 0.8;"></i>
+                                {{ booking.time_display }} - {{ booking.customer_name }}
+                            </div>
                             <div class="booking-service">{{ booking.service.name }}</div>
                         </a>
                         {% endif %}
