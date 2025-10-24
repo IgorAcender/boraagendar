@@ -587,6 +587,7 @@
         <div class="professional-card">
             <div class="professional-header">
                 <div class="professional-avatar" style="background: {{ p.color }};">
+                    {# Prioriza photo_base64 para evitar problemas com arquivos no Docker #}
                     {% if p.photo_base64 %}
                         <img src="{{ p.photo_base64 }}" alt="{{ p.display_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     {% elif p.photo %}
