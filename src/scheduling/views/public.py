@@ -155,8 +155,14 @@ def get_available_slots(request: HttpRequest, tenant_slug: str) -> JsonResponse:
     professional_id = request.GET.get('professional_id')
     date_str = request.GET.get('date')
 
+    print(f"DEBUG - get_available_slots chamado:")
+    print(f"  service_id: {service_id}")
+    print(f"  professional_id: {professional_id}")
+    print(f"  date_str: {date_str}")
+
     if not service_id or not professional_id or not date_str:
-        return JsonResponse({'slots': []})
+        print("DEBUG - Parâmetros faltando!")
+        return JsonResponse({'slots': [], 'error': 'missing_parameters'})
 
     try:
         from datetime import datetime
@@ -164,12 +170,18 @@ def get_available_slots(request: HttpRequest, tenant_slug: str) -> JsonResponse:
         professional = Professional.objects.get(pk=professional_id, tenant=tenant, is_active=True)
         target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
+        print(f"DEBUG - Service: {service.name}")
+        print(f"DEBUG - Professional: {professional.display_name}")
+        print(f"DEBUG - Target date: {target_date}")
+
         availability_service = AvailabilityService(tenant=tenant)
         available_slots = availability_service.get_available_slots(
             service=service,
             professional=professional,
             target_date=target_date,
         )
+
+        print(f"DEBUG - Slots encontrados: {len(available_slots)}")
 
         slots_data = []
         for slot in available_slots:
@@ -181,5 +193,6 @@ def get_available_slots(request: HttpRequest, tenant_slug: str) -> JsonResponse:
             slots_data.append(slot_data)
 
         return JsonResponse({'slots': slots_data})
-    except (Service.DoesNotExist, Professional.DoesNotExist):
-        return JsonResponse({'slots': []})
+    except (Service.DoesNotExist, Professional.DoesNotExist) as e:
+        print(f"DEBUG - Erro: {e}")
+        return JsonResponse({'slots': [], 'error': str(e)})

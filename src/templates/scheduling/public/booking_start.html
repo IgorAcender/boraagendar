@@ -624,9 +624,17 @@
 
         function loadAvailableSlots(serviceId, professionalId, date) {
             // Fazer requisição AJAX para carregar horários
-            fetch(`/agendar/${tenantSlug}/api/horarios/?service_id=${serviceId}&professional_id=${professionalId}&date=${date}`)
+            const url = `/agendar/${tenantSlug}/api/horarios/?service_id=${serviceId}&professional_id=${professionalId}&date=${date}`;
+            console.log('DEBUG - Carregando slots:', url);
+            console.log('  serviceId:', serviceId);
+            console.log('  professionalId:', professionalId);
+            console.log('  date:', date);
+
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
+                    console.log('DEBUG - Resposta da API:', data);
+                    console.log('  Slots recebidos:', data.slots ? data.slots.length : 0);
                     renderSlots(data.slots, serviceId, professionalId);
                 })
                 .catch(error => {
