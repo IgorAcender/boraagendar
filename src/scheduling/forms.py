@@ -182,6 +182,8 @@ class BookingForm(TenantAwareForm):
                 self.fields[name].widget = forms.HiddenInput()
 
     def clean(self):
+        from zoneinfo import ZoneInfo
+
         cleaned_data = super().clean()
         service = cleaned_data.get("service")
         date_value = cleaned_data.get("date")
@@ -193,7 +195,11 @@ class BookingForm(TenantAwareForm):
 
         if service and date_value and time_value:
             availability_service = AvailabilityService(tenant=self.tenant)
+            # Criar datetime com timezone do tenant
+            tz = ZoneInfo(self.tenant.timezone)
             target_datetime = datetime.combine(date_value, time_value)
+            target_datetime = target_datetime.replace(tzinfo=tz)
+
             if not availability_service.is_slot_available(service, professional, target_datetime):
                 raise forms.ValidationError("Este horario nao esta disponivel.")
             cleaned_data["scheduled_for"] = target_datetime
