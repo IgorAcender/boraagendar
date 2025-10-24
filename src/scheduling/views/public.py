@@ -126,15 +126,27 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
 
     if request.method == "POST":
         print("DEBUG - POST recebido, processando form...")
-        form = BookingForm(tenant=tenant, data=request.POST, hide_schedule_fields=True)
-        if form.is_valid():
-            booking: Booking = form.save(commit=False)
-            booking.tenant = tenant
-            booking.save()
-            send_booking_confirmation(booking)
-            return redirect("public:booking_success", tenant_slug=tenant.slug)
-        else:
-            print(f"DEBUG - Form inválido: {form.errors}")
+        print(f"DEBUG - POST data: {request.POST}")
+        try:
+            form = BookingForm(tenant=tenant, data=request.POST, hide_schedule_fields=True)
+            print("DEBUG - Form criado")
+            if form.is_valid():
+                print("DEBUG - Form válido, salvando...")
+                booking: Booking = form.save(commit=False)
+                booking.tenant = tenant
+                print(f"DEBUG - Booking criado: {booking}")
+                booking.save()
+                print("DEBUG - Booking salvo, enviando notificação...")
+                send_booking_confirmation(booking)
+                print("DEBUG - Notificação enviada, redirecionando...")
+                return redirect("public:booking_success", tenant_slug=tenant.slug)
+            else:
+                print(f"DEBUG - Form inválido: {form.errors}")
+        except Exception as e:
+            print(f"DEBUG - ERRO no POST: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
     else:
         print("DEBUG - GET, preparando form inicial...")
         initial = {
