@@ -453,13 +453,20 @@
 <script>
 // Marcar células como disponíveis/indisponíveis baseado nos horários de atendimento
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DEBUG - Iniciando marcação de disponibilidade');
+
     const availabilityByWeekday = JSON.parse('{{ availability_by_weekday|escapejs }}' || '{}');
+    console.log('DEBUG - availability_by_weekday:', availabilityByWeekday);
 
     // Para cada célula do calendário
     document.querySelectorAll('.day-cell').forEach(cell => {
         const weekday = parseInt(cell.dataset.weekday);
         const hourStr = cell.dataset.hour;
         const availability = availabilityByWeekday[weekday] || [];
+
+        if (availability.length > 0) {
+            console.log(`DEBUG - Dia ${weekday}, Hora ${hourStr}, Regras:`, availability);
+        }
 
         let isAvailable = false;
         let isBreakTime = false;
@@ -469,15 +476,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const startTime = rule.start_time;
             const endTime = rule.end_time;
 
+            console.log(`DEBUG - Comparando ${hourStr} com ${startTime} - ${endTime}`);
+
             if (hourStr >= startTime && hourStr < endTime) {
                 // Verificar se não está no intervalo
                 if (rule.break_start && rule.break_end) {
                     if (hourStr >= rule.break_start && hourStr < rule.break_end) {
                         isBreakTime = true;
+                        console.log(`DEBUG - ${hourStr} está no intervalo`);
                         return;
                     }
                 }
                 isAvailable = true;
+                console.log(`DEBUG - ${hourStr} está disponível`);
             }
         });
 
