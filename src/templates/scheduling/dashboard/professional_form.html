@@ -5,7 +5,9 @@
 <div class="container">
     <h2>Editar Profissional: {{ professional.display_name }}</h2>
 
-    {% if professional.photo %}
+    {% if professional.photo_base64 %}
+        <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}" width="150" style="border-radius: 50%; margin-bottom: 1rem;">
+    {% elif professional.photo %}
         <img src="{{ professional.photo.url }}" alt="{{ professional.display_name }}" width="150" style="border-radius: 50%; margin-bottom: 1rem;">
     {% endif %}
 

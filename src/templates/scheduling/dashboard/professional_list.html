@@ -587,9 +587,10 @@
         <div class="professional-card">
             <div class="professional-header">
                 <div class="professional-avatar" style="background: {{ p.color }};">
-                    {% if p.photo %}
-                        <img src="{{ p.photo.url }}" alt="{{ p.display_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onerror="console.log('Erro ao carregar foto:', '{{ p.photo.url }}'); this.style.display='none'; this.parentElement.innerHTML='{{ p.display_name|first|upper }}';">
-                        <!-- DEBUG: Caminho da foto: {{ p.photo.url }} -->
+                    {% if p.photo_base64 %}
+                        <img src="{{ p.photo_base64 }}" alt="{{ p.display_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    {% elif p.photo %}
+                        <img src="{{ p.photo.url }}" alt="{{ p.display_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                     {% else %}
                         {{ p.display_name|first|upper }}
                     {% endif %}

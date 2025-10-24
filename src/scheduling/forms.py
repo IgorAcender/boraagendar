@@ -1,5 +1,6 @@
 ﻿from datetime import date, datetime
 from decimal import Decimal
+import base64
 
 from django import forms
 from django.core.exceptions import FieldError, ValidationError
@@ -127,6 +128,16 @@ class ProfessionalUpdateForm(TenantAwareForm):
 
             if commit:
                 user.save()
+
+        # Converter foto para base64 se houver upload
+        photo = self.cleaned_data.get("photo")
+        if photo:
+            # Ler o arquivo e converter para base64
+            photo_data = photo.read()
+            photo_base64 = base64.b64encode(photo_data).decode('utf-8')
+            # Adicionar o prefixo do tipo MIME
+            content_type = photo.content_type or 'image/jpeg'
+            self.instance.photo_base64 = f"data:{content_type};base64,{photo_base64}"
 
         # Agora salva o professional normalmente (incluindo arquivos como photo)
         return super().save(commit=commit)
