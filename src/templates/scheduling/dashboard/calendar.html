@@ -375,19 +375,38 @@
     <!-- Calendar Controls -->
     <div class="calendar-controls">
         <div class="nav-buttons">
-            <a href="?week_offset={{ request.GET.week_offset|default:0|add:'-1' }}" class="nav-btn" title="Semana anterior">
+            <a href="?week_offset={{ request.GET.week_offset|default:0|add:'-1' }}{% if selected_professional %}&professional={{ selected_professional.id }}{% endif %}" class="nav-btn" title="Semana anterior">
                 <i class="fas fa-chevron-left"></i>
             </a>
             <span class="current-week">
                 {{ week_start|date:"d/m" }} - {{ week_end|date:"d/m/Y" }}
             </span>
-            <a href="?week_offset={{ request.GET.week_offset|default:0|add:'1' }}" class="nav-btn" title="Próxima semana">
+            <a href="?week_offset={{ request.GET.week_offset|default:0|add:'1' }}{% if selected_professional %}&professional={{ selected_professional.id }}{% endif %}" class="nav-btn" title="Próxima semana">
                 <i class="fas fa-chevron-right"></i>
             </a>
         </div>
-        <a href="?" class="btn-today">
-            <i class="fas fa-calendar-day"></i> Hoje
-        </a>
+
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <!-- Filtro de Profissional -->
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <label for="professional-filter" style="font-size: 0.875rem; color: #64748b; font-weight: 500;">
+                    <i class="fas fa-filter"></i> Profissional:
+                </label>
+                <select id="professional-filter" onchange="filterByProfessional(this.value)"
+                        style="padding: 0.5rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.875rem; color: #1e293b; cursor: pointer;">
+                    <option value="">Todos</option>
+                    {% for prof in professionals %}
+                    <option value="{{ prof.id }}" {% if selected_professional and selected_professional.id == prof.id %}selected{% endif %}>
+                        {{ prof.display_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <a href="?{% if request.GET.week_offset %}week_offset={{ request.GET.week_offset }}{% endif %}" class="btn-today">
+                <i class="fas fa-calendar-day"></i> Hoje
+            </a>
+        </div>
     </div>
 
     <!-- Calendar Grid -->
@@ -451,6 +470,37 @@
 </div>
 
 {{ availability_by_weekday|json_script:"availability-data" }}
+
+<script>
+// Função para filtrar por profissional
+function filterByProfessional(professionalId) {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (professionalId) {
+        urlParams.set('professional', professionalId);
+    } else {
+        urlParams.delete('professional');
+    }
+
+    // Manter o week_offset se existir
+    const weekOffset = urlParams.get('week_offset');
+
+    // Construir nova URL
+    let newUrl = window.location.pathname + '?';
+    if (weekOffset) {
+        newUrl += 'week_offset=' + weekOffset;
+        if (professionalId) {
+            newUrl += '&professional=' + professionalId;
+        }
+    } else if (professionalId) {
+        newUrl += 'professional=' + professionalId;
+    } else {
+        newUrl = window.location.pathname;
+    }
+
+    window.location.href = newUrl;
+}
+</script>
 
 <script>
 // Marcar células como disponíveis/indisponíveis baseado nos horários de atendimento

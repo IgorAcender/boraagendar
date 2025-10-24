@@ -76,13 +76,28 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
     for hour in range(0, 24):
         hours.append(f"{hour:02d}:00")
 
+    # Get professional filter (se houver)
+    professional_filter_id = request.GET.get('professional')
+    selected_professional = None
+    if professional_filter_id:
+        try:
+            selected_professional = Professional.objects.get(pk=professional_filter_id, tenant=tenant)
+        except Professional.DoesNotExist:
+            pass
+
     # Get bookings for this week
     week_start_dt = make_aware(datetime.combine(start_of_week, time.min), tz)
     week_end_dt = make_aware(datetime.combine(end_of_week, time.max), tz)
-    bookings_raw = Booking.objects.filter(
+    bookings_query = Booking.objects.filter(
         tenant=tenant,
         scheduled_for__range=(week_start_dt, week_end_dt)
-    ).select_related('service', 'professional').order_by('scheduled_for')
+    )
+
+    # Aplicar filtro de profissional se selecionado
+    if selected_professional:
+        bookings_query = bookings_query.filter(professional=selected_professional)
+
+    bookings_raw = bookings_query.select_related('service', 'professional').order_by('scheduled_for')
 
     # Process bookings for template
     bookings_by_cell = defaultdict(list)
@@ -151,6 +166,7 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
             "week_start": start_of_week,
             "week_end": end_of_week,
             "professionals": professionals,
+            "selected_professional": selected_professional,
             "availability_by_weekday": dict(availability_by_weekday),
         },
     )
