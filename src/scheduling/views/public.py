@@ -21,10 +21,11 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     selected_date = None
     available_professionals = []
 
-    if form.is_valid():
-        selected_service = form.cleaned_data["service"]
-        selected_professional = form.cleaned_data["professional"]
-        selected_date = form.cleaned_data["date"]
+    # Só processar se houver parâmetros GET (formulário foi submetido)
+    if request.GET and form.is_valid():
+        selected_service = form.cleaned_data.get("service")
+        selected_professional = form.cleaned_data.get("professional")
+        selected_date = form.cleaned_data.get("date")
 
         # Buscar profissionais que fazem o serviço selecionado
         if selected_service:
