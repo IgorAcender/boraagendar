@@ -352,6 +352,101 @@
             min-height: 50px;
         }
     }
+
+    /* Modal */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+        position: relative;
+        background: white;
+        border-radius: 20px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .modal-close {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: white;
+        font-size: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -438,16 +533,16 @@
                     <!-- Bookings for this cell -->
                     {% for booking in bookings %}
                         {% if booking.date == day.date and booking.hour == hour %}
-                        <a href="{% url 'dashboard:booking_detail' booking.id %}"
-                           class="booking status-{{ booking.status }}"
-                           style="top: {{ booking.offset|stringformat:'f' }}%; height: {{ booking.height|stringformat:'f' }}%; min-height: 35px;"
-                           title="{{ booking.customer_name }} - {{ booking.service.name }} - {{ booking.time_display }}">
+                        <div class="booking status-{{ booking.status }}"
+                             style="top: {{ booking.offset|stringformat:'f' }}%; height: {{ booking.height|stringformat:'f' }}%; min-height: 35px;"
+                             onclick="openBookingModal({{ booking.id }})"
+                             title="{{ booking.customer_name }} - {{ booking.service.name }} - {{ booking.time_display }}">
                             <div class="booking-customer">
                                 <i class="fas fa-clock" style="font-size: 0.65rem; opacity: 0.8;"></i>
                                 {{ booking.time_display }} - {{ booking.customer_name }}
                             </div>
                             <div class="booking-service">{{ booking.service.name }}</div>
-                        </a>
+                        </div>
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -471,11 +566,74 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Detalhes do Agendamento -->
+    <div id="bookingModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeBookingModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-calendar-check"></i> Detalhes do Agendamento</h2>
+                <button class="modal-close" onclick="closeBookingModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
+                    <p style="margin-top: 1rem; color: #64748b;">Carregando...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 {{ availability_by_weekday|json_script:"availability-data" }}
 
 <script>
+// Funções do Modal
+function openBookingModal(bookingId) {
+    const modal = document.getElementById('bookingModal');
+    const modalBody = document.getElementById('modalBody');
+
+    // Mostrar modal
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevenir scroll da página
+
+    // Carregar conteúdo via AJAX
+    fetch(`/dashboard/agendamentos/${bookingId}/`)
+        .then(response => response.text())
+        .then(html => {
+            // Extrair apenas o conteúdo relevante (sem o layout completo)
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const content = doc.querySelector('.booking-details, .card, main, .content') || doc.body;
+
+            modalBody.innerHTML = content.innerHTML;
+        })
+        .catch(error => {
+            modalBody.innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ef4444;"></i>
+                    <p style="margin-top: 1rem; color: #64748b;">Erro ao carregar detalhes do agendamento.</p>
+                </div>
+            `;
+            console.error('Erro ao carregar agendamento:', error);
+        });
+}
+
+function closeBookingModal() {
+    const modal = document.getElementById('bookingModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = ''; // Restaurar scroll
+}
+
+// Fechar modal com ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeBookingModal();
+    }
+});
+
 // Função para filtrar por profissional
 function filterByProfessional(professionalId) {
     const urlParams = new URLSearchParams(window.location.search);
