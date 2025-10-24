@@ -774,3 +774,113 @@ def my_services(request: HttpRequest) -> HttpResponse:
             "available_services": available_services,
         },
     )
+
+
+@login_required
+def default_availability_view(request: HttpRequest) -> HttpResponse:
+    """Gerenciar horários padrão da empresa"""
+    from ..models import AvailabilityRule
+
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+
+    # Buscar horários padrão (professional=None significa padrão da empresa)
+    default_rules = AvailabilityRule.objects.filter(
+        tenant=tenant,
+        professional__isnull=True,
+        is_active=True
+    ).order_by('weekday', 'start_time')
+
+    # Organizar por dia da semana
+    rules_by_weekday = defaultdict(list)
+    for rule in default_rules:
+        rules_by_weekday[rule.weekday].append(rule)
+
+    weekdays = [
+        {"value": 0, "label": "Segunda", "rules": rules_by_weekday[0]},
+        {"value": 1, "label": "Terça", "rules": rules_by_weekday[1]},
+        {"value": 2, "label": "Quarta", "rules": rules_by_weekday[2]},
+        {"value": 3, "label": "Quinta", "rules": rules_by_weekday[3]},
+        {"value": 4, "label": "Sexta", "rules": rules_by_weekday[4]},
+        {"value": 5, "label": "Sábado", "rules": rules_by_weekday[5]},
+        {"value": 6, "label": "Domingo", "rules": rules_by_weekday[6]},
+    ]
+
+    return render(
+        request,
+        "scheduling/dashboard/default_availability.html",
+        {
+            "tenant": tenant,
+            "weekdays": weekdays,
+        },
+    )
+
+
+@login_required
+@require_POST
+def default_availability_save(request: HttpRequest) -> HttpResponse:
+    """Salvar horários padrão da empresa"""
+    from ..models import AvailabilityRule
+
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+
+    # Deletar todas as regras padrão existentes
+    AvailabilityRule.objects.filter(tenant=tenant, professional__isnull=True).delete()
+
+    # Criar novas regras
+    created_count = 0
+    for weekday in range(7):
+        i = 0
+        while True:
+            start_key = f"weekday_{weekday}_{i}_start"
+            end_key = f"weekday_{weekday}_{i}_end"
+
+            start_time_str = request.POST.get(start_key)
+            end_time_str = request.POST.get(end_key)
+
+            if not start_time_str or not end_time_str:
+                break
+
+            try:
+                start_time_obj = datetime.strptime(start_time_str, '%H:%M').time()
+                end_time_obj = datetime.strptime(end_time_str, '%H:%M').time()
+
+                break_start_str = request.POST.get(f"weekday_{weekday}_{i}_break_start", "").strip()
+                break_end_str = request.POST.get(f"weekday_{weekday}_{i}_break_end", "").strip()
+
+                break_start_obj = None
+                break_end_obj = None
+
+                if break_start_str and break_end_str:
+                    break_start_obj = datetime.strptime(break_start_str, '%H:%M').time()
+                    break_end_obj = datetime.strptime(break_end_str, '%H:%M').time()
+
+                AvailabilityRule.objects.create(
+                    tenant=tenant,
+                    professional=None,
+                    weekday=weekday,
+                    start_time=start_time_obj,
+                    end_time=end_time_obj,
+                    break_start=break_start_obj,
+                    break_end=break_end_obj,
+                    is_active=True
+                )
+                created_count += 1
+            except ValueError:
+                pass
+
+            i += 1
+
+    messages.success(request, f"Horários padrão salvos! ({created_count} regras)")
+    return redirect("dashboard:default_availability")

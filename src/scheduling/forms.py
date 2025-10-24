@@ -69,6 +69,8 @@ class ProfessionalForm(TenantAwareForm):
         fields = ["user", "display_name", "photo", "bio", "color", "is_active"]
 
     def save(self, commit=True):
+        from .models import AvailabilityRule
+
         # Converter foto para base64 se houver upload
         photo = self.cleaned_data.get("photo")
         if photo and hasattr(photo, 'read'):
@@ -79,7 +81,32 @@ class ProfessionalForm(TenantAwareForm):
             content_type = photo.content_type or 'image/jpeg'
             self.instance.photo_base64 = f"data:{content_type};base64,{photo_base64}"
 
-        return super().save(commit=commit)
+        # Verificar se é um novo profissional (não tem PK ainda)
+        is_new = not self.instance.pk
+
+        professional = super().save(commit=commit)
+
+        # Se for novo profissional, copiar horários padrão da empresa
+        if is_new and commit:
+            default_rules = AvailabilityRule.objects.filter(
+                tenant=self.tenant,
+                professional__isnull=True,
+                is_active=True
+            )
+
+            for rule in default_rules:
+                AvailabilityRule.objects.create(
+                    tenant=self.tenant,
+                    professional=professional,
+                    weekday=rule.weekday,
+                    start_time=rule.start_time,
+                    end_time=rule.end_time,
+                    break_start=rule.break_start,
+                    break_end=rule.break_end,
+                    is_active=True
+                )
+
+        return professional
 
 
 class ProfessionalUpdateForm(TenantAwareForm):

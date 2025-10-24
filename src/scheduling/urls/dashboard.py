@@ -21,4 +21,6 @@ urlpatterns = [
     path("equipe/", dashboard_views.team_list, name="team_list"),
     path("equipe/<int:pk>/atualizar/", dashboard_views.team_update, name="team_update"),
     path("equipe/<int:pk>/remover/", dashboard_views.team_remove, name="team_remove"),
+    path("horario-padrao/", dashboard_views.default_availability_view, name="default_availability"),
+    path("horario-padrao/salvar/", dashboard_views.default_availability_save, name="default_availability_save"),
 ]
