@@ -80,6 +80,33 @@
         opacity: 0.9;
     }
 
+    /* New Booking Button */
+    .btn-new-booking {
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--brand-primary);
+        padding: 0.875rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-new-booking:hover {
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-new-booking i {
+        font-size: 1rem;
+    }
+
     /* Calendar Controls */
     .calendar-controls {
         background: white;
@@ -489,10 +516,19 @@
                 </div>
             </div>
 
-            <!-- Live Clock -->
-            <div class="live-clock">
-                <div class="clock-time" id="liveTime">--:--:--</div>
-                <div class="clock-date" id="liveDate">--/--/----</div>
+            <!-- Actions -->
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <!-- Live Clock -->
+                <div class="live-clock">
+                    <div class="clock-time" id="liveTime">--:--:--</div>
+                    <div class="clock-date" id="liveDate">--/--/----</div>
+                </div>
+
+                <!-- New Booking Button -->
+                <a href="{% url 'dashboard:booking_create' %}" class="btn-new-booking">
+                    <i class="fas fa-plus"></i>
+                    Novo Agendamento
+                </a>
             </div>
         </div>
     </div>
