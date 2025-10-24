@@ -388,32 +388,6 @@
 </div>
 {% endif %}
 
-<!-- Date Selection (shown after professional is selected) -->
-{% if selected_professional and not available_slots %}
-<div class="form-section" style="margin-top: 3rem;">
-    <h2 class="section-title">
-        <div class="section-icon">
-            <i class="fas fa-calendar"></i>
-        </div>
-        Escolha a Data
-    </h2>
-
-    <form method="get">
-        <input type="hidden" name="service" value="{{ selected_service.id }}">
-        <input type="hidden" name="professional" value="{{ selected_professional.id }}">
-
-        <div class="form-group">
-            <label for="id_date">Qual data você prefere?</label>
-            {{ form.date }}
-        </div>
-
-        <button type="submit" class="btn-search">
-            <i class="fas fa-search"></i>
-            Buscar Horários Disponíveis
-        </button>
-    </form>
-</div>
-{% endif %}
 
 <!-- Available Slots Section -->
 {% if available_slots %}
