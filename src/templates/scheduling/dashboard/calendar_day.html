@@ -121,6 +121,46 @@
         transform: scale(1.1);
     }
 
+    /* Date Picker */
+    .date-picker-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .date-picker-input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .date-picker-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: white;
+        border: 2px solid var(--brand-primary);
+        border-radius: 8px;
+        color: var(--brand-primary);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .date-picker-label:hover {
+        background: rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .date-picker-label i {
+        font-size: 1rem;
+    }
+
     .view-toggle {
         display: flex;
         gap: 0.5rem;
@@ -447,11 +487,25 @@
             <button class="nav-btn" onclick="navigateDay(-1)" title="Dia Anterior">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <button class="nav-btn" onclick="navigateDay(0)" title="Hoje">
-                <i class="fas fa-calendar-day"></i>
-            </button>
+
+            <div class="date-picker-wrapper">
+                <input type="date"
+                       id="datePicker"
+                       value="{{ selected_date|date:'Y-m-d' }}"
+                       onchange="navigateToDate(this.value)"
+                       class="date-picker-input">
+                <label for="datePicker" class="date-picker-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>{{ selected_date|date:"d/m/Y" }}</span>
+                </label>
+            </div>
+
             <button class="nav-btn" onclick="navigateDay(1)" title="Próximo Dia">
                 <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <button class="nav-btn" onclick="navigateDay(0)" title="Hoje" style="margin-left: 0.5rem;">
+                <i class="fas fa-calendar-day"></i>
             </button>
         </div>
 
@@ -530,6 +584,11 @@ function navigateDay(offset) {
     const currentOffset = {{ day_offset }};
     const newOffset = offset === 0 ? 0 : currentOffset + offset;
     window.location.href = `?day_offset=${newOffset}`;
+}
+
+// Navigate to specific date
+function navigateToDate(dateStr) {
+    window.location.href = `?date=${dateStr}`;
 }
 
 // Modal functions

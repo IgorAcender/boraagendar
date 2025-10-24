@@ -186,10 +186,23 @@ def calendar_day_view(request: HttpRequest) -> HttpResponse:
     tenant = membership.tenant
     tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
 
-    # Get day offset (default to today)
-    day_offset = int(request.GET.get('day_offset', 0))
+    # Get selected date from query param or use today
     today = now().astimezone(tz).date()
-    selected_date = today + timedelta(days=day_offset)
+    date_param = request.GET.get('date')
+
+    if date_param:
+        try:
+            from datetime import datetime as dt
+            selected_date = dt.strptime(date_param, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            selected_date = today
+    else:
+        # Fallback to day_offset for backward compatibility
+        day_offset = int(request.GET.get('day_offset', 0))
+        selected_date = today + timedelta(days=day_offset)
+
+    # Calculate day_offset for navigation buttons
+    day_offset = (selected_date - today).days
 
     # Day name
     day_names = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
