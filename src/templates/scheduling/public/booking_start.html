@@ -231,6 +231,96 @@
     .empty-state p {
         color: #94a3b8;
     }
+
+    /* Professionals Grid */
+    .professionals-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e2e8f0;
+    }
+
+    .professionals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .professional-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .professional-card:hover {
+        border-color: var(--brand-primary);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+    }
+
+    .professional-card-avatar {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 700;
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .professional-card-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .professional-card-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .professional-card-bio {
+        font-size: 0.875rem;
+        color: #64748b;
+        line-height: 1.4;
+        margin-bottom: 1rem;
+        height: 2.8em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .btn-select-professional {
+        width: 100%;
+        padding: 0.625rem;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .professional-card:hover .btn-select-professional {
+        transform: translateY(-2px);
+    }
 </style>
 {% endblock %}
 
@@ -239,33 +329,87 @@
 <div class="form-section">
     <h2 class="section-title">
         <div class="section-icon">
-            <i class="fas fa-search"></i>
+            <i class="fas fa-concierge-bell"></i>
         </div>
-        Buscar Horários Disponíveis
+        Escolha o Serviço
     </h2>
 
-    <form method="get">
+    <form method="get" id="serviceForm">
         <div class="form-group">
-            <label for="id_service">Escolha o Serviço</label>
+            <label for="id_service">Qual serviço você deseja?</label>
             {{ form.service }}
         </div>
 
-        <div class="form-group">
-            <label for="id_professional">Profissional (Opcional)</label>
-            {{ form.professional }}
+        {% if not available_professionals %}
+        <button type="submit" class="btn-search">
+            <i class="fas fa-arrow-right"></i>
+            Continuar
+        </button>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Professionals Section -->
+{% if available_professionals %}
+<div class="professionals-section">
+    <h2 class="section-title">
+        <div class="section-icon">
+            <i class="fas fa-users"></i>
         </div>
+        Escolha o Profissional
+    </h2>
+
+    <div class="professionals-grid">
+        {% for professional in available_professionals %}
+        <a href="?service={{ selected_service.id }}&professional={{ professional.id }}&date={{ selected_date|default_if_none:'' }}" class="professional-card">
+            <div class="professional-card-avatar" style="background: {{ professional.color }};">
+                {% if professional.photo_base64 %}
+                    <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}">
+                {% elif professional.photo %}
+                    <img src="{{ professional.photo.url }}" alt="{{ professional.display_name }}">
+                {% else %}
+                    {{ professional.display_name|first|upper }}
+                {% endif %}
+            </div>
+            <div class="professional-card-name">{{ professional.display_name }}</div>
+            {% if professional.bio %}
+            <div class="professional-card-bio">{{ professional.bio }}</div>
+            {% endif %}
+            <div class="btn-select-professional">
+                <i class="fas fa-calendar-check"></i> Selecionar
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Date Selection (shown after professional is selected) -->
+{% if selected_professional and not available_slots %}
+<div class="form-section" style="margin-top: 3rem;">
+    <h2 class="section-title">
+        <div class="section-icon">
+            <i class="fas fa-calendar"></i>
+        </div>
+        Escolha a Data
+    </h2>
+
+    <form method="get">
+        <input type="hidden" name="service" value="{{ selected_service.id }}">
+        <input type="hidden" name="professional" value="{{ selected_professional.id }}">
 
         <div class="form-group">
-            <label for="id_date">Data Desejada</label>
+            <label for="id_date">Qual data você prefere?</label>
             {{ form.date }}
         </div>
 
         <button type="submit" class="btn-search">
-            <i class="fas fa-calendar-search"></i>
-            Buscar Horários
+            <i class="fas fa-search"></i>
+            Buscar Horários Disponíveis
         </button>
     </form>
 </div>
+{% endif %}
 
 <!-- Available Slots Section -->
 {% if available_slots %}

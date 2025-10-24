@@ -19,17 +19,27 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     selected_service = None
     selected_professional = None
     selected_date = None
+    available_professionals = []
 
     if form.is_valid():
         selected_service = form.cleaned_data["service"]
         selected_professional = form.cleaned_data["professional"]
         selected_date = form.cleaned_data["date"]
-        availability_service = AvailabilityService(tenant=tenant)
-        available_slots = availability_service.get_available_slots(
-            service=selected_service,
-            professional=selected_professional,
-            target_date=selected_date,
-        )
+
+        # Buscar profissionais que fazem o serviço selecionado
+        if selected_service:
+            available_professionals = list(
+                selected_service.professionals.filter(is_active=True).order_by('display_name')
+            )
+
+        # Só buscar horários se um profissional foi selecionado E uma data foi informada
+        if selected_professional and selected_date:
+            availability_service = AvailabilityService(tenant=tenant)
+            available_slots = availability_service.get_available_slots(
+                service=selected_service,
+                professional=selected_professional,
+                target_date=selected_date,
+            )
 
     context = {
         "tenant": tenant,
@@ -38,6 +48,7 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         "selected_service": selected_service,
         "selected_professional": selected_professional,
         "selected_date": selected_date,
+        "available_professionals": available_professionals,
     }
     return render(request, "scheduling/public/booking_start.html", context)
 
