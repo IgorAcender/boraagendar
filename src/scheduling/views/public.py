@@ -125,6 +125,7 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         raise
 
     if request.method == "POST":
+        print("DEBUG - POST recebido, processando form...")
         form = BookingForm(tenant=tenant, data=request.POST, hide_schedule_fields=True)
         if form.is_valid():
             booking: Booking = form.save(commit=False)
@@ -132,26 +133,44 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             booking.save()
             send_booking_confirmation(booking)
             return redirect("public:booking_success", tenant_slug=tenant.slug)
+        else:
+            print(f"DEBUG - Form inválido: {form.errors}")
     else:
+        print("DEBUG - GET, preparando form inicial...")
         initial = {
             "service": service,
             "professional": professional,
             "date": start_datetime.date(),
             "time": start_datetime.time(),
         }
-        form = BookingForm(tenant=tenant, initial=initial, hide_schedule_fields=True)
+        print(f"DEBUG - Initial data: {initial}")
+        try:
+            form = BookingForm(tenant=tenant, initial=initial, hide_schedule_fields=True)
+            print("DEBUG - Form criado com sucesso")
+        except Exception as e:
+            print(f"DEBUG - ERRO ao criar form: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
 
-    return render(
-        request,
-        "scheduling/public/booking_confirm.html",
-        {
-            "tenant": tenant,
-            "form": form,
-            "service": service,
-            "professional": professional,
-            "start_datetime": start_datetime,
-        },
-    )
+    print("DEBUG - Renderizando template booking_confirm.html")
+    try:
+        return render(
+            request,
+            "scheduling/public/booking_confirm.html",
+            {
+                "tenant": tenant,
+                "form": form,
+                "service": service,
+                "professional": professional,
+                "start_datetime": start_datetime,
+            },
+        )
+    except Exception as e:
+        print(f"DEBUG - ERRO ao renderizar template: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
 
 
 def booking_success(request: HttpRequest, tenant_slug: str) -> HttpResponse:
