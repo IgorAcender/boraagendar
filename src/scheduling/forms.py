@@ -71,7 +71,7 @@ class ProfessionalForm(TenantAwareForm):
 class ProfessionalUpdateForm(TenantAwareForm):
     class Meta:
         model = Professional
-        fields = ["display_name", "photo", "bio", "color", "is_active"]
+        fields = ["user", "display_name", "photo", "bio", "color", "is_active"]
 
 
 
