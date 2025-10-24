@@ -71,12 +71,10 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
             'is_today': day_date == today,
         })
 
-    # Generate hours (8:00 to 20:00 with 30min intervals)
+    # Generate hours (0:00 to 23:00 - todas as 24 horas)
     hours = []
-    for hour in range(8, 21):
+    for hour in range(0, 24):
         hours.append(f"{hour:02d}:00")
-        if hour < 20:
-            hours.append(f"{hour:02d}:30")
 
     # Get bookings for this week
     week_start_dt = make_aware(datetime.combine(start_of_week, time.min), tz)
@@ -119,6 +117,29 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
     for bookings in bookings_by_cell.values():
         bookings_list.extend(bookings)
 
+    # Get availability rules (horários de atendimento)
+    from ..models import AvailabilityRule
+    availability_rules = AvailabilityRule.objects.filter(
+        tenant=tenant,
+        professional__isnull=True,  # Horário padrão da empresa
+        is_active=True
+    ).order_by('weekday', 'start_time')
+
+    # Organizar disponibilidade por dia da semana
+    availability_by_weekday = defaultdict(list)
+    for rule in availability_rules:
+        availability_by_weekday[rule.weekday].append({
+            'start_time': rule.start_time,
+            'end_time': rule.end_time,
+            'break_start': rule.break_start,
+            'break_end': rule.break_end,
+        })
+
+    # Adicionar disponibilidade aos dias da semana
+    for day in week_days:
+        weekday = day['date'].weekday()
+        day['availability'] = availability_by_weekday.get(weekday, [])
+
     return render(
         request,
         "scheduling/dashboard/calendar.html",
@@ -130,6 +151,7 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
             "week_start": start_of_week,
             "week_end": end_of_week,
             "professionals": professionals,
+            "availability_by_weekday": dict(availability_by_weekday),
         },
     )
 

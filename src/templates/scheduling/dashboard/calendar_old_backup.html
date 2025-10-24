@@ -1,0 +1,706 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Calendário{% endblock %}
+{% block extra_head %}
+<style>
+    /* Hero Header */
+    .hero-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="1000,100 1000,0 0,100"/></svg>');
+        background-size: cover;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .hero-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .hero-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+    }
+
+    .hero-title h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* Controls */
+    .calendar-controls {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(15px);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    }
+
+    .controls-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .nav-buttons {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.1);
+        border: none;
+        color: #667eea;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-btn:hover {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .current-period {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .filter-section {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 0.5rem 1.25rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .filter-btn:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .filter-btn.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-color: transparent;
+    }
+
+    /* Calendar Grid */
+    .calendar-wrapper {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        overflow: hidden;
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: 80px repeat(7, 1fr);
+        overflow-x: auto;
+    }
+
+    /* Header */
+    .calendar-header {
+        display: contents;
+    }
+
+    .time-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 1rem;
+        text-align: center;
+        font-weight: 600;
+        color: white;
+        position: sticky;
+        left: 0;
+        z-index: 3;
+    }
+
+    .day-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 1rem;
+        text-align: center;
+        color: white;
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .day-name {
+        font-size: 0.875rem;
+        font-weight: 500;
+        opacity: 0.9;
+    }
+
+    .day-date {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-top: 0.25rem;
+    }
+
+    .day-header.today {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    /* Time Slots */
+    .time-slot {
+        background: #f9fafb;
+        padding: 0.75rem;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #64748b;
+        border-top: 1px solid #e2e8f0;
+        position: sticky;
+        left: 0;
+        z-index: 2;
+    }
+
+    .calendar-cell {
+        min-height: 60px;
+        border-top: 1px solid #e2e8f0;
+        border-left: 1px solid #e2e8f0;
+        position: relative;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .calendar-cell:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    /* Bookings */
+    .booking-event {
+        position: absolute;
+        left: 2px;
+        right: 2px;
+        border-radius: 6px;
+        padding: 0.5rem;
+        font-size: 0.75rem;
+        color: white;
+        overflow: hidden;
+        cursor: move;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .booking-event:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+    }
+
+    .booking-event.dragging {
+        opacity: 0.5;
+        cursor: grabbing;
+    }
+
+    .calendar-cell.drag-over {
+        background: rgba(102, 126, 234, 0.2);
+        border: 2px dashed #667eea;
+    }
+
+    .booking-time {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .booking-customer {
+        font-weight: 500;
+        margin-bottom: 0.125rem;
+    }
+
+    .booking-service {
+        opacity: 0.9;
+        font-size: 0.7rem;
+    }
+
+    .status-confirmed {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .status-pending {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .status-cancelled {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        opacity: 0.6;
+    }
+
+    /* Legend */
+    .legend {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(15px);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    }
+
+    .legend-title {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .legend-items {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .legend-color {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+    }
+
+    .legend-label {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.5s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .calendar-grid {
+            grid-template-columns: 60px repeat(7, minmax(100px, 1fr));
+        }
+
+        .day-date {
+            font-size: 1.25rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-title h1 {
+            font-size: 1.5rem;
+        }
+
+        .controls-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .nav-buttons {
+            justify-content: center;
+        }
+
+        .filter-section {
+            justify-content: center;
+        }
+
+        .calendar-wrapper {
+            overflow-x: scroll;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<div class="hero-header animate-fade-in">
+    <div class="hero-content">
+        <div class="hero-title">
+            <div class="hero-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div>
+                <h1>Calendário</h1>
+            </div>
+        </div>
+        <a href="{% url 'dashboard:booking_create' %}" class="btn-primary" style="background: rgba(255, 255, 255, 0.9); color: #667eea; padding: 0.875rem 1.75rem; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); text-decoration: none;">
+            <i class="fas fa-plus"></i>
+            Novo Agendamento
+        </a>
+    </div>
+</div>
+
+<!-- Controls -->
+<div class="calendar-controls animate-slide-up">
+    <div class="controls-row">
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="previousWeek()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="current-period">
+                <span id="current-period">{{ week_start|date:"d/m" }} - {{ week_end|date:"d/m/Y" }}</span>
+            </div>
+            <button class="nav-btn" onclick="nextWeek()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="nav-btn" onclick="goToday()" title="Hoje">
+                <i class="fas fa-calendar-day"></i>
+            </button>
+        </div>
+
+        <div class="filter-section">
+            <span style="font-size: 0.875rem; color: #64748b; font-weight: 500;">Profissional:</span>
+            <button class="filter-btn active" onclick="filterProfessional('all')">Todos</button>
+            {% for prof in professionals %}
+            <button class="filter-btn" onclick="filterProfessional('{{ prof.id }}')" style="border-left: 4px solid {{ prof.color }};">
+                {{ prof.display_name }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Calendar Grid -->
+<div class="calendar-wrapper animate-slide-up">
+    <div class="calendar-grid">
+        <!-- Header Row -->
+        <div class="calendar-header">
+            <div class="time-header">Horário</div>
+            {% for day in week_days %}
+            <div class="day-header {% if day.is_today %}today{% endif %}">
+                <div class="day-name">{{ day.name }}</div>
+                <div class="day-date">{{ day.date.day }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Time Slots -->
+        {% for hour in hours %}
+            <div class="time-slot">{{ hour }}</div>
+            {% for day in week_days %}
+                <div class="calendar-cell"
+                     data-date="{{ day.date|date:'Y-m-d' }}"
+                     data-time="{{ hour }}"
+                     onclick="createBooking('{{ day.date|date:'Y-m-d' }}', '{{ hour }}')">
+
+                    {% for booking in bookings %}
+                        {% if booking.date == day.date and booking.hour == hour %}
+                            <div class="booking-event status-{{ booking.status }}"
+                                 data-professional="{{ booking.professional.id }}"
+                                 data-booking-id="{{ booking.id }}"
+                                 draggable="true"
+                                 style="height: {{ booking.height }}%; top: {{ booking.offset }}%;"
+                                 onclick="event.stopPropagation(); viewBooking({{ booking.id }})">
+                                <div class="booking-time">{{ booking.scheduled_for|time:"H:i" }}</div>
+                                <div class="booking-customer">{{ booking.customer_name }}</div>
+                                <div class="booking-service">{{ booking.service.name }}</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Legend -->
+<div class="legend animate-slide-up">
+    <div class="legend-title">
+        <i class="fas fa-info-circle"></i>
+        Legenda
+    </div>
+    <div class="legend-items">
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #10b981, #059669);"></div>
+            <span class="legend-label">Confirmado</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div>
+            <span class="legend-label">Pendente</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #ef4444, #dc2626);"></div>
+            <span class="legend-label">Cancelado</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Navigation functions
+    function previousWeek() {
+        window.location.href = '?week_offset=-1';
+    }
+
+    function nextWeek() {
+        window.location.href = '?week_offset=1';
+    }
+
+    function goToday() {
+        window.location.href = '{% url "dashboard:calendar" %}';
+    }
+
+    // Filter professional
+    function filterProfessional(professionalId) {
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const events = document.querySelectorAll('.booking-event');
+        events.forEach(event => {
+            if (professionalId === 'all' || event.dataset.professional === professionalId) {
+                event.style.display = 'block';
+            } else {
+                event.style.display = 'none';
+            }
+        });
+    }
+
+    // Create new booking
+    function createBooking(date, time) {
+        window.location.href = `{% url 'dashboard:booking_create' %}?date=${date}&time=${time}`;
+    }
+
+    // View booking details
+    function viewBooking(bookingId) {
+        window.location.href = `/dashboard/booking/${bookingId}/`;
+    }
+
+    // ========== DRAG & DROP ==========
+    let draggedBooking = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const bookingEvents = document.querySelectorAll('.booking-event');
+        const calendarCells = document.querySelectorAll('.calendar-cell');
+
+        // Setup drag events on booking events
+        bookingEvents.forEach(booking => {
+            booking.addEventListener('dragstart', handleDragStart);
+            booking.addEventListener('dragend', handleDragEnd);
+        });
+
+        // Setup drop events on calendar cells
+        calendarCells.forEach(cell => {
+            cell.addEventListener('dragover', handleDragOver);
+            cell.addEventListener('dragenter', handleDragEnter);
+            cell.addEventListener('dragleave', handleDragLeave);
+            cell.addEventListener('drop', handleDrop);
+        });
+    });
+
+    function handleDragStart(e) {
+        draggedBooking = this;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', this.innerHTML);
+
+        // Stop the click event from firing
+        this.onclick = null;
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        draggedBooking = null;
+
+        // Restore click handler
+        const bookingId = this.dataset.bookingId;
+        this.onclick = function(event) {
+            event.stopPropagation();
+            viewBooking(bookingId);
+        };
+
+        // Remove drag-over class from all cells
+        document.querySelectorAll('.calendar-cell').forEach(cell => {
+            cell.classList.remove('drag-over');
+        });
+    }
+
+    function handleDragOver(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleDragEnter(e) {
+        this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+
+        this.classList.remove('drag-over');
+
+        if (draggedBooking) {
+            const bookingId = draggedBooking.dataset.bookingId;
+            const newDate = this.dataset.date;
+            const newTime = this.dataset.time;
+
+            // Send AJAX request to update booking
+            moveBooking(bookingId, newDate, newTime);
+        }
+
+        return false;
+    }
+
+    function moveBooking(bookingId, newDate, newTime) {
+        // Get CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+
+        fetch(`/dashboard/agendamentos/${bookingId}/mover/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                date: newDate,
+                time: newTime,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                showNotification('Agendamento movido com sucesso!', 'success');
+
+                // Reload page to show updated calendar
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showNotification('Erro ao mover agendamento: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Erro ao mover agendamento', 'error');
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: ${type === 'success' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #ef4444, #dc2626)'};
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+            font-weight: 600;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}
