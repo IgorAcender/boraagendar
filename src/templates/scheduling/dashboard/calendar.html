@@ -438,10 +438,14 @@
                     <!-- Bookings for this cell -->
                     {% for booking in bookings %}
                         {% if booking.date == day.date and booking.hour == hour %}
+                        <!-- DEBUG: offset={{ booking.offset }}, height={{ booking.height }}, time={{ booking.time_display }} -->
                         <a href="{% url 'dashboard:booking_detail' booking.id %}"
                            class="booking status-{{ booking.status }}"
                            style="top: {{ booking.offset }}%; height: {{ booking.height }}%; min-height: 35px;"
-                           title="{{ booking.customer_name }} - {{ booking.service.name }} - {{ booking.time_display }}">
+                           title="{{ booking.customer_name }} - {{ booking.service.name }} - {{ booking.time_display }}"
+                           data-offset="{{ booking.offset }}"
+                           data-height="{{ booking.height }}"
+                           data-time="{{ booking.time_display }}">
                             <div class="booking-customer">
                                 <i class="fas fa-clock" style="font-size: 0.65rem; opacity: 0.8;"></i>
                                 {{ booking.time_display }} - {{ booking.customer_name }}
