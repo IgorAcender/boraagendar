@@ -339,13 +339,6 @@
             <label for="id_service">Qual serviço você deseja?</label>
             {{ form.service }}
         </div>
-
-        {% if not available_professionals %}
-        <button type="submit" class="btn-search">
-            <i class="fas fa-arrow-right"></i>
-            Continuar
-        </button>
-        {% endif %}
     </form>
 </div>
 
@@ -462,4 +455,20 @@
     </div>
 </div>
 {% endif %}
+
+<script>
+    // Auto-submit quando trocar o serviço
+    document.addEventListener('DOMContentLoaded', function() {
+        const serviceSelect = document.getElementById('id_service');
+        const serviceForm = document.getElementById('serviceForm');
+
+        if (serviceSelect && serviceForm) {
+            serviceSelect.addEventListener('change', function() {
+                if (this.value) {
+                    serviceForm.submit();
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
