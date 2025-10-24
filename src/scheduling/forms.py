@@ -33,13 +33,13 @@ class TenantAwareForm(forms.ModelForm):
 
 
 class AvailabilitySearchForm(forms.Form):
-    service = forms.ModelChoiceField(label="Servico", queryset=Service.objects.none())
+    service = forms.ModelChoiceField(label="Servico", queryset=Service.objects.none(), required=False)
     professional = forms.ModelChoiceField(
         label="Profissional",
         queryset=Professional.objects.none(),
         required=False,
     )
-    date = forms.DateField(label="Data", initial=date.today)
+    date = forms.DateField(label="Data", initial=date.today, required=False)
 
     def __init__(self, *args, tenant: Tenant, **kwargs):
         self.tenant = tenant
