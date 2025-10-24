@@ -155,16 +155,36 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
         font-size: 0.875rem;
         color: #64748b;
         margin-bottom: 1rem;
     }
 
-    .professional-dot {
-        width: 8px;
-        height: 8px;
+    .professional-avatar {
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+    }
+
+    .professional-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .professional-name {
+        font-weight: 500;
+        color: #475569;
     }
 
     .btn-book {
@@ -265,8 +285,16 @@
 
             {% if slot.professional %}
             <div class="slot-professional">
-                <div class="professional-dot" style="background: {{ slot.professional.color }};"></div>
-                <span>{{ slot.professional.display_name }}</span>
+                <div class="professional-avatar" style="background: {{ slot.professional.color }};">
+                    {% if slot.professional.photo_base64 %}
+                        <img src="{{ slot.professional.photo_base64 }}" alt="{{ slot.professional.display_name }}">
+                    {% elif slot.professional.photo %}
+                        <img src="{{ slot.professional.photo.url }}" alt="{{ slot.professional.display_name }}">
+                    {% else %}
+                        {{ slot.professional.display_name|first|upper }}
+                    {% endif %}
+                </div>
+                <span class="professional-name">{{ slot.professional.display_name }}</span>
             </div>
             {% endif %}
 
