@@ -27,47 +27,7 @@
 {% endblock %}
 
 {% block extra_head %}
-<!-- Flatpickr CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
 <style>
-    /* Customização Flatpickr */
-    .flatpickr-calendar {
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-        border: none;
-    }
-
-    .flatpickr-day.disabled {
-        color: #cbd5e1 !important;
-        cursor: not-allowed !important;
-    }
-
-    .flatpickr-day.selected {
-        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)) !important;
-        border-color: var(--brand-primary) !important;
-    }
-
-    .flatpickr-day:hover:not(.disabled):not(.selected) {
-        background: rgba(102, 126, 234, 0.1) !important;
-        border-color: var(--brand-primary) !important;
-    }
-
-    .flatpickr-months .flatpickr-month {
-        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-        color: white;
-    }
-
-    .flatpickr-current-month .flatpickr-monthDropdown-months {
-        background: transparent;
-        color: white;
-    }
-
-    .flatpickr-weekday {
-        color: #64748b;
-        font-weight: 600;
-    }
-
     .form-section {
         margin-bottom: 2rem;
     }
@@ -652,19 +612,12 @@
 
             professionalsSection.parentNode.insertBefore(dateSection, professionalsSection.nextSibling);
 
-            // Inicializar Flatpickr imediatamente
+            // Adicionar evento ao date picker
             const datePicker = document.getElementById('date_picker');
-            const fp = flatpickr(datePicker, {
-                locale: 'pt',
-                dateFormat: 'Y-m-d',
-                minDate: 'today',
-                disableMobile: false,
-                altInput: true,
-                altFormat: 'd/m/Y',
-                onChange: function(selectedDates, dateStr, instance) {
-                    if (dateStr) {
-                        loadAvailableSlots(serviceId, professionalId, dateStr);
-                    }
+            datePicker.addEventListener('change', function() {
+                const selectedDate = this.value;
+                if (selectedDate) {
+                    loadAvailableSlots(serviceId, professionalId, selectedDate);
                 }
             });
         }
@@ -682,18 +635,6 @@
                 .then(data => {
                     console.log('DEBUG - Resposta da API:', data);
                     console.log('  Slots recebidos:', data.slots ? data.slots.length : 0);
-
-                    // Verificar se retornou erro de data passada (silenciosamente)
-                    if (data.error === 'past_date') {
-                        const datePicker = document.getElementById('date_picker');
-                        if (datePicker) {
-                            datePicker.value = '';
-                        }
-                        // Não mostrar horários se a data for inválida
-                        renderSlots([], serviceId, professionalId);
-                        return;
-                    }
-
                     renderSlots(data.slots, serviceId, professionalId);
                 })
                 .catch(error => {
@@ -757,8 +698,4 @@
         }
     });
 </script>
-
-<!-- Flatpickr JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 {% endblock %}
