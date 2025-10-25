@@ -24,7 +24,6 @@ class TenantUpdateForm(forms.ModelForm):
             "phone_number",
             "whatsapp_number",
             "email",
-            "timezone",
             "color_primary",
             "color_secondary",
             "avatar",
@@ -36,7 +35,6 @@ class TenantUpdateForm(forms.ModelForm):
             "phone_number": "Telefone",
             "whatsapp_number": "WhatsApp",
             "email": "E-mail",
-            "timezone": "Fuso Horário",
             "color_primary": "Cor Primária",
             "color_secondary": "Cor Secundária",
             "avatar": "Logo da Empresa",
@@ -48,7 +46,6 @@ class TenantUpdateForm(forms.ModelForm):
             "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "(00) 0000-0000"}),
             "whatsapp_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "(00) 00000-0000"}),
             "email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "contato@empresa.com"}),
-            "timezone": forms.Select(attrs={"class": "form-control"}),
             "color_primary": forms.TextInput(attrs={"class": "form-control", "type": "color"}),
             "color_secondary": forms.TextInput(attrs={"class": "form-control", "type": "color"}),
             "avatar": forms.FileInput(attrs={"class": "form-control"}),
@@ -56,7 +53,6 @@ class TenantUpdateForm(forms.ModelForm):
         help_texts = {
             "name": "Nome que aparece na interface e para os clientes",
             "slug": "⚠️ CUIDADO: Mudar isso altera a URL pública! Links antigos param de funcionar.",
-            "timezone": "Fuso horário usado para os agendamentos",
             "color_primary": "Cor principal da interface",
             "color_secondary": "Cor secundária da interface",
         }
