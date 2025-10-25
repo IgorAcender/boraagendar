@@ -393,10 +393,10 @@
             <p>Visão geral do seu sistema de agendamentos</p>
         </div>
         <div class="hero-actions">
-            <a href="{% url 'dashboard:booking_create' %}" class="btn-hero">
+            <button onclick="openNewBookingModal()" class="btn-hero">
                 <i class="fas fa-plus"></i>
                 Novo Agendamento
-            </a>
+            </button>
         </div>
     </div>
 </div>
@@ -506,16 +506,16 @@
         </div>
         <h3>Nenhum agendamento encontrado</h3>
         <p>Comece criando seu primeiro agendamento!</p>
-        <a href="{% url 'dashboard:booking_create' %}" class="btn-hero">
+        <button onclick="openNewBookingModal()" class="btn-hero">
             <i class="fas fa-plus"></i>
             Criar Primeiro Agendamento
-        </a>
+        </button>
     </div>
     {% endif %}
 </div>
 
 <!-- Floating Action Button -->
-<a href="{% url 'dashboard:booking_create' %}" class="fab" title="Novo Agendamento">
+<button onclick="openNewBookingModal()" class="fab" title="Novo Agendamento">
     <i class="fas fa-plus"></i>
-</a>
+</button>
 {% endblock %}

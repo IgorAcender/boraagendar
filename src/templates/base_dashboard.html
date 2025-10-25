@@ -477,6 +477,106 @@
             }
         }
 
+        /* ========== MODAL GLOBAL ========== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+        }
+
+        .modal-content {
+            position: relative;
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: white;
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         {% block extra_head %}{% endblock %}
     </style>
 </head>
@@ -686,6 +786,25 @@
         </div>
     </div>
 
+    <!-- Modal Global para Novo Agendamento -->
+    <div id="newBookingModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeNewBookingModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Novo Agendamento</h2>
+                <button class="modal-close" onclick="closeNewBookingModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="newBookingModalBody">
+                <div style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
+                    <p style="margin-top: 1rem; color: #64748b;">Carregando...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script>
         // Copiar link de agendamento
@@ -755,6 +874,83 @@
             }
         `;
         document.head.appendChild(style);
+
+        // ========== MODAL DE NOVO AGENDAMENTO (GLOBAL) ==========
+        function openNewBookingModal() {
+            const modal = document.getElementById('newBookingModal');
+            const modalBody = document.getElementById('newBookingModalBody');
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            modalBody.innerHTML = '<div style="text-align: center; padding: 3rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i><p style="margin-top: 1rem; color: #64748b;">Carregando...</p></div>';
+
+            fetch('{% url "dashboard:booking_create" %}')
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const content = doc.querySelector('form, .card, main, .content') || doc.body;
+                    modalBody.innerHTML = content.innerHTML;
+
+                    // Attach form submit handler
+                    const form = modalBody.querySelector('form');
+                    if (form) {
+                        form.addEventListener('submit', function handleSubmit(e) {
+                            e.preventDefault();
+                            const formData = new FormData(form);
+
+                            fetch(form.action, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    // Success - reload page to show new booking
+                                    window.location.reload();
+                                } else {
+                                    return response.text().then(html => {
+                                        const parser = new DOMParser();
+                                        const doc = parser.parseFromString(html, 'text/html');
+                                        const content = doc.querySelector('form, .card, main, .content') || doc.body;
+                                        modalBody.innerHTML = content.innerHTML;
+
+                                        // Reattach submit handler to new form
+                                        const newForm = modalBody.querySelector('form');
+                                        if (newForm) {
+                                            newForm.addEventListener('submit', handleSubmit);
+                                        }
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error submitting form:', error);
+                                showNotification('Erro', 'Erro ao criar agendamento. Por favor, tente novamente.', 'error');
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Erro ao carregar formulário.</p>';
+                    console.error('Error loading booking form:', error);
+                });
+        }
+
+        function closeNewBookingModal() {
+            const modal = document.getElementById('newBookingModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeNewBookingModal();
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.getElementById('sidebar');

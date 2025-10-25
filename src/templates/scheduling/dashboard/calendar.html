@@ -690,25 +690,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal for New Booking -->
-    <div id="newBookingModal" class="modal" style="display: none;">
-        <div class="modal-overlay" onclick="closeNewBookingModal()"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-plus-circle"></i> Novo Agendamento</h2>
-                <button class="modal-close" onclick="closeNewBookingModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body" id="newBookingModalBody">
-                <div style="text-align: center; padding: 3rem;">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
-                    <p style="margin-top: 1rem; color: #64748b;">Carregando...</p>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 {{ availability_by_weekday|json_script:"availability-data" }}
@@ -750,84 +731,6 @@ function closeBookingModal() {
     modal.style.display = 'none';
     document.body.style.overflow = ''; // Restaurar scroll
 }
-
-// New Booking Modal functions
-function openNewBookingModal() {
-    const modal = document.getElementById('newBookingModal');
-    const modalBody = document.getElementById('newBookingModalBody');
-
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-
-    modalBody.innerHTML = '<div style="text-align: center; padding: 3rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i><p style="margin-top: 1rem; color: #64748b;">Carregando...</p></div>';
-
-    fetch('{% url "dashboard:booking_create" %}')
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const content = doc.querySelector('form, .card, main, .content') || doc.body;
-            modalBody.innerHTML = content.innerHTML;
-
-            // Attach form submit handler
-            const form = modalBody.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const formData = new FormData(form);
-
-                    fetch(form.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            // Success - reload page to show new booking
-                            window.location.reload();
-                        } else {
-                            return response.text().then(html => {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(html, 'text/html');
-                                const content = doc.querySelector('form, .card, main, .content') || doc.body;
-                                modalBody.innerHTML = content.innerHTML;
-
-                                // Reattach submit handler
-                                const newForm = modalBody.querySelector('form');
-                                if (newForm) {
-                                    arguments.callee.call(newForm, e);
-                                }
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error submitting form:', error);
-                        alert('Erro ao criar agendamento. Por favor, tente novamente.');
-                    });
-                });
-            }
-        })
-        .catch(error => {
-            modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Erro ao carregar formulário.</p>';
-            console.error('Error loading booking form:', error);
-        });
-}
-
-function closeNewBookingModal() {
-    const modal = document.getElementById('newBookingModal');
-    modal.style.display = 'none';
-    document.body.style.overflow = '';
-}
-
-// Fechar modals com ESC
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeBookingModal();
-        closeNewBookingModal();
-    }
-});
 
 // Função para filtrar por profissional
 function filterByProfessional(professionalId) {
