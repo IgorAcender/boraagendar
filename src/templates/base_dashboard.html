@@ -890,8 +890,21 @@
                 .then(html => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
-                    const content = doc.querySelector('form, .card, main, .content') || doc.body;
-                    modalBody.innerHTML = content.innerHTML;
+
+                    // Buscar o card que contém o formulário
+                    const card = doc.querySelector('.card');
+                    if (card) {
+                        modalBody.innerHTML = card.innerHTML;
+                    } else {
+                        // Fallback: buscar o formulário diretamente
+                        const form = doc.querySelector('form');
+                        if (form) {
+                            modalBody.innerHTML = '<h2>Novo agendamento</h2>' + form.outerHTML;
+                        } else {
+                            modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Formulário não encontrado.</p>';
+                            return;
+                        }
+                    }
 
                     // Attach form submit handler
                     const form = modalBody.querySelector('form');
@@ -915,8 +928,17 @@
                                     return response.text().then(html => {
                                         const parser = new DOMParser();
                                         const doc = parser.parseFromString(html, 'text/html');
-                                        const content = doc.querySelector('form, .card, main, .content') || doc.body;
-                                        modalBody.innerHTML = content.innerHTML;
+
+                                        // Buscar o card que contém o formulário com erros
+                                        const card = doc.querySelector('.card');
+                                        if (card) {
+                                            modalBody.innerHTML = card.innerHTML;
+                                        } else {
+                                            const form = doc.querySelector('form');
+                                            if (form) {
+                                                modalBody.innerHTML = '<h2>Novo agendamento</h2>' + form.outerHTML;
+                                            }
+                                        }
 
                                         // Reattach submit handler to new form
                                         const newForm = modalBody.querySelector('form');
