@@ -15,6 +15,7 @@ class Tenant(models.Model):
     color_primary = models.CharField("Cor primaria", max_length=7, default="#D97706")
     color_secondary = models.CharField("Cor secundaria", max_length=7, default="#1F2937")
     avatar = models.ImageField("Logo", upload_to="tenants/logo/", blank=True)
+    avatar_base64 = models.TextField("Logo (Base64)", null=True, blank=True)
     is_active = models.BooleanField("Ativo", default=True)
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
     updated_at = models.DateTimeField("Atualizado em", auto_now=True)

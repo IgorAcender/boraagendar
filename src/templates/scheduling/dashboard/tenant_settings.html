@@ -428,7 +428,10 @@
                     </label>
                     {{ form.avatar.as_widget }}
                     <div class="avatar-preview">
-                        {% if tenant.avatar %}
+                        {% if tenant.avatar_base64 %}
+                            <img src="{{ tenant.avatar_base64 }}" alt="Logo atual">
+                            <span style="color: #64748b; font-size: 0.875rem;">Logo atual</span>
+                        {% elif tenant.avatar %}
                             <img src="{{ tenant.avatar.url }}" alt="Logo atual">
                             <span style="color: #64748b; font-size: 0.875rem;">Logo atual</span>
                         {% else %}

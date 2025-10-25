@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import secrets
 from typing import Tuple
 
@@ -14,6 +15,19 @@ User = get_user_model()
 
 class TenantUpdateForm(forms.ModelForm):
     """Formulário para o dono editar informações da empresa"""
+
+    def save(self, commit=True):
+        # Converter foto para base64 se houver upload
+        avatar = self.cleaned_data.get("avatar")
+        if avatar and hasattr(avatar, 'read'):
+            # Ler o arquivo e converter para base64
+            avatar_data = avatar.read()
+            avatar_base64 = base64.b64encode(avatar_data).decode('utf-8')
+            # Adicionar o prefixo do tipo MIME
+            content_type = avatar.content_type or 'image/jpeg'
+            self.instance.avatar_base64 = f"data:{content_type};base64,{avatar_base64}"
+
+        return super().save(commit=commit)
 
     class Meta:
         model = Tenant
