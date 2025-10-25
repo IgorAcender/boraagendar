@@ -7,9 +7,55 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from .models import TenantMembership
+from .models import Tenant, TenantMembership
 
 User = get_user_model()
+
+
+class TenantUpdateForm(forms.ModelForm):
+    """Formulário para o dono editar informações da empresa"""
+
+    class Meta:
+        model = Tenant
+        fields = [
+            "name",
+            "document",
+            "phone_number",
+            "whatsapp_number",
+            "email",
+            "timezone",
+            "color_primary",
+            "color_secondary",
+            "avatar",
+        ]
+        labels = {
+            "name": "Nome da Empresa",
+            "document": "CNPJ/CPF",
+            "phone_number": "Telefone",
+            "whatsapp_number": "WhatsApp",
+            "email": "E-mail",
+            "timezone": "Fuso Horário",
+            "color_primary": "Cor Primária",
+            "color_secondary": "Cor Secundária",
+            "avatar": "Logo da Empresa",
+        }
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nome da sua empresa"}),
+            "document": forms.TextInput(attrs={"class": "form-control", "placeholder": "00.000.000/0000-00"}),
+            "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "(00) 0000-0000"}),
+            "whatsapp_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "(00) 00000-0000"}),
+            "email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "contato@empresa.com"}),
+            "timezone": forms.Select(attrs={"class": "form-control"}),
+            "color_primary": forms.TextInput(attrs={"class": "form-control", "type": "color"}),
+            "color_secondary": forms.TextInput(attrs={"class": "form-control", "type": "color"}),
+            "avatar": forms.FileInput(attrs={"class": "form-control"}),
+        }
+        help_texts = {
+            "slug": "⚠️ Cuidado: Mudar o slug vai alterar a URL pública de agendamento!",
+            "timezone": "Fuso horário usado para os agendamentos",
+            "color_primary": "Cor principal da interface",
+            "color_secondary": "Cor secundária da interface",
+        }
 
 
 class TeamMemberCreateForm(forms.Form):

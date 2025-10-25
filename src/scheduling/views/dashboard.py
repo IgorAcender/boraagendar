@@ -13,7 +13,7 @@ from django.utils.timezone import make_aware, now
 from django.views.decorators.http import require_POST
 
 from tenants.services import TenantSelectionRequired, ensure_membership_for_request
-from tenants.forms import TeamMemberCreateForm, TeamMemberUpdateForm
+from tenants.forms import TeamMemberCreateForm, TeamMemberUpdateForm, TenantUpdateForm
 from tenants.models import TenantMembership
 
 from ..forms import BookingForm, ProfessionalForm, ProfessionalUpdateForm, ServiceForm
@@ -539,6 +539,30 @@ def team_remove(request: HttpRequest, pk: int) -> HttpResponse:
         member.save(update_fields=["is_active"])
         messages.success(request, "Membro desativado.")
     return redirect("dashboard:team_list")
+
+
+@login_required
+def tenant_settings(request: HttpRequest) -> HttpResponse:
+    """Configurações da empresa - apenas para donos"""
+    membership, redirect_response = _membership_or_redirect(request, allowed_roles=["owner"])
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+
+    if request.method == "POST":
+        form = TenantUpdateForm(request.POST, request.FILES, instance=tenant)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Configurações da empresa atualizadas com sucesso!")
+            return redirect("dashboard:tenant_settings")
+    else:
+        form = TenantUpdateForm(instance=tenant)
+
+    return render(
+        request,
+        "scheduling/dashboard/tenant_settings.html",
+        {"tenant": tenant, "form": form},
+    )
 
 
 @login_required
