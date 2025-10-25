@@ -252,17 +252,17 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.service.id_for_label }}">
-                            <i class="fas fa-cut"></i> {{ form.service.label }}
+                            <i class="fas fa-cut"></i> Serviço
                         </label>
-                        {{ form.service }}
+                        {{ form.service.as_widget }}
                         {{ form.service.errors }}
                     </div>
 
                     <div class="form-group">
                         <label for="{{ form.professional.id_for_label }}">
-                            <i class="fas fa-user-tie"></i> {{ form.professional.label }}
+                            <i class="fas fa-user-tie"></i> Profissional
                         </label>
-                        {{ form.professional }}
+                        {{ form.professional.as_widget }}
                         {{ form.professional.errors }}
                     </div>
                 </div>
@@ -274,17 +274,17 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.date.id_for_label }}">
-                            <i class="fas fa-calendar-alt"></i> {{ form.date.label }}
+                            <i class="fas fa-calendar-alt"></i> Data
                         </label>
-                        {{ form.date }}
+                        {{ form.date.as_widget }}
                         {{ form.date.errors }}
                     </div>
 
                     <div class="form-group">
                         <label for="{{ form.time.id_for_label }}">
-                            <i class="fas fa-clock"></i> {{ form.time.label }}
+                            <i class="fas fa-clock"></i> Hora
                         </label>
-                        {{ form.time }}
+                        {{ form.time.as_widget }}
                         {{ form.time.errors }}
                     </div>
                 </div>
@@ -296,17 +296,17 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.customer_name.id_for_label }}">
-                            <i class="fas fa-user"></i> {{ form.customer_name.label }}
+                            <i class="fas fa-user"></i> Nome do Cliente
                         </label>
-                        {{ form.customer_name }}
+                        {{ form.customer_name.as_widget }}
                         {{ form.customer_name.errors }}
                     </div>
 
                     <div class="form-group">
                         <label for="{{ form.customer_phone.id_for_label }}">
-                            <i class="fas fa-phone"></i> {{ form.customer_phone.label }}
+                            <i class="fas fa-phone"></i> Telefone
                         </label>
-                        {{ form.customer_phone }}
+                        {{ form.customer_phone.as_widget }}
                         {{ form.customer_phone.errors }}
                     </div>
                 </div>
@@ -315,9 +315,9 @@
             <!-- Observações -->
             <div class="form-group">
                 <label for="{{ form.notes.id_for_label }}">
-                    <i class="fas fa-sticky-note"></i> {{ form.notes.label }}
+                    <i class="fas fa-sticky-note"></i> Observações
                 </label>
-                {{ form.notes }}
+                {{ form.notes.as_widget }}
                 {{ form.notes.errors }}
             </div>
         </div>
