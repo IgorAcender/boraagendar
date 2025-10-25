@@ -246,61 +246,77 @@
         {% endif %}
 
         <div class="form-grid">
-            <!-- Serviço -->
-            <div class="form-group">
-                <label for="{{ form.service.id_for_label }}">{{ form.service.label }}</label>
-                {{ form.service }}
-                {{ form.service.errors }}
-            </div>
+            <!-- Seção: Serviço -->
+            <div>
+                <h3 class="form-section-title">Serviço</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.service.id_for_label }}">
+                            <i class="fas fa-cut"></i> {{ form.service.label }}
+                        </label>
+                        {{ form.service }}
+                        {{ form.service.errors }}
+                    </div>
 
-            <!-- Profissional -->
-            <div class="form-group">
-                <label for="{{ form.professional.id_for_label }}">{{ form.professional.label }}</label>
-                {{ form.professional }}
-                {{ form.professional.errors }}
-            </div>
-
-            <!-- Data e Hora -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="{{ form.date.id_for_label }}">
-                        <i class="fas fa-calendar"></i> {{ form.date.label }}
-                    </label>
-                    {{ form.date }}
-                    {{ form.date.errors }}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.time.id_for_label }}">
-                        <i class="fas fa-clock"></i> {{ form.time.label }}
-                    </label>
-                    {{ form.time }}
-                    {{ form.time.errors }}
+                    <div class="form-group">
+                        <label for="{{ form.professional.id_for_label }}">
+                            <i class="fas fa-user-tie"></i> {{ form.professional.label }}
+                        </label>
+                        {{ form.professional }}
+                        {{ form.professional.errors }}
+                    </div>
                 </div>
             </div>
 
-            <!-- Dados do Cliente -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="{{ form.customer_name.id_for_label }}">
-                        <i class="fas fa-user"></i> {{ form.customer_name.label }}
-                    </label>
-                    {{ form.customer_name }}
-                    {{ form.customer_name.errors }}
-                </div>
+            <!-- Seção: Agendamento -->
+            <div>
+                <h3 class="form-section-title">Data e Horário</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.date.id_for_label }}">
+                            <i class="fas fa-calendar-alt"></i> {{ form.date.label }}
+                        </label>
+                        {{ form.date }}
+                        {{ form.date.errors }}
+                    </div>
 
-                <div class="form-group">
-                    <label for="{{ form.customer_phone.id_for_label }}">
-                        <i class="fas fa-phone"></i> {{ form.customer_phone.label }}
-                    </label>
-                    {{ form.customer_phone }}
-                    {{ form.customer_phone.errors }}
+                    <div class="form-group">
+                        <label for="{{ form.time.id_for_label }}">
+                            <i class="fas fa-clock"></i> {{ form.time.label }}
+                        </label>
+                        {{ form.time }}
+                        {{ form.time.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Cliente -->
+            <div>
+                <h3 class="form-section-title">Dados do Cliente</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.customer_name.id_for_label }}">
+                            <i class="fas fa-user"></i> {{ form.customer_name.label }}
+                        </label>
+                        {{ form.customer_name }}
+                        {{ form.customer_name.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.customer_phone.id_for_label }}">
+                            <i class="fas fa-phone"></i> {{ form.customer_phone.label }}
+                        </label>
+                        {{ form.customer_phone }}
+                        {{ form.customer_phone.errors }}
+                    </div>
                 </div>
             </div>
 
             <!-- Observações -->
             <div class="form-group">
-                <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+                <label for="{{ form.notes.id_for_label }}">
+                    <i class="fas fa-sticky-note"></i> {{ form.notes.label }}
+                </label>
                 {{ form.notes }}
                 {{ form.notes.errors }}
             </div>
