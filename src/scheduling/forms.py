@@ -185,8 +185,15 @@ class ProfessionalUpdateForm(TenantAwareForm):
 
 
 class BookingForm(TenantAwareForm):
-    date = forms.DateField(label="Data", initial=date.today)
-    time = forms.TimeField(label="Hora")
+    date = forms.DateField(
+        label="Data",
+        initial=date.today,
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+    time = forms.TimeField(
+        label="Hora",
+        widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'})
+    )
 
     class Meta:
         model = Booking
@@ -204,6 +211,15 @@ class BookingForm(TenantAwareForm):
     def __init__(self, *args, tenant: Tenant, hide_schedule_fields: bool = False, **kwargs):
         self.hide_schedule_fields = hide_schedule_fields
         super().__init__(*args, tenant=tenant, **kwargs)
+
+        # Adicionar classes CSS aos widgets
+        self.fields['service'].widget.attrs.update({'class': 'form-control'})
+        self.fields['professional'].widget.attrs.update({'class': 'form-control'})
+        self.fields['customer_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Nome completo'})
+        self.fields['customer_phone'].widget.attrs.update({'class': 'form-control', 'placeholder': '(00) 00000-0000'})
+        self.fields['customer_email'].widget.attrs.update({'class': 'form-control', 'placeholder': 'email@exemplo.com'})
+        self.fields['notes'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Observações adicionais (opcional)', 'rows': 3})
+
         if hide_schedule_fields:
             for name in ("service", "professional", "date", "time"):
                 self.fields[name].widget = forms.HiddenInput()
