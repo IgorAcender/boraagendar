@@ -160,6 +160,36 @@
         font-size: 0.75rem;
     }
 
+    .help-text.warning {
+        color: #dc2626;
+        font-weight: 600;
+        background: #fef2f2;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border-left: 3px solid #ef4444;
+    }
+
+    .slug-preview {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 0.75rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        color: #475569;
+        word-break: break-all;
+    }
+
+    .slug-preview strong {
+        color: var(--brand-primary);
+        font-weight: 700;
+    }
+
+    .slug-input {
+        font-family: 'Courier New', monospace !important;
+    }
+
     .form-actions {
         display: flex;
         gap: 1rem;
@@ -285,6 +315,23 @@
                     <p class="help-text"><i class="fas fa-info-circle"></i> {{ form.name.help_text }}</p>
                     {% endif %}
                     {{ form.name.errors }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="{{ form.slug.id_for_label }}">
+                        <i class="fas fa-link"></i> <span>{{ form.slug.label }}</span>
+                    </label>
+                    {{ form.slug.as_widget }}
+                    {% if form.slug.help_text %}
+                    <p class="help-text warning"><i class="fas fa-exclamation-triangle"></i> {{ form.slug.help_text }}</p>
+                    {% endif %}
+                    <div class="slug-preview">
+                        <strong>URL de agendamento atual:</strong><br>
+                        {{ request.scheme }}://{{ request.get_host }}/agendar/<strong id="slug-preview-value">{{ tenant.slug }}</strong>/
+                    </div>
+                    {{ form.slug.errors }}
                 </div>
             </div>
 
@@ -419,5 +466,42 @@
     document.getElementById('{{ form.color_secondary.id_for_label }}').addEventListener('input', function(e) {
         document.getElementById('color-secondary-value').textContent = e.target.value.toUpperCase();
     });
+
+    // Atualizar preview da URL ao digitar o slug
+    const slugInput = document.getElementById('{{ form.slug.id_for_label }}');
+    if (slugInput) {
+        slugInput.addEventListener('input', function(e) {
+            const slugValue = e.target.value || '{{ tenant.slug }}';
+            document.getElementById('slug-preview-value').textContent = slugValue;
+        });
+
+        // Confirmação antes de salvar se o slug foi alterado
+        const originalSlug = '{{ tenant.slug }}';
+        const form = slugInput.closest('form');
+
+        form.addEventListener('submit', function(e) {
+            const newSlug = slugInput.value;
+
+            if (newSlug !== originalSlug) {
+                const confirmed = confirm(
+                    '⚠️ ATENÇÃO!\n\n' +
+                    'Você está prestes a mudar a URL de agendamento:\n\n' +
+                    'DE: /agendar/' + originalSlug + '/\n' +
+                    'PARA: /agendar/' + newSlug + '/\n\n' +
+                    '🔴 CONSEQUÊNCIAS:\n' +
+                    '• Links antigos pararão de funcionar\n' +
+                    '• QR Codes em materiais impressos ficarão inválidos\n' +
+                    '• Posts em redes sociais quebrarão\n' +
+                    '• Clientes podem não conseguir agendar\n\n' +
+                    '✅ Você tem CERTEZA que deseja continuar?'
+                );
+
+                if (!confirmed) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+    }
 </script>
 {% endblock %}

@@ -19,6 +19,7 @@ class TenantUpdateForm(forms.ModelForm):
         model = Tenant
         fields = [
             "name",
+            "slug",
             "document",
             "phone_number",
             "whatsapp_number",
@@ -30,6 +31,7 @@ class TenantUpdateForm(forms.ModelForm):
         ]
         labels = {
             "name": "Nome da Empresa",
+            "slug": "URL de Agendamento (Slug)",
             "document": "CNPJ/CPF",
             "phone_number": "Telefone",
             "whatsapp_number": "WhatsApp",
@@ -41,6 +43,7 @@ class TenantUpdateForm(forms.ModelForm):
         }
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nome da sua empresa"}),
+            "slug": forms.TextInput(attrs={"class": "form-control slug-input", "placeholder": "minha-empresa"}),
             "document": forms.TextInput(attrs={"class": "form-control", "placeholder": "00.000.000/0000-00"}),
             "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "(00) 0000-0000"}),
             "whatsapp_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "(00) 00000-0000"}),
@@ -51,7 +54,8 @@ class TenantUpdateForm(forms.ModelForm):
             "avatar": forms.FileInput(attrs={"class": "form-control"}),
         }
         help_texts = {
-            "slug": "⚠️ Cuidado: Mudar o slug vai alterar a URL pública de agendamento!",
+            "name": "Nome que aparece na interface e para os clientes",
+            "slug": "⚠️ CUIDADO: Mudar isso altera a URL pública! Links antigos param de funcionar.",
             "timezone": "Fuso horário usado para os agendamentos",
             "color_primary": "Cor principal da interface",
             "color_secondary": "Cor secundária da interface",
