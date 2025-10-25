@@ -725,14 +725,12 @@
                                     <span class="submenu-text">Editar Perfil</span>
                                 </a>
                             </li>
-                            {% if request.user.tenant_memberships.filter(tenant=tenant, role='owner').exists %}
                             <li class="submenu-item">
                                 <a href="{% url 'dashboard:tenant_settings' %}" class="submenu-link">
                                     <i class="fas fa-cog submenu-icon"></i>
                                     <span class="submenu-text">Configurações da Empresa</span>
                                 </a>
                             </li>
-                            {% endif %}
                         </ul>
                     </li>
                 </ul>
