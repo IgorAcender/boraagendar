@@ -199,25 +199,22 @@
                 </div>
             </div>
 
-            <!-- Nome do Cliente -->
-            <div class="form-group">
-                <label for="{{ form.customer_name.id_for_label }}">{{ form.customer_name.label }}</label>
-                {{ form.customer_name }}
-                {{ form.customer_name.errors }}
-            </div>
-
-            <!-- Telefone e Email -->
+            <!-- Dados do Cliente -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="{{ form.customer_phone.id_for_label }}">{{ form.customer_phone.label }}</label>
-                    {{ form.customer_phone }}
-                    {{ form.customer_phone.errors }}
+                    <label for="{{ form.customer_name.id_for_label }}">
+                        <i class="fas fa-user"></i> {{ form.customer_name.label }}
+                    </label>
+                    {{ form.customer_name }}
+                    {{ form.customer_name.errors }}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.customer_email.id_for_label }}">{{ form.customer_email.label }}</label>
-                    {{ form.customer_email }}
-                    {{ form.customer_email.errors }}
+                    <label for="{{ form.customer_phone.id_for_label }}">
+                        <i class="fas fa-phone"></i> {{ form.customer_phone.label }}
+                    </label>
+                    {{ form.customer_phone }}
+                    {{ form.customer_phone.errors }}
                 </div>
             </div>
 

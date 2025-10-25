@@ -202,7 +202,6 @@ class BookingForm(TenantAwareForm):
             "professional",
             "customer_name",
             "customer_phone",
-            "customer_email",
             "date",
             "time",
             "notes",
@@ -217,7 +216,6 @@ class BookingForm(TenantAwareForm):
         self.fields['professional'].widget.attrs.update({'class': 'form-control'})
         self.fields['customer_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Nome completo'})
         self.fields['customer_phone'].widget.attrs.update({'class': 'form-control', 'placeholder': '(00) 00000-0000'})
-        self.fields['customer_email'].widget.attrs.update({'class': 'form-control', 'placeholder': 'email@exemplo.com'})
         self.fields['notes'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Observações adicionais (opcional)', 'rows': 3})
 
         if hide_schedule_fields:
