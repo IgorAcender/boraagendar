@@ -111,6 +111,12 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
 
         print(f"DEBUG - Datetime com timezone: {start_datetime}")
 
+        # Validar se a data/hora não está no passado
+        from django.utils.timezone import now as django_now
+        if start_datetime < django_now():
+            print("DEBUG - Data/hora no passado, redirecionando...")
+            return redirect("public:booking_start", tenant_slug=tenant.slug)
+
         availability_service = AvailabilityService(tenant=tenant)
         is_available = availability_service.is_slot_available(service, professional, start_datetime)
         print(f"DEBUG - Slot disponível: {is_available}")
@@ -240,10 +246,15 @@ def get_available_slots(request: HttpRequest, tenant_slug: str) -> JsonResponse:
         return JsonResponse({'slots': [], 'error': 'missing_parameters'})
 
     try:
-        from datetime import datetime
+        from datetime import datetime, date as date_type
         service = Service.objects.get(pk=service_id, tenant=tenant, is_active=True)
         professional = Professional.objects.get(pk=professional_id, tenant=tenant, is_active=True)
         target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+        # Validar se a data não está no passado
+        if target_date < date_type.today():
+            print("DEBUG - Data no passado!")
+            return JsonResponse({'slots': [], 'error': 'past_date'})
 
         print(f"DEBUG - Service: {service.name}")
         print(f"DEBUG - Professional: {professional.display_name}")

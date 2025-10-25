@@ -39,7 +39,12 @@ class AvailabilitySearchForm(forms.Form):
         queryset=Professional.objects.none(),
         required=False,
     )
-    date = forms.DateField(label="Data", initial=date.today, required=False)
+    date = forms.DateField(
+        label="Data",
+        initial=date.today,
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date', 'min': date.today().isoformat()})
+    )
 
     def __init__(self, *args, tenant: Tenant, **kwargs):
         self.tenant = tenant
@@ -48,6 +53,12 @@ class AvailabilitySearchForm(forms.Form):
         self.fields["professional"].queryset = Professional.objects.filter(
             tenant=tenant, is_active=True
         ).order_by("display_name")
+
+    def clean_date(self):
+        selected_date = self.cleaned_data.get('date')
+        if selected_date and selected_date < date.today():
+            raise ValidationError("Não é possível selecionar uma data no passado.")
+        return selected_date
 
 
 class ServiceForm(TenantAwareForm):
