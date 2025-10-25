@@ -9,7 +9,7 @@
         <div class="step-circle">
             {% if selected_service %}<i class="fas fa-check"></i>{% else %}1{% endif %}
         </div>
-        <div class="step-label">Escolher Serviço</div>
+        <div class="step-label">Escolher {{ tenant.label_servico }}</div>
     </div>
 
     <div class="step {% if selected_service and not available_slots %}active{% elif available_slots %}completed{% endif %}">
@@ -349,12 +349,12 @@
         <div class="section-icon">
             <i class="fas fa-concierge-bell"></i>
         </div>
-        Escolha o Serviço
+        Escolha o {{ tenant.label_servico }}
     </h2>
 
     <form method="get" id="serviceForm">
         <div class="form-group">
-            <label for="id_service">Qual serviço você deseja?</label>
+            <label for="id_service">Qual {{ tenant.label_servico|lower }} você deseja?</label>
             {{ form.service }}
         </div>
     </form>
@@ -367,7 +367,7 @@
         <div class="section-icon">
             <i class="fas fa-users"></i>
         </div>
-        Escolha o Profissional
+        Escolha o {{ tenant.label_profissional }}
     </h2>
 
     <div class="professionals-grid">
@@ -453,6 +453,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         const serviceSelect = document.getElementById('id_service');
         const tenantSlug = '{{ tenant.slug }}';
+        const labelServico = '{{ tenant.label_servico }}';
+        const labelProfissional = '{{ tenant.label_profissional }}';
         let selectedProfessionalId = null;
         let selectedServiceId = null;
 
@@ -521,7 +523,7 @@
                     <div class="section-icon">
                         <i class="fas fa-users"></i>
                     </div>
-                    Escolha o Profissional
+                    Escolha o ${labelProfissional}
                 </h2>
                 <div class="professionals-grid" id="professionalsGrid"></div>
             `;

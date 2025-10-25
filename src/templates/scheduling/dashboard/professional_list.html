@@ -1,5 +1,5 @@
 {% extends "base_dashboard.html" %}
-{% block title %}Profissionais{% endblock %}
+{% block title %}{{ tenant.label_profissional_plural }}{% endblock %}
 {% block extra_head %}
 <style>
     /* Hero Header com gradiente moderno */
@@ -528,14 +528,14 @@
             <i class="fas fa-users"></i>
         </div>
         <div>
-            <h1>Profissionais</h1>
+            <h1>{{ tenant.label_profissional_plural }}</h1>
             <p class="hero-subtitle">Gerencie a equipe da sua empresa</p>
         </div>
     </div>
     <div class="hero-actions">
         <button class="btn-primary" onclick="openModal()">
             <i class="fas fa-plus"></i>
-            Novo Profissional
+            Novo {{ tenant.label_profissional }}
         </button>
     </div>
 </div>
@@ -545,7 +545,7 @@
     <div class="stat-card primary">
         <div class="stat-card-content">
             <div class="stat-info">
-                <div class="stat-label">Total de Profissionais</div>
+                <div class="stat-label">Total de {{ tenant.label_profissional_plural }}</div>
                 <div class="stat-value">{{ totals.professionals }}</div>
             </div>
             <div class="stat-icon-wrapper">
@@ -557,7 +557,7 @@
     <div class="stat-card success">
         <div class="stat-card-content">
             <div class="stat-info">
-                <div class="stat-label">Profissionais Ativos</div>
+                <div class="stat-label">{{ tenant.label_profissional_plural }} Ativos</div>
                 <div class="stat-value">{{ totals.active }}</div>
             </div>
             <div class="stat-icon-wrapper">
@@ -579,7 +579,7 @@
     </div>
 </div>
 
-<!-- Lista de Profissionais -->
+<!-- Lista de {{ tenant.label_profissional_plural }} -->
 <div class="glass-card animate-slide-up">
     {% if professionals %}
     <div class="professionals-grid">
@@ -627,7 +627,7 @@
             </a>
 
             <a href="{% url 'dashboard:professional_services' p.id %}" style="display: block; margin-top: 0.5rem; padding: 0.75rem; background: linear-gradient(135deg, #10b981, #059669); color: white; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
-                <i class="fas fa-briefcase"></i> Gerenciar Serviços
+                <i class="fas fa-briefcase"></i> Gerenciar {{ tenant.label_servico_plural }}
             </a>
         </div>
         {% endfor %}
@@ -637,11 +637,11 @@
         <div class="empty-state-icon">
             <i class="fas fa-users"></i>
         </div>
-        <h3>Nenhum profissional cadastrado</h3>
-        <p>Comece adicionando seu primeiro profissional para aparecer aqui.</p>
+        <h3>Nenhum {{ tenant.label_profissional|lower }} cadastrado</h3>
+        <p>Comece adicionando seu primeiro {{ tenant.label_profissional|lower }} para aparecer aqui.</p>
         <button class="btn-primary" onclick="openModal()">
             <i class="fas fa-plus"></i>
-            Adicionar Primeiro Profissional
+            Adicionar Primeiro {{ tenant.label_profissional }}
         </button>
     </div>
     {% endif %}
@@ -651,7 +651,7 @@
 <div id="modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 id="modalTitle">Novo Profissional</h3>
+            <h3 id="modalTitle">Novo {{ tenant.label_profissional }}</h3>
             <button class="close-modal" onclick="closeModal()">&times;</button>
         </div>
         <form method="post" enctype="multipart/form-data">
@@ -706,14 +706,14 @@
             <div style="margin-top: 1rem;">
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                     <input type="checkbox" name="is_active" checked style="width: auto;">
-                    <span>Profissional ativo</span>
+                    <span>{{ tenant.label_profissional }} ativo</span>
                 </label>
             </div>
 
             <div class="actions">
                 <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
                 <button type="submit" class="btn-submit">
-                    <i class="fas fa-check"></i> Salvar Profissional
+                    <i class="fas fa-check"></i> Salvar {{ tenant.label_profissional }}
                 </button>
             </div>
         </form>

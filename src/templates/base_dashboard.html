@@ -670,13 +670,13 @@
                             <li class="submenu-item">
                                 <a href="{% url 'dashboard:professional_list' %}" class="submenu-link">
                                     <i class="fas fa-user-tie submenu-icon"></i>
-                                    <span class="submenu-text">Profissionais</span>
+                                    <span class="submenu-text">{{ tenant.label_profissional_plural }}</span>
                                 </a>
                             </li>
                             <li class="submenu-item">
                                 <a href="{% url 'dashboard:service_list' %}" class="submenu-link">
                                     <i class="fas fa-concierge-bell submenu-icon"></i>
-                                    <span class="submenu-text">Serviços</span>
+                                    <span class="submenu-text">{{ tenant.label_servico_plural }}</span>
                                 </a>
                             </li>
                             <li class="submenu-item">
@@ -704,7 +704,7 @@
                             <div class="nav-icon">
                                 <i class="fas fa-briefcase"></i>
                             </div>
-                            <span class="nav-text">Meus Serviços e Preços</span>
+                            <span class="nav-text">Meus {{ tenant.label_servico_plural }} e Preços</span>
                         </a>
                     </li>
 

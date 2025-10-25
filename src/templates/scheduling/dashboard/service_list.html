@@ -1,5 +1,5 @@
 {% extends "base_dashboard.html" %}
-{% block title %}Serviços{% endblock %}
+{% block title %}{{ tenant.label_servico_plural }}{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -255,15 +255,15 @@
 
 {% block content %}
 <div class="hero-header">
-    <h1><i class="fas fa-concierge-bell"></i> Serviços</h1>
-    <p>Cadastre e gerencie os serviços oferecidos pela sua empresa</p>
+    <h1><i class="fas fa-concierge-bell"></i> {{ tenant.label_servico_plural }}</h1>
+    <p>Cadastre e gerencie os {{ tenant.label_servico_plural|lower }} oferecidos pela sua empresa</p>
 </div>
 
 <div class="section-card">
     <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem; color: #1e293b;">
-        <i class="fas fa-list"></i> Serviços Cadastrados
+        <i class="fas fa-list"></i> {{ tenant.label_servico_plural }} Cadastrados
     </h2>
-    <p style="color: #64748b; margin: 0 0 1rem 0;">Gerencie todos os serviços da empresa. Para vincular profissionais a serviços, acesse a página de cada profissional.</p>
+    <p style="color: #64748b; margin: 0 0 1rem 0;">Gerencie todos os {{ tenant.label_servico_plural|lower }} da empresa. Para vincular {{ tenant.label_profissional_plural|lower }} a {{ tenant.label_servico_plural|lower }}, acesse a página de cada {{ tenant.label_profissional|lower }}.</p>
 
     {% if services %}
     <div class="services-grid">
@@ -313,21 +313,21 @@
     {% else %}
     <div class="empty-state">
         <i class="fas fa-concierge-bell"></i>
-        <p style="font-size: 1.125rem; margin: 0;">Nenhum serviço cadastrado ainda.</p>
-        <p style="margin: 0.5rem 0 0 0;">Adicione seu primeiro serviço usando o formulário abaixo.</p>
+        <p style="font-size: 1.125rem; margin: 0;">Nenhum {{ tenant.label_servico|lower }} cadastrado ainda.</p>
+        <p style="margin: 0.5rem 0 0 0;">Adicione seu primeiro {{ tenant.label_servico|lower }} usando o formulário abaixo.</p>
     </div>
     {% endif %}
 
     <!-- Add Service Form -->
     <div class="add-service-form">
         <h3 style="margin: 0 0 1rem 0; font-size: 1.125rem; color: #1e293b;">
-            <i class="fas fa-plus-circle"></i> Adicionar Novo Serviço
+            <i class="fas fa-plus-circle"></i> Adicionar Novo {{ tenant.label_servico }}
         </h3>
         <form method="post">
             {% csrf_token %}
             <div class="form-row">
                 <div class="form-group">
-                    <label>Nome do Serviço</label>
+                    <label>Nome do {{ tenant.label_servico }}</label>
                     {{ form.name }}
                 </div>
                 <div class="form-group">
@@ -366,13 +366,13 @@
 <div id="editModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 id="modalTitle">Editar Serviço</h3>
+            <h3 id="modalTitle">Editar {{ tenant.label_servico }}</h3>
         </div>
         <form method="post" id="editForm" action="">
             {% csrf_token %}
 
             <div style="margin-bottom: 1rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Nome do Serviço</label>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Nome do {{ tenant.label_servico }}</label>
                 <input type="text" name="name" id="edit_name" required style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 10px;">
             </div>
 
@@ -395,7 +395,7 @@
             <div style="margin-bottom: 1.5rem;">
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                     <input type="checkbox" name="is_active" id="edit_is_active" style="width: auto;">
-                    <span style="font-weight: 600;">Serviço ativo</span>
+                    <span style="font-weight: 600;">{{ tenant.label_servico }} ativo</span>
                 </label>
             </div>
 

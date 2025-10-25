@@ -41,6 +41,10 @@ class TenantUpdateForm(forms.ModelForm):
             "color_primary",
             "color_secondary",
             "avatar",
+            "label_servico",
+            "label_servico_plural",
+            "label_profissional",
+            "label_profissional_plural",
         ]
         labels = {
             "name": "Nome da Empresa",
@@ -52,6 +56,10 @@ class TenantUpdateForm(forms.ModelForm):
             "color_primary": "Cor Primária",
             "color_secondary": "Cor Secundária",
             "avatar": "Logo da Empresa",
+            "label_servico": "Nome para Serviço (singular)",
+            "label_servico_plural": "Nome para Serviço (plural)",
+            "label_profissional": "Nome para Profissional (singular)",
+            "label_profissional_plural": "Nome para Profissional (plural)",
         }
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nome da sua empresa"}),
@@ -63,12 +71,20 @@ class TenantUpdateForm(forms.ModelForm):
             "color_primary": forms.TextInput(attrs={"class": "form-control", "type": "color"}),
             "color_secondary": forms.TextInput(attrs={"class": "form-control", "type": "color"}),
             "avatar": forms.FileInput(attrs={"class": "form-control"}),
+            "label_servico": forms.TextInput(attrs={"class": "form-control", "placeholder": "Serviço"}),
+            "label_servico_plural": forms.TextInput(attrs={"class": "form-control", "placeholder": "Serviços"}),
+            "label_profissional": forms.TextInput(attrs={"class": "form-control", "placeholder": "Profissional"}),
+            "label_profissional_plural": forms.TextInput(attrs={"class": "form-control", "placeholder": "Profissionais"}),
         }
         help_texts = {
             "name": "Nome que aparece na interface e para os clientes",
             "slug": "⚠️ CUIDADO: Mudar isso altera a URL pública! Links antigos param de funcionar.",
             "color_primary": "Cor principal da interface",
             "color_secondary": "Cor secundária da interface",
+            "label_servico": "Ex: Serviço, Modalidade, Tipo de Evento",
+            "label_servico_plural": "Ex: Serviços, Modalidades, Tipos de Eventos",
+            "label_profissional": "Ex: Profissional, Quadra, Salão",
+            "label_profissional_plural": "Ex: Profissionais, Quadras, Salões",
         }
 
 

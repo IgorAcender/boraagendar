@@ -385,6 +385,64 @@
             </div>
         </div>
 
+        <!-- Personalização de Nomenclatura -->
+        <div class="form-section">
+            <h3 class="form-section-title">
+                <i class="fas fa-tag"></i> Personalização de Nomenclatura
+            </h3>
+            <p class="help-text" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-info-circle"></i> Personalize os termos usados no sistema para se adequar ao seu tipo de negócio
+            </p>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.label_servico.id_for_label }}">
+                        <i class="fas fa-briefcase"></i> <span>{{ form.label_servico.label }}</span>
+                    </label>
+                    {{ form.label_servico.as_widget }}
+                    {% if form.label_servico.help_text %}
+                    <p class="help-text"><i class="fas fa-lightbulb"></i> {{ form.label_servico.help_text }}</p>
+                    {% endif %}
+                    {{ form.label_servico.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.label_servico_plural.id_for_label }}">
+                        <i class="fas fa-briefcase"></i> <span>{{ form.label_servico_plural.label }}</span>
+                    </label>
+                    {{ form.label_servico_plural.as_widget }}
+                    {% if form.label_servico_plural.help_text %}
+                    <p class="help-text"><i class="fas fa-lightbulb"></i> {{ form.label_servico_plural.help_text }}</p>
+                    {% endif %}
+                    {{ form.label_servico_plural.errors }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.label_profissional.id_for_label }}">
+                        <i class="fas fa-user-tie"></i> <span>{{ form.label_profissional.label }}</span>
+                    </label>
+                    {{ form.label_profissional.as_widget }}
+                    {% if form.label_profissional.help_text %}
+                    <p class="help-text"><i class="fas fa-lightbulb"></i> {{ form.label_profissional.help_text }}</p>
+                    {% endif %}
+                    {{ form.label_profissional.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.label_profissional_plural.id_for_label }}">
+                        <i class="fas fa-user-tie"></i> <span>{{ form.label_profissional_plural.label }}</span>
+                    </label>
+                    {{ form.label_profissional_plural.as_widget }}
+                    {% if form.label_profissional_plural.help_text %}
+                    <p class="help-text"><i class="fas fa-lightbulb"></i> {{ form.label_profissional_plural.help_text }}</p>
+                    {% endif %}
+                    {{ form.label_profissional_plural.errors }}
+                </div>
+            </div>
+        </div>
+
         <!-- Personalização Visual -->
         <div class="form-section">
             <h3 class="form-section-title">
