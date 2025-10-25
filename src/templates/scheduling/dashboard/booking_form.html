@@ -16,39 +16,52 @@
 
     .form-grid {
         display: grid;
-        gap: 1.5rem;
+        gap: 2.5rem;
         padding: 2rem;
     }
 
+    .form-section {
+        display: grid;
+        gap: 1.25rem;
+    }
+
     .form-section-title {
-        font-size: 0.75rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #94a3b8;
-        margin: 0 0 1rem 0;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #f1f5f9;
+        letter-spacing: 0.08em;
+        color: #64748b;
+        margin: 0 0 0.5rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
     }
 
     .form-group {
         display: flex;
         flex-direction: column;
-        gap: 0.625rem;
+        gap: 0.75rem;
     }
 
     .form-group label {
         font-weight: 600;
-        color: #334155;
-        font-size: 0.9rem;
+        color: #475569;
+        font-size: 0.875rem;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.625rem;
     }
 
     .form-group label i {
         color: var(--brand-primary);
-        font-size: 0.875rem;
+        font-size: 1rem;
+        width: 18px;
+        text-align: center;
     }
 
     .form-control, .form-select {
@@ -154,28 +167,27 @@
         display: flex;
         gap: 1rem;
         margin: 0;
-        padding: 1.5rem 2rem;
-        background: #f8fafc;
-        border-top: 1px solid #e2e8f0;
+        padding: 2rem;
+        padding-top: 1rem;
     }
 
     .btn-primary {
-        flex: 1;
-        padding: 1rem 2rem;
+        width: 100%;
+        padding: 1.125rem 2rem;
         background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
         color: white;
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
         font-weight: 600;
         font-size: 1rem;
         cursor: pointer;
         transition: all 0.3s;
         font-family: inherit;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 0.625rem;
     }
 
     .btn-primary:hover {
@@ -218,6 +230,11 @@
     @media (max-width: 768px) {
         .form-grid {
             padding: 1.5rem;
+            gap: 2rem;
+        }
+
+        .form-section {
+            gap: 1rem;
         }
 
         .form-row {
@@ -226,8 +243,12 @@
         }
 
         .form-actions {
-            flex-direction: column;
-            padding: 1.25rem 1.5rem;
+            padding: 1.5rem;
+            padding-top: 1rem;
+        }
+
+        .btn-primary {
+            padding: 1rem 1.5rem;
         }
     }
 </style>
@@ -247,12 +268,12 @@
 
         <div class="form-grid">
             <!-- Seção: Serviço -->
-            <div>
+            <div class="form-section">
                 <h3 class="form-section-title">Serviço</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.service.id_for_label }}">
-                            <i class="fas fa-cut"></i> Serviço
+                            <i class="fas fa-cut"></i> <span>Serviço</span>
                         </label>
                         {{ form.service.as_widget }}
                         {{ form.service.errors }}
@@ -260,7 +281,7 @@
 
                     <div class="form-group">
                         <label for="{{ form.professional.id_for_label }}">
-                            <i class="fas fa-user-tie"></i> Profissional
+                            <i class="fas fa-user-tie"></i> <span>Profissional</span>
                         </label>
                         {{ form.professional.as_widget }}
                         {{ form.professional.errors }}
@@ -269,12 +290,12 @@
             </div>
 
             <!-- Seção: Agendamento -->
-            <div>
+            <div class="form-section">
                 <h3 class="form-section-title">Data e Horário</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.date.id_for_label }}">
-                            <i class="fas fa-calendar-alt"></i> Data
+                            <i class="fas fa-calendar-alt"></i> <span>Data</span>
                         </label>
                         {{ form.date.as_widget }}
                         {{ form.date.errors }}
@@ -282,7 +303,7 @@
 
                     <div class="form-group">
                         <label for="{{ form.time.id_for_label }}">
-                            <i class="fas fa-clock"></i> Hora
+                            <i class="fas fa-clock"></i> <span>Hora</span>
                         </label>
                         {{ form.time.as_widget }}
                         {{ form.time.errors }}
@@ -291,12 +312,12 @@
             </div>
 
             <!-- Seção: Cliente -->
-            <div>
+            <div class="form-section">
                 <h3 class="form-section-title">Dados do Cliente</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.customer_name.id_for_label }}">
-                            <i class="fas fa-user"></i> Nome do Cliente
+                            <i class="fas fa-user"></i> <span>Nome</span>
                         </label>
                         {{ form.customer_name.as_widget }}
                         {{ form.customer_name.errors }}
@@ -304,7 +325,7 @@
 
                     <div class="form-group">
                         <label for="{{ form.customer_phone.id_for_label }}">
-                            <i class="fas fa-phone"></i> Telefone
+                            <i class="fas fa-phone"></i> <span>Telefone</span>
                         </label>
                         {{ form.customer_phone.as_widget }}
                         {{ form.customer_phone.errors }}
@@ -313,12 +334,14 @@
             </div>
 
             <!-- Observações -->
-            <div class="form-group">
-                <label for="{{ form.notes.id_for_label }}">
-                    <i class="fas fa-sticky-note"></i> Observações
-                </label>
-                {{ form.notes.as_widget }}
-                {{ form.notes.errors }}
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="{{ form.notes.id_for_label }}">
+                        <i class="fas fa-sticky-note"></i> <span>Observações (opcional)</span>
+                    </label>
+                    {{ form.notes.as_widget }}
+                    {{ form.notes.errors }}
+                </div>
             </div>
         </div>
 
