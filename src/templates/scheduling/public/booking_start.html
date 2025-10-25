@@ -27,7 +27,47 @@
 {% endblock %}
 
 {% block extra_head %}
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <style>
+    /* Customização Flatpickr */
+    .flatpickr-calendar {
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        border: none;
+    }
+
+    .flatpickr-day.disabled {
+        color: #cbd5e1 !important;
+        cursor: not-allowed !important;
+    }
+
+    .flatpickr-day.selected {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)) !important;
+        border-color: var(--brand-primary) !important;
+    }
+
+    .flatpickr-day:hover:not(.disabled):not(.selected) {
+        background: rgba(102, 126, 234, 0.1) !important;
+        border-color: var(--brand-primary) !important;
+    }
+
+    .flatpickr-months .flatpickr-month {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: white;
+    }
+
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+        background: transparent;
+        color: white;
+    }
+
+    .flatpickr-weekday {
+        color: #64748b;
+        font-weight: 600;
+    }
+
     .form-section {
         margin-bottom: 2rem;
     }
@@ -720,6 +760,41 @@
 
             dateSection.parentNode.insertBefore(slotsSection, dateSection.nextSibling);
         }
+    });
+</script>
+
+<!-- Flatpickr JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+
+<script>
+    // Inicializar Flatpickr em todos os inputs de data quando forem criados
+    document.addEventListener('DOMContentLoaded', function() {
+        // Observer para detectar quando o date picker for criado dinamicamente
+        const observer = new MutationObserver(function(mutations) {
+            const datePicker = document.getElementById('date_picker');
+            if (datePicker && !datePicker._flatpickr) {
+                flatpickr(datePicker, {
+                    locale: 'pt',
+                    dateFormat: 'Y-m-d',
+                    minDate: 'today',
+                    disableMobile: false, // Usa Flatpickr mesmo no mobile
+                    altInput: true,
+                    altFormat: 'd/m/Y',
+                    onChange: function(selectedDates, dateStr, instance) {
+                        // Trigger do evento change original
+                        const event = new Event('change', { bubbles: true });
+                        datePicker.dispatchEvent(event);
+                    }
+                });
+            }
+        });
+
+        // Observar mudanças no DOM
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
     });
 </script>
 {% endblock %}
