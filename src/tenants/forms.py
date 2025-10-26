@@ -26,6 +26,8 @@ class TenantUpdateForm(forms.ModelForm):
             # Adicionar o prefixo do tipo MIME
             content_type = avatar.content_type or 'image/jpeg'
             self.instance.avatar_base64 = f"data:{content_type};base64,{avatar_base64}"
+            # Limpar o campo avatar para não tentar salvar no disco
+            self.instance.avatar = None
 
         return super().save(commit=commit)
 
