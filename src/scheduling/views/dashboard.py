@@ -550,11 +550,19 @@ def tenant_settings(request: HttpRequest) -> HttpResponse:
     tenant = membership.tenant
 
     if request.method == "POST":
-        form = TenantUpdateForm(request.POST, request.FILES, instance=tenant)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Configurações da empresa atualizadas com sucesso!")
-            return redirect("dashboard:tenant_settings")
+        try:
+            form = TenantUpdateForm(request.POST, request.FILES, instance=tenant)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Configurações da empresa atualizadas com sucesso!")
+                return redirect("dashboard:tenant_settings")
+            else:
+                messages.error(request, f"Erros no formulário: {form.errors}")
+        except Exception as e:
+            messages.error(request, f"Erro ao salvar: {str(e)}")
+            import traceback
+            print("ERRO COMPLETO:")
+            traceback.print_exc()
     else:
         form = TenantUpdateForm(instance=tenant)
 
