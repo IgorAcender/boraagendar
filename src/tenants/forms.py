@@ -17,10 +17,14 @@ class TenantUpdateForm(forms.ModelForm):
     """Formulário para o dono editar informações da empresa"""
 
     def save(self, commit=True):
-        # Converter foto para base64 se houver upload
+        # Converter foto para base64 se houver upload NOVO
         avatar = self.cleaned_data.get("avatar")
-        if avatar and hasattr(avatar, 'read'):
-            # Ler o arquivo e converter para base64
+
+        # Verificar se é um upload novo (UploadedFile) ou arquivo já existente (FieldFile)
+        from django.core.files.uploadedfile import UploadedFile
+
+        if avatar and isinstance(avatar, UploadedFile):
+            # É um upload novo - converter para base64
             avatar_data = avatar.read()
             avatar_base64 = base64.b64encode(avatar_data).decode('utf-8')
             # Adicionar o prefixo do tipo MIME
