@@ -1,4 +1,4 @@
-{% extends "base_dashboard.html" %}
+﻿{% extends "base_dashboard.html" %}
 {% block title %}Perfil{% endblock %}
 {% block content %}
 
@@ -310,7 +310,7 @@
         transform: translateY(-2px);
     }
 
-    /* Info Card (para não profissionais) */
+    /* Info Card (para nÃ£o profissionais) */
     .info-card {
         display: grid;
         gap: 1.5rem;
@@ -379,7 +379,7 @@
 </style>
 
 {% if professional %}
-{# Se for profissional, mostrar formulário de edição #}
+{# Se for profissional, mostrar formulÃ¡rio de ediÃ§Ã£o #}
 
 <!-- Hero Header -->
 <div class="hero-header animate-fade-in">
@@ -389,7 +389,7 @@
         </div>
         <div>
             <h1>Editar Meu Perfil</h1>
-            <p class="hero-subtitle">Mantenha suas informações sempre atualizadas</p>
+            <p class="hero-subtitle">Mantenha suas informaÃ§Ãµes sempre atualizadas</p>
         </div>
     </div>
 </div>
@@ -416,9 +416,9 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- Dados do Usuário -->
+        <!-- Dados do UsuÃ¡rio -->
         <div class="form-section">
-            <h3><i class="fas fa-user"></i> Dados do Usuário</h3>
+            <h3><i class="fas fa-user"></i> Dados do UsuÃ¡rio</h3>
 
             <div class="form-grid">
                 <div class="form-field">
@@ -519,7 +519,7 @@
         <div class="form-actions">
             <button type="submit" class="btn-primary">
                 <i class="fas fa-save"></i>
-                Salvar Alterações
+                Salvar AlteraÃ§Ãµes
             </button>
             <a href="{% url 'accounts:password_change' %}" class="btn-secondary">
                 <i class="fas fa-key"></i>
@@ -530,7 +530,7 @@
 </div>
 
 {% else %}
-{# Se não for profissional, mostrar apenas informações básicas #}
+{# Se nÃ£o for profissional, mostrar apenas informaÃ§Ãµes bÃ¡sicas #}
 
 <!-- Hero Header -->
 <div class="hero-header animate-fade-in">
@@ -540,7 +540,7 @@
         </div>
         <div>
             <h1>Meu Perfil</h1>
-            <p class="hero-subtitle">Suas informações pessoais</p>
+            <p class="hero-subtitle">Suas informaÃ§Ãµes pessoais</p>
         </div>
     </div>
 </div>
@@ -593,7 +593,7 @@
                 <i class="fas fa-clock"></i>
             </div>
             <div class="info-content">
-                <div class="info-label">Fuso Horário</div>
+                <div class="info-label">Fuso HorÃ¡rio</div>
                 <div class="info-value">{{ request.user.timezone }}</div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -105,7 +105,7 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        /* Navegação */
+        /* NavegaÃ§Ã£o */
         .sidebar-nav {
             padding: 1rem 0;
         }
@@ -236,7 +236,7 @@
             font-size: 0.875rem;
         }
 
-        /* Perfil do usuário */
+        /* Perfil do usuÃ¡rio */
         .user-profile {
             padding: 1rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -599,9 +599,9 @@
             </button>
         </div>
 
-        <!-- Navegação -->
+        <!-- NavegaÃ§Ã£o -->
         <nav class="sidebar-nav">
-            <!-- Seção Principal -->
+            <!-- SeÃ§Ã£o Principal -->
             <div class="nav-section">
                 <h3 class="section-title">
                     <i class="fas fa-circle section-indicator"></i>
@@ -623,7 +623,7 @@
                             <div class="nav-icon">
                                 <i class="fas fa-calendar"></i>
                             </div>
-                            <span class="nav-text">Calendário</span>
+                            <span class="nav-text">CalendÃ¡rio</span>
                         </a>
                     </li>
                 </ul>
@@ -648,7 +648,7 @@
                 </ul>
             </div>
 
-            <!-- Seção Gerenciamento -->
+            <!-- SeÃ§Ã£o Gerenciamento -->
             <div class="nav-section">
                 <h3 class="section-title">
                     <i class="fas fa-circle section-indicator"></i>
@@ -682,29 +682,29 @@
                             <li class="submenu-item">
                                 <a href="{% url 'dashboard:default_availability' %}" class="submenu-link">
                                     <i class="fas fa-business-time submenu-icon"></i>
-                                    <span class="submenu-text">Horário Padrão</span>
+                                    <span class="submenu-text">HorÃ¡rio PadrÃ£o</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Meus Horários -->
+                    <!-- Meus HorÃ¡rios -->
                     <li class="nav-item">
                         <a href="{% url 'dashboard:my_schedule' %}" class="nav-link">
                             <div class="nav-icon">
                                 <i class="fas fa-clock"></i>
                             </div>
-                            <span class="nav-text">Meus Horários</span>
+                            <span class="nav-text">Meus HorÃ¡rios</span>
                         </a>
                     </li>
 
-                    <!-- Meus Serviços -->
+                    <!-- Meus ServiÃ§os -->
                     <li class="nav-item">
                         <a href="{% url 'dashboard:my_services' %}" class="nav-link">
                             <div class="nav-icon">
                                 <i class="fas fa-briefcase"></i>
                             </div>
-                            <span class="nav-text">Meus {{ tenant.label_servico_plural }} e Preços</span>
+                            <span class="nav-text">Meus {{ tenant.label_servico_plural }} e PreÃ§os</span>
                         </a>
                     </li>
 
@@ -728,7 +728,7 @@
                             <li class="submenu-item">
                                 <a href="{% url 'dashboard:tenant_settings' %}" class="submenu-link">
                                     <i class="fas fa-cog submenu-icon"></i>
-                                    <span class="submenu-text">Configurações da Empresa</span>
+                                    <span class="submenu-text">ConfiguraÃ§Ãµes da Empresa</span>
                                 </a>
                             </li>
                         </ul>
@@ -737,7 +737,7 @@
             </div>
         </nav>
 
-        <!-- Perfil do Usuário -->
+        <!-- Perfil do UsuÃ¡rio -->
         <div class="user-profile">
             <div class="profile-content">
                 <div class="profile-avatar">
@@ -768,7 +768,7 @@
     <!-- Overlay para Mobile -->
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-    <!-- Botão Mobile -->
+    <!-- BotÃ£o Mobile -->
     <button id="mobile-toggle" class="mobile-toggle">
         <div class="hamburger">
             <span></span>
@@ -832,7 +832,7 @@
             });
         }
 
-        // Mostrar notificação
+        // Mostrar notificaÃ§Ã£o
         function showNotification(title, message, type) {
             const notification = document.createElement('div');
             notification.style.cssText = `
@@ -867,7 +867,7 @@
             }, 4000);
         }
 
-        // Adicionar animações
+        // Adicionar animaÃ§Ãµes
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideInRight {
@@ -897,17 +897,17 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
-                    // Buscar o card que contém o formulário
+                    // Buscar o card que contÃ©m o formulÃ¡rio
                     const card = doc.querySelector('.card');
                     if (card) {
                         modalBody.innerHTML = card.innerHTML;
                     } else {
-                        // Fallback: buscar o formulário diretamente
+                        // Fallback: buscar o formulÃ¡rio diretamente
                         const form = doc.querySelector('form');
                         if (form) {
                             modalBody.innerHTML = '<h2>Novo agendamento</h2>' + form.outerHTML;
                         } else {
-                            modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Formulário não encontrado.</p>';
+                            modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">FormulÃ¡rio nÃ£o encontrado.</p>';
                             return;
                         }
                     }
@@ -935,7 +935,7 @@
                                         const parser = new DOMParser();
                                         const doc = parser.parseFromString(html, 'text/html');
 
-                                        // Buscar o card que contém o formulário com erros
+                                        // Buscar o card que contÃ©m o formulÃ¡rio com erros
                                         const card = doc.querySelector('.card');
                                         if (card) {
                                             modalBody.innerHTML = card.innerHTML;
@@ -962,7 +962,7 @@
                     }
                 })
                 .catch(error => {
-                    modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Erro ao carregar formulário.</p>';
+                    modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Erro ao carregar formulÃ¡rio.</p>';
                     console.error('Error loading booking form:', error);
                 });
         }

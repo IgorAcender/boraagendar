@@ -1,4 +1,4 @@
-{% extends "base_dashboard.html" %}
+﻿{% extends "base_dashboard.html" %}
 {% block title %}Novo agendamento{% endblock %}
 
 {% block extra_head %}
@@ -11,7 +11,7 @@
     }
 
     .booking-form-card h2 {
-        display: none; /* Título já está no header do modal */
+        display: none; /* TÃ­tulo jÃ¡ estÃ¡ no header do modal */
     }
 
     .form-grid {
@@ -159,7 +159,7 @@
     }
 
     .errorlist li:before {
-        content: '⚠';
+        content: 'âš ';
         font-size: 1.1rem;
     }
 
@@ -203,7 +203,7 @@
         font-size: 1.1rem;
     }
 
-    /* Inputs com ícones */
+    /* Inputs com Ã­cones */
     .input-with-icon {
         position: relative;
     }
@@ -267,13 +267,13 @@
         {% endif %}
 
         <div class="form-grid">
-            <!-- Seção: Serviço -->
+            <!-- SeÃ§Ã£o: ServiÃ§o -->
             <div class="form-section">
-                <h3 class="form-section-title">Serviço</h3>
+                <h3 class="form-section-title">ServiÃ§o</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.service.id_for_label }}">
-                            <i class="fas fa-cut"></i> <span>Serviço</span>
+                            <i class="fas fa-cut"></i> <span>ServiÃ§o</span>
                         </label>
                         {{ form.service.as_widget }}
                         {{ form.service.errors }}
@@ -289,9 +289,9 @@
                 </div>
             </div>
 
-            <!-- Seção: Agendamento -->
+            <!-- SeÃ§Ã£o: Agendamento -->
             <div class="form-section">
-                <h3 class="form-section-title">Data e Horário</h3>
+                <h3 class="form-section-title">Data e HorÃ¡rio</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="{{ form.date.id_for_label }}">
@@ -311,7 +311,7 @@
                 </div>
             </div>
 
-            <!-- Seção: Cliente -->
+            <!-- SeÃ§Ã£o: Cliente -->
             <div class="form-section">
                 <h3 class="form-section-title">Dados do Cliente</h3>
                 <div class="form-row">
@@ -333,11 +333,11 @@
                 </div>
             </div>
 
-            <!-- Observações -->
+            <!-- ObservaÃ§Ãµes -->
             <div class="form-section">
                 <div class="form-group">
                     <label for="{{ form.notes.id_for_label }}">
-                        <i class="fas fa-sticky-note"></i> <span>Observações (opcional)</span>
+                        <i class="fas fa-sticky-note"></i> <span>ObservaÃ§Ãµes (opcional)</span>
                     </label>
                     {{ form.notes.as_widget }}
                     {{ form.notes.errors }}
