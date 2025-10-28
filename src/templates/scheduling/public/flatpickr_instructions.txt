@@ -1,0 +1,2 @@
+// Flatpickr - https://cdn.jsdelivr.net/npm/flatpickr
+import 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css';
