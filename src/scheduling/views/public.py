@@ -318,7 +318,6 @@ def get_available_slots(request: HttpRequest, tenant_slug: str) -> JsonResponse:
     try:
         from datetime import datetime, date as date_type
         service = Service.objects.get(pk=service_id, tenant=tenant, is_active=True)
-        professional = Professional.objects.get(pk=professional_id, tenant=tenant, is_active=True)
         target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
 
         # Validar se a data não está no passado
@@ -327,17 +326,43 @@ def get_available_slots(request: HttpRequest, tenant_slug: str) -> JsonResponse:
             return JsonResponse({'slots': [], 'error': 'past_date'})
 
         print(f"DEBUG - Service: {service.name}")
-        print(f"DEBUG - Professional: {professional.display_name}")
         print(f"DEBUG - Target date: {target_date}")
 
         availability_service = AvailabilityService(tenant=tenant)
-        available_slots = availability_service.get_available_slots(
-            service=service,
-            professional=professional,
-            target_date=target_date,
-        )
 
-        print(f"DEBUG - Slots encontrados: {len(available_slots)}")
+        # Se professional_id == 'any', agregar slots de todos os profissionais
+        if professional_id == 'any':
+            print("DEBUG - Buscando slots de TODOS os profissionais")
+            available_professionals = service.professionals.filter(is_active=True)
+
+            all_slots = []
+            for prof in available_professionals:
+                prof_slots = availability_service.get_available_slots(
+                    service=service,
+                    professional=prof,
+                    target_date=target_date,
+                )
+                all_slots.extend(prof_slots)
+
+            # Agrupar por horário (remover duplicatas)
+            seen_times = {}
+            for slot in all_slots:
+                time_key = slot.start
+                if time_key not in seen_times:
+                    seen_times[time_key] = slot
+
+            available_slots = sorted(seen_times.values(), key=lambda x: x.start)
+            print(f"DEBUG - Slots agregados encontrados: {len(available_slots)}")
+        else:
+            professional = Professional.objects.get(pk=professional_id, tenant=tenant, is_active=True)
+            print(f"DEBUG - Professional: {professional.display_name}")
+
+            available_slots = availability_service.get_available_slots(
+                service=service,
+                professional=professional,
+                target_date=target_date,
+            )
+            print(f"DEBUG - Slots encontrados: {len(available_slots)}")
 
         slots_data = []
         for slot in available_slots:
