@@ -9,14 +9,14 @@
         <div class="step-circle">
             {% if selected_service %}<i class="fas fa-check"></i>{% else %}1{% endif %}
         </div>
-        <div class="step-label">Escolher {{ tenant.label_servico }}</div>
+        <div class="step-label">{{ tenant.label_servico }}</div>
     </div>
 
     <div class="step {% if selected_service and not available_slots %}active{% elif available_slots %}completed{% endif %}">
         <div class="step-circle">
             {% if available_slots %}<i class="fas fa-check"></i>{% else %}2{% endif %}
         </div>
-        <div class="step-label">Escolher Data</div>
+        <div class="step-label">Data e Horário</div>
     </div>
 
     <div class="step {% if available_slots %}active{% endif %}">
@@ -349,7 +349,7 @@
         <div class="section-icon">
             <i class="fas fa-concierge-bell"></i>
         </div>
-        Escolha o {{ tenant.label_servico }}
+        {{ tenant.label_servico }}
     </h2>
 
     <form method="get" id="serviceForm">
@@ -367,7 +367,7 @@
         <div class="section-icon">
             <i class="fas fa-users"></i>
         </div>
-        Escolha o {{ tenant.label_profissional }}
+        {{ tenant.label_profissional }}
     </h2>
 
     <div class="professionals-grid">
@@ -523,7 +523,7 @@
                     <div class="section-icon">
                         <i class="fas fa-users"></i>
                     </div>
-                    Escolha o ${labelProfissional}
+                    ${labelProfissional}
                 </h2>
                 <div class="professionals-grid" id="professionalsGrid"></div>
             `;
@@ -609,7 +609,7 @@
                     <div class="section-icon">
                         <i class="fas fa-calendar"></i>
                     </div>
-                    Escolha a Data
+                    Data e Horário
                 </h2>
                 <div class="form-group">
                     <label for="date_picker">Qual data você prefere?</label>
