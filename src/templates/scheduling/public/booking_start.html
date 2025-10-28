@@ -1,4 +1,4 @@
-{% extends "scheduling/public/base_public.html" %}
+﻿{% extends "scheduling/public/base_public.html" %}
 {% block title %}Agendar Hor�rio{% endblock %}
 
 {% block progress %}
@@ -435,7 +435,7 @@
                 {{ form.service }}
             </div>
             
-            <!-- Grid de servi?os: mostra todos apenas quando nenhum foi selecionado -->`n            <div class="services-grid" id="servicesGrid">`n                {% if not selected_service %}`n                    <!-- Cards ser?o criados via JS a partir do select oculto -->`n                {% else %}`n                    <!-- Exibir somente o servi?o j? selecionado -->`n                    <div class="service-card selected" data-service-id="{{ selected_service.id }}">`n                        <div class="service-name">{{ selected_service.name }}</div>`n                        {% if selected_service.description %}`n                        <div class="service-description">{{ selected_service.description }}</div>`n                        {% endif %}`n                    </div>`n                {% endif %}`n            </div>
+            <!-- Grid de serviços: mostra todos apenas quando nenhum foi selecionado -->`n            <div class="services-grid" id="servicesGrid">`n                {% if not selected_service %}`n                    <!-- Cards ser?o criados via JS a partir do select oculto -->`n                {% else %}`n                    <!-- Exibir somente o serviço j? selecionado -->`n                    <div class="service-card selected" data-service-id="{{ selected_service.id }}">`n                        <div class="service-name">{{ selected_service.name }}</div>`n                        {% if selected_service.description %}`n                        <div class="service-description">{{ selected_service.description }}</div>`n                        {% endif %}`n                    </div>`n                {% endif %}`n            </div>
         </div>
     </form>
 </div>
