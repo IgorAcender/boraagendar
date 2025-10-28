@@ -560,9 +560,15 @@
         // Inicializa o Flatpickr
         if (dateInput) {
             flatpickr(dateInput, {
+                // Exibir calendário embutido (sempre aparente)
+                inline: true,
+                // Formato para envio ao backend
                 dateFormat: "Y-m-d",
+                // Data mínima disponível
                 minDate: "{{ today|date:'Y-m-d' }}",
+                // Data padrão
                 defaultDate: dateInput.value || undefined,
+                // Localização em Português
                 locale: {
                     firstDayOfWeek: 1,
                     weekdays: {
@@ -574,6 +580,7 @@
                         longhand: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
                     },
                 },
+                // Quando o usuário escolhe, atualiza o input e dispare o evento change
                 onChange: function(selectedDates, dateStr) {
                     dateInput.value = dateStr;
                     dateInput.dispatchEvent(new Event('change'));
