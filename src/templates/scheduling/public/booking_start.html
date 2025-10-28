@@ -545,9 +545,9 @@
             const grid = document.getElementById('professionalsGrid');
 
             // Adicionar card "Qualquer Profissional" primeiro
-            const anyProfCard = document.createElement('a');
-            anyProfCard.href = `?service=${serviceId}&professional=any&date=`;
+            const anyProfCard = document.createElement('div');
             anyProfCard.className = 'professional-card';
+            anyProfCard.dataset.professionalId = 'any';
             anyProfCard.style.border = '3px solid var(--brand-primary)';
             anyProfCard.style.background = 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05))';
             anyProfCard.innerHTML = `
@@ -560,6 +560,13 @@
                     <i class="fas fa-calendar-check"></i> Selecionar
                 </div>
             `;
+
+            // Adicionar evento de clique para "Qualquer Profissional"
+            anyProfCard.addEventListener('click', function(e) {
+                e.preventDefault();
+                selectProfessional('any', serviceId);
+            });
+
             grid.appendChild(anyProfCard);
 
             professionals.forEach(prof => {
