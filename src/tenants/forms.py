@@ -62,10 +62,10 @@ class TenantUpdateForm(forms.ModelForm):
             "color_primary": "Cor Primária",
             "color_secondary": "Cor Secundária",
             "avatar": "Logo da Empresa",
-            "label_servico": "Nome para Serviço (singular)",
-            "label_servico_plural": "Nome para Serviço (plural)",
-            "label_profissional": "Nome para Profissional (singular)",
-            "label_profissional_plural": "Nome para Profissional (plural)",
+            "label_servico": "Singular",
+            "label_servico_plural": "Plural",
+            "label_profissional": "Singular",
+            "label_profissional_plural": "Plural",
         }
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nome da sua empresa"}),
