@@ -94,7 +94,7 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     print(f"  professional_id: {professional_id}")
     print(f"  start_iso: {start_iso}")
 
-    if not service_id or not start_iso:
+    if not service_id or not start_iso or not professional_id:
         print("DEBUG - Parâmetros faltando, redirecionando...")
         return redirect("public:booking_start", tenant_slug=tenant.slug)
 
