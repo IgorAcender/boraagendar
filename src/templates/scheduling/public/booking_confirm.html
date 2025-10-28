@@ -1,30 +1,217 @@
 ﻿{% extends "scheduling/public/base_public.html" %}
 {% block title %}Confirmar{% endblock %}
+
+{% block extra_head %}
+<style>
+    .booking-confirm-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .booking-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .booking-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .booking-header p {
+        color: #64748b;
+        font-size: 1rem;
+    }
+
+    .booking-summary {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+
+    .summary-label {
+        font-weight: 600;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .summary-value {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 1rem;
+    }
+
+    .price-value {
+        font-size: 1.1rem;
+        color: var(--brand-primary);
+        font-weight: 700;
+    }
+
+    .form-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+    }
+
+    .form-section h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.2s;
+        background: white;
+        color: #1e293b;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .btn-confirm {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-confirm i {
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <h2>Confirmar agendamento</h2>
-    <div class="card" style="margin-bottom: 24px;">
-        <p><strong>{{ tenant.label_servico }}:</strong> {{ service.name }}</p>
-        {% if professional %}
-            <p><strong>{{ tenant.label_profissional }}:</strong> {{ professional.display_name }}</p>
-        {% endif %}
-        <p><strong>Data:</strong> {{ start_datetime|date:"d/m/Y" }}</p>
-        <p><strong>Hora:</strong> {{ start_datetime|time:"H:i" }}</p>
-        <p><strong>Valor:</strong> R$ {{ service.price }}</p>
+<div class="booking-confirm-container">
+    <div class="booking-header">
+        <h2>Confirmar agendamento</h2>
+        <p>Verifique os detalhes e preencha suas informações para finalizar</p>
     </div>
 
-    <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="start" value="{{ start_datetime|date:'c' }}">
-        {{ form.service }}
-        {{ form.professional }}
-        {{ form.date }}
-        {{ form.time }}
-        <label for="id_customer_name">Seu nome</label>
-        {{ form.customer_name }}
-        <label for="id_customer_phone">Telefone/WhatsApp</label>
-        {{ form.customer_phone }}
-        <label for="id_notes">Observacoes</label>
-        {{ form.notes }}
-        <button type="submit" class="btn-primary">Confirmar agendamento</button>
-    </form>
+    <div class="booking-summary">
+        <div class="summary-item">
+            <div class="summary-label">{{ tenant.label_servico }}</div>
+            <div class="summary-value">{{ service.name }}</div>
+        </div>
+        
+        {% if professional %}
+        <div class="summary-item">
+            <div class="summary-label">{{ tenant.label_profissional }}</div>
+            <div class="summary-value">{{ professional.display_name }}</div>
+        </div>
+        {% endif %}
+        
+        <div class="summary-item">
+            <div class="summary-label">Data</div>
+            <div class="summary-value">{{ start_datetime|date:"d/m/Y" }}</div>
+        </div>
+        
+        <div class="summary-item">
+            <div class="summary-label">Horário</div>
+            <div class="summary-value">{{ start_datetime|time:"H:i" }}</div>
+        </div>
+        
+        <div class="summary-item">
+            <div class="summary-label">Valor</div>
+            <div class="summary-value price-value">R$ {{ service.price }}</div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>Suas informações</h3>
+        
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="start" value="{{ start_datetime|date:'c' }}">
+            {{ form.service }}
+            {{ form.professional }}
+            {{ form.date }}
+            {{ form.time }}
+            
+            <div class="form-group">
+                <label for="id_customer_name">Seu nome completo</label>
+                {{ form.customer_name }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_customer_phone">Telefone/WhatsApp</label>
+                {{ form.customer_phone }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_notes">Observações (opcional)</label>
+                {{ form.notes }}
+            </div>
+            
+            <button type="submit" class="btn-confirm">
+                <i class="fas fa-calendar-check"></i>
+                Confirmar agendamento
+            </button>
+        </form>
+    </div>
+</div>
 {% endblock %}
