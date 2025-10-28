@@ -283,6 +283,22 @@
         background: linear-gradient(135deg, #10b981, #059669);
     }
 
+    /* Estilo especial para card "Qualquer Profissional" */
+    .professional-card-any {
+        border: 2px solid #e2e8f0;
+    }
+
+    .professional-card-any.selected {
+        border: 3px solid var(--brand-primary);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        transform: translateY(-5px);
+    }
+
+    .professional-card-any.selected .btn-select-professional {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+    }
+
     .professional-card-avatar {
         width: 80px;
         height: 80px;
@@ -372,13 +388,13 @@
 
     <div class="professionals-grid">
         <!-- Opção: Qualquer Profissional -->
-        <a href="?service={{ selected_service.id }}&professional=any&date={{ selected_date|default_if_none:'' }}" class="professional-card" style="border: 3px solid var(--brand-primary); background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));">
+        <a href="?service={{ selected_service.id }}&professional=any&date={{ selected_date|default_if_none:'' }}" class="professional-card professional-card-any">
             <div class="professional-card-avatar" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
                 <i class="fas fa-users" style="font-size: 2rem; color: white;"></i>
             </div>
             <div class="professional-card-name" style="color: var(--brand-primary); font-weight: 700;">Qualquer {{ tenant.label_profissional }}</div>
             <div class="professional-card-bio" style="color: #64748b;">Mostrar todos os horários disponíveis</div>
-            <div class="btn-select-professional" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
+            <div class="btn-select-professional">
                 <i class="fas fa-calendar-check"></i> Selecionar
             </div>
         </a>
@@ -546,17 +562,15 @@
 
             // Adicionar card "Qualquer Profissional" primeiro
             const anyProfCard = document.createElement('div');
-            anyProfCard.className = 'professional-card';
+            anyProfCard.className = 'professional-card professional-card-any';
             anyProfCard.dataset.professionalId = 'any';
-            anyProfCard.style.border = '3px solid var(--brand-primary)';
-            anyProfCard.style.background = 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05))';
             anyProfCard.innerHTML = `
                 <div class="professional-card-avatar" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
                     <i class="fas fa-users" style="font-size: 2rem; color: white;"></i>
                 </div>
                 <div class="professional-card-name" style="color: var(--brand-primary); font-weight: 700;">Qualquer ${labelProfissional}</div>
                 <div class="professional-card-bio" style="color: #64748b;">Mostrar todos os horários disponíveis</div>
-                <div class="btn-select-professional" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
+                <div class="btn-select-professional">
                     <i class="fas fa-calendar-check"></i> Selecionar
                 </div>
             `;
