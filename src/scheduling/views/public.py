@@ -34,14 +34,40 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
                 selected_service.professionals.filter(is_active=True).order_by('display_name')
             )
 
-        # Só buscar horários se um profissional foi selecionado E uma data foi informada
-        if selected_professional and selected_date:
+        # Buscar horários se uma data foi informada e:
+        # - Um profissional específico foi selecionado, OU
+        # - "Qualquer profissional" foi selecionado (professional_id = 'any')
+        professional_id_param = request.GET.get('professional')
+
+        if selected_date and (selected_professional or professional_id_param == 'any'):
             availability_service = AvailabilityService(tenant=tenant)
-            available_slots = availability_service.get_available_slots(
-                service=selected_service,
-                professional=selected_professional,
-                target_date=selected_date,
-            )
+
+            if professional_id_param == 'any':
+                # Buscar slots de TODOS os profissionais e agregar
+                all_slots = []
+                for prof in available_professionals:
+                    prof_slots = availability_service.get_available_slots(
+                        service=selected_service,
+                        professional=prof,
+                        target_date=selected_date,
+                    )
+                    all_slots.extend(prof_slots)
+
+                # Agrupar por horário (remover duplicatas)
+                seen_times = {}
+                for slot in all_slots:
+                    time_key = slot['start_datetime']
+                    if time_key not in seen_times:
+                        seen_times[time_key] = slot
+
+                available_slots = sorted(seen_times.values(), key=lambda x: x['start_datetime'])
+            else:
+                # Buscar slots de um profissional específico
+                available_slots = availability_service.get_available_slots(
+                    service=selected_service,
+                    professional=selected_professional,
+                    target_date=selected_date,
+                )
 
     context = {
         "tenant": tenant,
@@ -75,7 +101,51 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     try:
         service = get_object_or_404(Service, pk=service_id, tenant=tenant, is_active=True)
         professional = None
-        if professional_id:
+
+        # Se professional_id == 'any', escolher o menos ocupado automaticamente
+        if professional_id == 'any':
+            print("DEBUG - Escolhendo profissional automaticamente (menos ocupado)...")
+            # Buscar todos os profissionais que fazem esse serviço
+            available_professionals = service.professionals.filter(is_active=True)
+
+            # Parse do horário para pegar a data
+            try:
+                start_datetime = datetime.fromisoformat(start_iso)
+            except ValueError:
+                start_datetime = datetime.strptime(start_iso.split('+')[0].split('-')[0], '%Y-%m-%dT%H:%M:%S')
+                start_datetime = start_datetime.replace(tzinfo=tz)
+
+            if start_datetime.tzinfo is None:
+                start_datetime = start_datetime.replace(tzinfo=tz)
+
+            target_date = start_datetime.date()
+
+            # Contar agendamentos de cada profissional no mesmo dia
+            from django.db.models import Count, Q
+            professional_counts = []
+            for prof in available_professionals:
+                # Checar se o profissional está disponível nesse horário
+                availability_service = AvailabilityService(tenant=tenant)
+                if availability_service.is_slot_available(service, prof, start_datetime):
+                    # Contar agendamentos do dia
+                    count = Booking.objects.filter(
+                        professional=prof,
+                        date=target_date,
+                        status__in=['pending', 'confirmed']
+                    ).count()
+                    professional_counts.append((prof, count))
+                    print(f"DEBUG - {prof.display_name}: {count} agendamentos hoje")
+
+            if professional_counts:
+                # Escolher o menos ocupado
+                professional_counts.sort(key=lambda x: x[1])
+                professional = professional_counts[0][0]
+                print(f"DEBUG - Profissional escolhido: {professional.display_name} ({professional_counts[0][1]} agendamentos)")
+            else:
+                print("DEBUG - Nenhum profissional disponível para esse horário")
+                return redirect("public:booking_start", tenant_slug=tenant.slug)
+
+        elif professional_id:
             professional = get_object_or_404(Professional, pk=professional_id, tenant=tenant, is_active=True)
 
         print(f"DEBUG - Service: {service.name}")
