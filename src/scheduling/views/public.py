@@ -156,9 +156,14 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
                 # Checar se o profissional está disponível nesse horário
                 if availability_service.is_slot_available(service, prof, start_datetime):
                     # Contar agendamentos do dia
+                    from datetime import datetime as dt, time
+                    start_of_day = dt.combine(target_date, time.min).replace(tzinfo=tz)
+                    end_of_day = dt.combine(target_date, time.max).replace(tzinfo=tz)
+
                     count = Booking.objects.filter(
                         professional=prof,
-                        date=target_date,
+                        scheduled_for__gte=start_of_day,
+                        scheduled_for__lte=end_of_day,
                         status__in=['pending', 'confirmed']
                     ).count()
                     professional_counts.append((prof, count))
