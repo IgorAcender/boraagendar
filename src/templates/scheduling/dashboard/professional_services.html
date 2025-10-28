@@ -206,7 +206,7 @@
                 <h3>{{ ps.service.name }}</h3>
                 <div class="service-prices">
                     <div class="price-item">
-                        <span class="price-label">ðŸ’° PreÃ§o:</span>
+                        <span class="price-label">💰 Preço:</span>
                         <span class="price-value {% if ps.price %}price-custom{% endif %}">
                             R$ {{ ps.price|default:ps.service.price }}
                             {% if ps.price %}<small style="color: #94a3b8;">(padrão: R$ {{ ps.service.price }})</small>{% endif %}
@@ -230,7 +230,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="remove_service">
                 <input type="hidden" name="ps_id" value="{{ ps.id }}">
-                <button type="submit" class="btn-remove" onclick="return confirm('Remover este serviÃ§o?')">
+                <button type="submit" class="btn-remove" onclick="return confirm('Remover este serviço?')">>
                     <i class="fas fa-trash"></i>
                 </button>
             </form>
@@ -238,21 +238,21 @@
         {% endfor %}
     </div>
     {% else %}
-    <p style="color: #94a3b8; padding: 2rem; text-align: center;">Nenhum serviÃ§o adicionado ainda.</p>
+    <p style="color: #94a3b8; padding: 2rem; text-align: center;">Nenhum serviço adicionado ainda.</p>
     {% endif %}
 
     <!-- Add Service Form -->
     {% if available_services %}
     <div class="add-service-form">
         <h3 style="margin: 0 0 1rem 0; font-size: 1.125rem; color: #1e293b;">
-            <i class="fas fa-plus-circle"></i> Adicionar Novo ServiÃ§o
+            <i class="fas fa-plus-circle"></i> Adicionar Novo Serviço
         </h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_service">
             <div class="form-row">
                 <div class="form-group">
-                    <label>ServiÃ§o</label>
+                    <label>Serviço</label>
                     <select name="service_id" required>
                         <option value="">Selecione...</option>
                         {% for service in available_services %}
@@ -281,7 +281,7 @@
 <div id="editModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 id="modalTitle">Editar ServiÃ§o</h3>
+            <h3 id="modalTitle">Editar Serviço</h3>
         </div>
         <form method="post" id="editForm">
             {% csrf_token %}

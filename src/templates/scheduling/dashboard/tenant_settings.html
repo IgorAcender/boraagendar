@@ -1,5 +1,5 @@
 ﻿{% extends "base_dashboard.html" %}
-{% block title %}ConfiguraÃ§Ãµes da Empresa{% endblock %}
+{% block title %}Configurações da Empresa{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -304,18 +304,18 @@
             <i class="fas fa-cog"></i>
         </div>
         <div>
-            <h2>ConfiguraÃ§Ãµes da Empresa</h2>
-            <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 0.9rem;">Gerencie as informaÃ§Ãµes e aparÃªncia da sua empresa</p>
+            <h2>Configurações da Empresa</h2>
+            <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 0.9rem;">Gerencie as informações e aparência da sua empresa</p>
         </div>
     </div>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- InformaÃ§Ãµes BÃ¡sicas -->
+        <!-- Informações Básicas -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-building"></i> InformaÃ§Ãµes BÃ¡sicas
+                <i class="fas fa-building"></i> Informações Básicas
             </h3>
 
             <div class="form-row">
@@ -385,13 +385,13 @@
             </div>
         </div>
 
-        <!-- PersonalizaÃ§Ã£o de Nomenclatura -->
+        <!-- Personalização de Nomenclatura -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-tag"></i> PersonalizaÃ§Ã£o de Nomenclatura
+                <i class="fas fa-tag"></i> Personalização de Nomenclatura
             </h3>
             <p class="help-text" style="margin-bottom: 1.5rem;">
-                <i class="fas fa-info-circle"></i> Personalize os termos usados no sistema para se adequar ao seu tipo de negÃ³cio
+                <i class="fas fa-info-circle"></i> Personalize os termos usados no sistema para se adequar ao seu tipo de negócio
             </p>
 
             <div style="margin-bottom: 1.5rem;">

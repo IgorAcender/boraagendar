@@ -263,7 +263,7 @@
     <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem; color: #1e293b;">
         <i class="fas fa-list"></i> {{ tenant.label_servico_plural }} Cadastrados
     </h2>
-    <p style="color: #64748b; margin: 0 0 1rem 0;">Gerencie todos os {{ tenant.label_servico_plural|lower }} da empresa. Para vincular {{ tenant.label_profissional_plural|lower }} a {{ tenant.label_servico_plural|lower }}, acesse a pÃ¡gina de cada {{ tenant.label_profissional|lower }}.</p>
+    <p style="color: #64748b; margin: 0 0 1rem 0;">Gerencie todos os {{ tenant.label_servico_plural|lower }} da empresa. Para vincular {{ tenant.label_profissional_plural|lower }} a {{ tenant.label_servico_plural|lower }}, acesse a página de cada {{ tenant.label_profissional|lower }}.</p>
 
     {% if services %}
     <div class="services-grid">
@@ -280,7 +280,7 @@
 
                 <div class="service-details">
                     <div class="detail-item">
-                        <span class="detail-label">ðŸ’° PreÃ§o:</span>
+                        <span class="detail-label">💰 Preço:</span>
                         <span class="detail-value">R$ {{ service.price }}</span>
                     </div>
                     <div class="detail-item">
@@ -314,7 +314,7 @@
     <div class="empty-state">
         <i class="fas fa-concierge-bell"></i>
         <p style="font-size: 1.125rem; margin: 0;">Nenhum {{ tenant.label_servico|lower }} cadastrado ainda.</p>
-        <p style="margin: 0.5rem 0 0 0;">Adicione seu primeiro {{ tenant.label_servico|lower }} usando o formulÃ¡rio abaixo.</p>
+        <p style="margin: 0.5rem 0 0 0;">Adicione seu primeiro {{ tenant.label_servico|lower }} usando o formulário abaixo.</p>
     </div>
     {% endif %}
 
@@ -331,7 +331,7 @@
                     {{ form.name }}
                 </div>
                 <div class="form-group">
-                    <label>PreÃ§o (R$)</label>
+                    <label>Preço (R$)</label>
                     {{ form.price }}
                 </div>
                 <div class="form-group">
@@ -343,7 +343,7 @@
                 </button>
             </div>
             <div class="form-group" style="margin-top: 1rem;">
-                <label>DescriÃ§Ã£o (opcional)</label>
+                <label>Descrição (opcional)</label>
                 {{ form.description }}
             </div>
             {% if form.errors %}
@@ -388,7 +388,7 @@
             </div>
 
             <div style="margin-bottom: 1rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">DescriÃ§Ã£o</label>
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Descrição</label>
                 <textarea name="description" id="edit_description" rows="3" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 10px; font-family: inherit;"></textarea>
             </div>
 
@@ -404,7 +404,7 @@
                     Cancelar
                 </button>
                 <button type="submit" style="flex: 1; padding: 0.75rem; background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                    Salvar AlteraÃ§Ãµes
+                    Salvar Alterações
                 </button>
             </div>
         </form>
