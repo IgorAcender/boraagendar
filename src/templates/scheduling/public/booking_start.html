@@ -419,6 +419,7 @@
 
 {% block content %}
 <!-- Service Selection -->
+{% if not selected_service %}
 <div class="form-section">
     <h2 class="section-title">
         <div class="section-icon">
@@ -434,16 +435,13 @@
             <div class="hidden-select">
                 {{ form.service }}
             </div>
-            
-            <!-- Grid de serviços: mostra todos apenas quando nenhum foi selecionado -->
             <div class="services-grid" id="servicesGrid">
-                {% if not selected_service %}
-                    <!-- Cards serão criados via JS a partir do select oculto -->
-                {% endif %}
+                <!-- Cards serão criados via JS a partir do select oculto -->
             </div>
         </div>
     </form>
 </div>
+{% endif %}
 
 <!-- Unified Booking Container (shown only after service selection) -->
 {% if selected_service %}
