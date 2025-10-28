@@ -381,6 +381,7 @@
         transition: all 0.2s;
         background: white;
         color: #1e293b;
+        box-sizing: border-box;
     }
 
     .date-selection-section input[type="date"]:focus {
@@ -437,8 +438,7 @@
             <label for="date_input">Qual data você prefere?</label>
             <input type="date" id="date_input" name="date"
                    value="{{ selected_date|date:'Y-m-d' }}"
-                   min="{{ today|date:'Y-m-d' }}"
-                   style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem;">
+                   min="{{ today|date:'Y-m-d' }}">
         </div>
     </div>
 
