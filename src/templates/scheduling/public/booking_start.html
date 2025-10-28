@@ -1,12 +1,12 @@
 {% extends "scheduling/public/base_public.html" %}
-{% block title %}Agendar Hor√°rio{% endblock %}
+{% block title %}Agendar Hor·rio{% endblock %}
 
 {% block progress %}
 {% if selected_service %}
 <!-- Breadcrumb simples -->
 <div style="padding: 1rem 0; color: #64748b; font-size: 0.875rem;">
-    <a href="?service=" style="color: #64748b; text-decoration: none;">‚Üê Voltar aos {{ tenant.label_servico_plural }}</a>
-    <span style="margin: 0 0.5rem;">‚Ä¢</span>
+    <a href="?service=" style="color: #64748b; text-decoration: none;">? Voltar aos {{ tenant.label_servico_plural }}</a>
+    <span style="margin: 0 0.5rem;">ï</span>
     <span style="color: var(--brand-primary); font-weight: 600;">{{ selected_service.name }}</span>
 </div>
 {% endif %}
@@ -300,7 +300,7 @@
     }
 
     .btn-select-professional {
-        display: none; /* Ocultar bot√£o no layout compacto */
+        display: none; /* Ocultar bot„o no layout compacto */
     }
 
     /* Date Selection Section */
@@ -343,7 +343,7 @@
         margin: 1.5rem 0;
     }
 
-    /* Estilo para os blocos de servi√ßos */
+    /* Estilo para os blocos de serviÁos */
     .services-grid {
         display: grid;
         grid-template-columns: 1fr;
@@ -429,16 +429,13 @@
 
     <form method="get" id="serviceForm">
         <div class="form-group">
-            <label for="id_service">Qual {{ tenant.label_servico|lower }} voc√™ deseja?</label>
+            <label for="id_service">Qual {{ tenant.label_servico|lower }} vocÍ deseja?</label>
             <!-- Escondemos o select original, mas mantemos para compatibilidade com o backend -->
             <div class="hidden-select">
                 {{ form.service }}
             </div>
             
-            <!-- Aqui vamos exibir os servi√ßos em formato de cards -->
-            <div class="services-grid" id="servicesGrid">
-                <!-- Os servi√ßos ser√£o carregados aqui via JavaScript -->
-            </div>
+            <!-- Grid de servi?os: mostra todos apenas quando nenhum foi selecionado -->`n            <div class="services-grid" id="servicesGrid">`n                {% if not selected_service %}`n                    <!-- Cards ser?o criados via JS a partir do select oculto -->`n                {% else %}`n                    <!-- Exibir somente o servi?o j? selecionado -->`n                    <div class="service-card selected" data-service-id="{{ selected_service.id }}">`n                        <div class="service-name">{{ selected_service.name }}</div>`n                        {% if selected_service.description %}`n                        <div class="service-description">{{ selected_service.description }}</div>`n                        {% endif %}`n                    </div>`n                {% endif %}`n            </div>
         </div>
     </form>
 </div>
@@ -455,7 +452,7 @@
             Data
         </h2>
         <div class="form-group">
-            <label for="date_input">Qual data voc√™ prefere?</label>
+            <label for="date_input">Qual data vocÍ prefere?</label>
             <input type="date" id="date_input" name="date"
                    value="{{ selected_date|date:'Y-m-d' }}"
                    min="{{ today|date:'Y-m-d' }}">
@@ -473,14 +470,14 @@
         </h2>
 
         <div class="professionals-grid">
-            <!-- Op√ß√£o: Qualquer Profissional -->
+            <!-- OpÁ„o: Qualquer Profissional -->
             <div class="professional-card professional-card-any"
                  data-professional-id="any">
                 <div class="professional-card-avatar" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
                     <i class="fas fa-users" style="font-size: 1.5rem; color: white;"></i>
                 </div>
                 <div class="professional-card-name" style="color: var(--brand-primary); font-weight: 700;">
-                    Sem<br>Prefer√™ncia
+                    Sem<br>PreferÍncia
                 </div>
             </div>
 
@@ -516,7 +513,7 @@
             <div class="section-icon">
                 <i class="fas fa-clock"></i>
             </div>
-            Hor√°rios Dispon√≠veis
+            Hor·rios DisponÌveis
         </h2>
 
         <div class="slots-grid">
@@ -532,8 +529,8 @@
             <div class="empty-icon">
                 <i class="fas fa-calendar-times"></i>
             </div>
-            <h3>Nenhum hor√°rio dispon√≠vel</h3>
-            <p>N√£o encontramos hor√°rios dispon√≠veis para a data selecionada. Tente outra data.</p>
+            <h3>Nenhum hor·rio disponÌvel</h3>
+            <p>N„o encontramos hor·rios disponÌveis para a data selecionada. Tente outra data.</p>
         </div>
         {% else %}
         <div class="empty-state">
@@ -541,7 +538,7 @@
                 <i class="fas fa-hand-pointer"></i>
             </div>
             <h3>Selecione uma data</h3>
-            <p>Escolha uma data acima para ver os hor√°rios dispon√≠veis</p>
+            <p>Escolha uma data acima para ver os hor·rios disponÌveis</p>
         </div>
         {% endif %}
     </div>
@@ -558,7 +555,7 @@
         let selectedProfessionalId = '{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %}';
         let selectedDate = '{{ selected_date|date:"Y-m-d"|default:"" }}';
         
-        // Fun√ß√£o para criar os cards de servi√ßo
+        // FunÁ„o para criar os cards de serviÁo
         function createServiceCards() {
             if (!serviceSelect) return;
             
@@ -569,7 +566,7 @@
             servicesGrid.innerHTML = '';
             
             for (let i = 0; i < options.length; i++) {
-                if (options[i].value) { // Ignorar op√ß√£o vazia
+                if (options[i].value) { // Ignorar opÁ„o vazia
                     const serviceCard = document.createElement('div');
                     serviceCard.className = 'service-card';
                     if (options[i].value === selectedServiceId) {
@@ -577,12 +574,12 @@
                     }
                     serviceCard.dataset.serviceId = options[i].value;
                     
-                    // Extrair nome do servi√ßo e poss√≠veis informa√ß√µes adicionais
+                    // Extrair nome do serviÁo e possÌveis informaÁıes adicionais
                     const serviceText = options[i].text;
                     let serviceName = serviceText;
                     let serviceInfo = '';
                     
-                    // Verificar se o texto cont√©m informa√ß√µes de pre√ßo/dura√ß√£o entre par√™nteses
+                    // Verificar se o texto contÈm informaÁıes de preÁo/duraÁ„o entre parÍnteses
                     const match = serviceText.match(/(.*?)(\(.*\))?$/);
                     if (match) {
                         serviceName = match[1].trim();
@@ -605,7 +602,7 @@
             }
         }
         
-        // Criar os cards de servi√ßo ao carregar a p√°gina
+        // Criar os cards de serviÁo ao carregar a p·gina
         createServiceCards();
 
         // Date selection - load slots when date changes
@@ -685,8 +682,8 @@
                         <div class="empty-icon">
                             <i class="fas fa-calendar-times"></i>
                         </div>
-                        <h3>Nenhum hor√°rio dispon√≠vel</h3>
-                        <p>N√£o encontramos hor√°rios dispon√≠veis para a data selecionada. Tente outra data.</p>
+                        <h3>Nenhum hor·rio disponÌvel</h3>
+                        <p>N„o encontramos hor·rios disponÌveis para a data selecionada. Tente outra data.</p>
                     </div>
                 `;
                 return;
@@ -697,7 +694,7 @@
                     <div class="section-icon">
                         <i class="fas fa-clock"></i>
                     </div>
-                    Hor√°rios Dispon√≠veis
+                    Hor·rios DisponÌveis
                 </h2>
                 <div class="slots-grid">
             `;
@@ -715,4 +712,5 @@
         }
     });
 </script>
-{% endblock %}
+{% endblock %}
+
