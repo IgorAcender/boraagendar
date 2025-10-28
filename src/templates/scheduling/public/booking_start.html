@@ -543,6 +543,25 @@
             formSection.parentNode.insertBefore(professionalsSection, formSection.nextSibling);
 
             const grid = document.getElementById('professionalsGrid');
+
+            // Adicionar card "Qualquer Profissional" primeiro
+            const anyProfCard = document.createElement('a');
+            anyProfCard.href = `?service=${serviceId}&professional=any&date=`;
+            anyProfCard.className = 'professional-card';
+            anyProfCard.style.border = '3px solid var(--brand-primary)';
+            anyProfCard.style.background = 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05))';
+            anyProfCard.innerHTML = `
+                <div class="professional-card-avatar" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
+                    <i class="fas fa-users" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <div class="professional-card-name" style="color: var(--brand-primary); font-weight: 700;">Qualquer ${labelProfissional}</div>
+                <div class="professional-card-bio" style="color: #64748b;">Mostrar todos os horários disponíveis</div>
+                <div class="btn-select-professional" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
+                    <i class="fas fa-calendar-check"></i> Selecionar
+                </div>
+            `;
+            grid.appendChild(anyProfCard);
+
             professionals.forEach(prof => {
                 const card = document.createElement('div');
                 card.className = 'professional-card';
