@@ -1,5 +1,5 @@
 ﻿{% extends "base_dashboard.html" %}
-{% block title %}CalendÃ¡rio{% endblock %}
+{% block title %}Calendário{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -286,7 +286,7 @@
         background: #f8fafc;
     }
 
-    /* HorÃ¡rio de atendimento (highlighted) */
+    /* Horário de atendimento (highlighted) */
     .day-cell.available {
         background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
     }
@@ -295,7 +295,7 @@
         background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.25));
     }
 
-    /* HorÃ¡rio de intervalo */
+    /* Horário de intervalo */
     .day-cell.break-time {
         background: repeating-linear-gradient(
             45deg,
@@ -307,7 +307,7 @@
         opacity: 0.3;
     }
 
-    /* HorÃ¡rio FORA do atendimento (nÃ£o disponÃ­vel) */
+    /* Horário FORA do atendimento (não disponível) */
     .day-cell.unavailable {
         background: #f1f5f9;
     }
@@ -317,7 +317,7 @@
         position: absolute;
         left: 2px;
         right: 2px;
-        /* top Ã© definido inline via style="top: X%" */
+        /* top é definido inline via style="top: X%" */
         background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
         color: white;
         border-radius: 6px;
@@ -540,14 +540,14 @@
                     <i class="fas fa-calendar-week"></i>
                 </div>
                 <div>
-                    <h1>CalendÃ¡rio Semanal</h1>
-                    <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">VisualizaÃ§Ã£o de 24 horas</p>
+                    <h1>Calendário Semanal</h1>
+                    <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Visualização de 24 horas</p>
                 </div>
             </div>
 
             <!-- Actions -->
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <!-- RelÃ³gio em Tempo Real -->
+                <!-- Relógio em Tempo Real -->
                 <div class="live-clock">
                     <div class="clock-time" id="liveTime">--:--:--</div>
                     <div class="clock-date" id="liveDate">--/--/----</div>
@@ -571,7 +571,7 @@
             <span class="current-week">
                 {{ week_start|date:"d/m" }} - {{ week_end|date:"d/m/Y" }}
             </span>
-            <a href="?week_offset={{ request.GET.week_offset|default:0|add:'1' }}{% if selected_professional %}&professional={{ selected_professional.id }}{% endif %}" class="nav-btn" title="PrÃ³xima semana">
+            <a href="?week_offset={{ request.GET.week_offset|default:0|add:'1' }}{% if selected_professional %}&professional={{ selected_professional.id }}{% endif %}" class="nav-btn" title="Próxima semana">
                 <i class="fas fa-chevron-right"></i>
             </a>
         </div>
@@ -659,11 +659,11 @@
         <div class="calendar-legend">
             <div class="legend-item">
                 <div class="legend-color available"></div>
-                <span>HorÃ¡rio de Atendimento</span>
+                <span>Horário de Atendimento</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color unavailable"></div>
-                <span>Fora do HorÃ¡rio</span>
+                <span>Fora do Horário</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color booking"></div>
@@ -695,20 +695,20 @@
 {{ availability_by_weekday|json_script:"availability-data" }}
 
 <script>
-// FunÃ§Ãµes do Modal
+// Funções do Modal
 function openBookingModal(bookingId) {
     const modal = document.getElementById('bookingModal');
     const modalBody = document.getElementById('modalBody');
 
     // Mostrar modal
     modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // Prevenir scroll da pÃ¡gina
+    document.body.style.overflow = 'hidden'; // Prevenir scroll da página
 
-    // Carregar conteÃºdo via AJAX
+    // Carregar conteúdo via AJAX
     fetch(`/dashboard/agendamentos/${bookingId}/`)
         .then(response => response.text())
         .then(html => {
-            // Extrair apenas o conteÃºdo relevante (sem o layout completo)
+            // Extrair apenas o conteúdo relevante (sem o layout completo)
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const content = doc.querySelector('.booking-details, .card, main, .content') || doc.body;
@@ -732,7 +732,7 @@ function closeBookingModal() {
     document.body.style.overflow = ''; // Restaurar scroll
 }
 
-// FunÃ§Ã£o para filtrar por profissional
+// Função para filtrar por profissional
 function filterByProfessional(professionalId) {
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -763,7 +763,7 @@ function filterByProfessional(professionalId) {
 </script>
 
 <script>
-// Marcar cÃ©lulas como disponÃ­veis/indisponÃ­veis baseado nos horÃ¡rios de atendimento
+// Marcar células como disponíveis/indisponíveis baseado nos horários de atendimento
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DEBUG - Iniciando marcaÃ§Ã£o de disponibilidade');
 
