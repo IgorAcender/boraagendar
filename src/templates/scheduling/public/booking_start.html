@@ -342,6 +342,78 @@
         background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
         margin: 1.5rem 0;
     }
+
+    /* Estilo para os blocos de serviços */
+    .services-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .service-card {
+        background: white;
+        border: 3px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1.25rem;
+        transition: all 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .service-card:hover {
+        border-color: var(--brand-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .service-card.selected {
+        border-color: var(--brand-primary);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .service-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .service-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+    }
+
+    .service-duration {
+        color: #64748b;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .service-price {
+        font-weight: 600;
+        color: var(--brand-primary);
+    }
+
+    .service-description {
+        margin-top: 0.5rem;
+        color: #64748b;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    /* Esconder o select original */
+    .hidden-select {
+        display: none;
+    }
 </style>
 {% endblock %}
 
@@ -358,7 +430,15 @@
     <form method="get" id="serviceForm">
         <div class="form-group">
             <label for="id_service">Qual {{ tenant.label_servico|lower }} você deseja?</label>
-            {{ form.service }}
+            <!-- Escondemos o select original, mas mantemos para compatibilidade com o backend -->
+            <div class="hidden-select">
+                {{ form.service }}
+            </div>
+            
+            <!-- Aqui vamos exibir os serviços em formato de cards -->
+            <div class="services-grid" id="servicesGrid">
+                <!-- Os serviços serão carregados aqui via JavaScript -->
+            </div>
         </div>
     </form>
 </div>
@@ -477,18 +557,56 @@
         let selectedServiceId = '{{ selected_service.id|default:"" }}';
         let selectedProfessionalId = '{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %}';
         let selectedDate = '{{ selected_date|date:"Y-m-d"|default:"" }}';
-
-        // Service selection - reload page with service parameter
-        if (serviceSelect) {
-            serviceSelect.addEventListener('change', function() {
-                const serviceId = this.value;
-                if (serviceId) {
-                    window.location.href = `?service=${serviceId}`;
-                } else {
-                    window.location.href = '?';
+        
+        // Função para criar os cards de serviço
+        function createServiceCards() {
+            if (!serviceSelect) return;
+            
+            const servicesGrid = document.getElementById('servicesGrid');
+            if (!servicesGrid) return;
+            
+            const options = serviceSelect.options;
+            servicesGrid.innerHTML = '';
+            
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value) { // Ignorar opção vazia
+                    const serviceCard = document.createElement('div');
+                    serviceCard.className = 'service-card';
+                    if (options[i].value === selectedServiceId) {
+                        serviceCard.classList.add('selected');
+                    }
+                    serviceCard.dataset.serviceId = options[i].value;
+                    
+                    // Extrair nome do serviço e possíveis informações adicionais
+                    const serviceText = options[i].text;
+                    let serviceName = serviceText;
+                    let serviceInfo = '';
+                    
+                    // Verificar se o texto contém informações de preço/duração entre parênteses
+                    const match = serviceText.match(/(.*?)(\(.*\))?$/);
+                    if (match) {
+                        serviceName = match[1].trim();
+                        serviceInfo = match[2] || '';
+                    }
+                    
+                    serviceCard.innerHTML = `
+                        <div class="service-name">${serviceName}</div>
+                        <div class="service-description">
+                            ${serviceInfo ? `<div class="service-info">${serviceInfo}</div>` : ''}
+                        </div>
+                    `;
+                    
+                    serviceCard.addEventListener('click', function() {
+                        window.location.href = `?service=${this.dataset.serviceId}`;
+                    });
+                    
+                    servicesGrid.appendChild(serviceCard);
                 }
-            });
+            }
         }
+        
+        // Criar os cards de serviço ao carregar a página
+        createServiceCards();
 
         // Date selection - load slots when date changes
         if (dateInput) {
