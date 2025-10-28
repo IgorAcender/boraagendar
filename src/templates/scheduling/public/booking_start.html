@@ -439,14 +439,6 @@
             <div class="services-grid" id="servicesGrid">
                 {% if not selected_service %}
                     <!-- Cards serão criados via JS a partir do select oculto -->
-                {% else %}
-                    <!-- Exibir somente o serviço j? selecionado -->
-                    <div class="service-card selected" data-service-id="{{ selected_service.id }}">
-                        <div class="service-name">{{ selected_service.name }}</div>
-                        {% if selected_service.description %}
-                        <div class="service-description">{{ selected_service.description }}</div>
-                        {% endif %}
-                    </div>
                 {% endif %}
             </div>
         </div>
