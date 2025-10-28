@@ -1,4 +1,4 @@
-﻿{% extends "scheduling/public/base_public.html" %}
+{% extends "scheduling/public/base_public.html" %}
 {% block title %}Agendar Horário{% endblock %}
 
 {% block progress %}
@@ -300,7 +300,7 @@
     }
 
     .btn-select-professional {
-        display: none; /* Ocultar bot�o no layout compacto */
+        display: none; /* Ocultar boto no layout compacto */
     }
 
     /* Date Selection Section */
@@ -565,9 +565,10 @@
         const tenantSlug = '{{ tenant.slug }}';
         const labelProfissional = '{{ tenant.label_profissional }}';
         let selectedServiceId = '{{ selected_service.id|default:"" }}';
-        let selectedProfessionalId = '{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %}';
+        let selectedProfessionalId = '{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %} ';
         let selectedDate = '{{ selected_date|date:"Y-m-d"|default:"" }}';
         
+        {% if not selected_service %}
         // Função para criar os cards de serviço
         function createServiceCards() {
             if (!serviceSelect) return;
@@ -592,7 +593,7 @@
                     let serviceName = serviceText;
                     let serviceInfo = '';
                     
-                    // Verificar se o texto cont�m informações de preço/duração entre parênteses
+                    // Verificar se o texto contm informações de preço/duração entre parênteses
                     const match = serviceText.match(/(.*?)(\(.*\))?$/);
                     if (match) {
                         serviceName = match[1].trim();
@@ -617,6 +618,7 @@
         
         // Criar os cards de serviço ao carregar a página
         createServiceCards();
+        {% endif %}
 
         // Date selection - load slots when date changes
         if (dateInput) {
@@ -726,6 +728,3 @@
     });
 </script>
 {% endblock %}
-
-
-
