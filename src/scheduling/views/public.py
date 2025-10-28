@@ -69,6 +69,8 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
                     target_date=selected_date,
                 )
 
+    from datetime import date as date_type
+
     context = {
         "tenant": tenant,
         "form": form,
@@ -77,6 +79,7 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         "selected_professional": selected_professional,
         "selected_date": selected_date,
         "available_professionals": available_professionals,
+        "today": date_type.today(),
     }
     return render(request, "scheduling/public/booking_start.html", context)
 
