@@ -13,8 +13,6 @@
 {% endblock %}
 
 {% block extra_head %}
-<!-- Flatpickr CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     .form-section {
         margin-bottom: 2rem;
@@ -458,10 +456,9 @@
         </h2>
         <div class="form-group">
             <label for="date_input">Qual data Você prefere?</label>
-            <input type="text" id="date_input" name="date"
+            <input type="date" id="date_input" name="date"
                    value="{{ selected_date|date:'Y-m-d' }}"
-                   placeholder="Selecione uma data"
-                   readonly>
+                   min="{{ today|date:'Y-m-d' }}">
         </div>
     </div>
 
@@ -551,46 +548,14 @@
 </div>
 {% endif %}
 
-<!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const serviceSelect = document.getElementById('id_service');
         const dateInput = document.getElementById('date_input');
-        // Inicializa o Flatpickr
-        if (dateInput) {
-            flatpickr(dateInput, {
-                // Exibir calendário embutido (sempre aparente)
-                inline: true,
-                // Formato para envio ao backend
-                dateFormat: "Y-m-d",
-                // Data mínima disponível
-                minDate: "{{ today|date:'Y-m-d' }}",
-                // Data padrão
-                defaultDate: dateInput.value || undefined,
-                // Localização em Português
-                locale: {
-                    firstDayOfWeek: 1,
-                    weekdays: {
-                        shorthand: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-                        longhand: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-                    },
-                    months: {
-                        shorthand: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-                        longhand: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-                    },
-                },
-                // Quando o usuário escolhe, atualiza o input e dispare o evento change
-                onChange: function(selectedDates, dateStr) {
-                    dateInput.value = dateStr;
-                    dateInput.dispatchEvent(new Event('change'));
-                }
-            });
-        }
         const tenantSlug = '{{ tenant.slug }}';
         const labelProfissional = '{{ tenant.label_profissional }}';
         let selectedServiceId = '{{ selected_service.id|default:"" }}';
-        let selectedProfessionalId = '{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %} ';
+        let selectedProfessionalId = '{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %}';
         let selectedDate = '{{ selected_date|date:"Y-m-d"|default:"" }}';
         
         {% if not selected_service %}
