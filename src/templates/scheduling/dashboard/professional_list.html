@@ -616,6 +616,16 @@
                     <i class="fas fa-briefcase"></i>
                     <span>{{ p.bio|default:"Sem especialidade definida" }}</span>
                 </div>
+                <div>
+                    <i class="fas fa-random"></i>
+                    <span>
+                        {% if p.allow_auto_assign %}
+                            Participa do "Sem preferência"
+                        {% else %}
+                            Fora da seleção automática
+                        {% endif %}
+                    </span>
+                </div>
             </div>
 
             <a href="{% url 'dashboard:professional_update' p.id %}" style="display: block; margin-top: 1rem; padding: 0.75rem; background: #f59e0b; color: white; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.875rem;">
@@ -707,6 +717,13 @@
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                     <input type="checkbox" name="is_active" checked style="width: auto;">
                     <span>{{ tenant.label_profissional }} ativo</span>
+                </label>
+            </div>
+
+            <div style="margin-top: 0.5rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" name="allow_auto_assign" checked style="width: auto;">
+                    <span>Participar da opção "Sem preferência"</span>
                 </label>
             </div>
 

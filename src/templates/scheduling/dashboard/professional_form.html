@@ -465,6 +465,15 @@
                     </label>
                 </div>
                 {{ form.is_active.errors }}
+
+                <div class="checkbox-field" style="margin-top: 0.75rem;">
+                    {{ form.allow_auto_assign }}
+                    <label for="{{ form.allow_auto_assign.id_for_label }}">
+                        <i class="fas fa-random"></i>
+                        {{ form.allow_auto_assign.label }}
+                    </label>
+                </div>
+                {{ form.allow_auto_assign.errors }}
             </div>
         </div>
 

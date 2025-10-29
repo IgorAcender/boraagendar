@@ -17,8 +17,8 @@ class ServiceAdmin(admin.ModelAdmin):
 
 @admin.register(Professional)
 class ProfessionalAdmin(admin.ModelAdmin):
-    list_display = ("display_name", "tenant", "is_active")
-    list_filter = ("tenant", "is_active")
+    list_display = ("display_name", "tenant", "is_active", "allow_auto_assign")
+    list_filter = ("tenant", "is_active", "allow_auto_assign")
     search_fields = ("display_name", "tenant__name")
     inlines = [ProfessionalServiceInline]
 

@@ -26,6 +26,7 @@ class ProfessionalSerializer(serializers.ModelSerializer):
             "bio",
             "color",
             "is_active",
+            "allow_auto_assign",
         ]
 
 

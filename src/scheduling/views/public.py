@@ -71,6 +71,8 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
 
     from datetime import date as date_type
 
+    auto_assign_professionals = [prof for prof in available_professionals if getattr(prof, "allow_auto_assign", True)]
+
     services_queryset = form.fields["service"].queryset
     services = list(services_queryset)
     has_service_categories = any((service.category or "").strip() for service in services)
@@ -83,6 +85,8 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         "selected_professional": selected_professional,
         "selected_date": selected_date,
         "available_professionals": available_professionals,
+        "auto_assign_professionals": auto_assign_professionals,
+        "has_auto_assign_professionals": bool(auto_assign_professionals),
         "today": date_type.today(),
         "services": services,
         "has_service_categories": has_service_categories,
@@ -153,7 +157,7 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         if professional_id == 'any':
             print("DEBUG - Escolhendo profissional automaticamente (menos ocupado)...")
             # Buscar todos os profissionais que fazem esse serviço
-            available_professionals = service.professionals.filter(is_active=True)
+            available_professionals = service.professionals.filter(is_active=True, allow_auto_assign=True)
             target_date = start_datetime.date()
 
             # Contar agendamentos de cada profissional no mesmo dia

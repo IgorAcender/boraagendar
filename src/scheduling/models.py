@@ -61,6 +61,11 @@ class Professional(models.Model):
     bio = models.TextField(blank=True, verbose_name="Bio")
     color = models.CharField(max_length=7, default="#2563EB", verbose_name="Cor na agenda")
     is_active = models.BooleanField(default=True, verbose_name="Ativo")
+    allow_auto_assign = models.BooleanField(
+        default=True,
+        verbose_name="Disponível para seleção automática",
+        help_text="Quando marcado, este profissional pode ser escolhido automaticamente na opção Sem preferência.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
