@@ -882,6 +882,8 @@
         document.head.appendChild(style);
 
         // ========== MODAL DE NOVO AGENDAMENTO (GLOBAL) ==========
+        console.log('DEBUG: Script base_dashboard.html carregado - função openNewBookingModal será definida');
+
         function openNewBookingModal() {
             console.log('DEBUG: openNewBookingModal() chamado');
             const modal = document.getElementById('newBookingModal');
@@ -1034,9 +1036,12 @@
         }
 
         function closeNewBookingModal() {
+            console.log('DEBUG: closeNewBookingModal() chamado');
             const modal = document.getElementById('newBookingModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = '';
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
         }
 
         // Fechar modal com ESC
@@ -1045,6 +1050,10 @@
                 closeNewBookingModal();
             }
         });
+
+        // Confirmar que função está disponível globalmente
+        console.log('DEBUG: Função openNewBookingModal está disponível?', typeof openNewBookingModal === 'function');
+        console.log('DEBUG: Função closeNewBookingModal está disponível?', typeof closeNewBookingModal === 'function');
 
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.getElementById('sidebar');
