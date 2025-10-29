@@ -821,13 +821,24 @@ function openNewBookingModal() {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             
-            // Procurar pelo formulário ou conteúdo principal
-            const form = doc.querySelector('form') || doc.querySelector('.booking-form') || doc.querySelector('main') || doc.body;
+            // Tentar diferentes seletores para encontrar o conteúdo
+            let content = doc.querySelector('.booking-form-card') || 
+                         doc.querySelector('.form-grid') ||
+                         doc.querySelector('form') || 
+                         doc.querySelector('main .container') ||
+                         doc.querySelector('main') ||
+                         doc.querySelector('.content');
             
-            console.log('DEBUG: Elemento form encontrado:', form);
-            console.log('DEBUG: Form HTML (primeiros 200 chars):', form ? form.innerHTML.substring(0, 200) : 'NENHUM');
+            console.log('DEBUG: Elemento content encontrado:', content);
+            console.log('DEBUG: Content tag name:', content ? content.tagName : 'NENHUM');
+            console.log('DEBUG: Content HTML (primeiros 200 chars):', content ? content.innerHTML.substring(0, 200) : 'NENHUM');
             
-            modalBody.innerHTML = form.innerHTML;
+            if (content) {
+                modalBody.innerHTML = content.innerHTML;
+            } else {
+                console.log('DEBUG: Usando body como fallback');
+                modalBody.innerHTML = doc.body.innerHTML;
+            }
             
             // Reconfigurar o formulário para submissão via AJAX
             const formElement = modalBody.querySelector('form');
@@ -839,6 +850,7 @@ function openNewBookingModal() {
                 });
             } else {
                 console.log('DEBUG: ERRO - Nenhum formulário encontrado no modalBody');
+                console.log('DEBUG: ModalBody innerHTML (primeiros 500 chars):', modalBody.innerHTML.substring(0, 500));
             }
         })
         .catch(error => {

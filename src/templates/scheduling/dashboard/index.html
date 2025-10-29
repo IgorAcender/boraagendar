@@ -638,10 +638,23 @@ function openNewBookingModal() {
             console.log('DEBUG: HTML recebido (primeiros 200 chars):', html.substring(0, 200));
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const form = doc.querySelector('form') || doc.querySelector('.booking-form') || doc.querySelector('main') || doc.body;
             
-            console.log('DEBUG: Elemento form encontrado:', form);
-            modalBody.innerHTML = form.innerHTML;
+            // Tentar diferentes seletores para encontrar o conteúdo
+            let content = doc.querySelector('.booking-form-card') || 
+                         doc.querySelector('.form-grid') ||
+                         doc.querySelector('form') || 
+                         doc.querySelector('main .container') ||
+                         doc.querySelector('main') ||
+                         doc.querySelector('.content');
+            
+            console.log('DEBUG: Elemento content encontrado:', content);
+            
+            if (content) {
+                modalBody.innerHTML = content.innerHTML;
+            } else {
+                console.log('DEBUG: Usando body como fallback');
+                modalBody.innerHTML = doc.body.innerHTML;
+            }
             
             const formElement = modalBody.querySelector('form');
             if (formElement) {
