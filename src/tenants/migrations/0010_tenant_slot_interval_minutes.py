@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("tenants", "0009_tenant_avatar_base64"),
+        ("tenants", "0002_alter_tenantmembership_options_and_more"),
     ]
 
     operations = [
@@ -27,4 +27,3 @@ class Migration(migrations.Migration):
             ),
         ),
     ]
-
