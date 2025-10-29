@@ -793,17 +793,30 @@ function closeBookingModal() {
 
 // Funções do Modal de Novo Agendamento
 function openNewBookingModal() {
+    console.log('DEBUG: openNewBookingModal() chamada');
     const modal = document.getElementById('newBookingModal');
     const modalBody = document.getElementById('newModalBody');
+
+    console.log('DEBUG: Modal encontrado:', modal);
+    console.log('DEBUG: ModalBody encontrado:', modalBody);
 
     // Mostrar modal
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden'; // Prevenir scroll da página
 
+    console.log('DEBUG: Fazendo fetch para {% url "dashboard:booking_create" %}');
+    
     // Carregar formulário de novo agendamento via AJAX
-    fetch('/dashboard/agendamentos/novo/')
-        .then(response => response.text())
+    fetch('{% url "dashboard:booking_create" %}')
+        .then(response => {
+            console.log('DEBUG: Response recebido:', response);
+            console.log('DEBUG: Response status:', response.status);
+            console.log('DEBUG: Response ok:', response.ok);
+            return response.text();
+        })
         .then(html => {
+            console.log('DEBUG: HTML recebido (primeiros 200 chars):', html.substring(0, 200));
+            
             // Extrair apenas o formulário (sem o layout completo)
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
@@ -811,22 +824,30 @@ function openNewBookingModal() {
             // Procurar pelo formulário ou conteúdo principal
             const form = doc.querySelector('form') || doc.querySelector('.booking-form') || doc.querySelector('main') || doc.body;
             
+            console.log('DEBUG: Elemento form encontrado:', form);
+            console.log('DEBUG: Form HTML (primeiros 200 chars):', form ? form.innerHTML.substring(0, 200) : 'NENHUM');
+            
             modalBody.innerHTML = form.innerHTML;
             
             // Reconfigurar o formulário para submissão via AJAX
             const formElement = modalBody.querySelector('form');
             if (formElement) {
+                console.log('DEBUG: Configurando evento submit no formulário');
                 formElement.addEventListener('submit', function(e) {
                     e.preventDefault();
                     submitNewBookingForm(formElement);
                 });
+            } else {
+                console.log('DEBUG: ERRO - Nenhum formulário encontrado no modalBody');
             }
         })
         .catch(error => {
+            console.error('DEBUG: ERRO no fetch:', error);
             modalBody.innerHTML = `
                 <div style="text-align: center; padding: 3rem;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ef4444;"></i>
                     <p style="margin-top: 1rem; color: #64748b;">Erro ao carregar formulário de agendamento.</p>
+                    <p style="font-size: 0.8rem; color: #94a3b8;">Erro: ${error.message}</p>
                 </div>
             `;
             console.error('Erro ao carregar formulário:', error);
@@ -850,7 +871,7 @@ function submitNewBookingForm(form) {
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
     }
     
-    fetch('/dashboard/agendamentos/novo/', {
+    fetch('{% url "dashboard:booking_create" %}', {
         method: 'POST',
         body: formData,
         headers: {
