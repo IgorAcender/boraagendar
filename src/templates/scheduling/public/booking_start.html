@@ -620,7 +620,32 @@
                 {{ form.service }}
             </div>
             <div class="services-grid" id="servicesGrid">
-                <!-- Cards serão criados via JS a partir do select oculto -->
+                <!-- Cards de serviço -->
+                {% for service in form.service.field.queryset %}
+                <div class="service-card" data-service-id="{{ service.id }}" onclick="window.location.href='?service={{ service.id }}'">
+                    <div class="service-name">{{ service.name }}</div>
+                    <div class="service-description">
+                        {% if service.description %}{{ service.description }}{% else %}Clique para selecionar este serviço{% endif %}
+                    </div>
+                    <div class="service-details">
+                        <span class="service-duration">
+                            <i class="fas fa-clock"></i>
+                            {{ service.duration_minutes }} min
+                        </span>
+                        <span class="service-price">
+                            {% if service.price %}R$ {{ service.price }}{% else %}Consultar{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-concierge-bell"></i>
+                    </div>
+                    <h3>Nenhum serviço disponível</h3>
+                    <p>Entre em contato para verificar nossos serviços.</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </form>
@@ -972,31 +997,75 @@
         console.log('Timestamp:', new Date().toISOString());
 
         // Tentar múltiplas vezes para garantir
-        try {
+        // Solução definitiva - aguardar que o select esteja totalmente populado
+        function waitForSelectAndCreateCards() {
+            console.log('=== WAITING FOR SELECT TO BE READY ===');
+            
+            const serviceSelect = document.getElementById('id_service');
+            if (!serviceSelect) {
+                console.error('Select não encontrado, tentando novamente...');
+                setTimeout(waitForSelectAndCreateCards, 100);
+                return;
+            }
+            
+            // Verificar se o select tem opções válidas
+            const validOptions = Array.from(serviceSelect.options).filter(opt => opt.value && opt.value !== '');
+            console.log('Opções válidas encontradas:', validOptions.length);
+            
+            if (validOptions.length === 0) {
+                console.log('Select ainda sem opções, aguardando...');
+                setTimeout(waitForSelectAndCreateCards, 100);
+                return;
+            }
+            
+            // Select está pronto, criar os cards
+            console.log('Select pronto com', validOptions.length, 'opções válidas');
             createServiceCards();
-        } catch (error) {
-            console.error('Erro ao criar cards (tentativa 1):', error);
+            
+            // Verificar se os cards foram criados
+            setTimeout(() => {
+                const grid = document.getElementById('servicesGrid');
+                if (grid && grid.children.length === 0) {
+                    console.log('Cards não foram criados, tentando novamente...');
+                    createServiceCards();
+                }
+            }, 200);
         }
-
-        // Tentar novamente após 100ms
-        setTimeout(() => {
-            try {
-                console.log('Tentativa 2 de criar cards...');
-                createServiceCards();
-            } catch (error) {
-                console.error('Erro ao criar cards (tentativa 2):', error);
-            }
-        }, 100);
-
-        // E mais uma vez após 500ms
-        setTimeout(() => {
-            try {
-                console.log('Tentativa 3 de criar cards...');
-                createServiceCards();
-            } catch (error) {
-                console.error('Erro ao criar cards (tentativa 3):', error);
-            }
-        }, 500);
+        
+        // Iniciar o processo
+        waitForSelectAndCreateCards();
+        
+        // Sistema adicional de fallback usando MutationObserver
+        const observeSelectChanges = () => {
+            const serviceSelect = document.getElementById('id_service');
+            if (!serviceSelect) return;
+            
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        console.log('Mudanças detectadas no select');
+                        setTimeout(() => {
+                            const validOptions = Array.from(serviceSelect.options).filter(opt => opt.value && opt.value !== '');
+                            if (validOptions.length > 0) {
+                                console.log('Opções detectadas via observer, criando cards...');
+                                createServiceCards();
+                                observer.disconnect(); // Parar de observar após sucesso
+                            }
+                        }, 50);
+                    }
+                });
+            });
+            
+            observer.observe(serviceSelect, {
+                childList: true,
+                subtree: true
+            });
+            
+            // Desconectar após 5 segundos para evitar vazamentos de memória
+            setTimeout(() => observer.disconnect(), 5000);
+        };
+        
+        observeSelectChanges();
         {% endif %}
 
         // Date selection - load slots when date changes
