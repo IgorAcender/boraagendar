@@ -782,11 +782,18 @@
     document.addEventListener('DOMContentLoaded', function() {
         const serviceSelect = document.getElementById('id_service');
         const dateInput = document.getElementById('date_input');
-        const tenantSlug = 'igorejunior';
-        const labelProfissional = 'Profissional';
-        let selectedServiceId = '';
-        let selectedProfessionalId = 'any';
-        let selectedDate = '';        // Calendar Widget Implementation
+        const tenantSlug = '{{ tenant.slug }}';
+        const labelProfissional = '{{ tenant.label_profissional }}';
+        
+        // Capturar valores do contexto Django
+        let selectedServiceId = '{% if selected_service %}{{ selected_service.id }}{% else %}{% endif %}';
+        let selectedProfessionalId = '{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %}';
+        let selectedDate = '{% if selected_date %}{{ selected_date|date:"Y-m-d" }}{% else %}{% endif %}';
+        
+        console.log('=== INITIAL VALUES ===');
+        console.log('Selected Service ID:', selectedServiceId);
+        console.log('Selected Professional ID:', selectedProfessionalId);
+        console.log('Selected Date:', selectedDate);        // Calendar Widget Implementation
         class CustomCalendar {
             constructor() {
                 this.currentDate = new Date();
@@ -1068,14 +1075,38 @@
         observeSelectChanges();
         {% endif %}
 
+        // Função para carregar slots automaticamente
+        function autoLoadSlots() {
+            console.log('=== AUTO LOAD SLOTS CHECK ===');
+            console.log('Has Service:', !!selectedServiceId);
+            console.log('Has Professional:', !!selectedProfessionalId);
+            console.log('Has Date:', !!selectedDate);
+            
+            if (selectedDate && selectedServiceId && selectedProfessionalId) {
+                console.log('Auto-loading slots with:', { selectedServiceId, selectedProfessionalId, selectedDate });
+                loadAvailableSlots(selectedServiceId, selectedProfessionalId, selectedDate);
+            } else {
+                console.log('Missing data for auto-load, waiting for user selection');
+            }
+        }
+
         // Date selection - load slots when date changes
         if (dateInput) {
             dateInput.addEventListener('change', function() {
+                console.log('Date changed to:', this.value);
                 selectedDate = this.value;
                 if (selectedDate && selectedServiceId && selectedProfessionalId) {
+                    console.log('Loading slots for date change...');
                     loadAvailableSlots(selectedServiceId, selectedProfessionalId, selectedDate);
+                } else {
+                    console.log('Missing data after date change:', { selectedDate, selectedServiceId, selectedProfessionalId });
                 }
             });
+            
+            // Auto-load slots if we already have a date
+            if (selectedDate) {
+                setTimeout(autoLoadSlots, 500);
+            }
         }
 
         // Professional card selection
@@ -1122,13 +1153,27 @@
         }
 
         function loadAvailableSlots(serviceId, professionalId, date) {
+            console.log('=== LOADING AVAILABLE SLOTS ===');
+            console.log('Service ID:', serviceId);
+            console.log('Professional ID:', professionalId);
+            console.log('Date:', date);
+            console.log('Tenant Slug:', tenantSlug);
+            
             const url = `/agendar/${tenantSlug}/api/horarios/?service_id=${serviceId}&professional_id=${professionalId}&date=${date}`;
-            console.log('Loading slots:', { serviceId, professionalId, date });
+            console.log('API URL:', url);
 
             fetch(url)
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response OK:', response.ok);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('API Response data:', data);
                     console.log('Slots received:', data.slots ? data.slots.length : 0);
+                    if (data.slots) {
+                        console.log('First slot example:', data.slots[0]);
+                    }
                     renderSlots(data.slots, serviceId, professionalId);
                 })
                 .catch(error => {
@@ -1137,9 +1182,21 @@
         }
 
         function renderSlots(slots, serviceId, professionalId) {
+            console.log('=== RENDERING SLOTS ===');
+            console.log('Slots to render:', slots ? slots.length : 0);
+            console.log('Service ID:', serviceId);
+            console.log('Professional ID:', professionalId);
+            
             const slotsContainer = document.getElementById('slotsContainer');
+            console.log('Slots container found:', !!slotsContainer);
+            
+            if (!slotsContainer) {
+                console.error('ERRO: slotsContainer não encontrado!');
+                return;
+            }
 
-            if (slots.length === 0) {
+            if (!slots || slots.length === 0) {
+                console.log('No slots available, showing empty state');
                 slotsContainer.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">
@@ -1152,6 +1209,7 @@
                 return;
             }
 
+            console.log('Building slots HTML...');
             let slotsHTML = `
                 <h2 class="section-title">
                     <div class="section-icon">
@@ -1162,7 +1220,8 @@
                 <div class="slots-grid">
             `;
 
-            slots.forEach(slot => {
+            slots.forEach((slot, index) => {
+                console.log(`Slot ${index}:`, slot);
                 slotsHTML += `
                     <a class="slot-card btn-book" href="/agendar/${tenantSlug}/confirmar/?service=${serviceId}&professional=${professionalId}&start=${slot.start}">
                         <div class="slot-time">${slot.time}</div>
@@ -1171,7 +1230,9 @@
             });
 
             slotsHTML += '</div>';
+            console.log('Setting innerHTML, HTML length:', slotsHTML.length);
             slotsContainer.innerHTML = slotsHTML;
+            console.log('Slots rendered successfully');
         }
     });
 </script>
