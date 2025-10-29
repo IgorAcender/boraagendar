@@ -49,7 +49,9 @@ class AvailabilitySearchForm(forms.Form):
     def __init__(self, *args, tenant: Tenant, **kwargs):
         self.tenant = tenant
         super().__init__(*args, **kwargs)
-        self.fields["service"].queryset = Service.objects.filter(tenant=tenant, is_active=True).order_by("name")
+        self.fields["service"].queryset = (
+            Service.objects.filter(tenant=tenant, is_active=True).order_by("category", "name")
+        )
         self.fields["professional"].queryset = Professional.objects.filter(
             tenant=tenant, is_active=True
         ).order_by("display_name")
@@ -64,7 +66,7 @@ class AvailabilitySearchForm(forms.Form):
 class ServiceForm(TenantAwareForm):
     class Meta:
         model = Service
-        fields = ["name", "description", "duration_minutes", "price", "is_active", "professionals"]
+        fields = ["name", "description", "category", "duration_minutes", "price", "is_active", "professionals"]
 
 
 class ProfessionalForm(TenantAwareForm):

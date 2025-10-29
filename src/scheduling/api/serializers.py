@@ -10,6 +10,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
+            "category",
             "duration_minutes",
             "price",
             "is_active",

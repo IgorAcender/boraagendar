@@ -71,6 +71,10 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
 
     from datetime import date as date_type
 
+    services_queryset = form.fields["service"].queryset
+    services = list(services_queryset)
+    has_service_categories = any((service.category or "").strip() for service in services)
+
     context = {
         "tenant": tenant,
         "form": form,
@@ -80,6 +84,8 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         "selected_date": selected_date,
         "available_professionals": available_professionals,
         "today": date_type.today(),
+        "services": services,
+        "has_service_categories": has_service_categories,
     }
     return render(request, "scheduling/public/booking_start.html", context)
 

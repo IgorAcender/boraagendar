@@ -10,8 +10,8 @@ class ProfessionalServiceInline(admin.TabularInline):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ("name", "tenant", "duration_minutes", "price", "is_active")
-    list_filter = ("tenant", "is_active")
+    list_display = ("name", "category", "tenant", "duration_minutes", "price", "is_active")
+    list_filter = ("tenant", "category", "is_active")
     search_fields = ("name", "tenant__name")
 
 

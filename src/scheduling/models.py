@@ -8,6 +8,7 @@ class Service(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="services")
     name = models.CharField(max_length=120, verbose_name="Servico")
     description = models.TextField(blank=True, verbose_name="Descricao")
+    category = models.CharField(max_length=120, blank=True, verbose_name="Categoria")
     duration_minutes = models.PositiveIntegerField(default=30, verbose_name="Duracao (min)")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Preco")
     is_active = models.BooleanField(default=True, verbose_name="Ativo")

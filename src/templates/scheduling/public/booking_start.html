@@ -522,6 +522,23 @@
         z-index: 1 !important;
     }
 
+    .service-category-group {
+        margin-bottom: 2rem !important;
+    }
+
+    .service-category-title {
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        color: #334155 !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .service-category-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
     .service-card {
         background: white !important;
         border: 3px solid #e2e8f0 !important;
@@ -599,24 +616,56 @@
             <div class="hidden-select">
                 {{ form.service }}
             </div>
-            <div class="services-grid" id="servicesGrid">
-                <!-- Cards de serviço -->
-                {% for service in form.service.field.queryset %}
-                <div class="service-card" data-service-id="{{ service.id }}" onclick="window.location.href='?service={{ service.id }}'">
-                    <div class="service-name">{{ service.name }}</div>
-                    <div class="service-description">
-                        {% if service.description %}{{ service.description }}{% else %}Clique para selecionar este serviço{% endif %}
+            <div class="services-grid" id="servicesGrid" data-rendered="server">
+                {% if has_service_categories %}
+                    {% regroup services by category as service_categories %}
+                    {% for category in service_categories %}
+                    <div class="service-category-group">
+                        <div class="service-category-title">
+                            {% if category.grouper %}
+                                {{ category.grouper }}
+                            {% else %}
+                                Outros {{ tenant.label_servico_plural|lower }}
+                            {% endif %}
+                        </div>
+                        <div class="service-category-grid">
+                            {% for service in category.list %}
+                            <div class="service-card" data-service-id="{{ service.id }}" onclick="window.location.href='?service={{ service.id }}'">
+                                <div class="service-name">{{ service.name }}</div>
+                                <div class="service-description">
+                                    {% if service.description %}{{ service.description }}{% else %}Clique para selecionar este serviço{% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
-                {% empty %}
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-concierge-bell"></i>
+                    {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-concierge-bell"></i>
+                        </div>
+                        <h3>Nenhum serviço disponível</h3>
+                        <p>Entre em contato para verificar nossos serviços.</p>
                     </div>
-                    <h3>Nenhum serviço disponível</h3>
-                    <p>Entre em contato para verificar nossos serviços.</p>
-                </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    {% for service in services %}
+                    <div class="service-card" data-service-id="{{ service.id }}" onclick="window.location.href='?service={{ service.id }}'">
+                        <div class="service-name">{{ service.name }}</div>
+                        <div class="service-description">
+                            {% if service.description %}{{ service.description }}{% else %}Clique para selecionar este serviço{% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-concierge-bell"></i>
+                        </div>
+                        <h3>Nenhum serviço disponível</h3>
+                        <p>Entre em contato para verificar nossos serviços.</p>
+                    </div>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
     </form>
@@ -891,6 +940,11 @@
 
             const serviceSelect = document.getElementById('id_service');
             const servicesGrid = document.getElementById('servicesGrid');
+
+            if (servicesGrid && servicesGrid.dataset.rendered === 'server') {
+                console.log('Serviços renderizados no servidor; pulando renderização dinâmica.');
+                return;
+            }
 
             console.log('serviceSelect:', serviceSelect);
             console.log('servicesGrid:', servicesGrid);

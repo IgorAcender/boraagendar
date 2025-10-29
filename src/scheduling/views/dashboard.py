@@ -364,7 +364,7 @@ def service_list(request: HttpRequest) -> HttpResponse:
     else:
         form = ServiceForm(tenant=tenant)
 
-    services = Service.objects.filter(tenant=tenant).order_by("name")
+    services = Service.objects.filter(tenant=tenant).order_by("category", "name")
     return render(
         request,
         "scheduling/dashboard/service_list.html",
@@ -387,6 +387,7 @@ def service_update(request: HttpRequest, pk: int) -> HttpResponse:
     if request.method == "POST":
         service.name = request.POST.get("name")
         service.description = request.POST.get("description", "")
+        service.category = request.POST.get("category", "").strip()
         service.price = request.POST.get("price")
         service.duration_minutes = request.POST.get("duration_minutes")
         service.is_active = request.POST.get("is_active") == "on"
