@@ -739,13 +739,31 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM Content Loaded');
+        
         const serviceSelect = document.getElementById('id_service');
+        console.log('serviceSelect search result:', serviceSelect);
+        
+        // Verificar se existe outro elemento com id similar
+        const allSelects = document.querySelectorAll('select');
+        console.log('All selects found:', allSelects);
+        allSelects.forEach((select, index) => {
+            console.log(`Select ${index}:`, select, 'id:', select.id, 'name:', select.name);
+        });
+        
         const dateInput = document.getElementById('date_input');
         const tenantSlug = '{{ tenant.slug }}';
         const labelProfissional = '{{ tenant.label_profissional }}';
         let selectedServiceId = '{{ selected_service.id|default:"" }}';
         let selectedProfessionalId = '{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %}';
         let selectedDate = '{{ selected_date|date:"Y-m-d"|default:"" }}';
+        
+        console.log('Initial values:', {
+            tenantSlug,
+            selectedServiceId,
+            selectedProfessionalId,
+            selectedDate
+        });
         
         // Calendar Widget Implementation
         class CustomCalendar {
