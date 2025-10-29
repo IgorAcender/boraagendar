@@ -884,21 +884,33 @@
         {% if not selected_service %}
         // Função para criar os cards de serviço
         function createServiceCards() {
+            console.log('createServiceCards() chamada');
+
             const serviceSelect = document.getElementById('id_service');
             const servicesGrid = document.getElementById('servicesGrid');
 
+            console.log('serviceSelect:', serviceSelect);
+            console.log('servicesGrid:', servicesGrid);
+
             if (!serviceSelect || !servicesGrid) {
                 console.error('Elementos necessários não encontrados');
+                console.error('serviceSelect existe?', !!serviceSelect);
+                console.error('servicesGrid existe?', !!servicesGrid);
                 return;
             }
 
             const options = Array.from(serviceSelect.options);
+            console.log('Total de options:', options.length);
+
             servicesGrid.innerHTML = '';
 
             // Filtrar opções válidas (ignorar opções vazias)
             const validOptions = options.filter(opt => opt.value && opt.value !== '');
+            console.log('Valid options:', validOptions.length);
+            console.log('Valid options:', validOptions.map(o => ({ value: o.value, text: o.text })));
 
             if (validOptions.length === 0) {
+                console.log('Nenhum serviço válido encontrado, mostrando empty state');
                 // Nenhum serviço disponível
                 servicesGrid.innerHTML = `
                     <div class="empty-state">
@@ -912,8 +924,12 @@
                 return;
             }
 
+            console.log('Criando', validOptions.length, 'cards...');
+
             // Criar cards para cada serviço
-            validOptions.forEach(option => {
+            validOptions.forEach((option, index) => {
+                console.log(`Criando card ${index + 1}:`, option.text);
+
                 const serviceCard = document.createElement('div');
                 serviceCard.className = 'service-card';
                 serviceCard.dataset.serviceId = option.value;
@@ -939,16 +955,20 @@
                 `;
 
                 serviceCard.addEventListener('click', function() {
+                    console.log('Card clicado, ID:', this.dataset.serviceId);
                     window.location.href = `?service=${this.dataset.serviceId}`;
                 });
 
                 servicesGrid.appendChild(serviceCard);
+                console.log(`Card ${index + 1} adicionado ao grid`);
             });
 
-            console.log(`${validOptions.length} serviço(s) carregado(s)`);
+            console.log('Finalizado! Total de cards no grid:', servicesGrid.children.length);
+            console.log('Grid HTML:', servicesGrid.innerHTML.substring(0, 200));
         }
 
         // Executar quando o DOM estiver pronto
+        console.log('Pronto para criar cards...');
         createServiceCards();
         {% endif %}
 
