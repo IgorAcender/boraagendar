@@ -243,6 +243,10 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
 
     print("DEBUG - Renderizando template booking_confirm.html")
     try:
+        # Calcular duração e preço específicos do profissional
+        duration_minutes = service.duration_for(professional)
+        price = service.price_for(professional)
+        
         return render(
             request,
             "scheduling/public/booking_confirm.html",
@@ -252,6 +256,8 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
                 "service": service,
                 "professional": professional,
                 "start_datetime": start_datetime,
+                "duration_minutes": duration_minutes,
+                "price": price,
             },
         )
     except Exception as e:
