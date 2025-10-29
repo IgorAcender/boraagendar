@@ -531,6 +531,10 @@
 {% endblock %}
 
 {% block content %}
+<script>
+console.log('DEBUG calendar template: Total de bookings recebidos:', {{ bookings|length }});
+console.log('DEBUG calendar template: Bookings:', {{ bookings|safe }});
+</script>
 <div class="calendar-page">
     <!-- Hero Header -->
     <div class="hero-header">
@@ -639,7 +643,7 @@
                     {% for booking in bookings %}
                         {% if booking.date == day.date and booking.hour == hour %}
                         <div class="booking status-{{ booking.status }}"
-                             style="top: {{ booking.offset|stringformat:'f' }}%; height: {{ booking.height|stringformat:'f' }}%; min-height: 35px;"
+                             style="top: {{ booking.offset|stringformat:'f' }}%; height: {{ booking.height|stringformat:'f' }}%; min-height: 35px; z-index: 100;"
                              onclick="openBookingModal({{ booking.id }})"
                              title="{{ booking.customer_name }} - {{ booking.service.name }} - {{ booking.time_display }}">
                             <div class="booking-customer">

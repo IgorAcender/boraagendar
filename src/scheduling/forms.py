@@ -254,6 +254,10 @@ class BookingForm(TenantAwareForm):
             target_datetime = datetime.combine(date_value, time_value)
             target_datetime = target_datetime.replace(tzinfo=tz)
 
+            print(f"DEBUG BookingForm.clean: Tenant timezone: {self.tenant.timezone}")
+            print(f"DEBUG BookingForm.clean: Data/hora do form: {date_value} {time_value}")
+            print(f"DEBUG BookingForm.clean: DateTime com timezone: {target_datetime}")
+
             if not availability_service.is_slot_available(service, professional, target_datetime):
                 raise forms.ValidationError("Este horario nao esta disponivel.")
             cleaned_data["scheduled_for"] = target_datetime
