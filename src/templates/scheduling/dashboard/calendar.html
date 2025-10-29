@@ -560,7 +560,7 @@ console.log('  Booking {{ booking.id }}: {{ booking.customer_name }} em {{ booki
                 </div>
 
                 <!-- New Booking Button -->
-                <button onclick="openNewBookingModal()" class="btn-new-booking">
+                <button onclick="window.location.href='{% url 'dashboard:booking_create' %}'" class="btn-new-booking">
                     <i class="fas fa-plus"></i>
                     Novo Agendamento
                 </button>
