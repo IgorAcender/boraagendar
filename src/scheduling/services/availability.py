@@ -65,11 +65,15 @@ class AvailabilityService:
         duration = self._service_duration(service, professional)
         intervals = self._availability_intervals(professional, target_date)
         slots: List[AvailableSlot] = []
+        now = datetime.now(self.timezone)
 
         for start, end in intervals:
             slot_start = start
             while slot_start + timedelta(minutes=duration) <= end:
                 slot_end = slot_start + timedelta(minutes=duration)
+                if slot_start.date() == now.date() and slot_start < now:
+                    slot_start += self.slot_granularity
+                    continue
                 if not self._has_conflict(professional, slot_start, slot_end):
                     slots.append(AvailableSlot(professional=professional, start=slot_start, end=slot_end))
                 slot_start += self.slot_granularity
