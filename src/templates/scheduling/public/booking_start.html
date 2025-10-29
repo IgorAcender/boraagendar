@@ -882,167 +882,74 @@
         const calendar = new CustomCalendar();
         
         {% if not selected_service %}
-                // Função para criar os cards de serviço
+        // Função para criar os cards de serviço
         function createServiceCards() {
-            console.log('=== DEBUG: Creating service cards ===');
-            console.log('DOM ready state:', document.readyState);
-            console.log('Current timestamp:', new Date().toISOString());
-            
-            // Verificar DOM
             const serviceSelect = document.getElementById('id_service');
-            console.log('Service select element:', serviceSelect);
-            console.log('Service select exists:', !!serviceSelect);
-            
-            if (!serviceSelect) {
-                console.error('ERRO: Service select não encontrado');
-                return;
-            }
-            
             const servicesGrid = document.getElementById('servicesGrid');
-            console.log('Services grid element:', servicesGrid);
-            console.log('Services grid exists:', !!servicesGrid);
-            
-            if (!servicesGrid) {
-                console.error('ERRO: Services grid não encontrado');
+
+            if (!serviceSelect || !servicesGrid) {
+                console.error('Elementos necessários não encontrados');
                 return;
             }
-            
-            // Debug do select
-            console.log('Select HTML:', serviceSelect.outerHTML);
-            console.log('Select children count:', serviceSelect.children.length);
-            console.log('Select options:', serviceSelect.options);
-            console.log('Options length:', serviceSelect.options.length);
-            
-            const options = serviceSelect.options;
+
+            const options = Array.from(serviceSelect.options);
             servicesGrid.innerHTML = '';
-            
-            // Listar todas as opções
-            for (let i = 0; i < options.length; i++) {
-                console.log(`Option ${i}:`, {
-                    value: options[i].value,
-                    text: options[i].text,
-                    hasValue: !!options[i].value,
-                    isEmpty: options[i].value === ''
-                });
-            }
-            
-            let cardsCreated = 0;
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].value && options[i].value !== '') { // Ignorar opção vazia
-                    console.log(`Creating card for option ${i}:`, options[i].text, 'value:', options[i].value);
-                    
-                    const serviceCard = document.createElement('div');
-                    serviceCard.className = 'service-card';
-                    serviceCard.style.display = 'block';
-                    serviceCard.style.visibility = 'visible';
-                    serviceCard.style.opacity = '1';
-                    serviceCard.style.backgroundColor = '#fff';
-                    serviceCard.style.border = '3px solid #e2e8f0';
-                    serviceCard.style.borderRadius = '14px';
-                    serviceCard.style.padding = '1.25rem';
-                    serviceCard.style.marginBottom = '1rem';
-                    serviceCard.style.minHeight = '120px';
-                    
-                    if (options[i].value === selectedServiceId) {
-                        serviceCard.classList.add('selected');
-                    }
-                    serviceCard.dataset.serviceId = options[i].value;
-                    
-                    // Extrair nome do serviço e possíveis informações adicionais
-                    const serviceText = options[i].text;
-                    let serviceName = serviceText;
-                    let serviceInfo = '';
-                    
-                    // Verificar se o texto contém informações de preço/duração entre parênteses
-                    const match = serviceText.match(/(.*?)(\(.*\))?$/);
-                    if (match) {
-                        serviceName = match[1].trim();
-                        serviceInfo = match[2] || '';
-                    }
-                    
-                    serviceCard.innerHTML = `
-                        <div class="service-name" style="font-size: 1.1rem; font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">${serviceName}</div>
-                        <div class="service-description" style="color: #64748b; font-size: 0.875rem;">
-                            ${serviceInfo ? `<div class="service-info">${serviceInfo}</div>` : 'Clique para selecionar este serviço'}
-                        </div>
-                        <div class="service-details" style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
-                            <span class="service-duration" style="color: #64748b; font-size: 0.875rem;">
-                                <i class="fas fa-clock"></i>
-                                30 min
-                            </span>
-                            <span class="service-price" style="font-weight: 600; color: var(--brand-primary);">
-                                Consultar preço
-                            </span>
-                        </div>
-                    `;
-                    
-                    serviceCard.addEventListener('click', function() {
-                        console.log('Service card clicked:', this.dataset.serviceId);
-                        window.location.href = `?service=${this.dataset.serviceId}`;
-                    });
-                    
-                    console.log('Appending card to grid...');
-                    servicesGrid.appendChild(serviceCard);
-                    cardsCreated++;
-                    
-                    console.log('Card appended. Current grid children:', servicesGrid.children.length);
-                    console.log('Card element in DOM:', document.contains(serviceCard));
-                    console.log('Card computed style display:', window.getComputedStyle(serviceCard).display);
-                }
-            }
-            
-            console.log('=== FINAL RESULTS ===');
-            console.log('Cards created:', cardsCreated);
-            console.log('Grid final children count:', servicesGrid.children.length);
-            console.log('Grid innerHTML length:', servicesGrid.innerHTML.length);
-            console.log('Grid visibility:', window.getComputedStyle(servicesGrid).visibility);
-            console.log('Grid display:', window.getComputedStyle(servicesGrid).display);
-            
-            // Se não houver serviços, mostrar mensagem
-            if (cardsCreated === 0) {
-                console.log('No cards created, showing empty state...');
+
+            // Filtrar opções válidas (ignorar opções vazias)
+            const validOptions = options.filter(opt => opt.value && opt.value !== '');
+
+            if (validOptions.length === 0) {
+                // Nenhum serviço disponível
                 servicesGrid.innerHTML = `
-                    <div class="empty-state" style="text-align: center; padding: 3rem 1rem; display: block;">
-                        <div class="empty-icon" style="font-size: 2.5rem; color: #9ca3af; margin-bottom: 1rem;">
+                    <div class="empty-state">
+                        <div class="empty-icon">
                             <i class="fas fa-concierge-bell"></i>
                         </div>
-                        <h3 style="font-size: 1.25rem; color: #64748b; margin-bottom: 0.5rem;">Nenhum serviço disponível</h3>
-                        <p style="color: #94a3b8;">Entre em contato para verificar nossos serviços.</p>
+                        <h3>Nenhum serviço disponível</h3>
+                        <p>Entre em contato para verificar nossos serviços.</p>
                     </div>
                 `;
+                return;
             }
-            
-            console.log('=== END DEBUG ===');
+
+            // Criar cards para cada serviço
+            validOptions.forEach(option => {
+                const serviceCard = document.createElement('div');
+                serviceCard.className = 'service-card';
+                serviceCard.dataset.serviceId = option.value;
+
+                // Extrair nome do serviço (remover info extra entre parênteses)
+                const serviceText = option.text;
+                const serviceName = serviceText.split('(')[0].trim();
+
+                serviceCard.innerHTML = `
+                    <div class="service-name">${serviceName}</div>
+                    <div class="service-description">
+                        Clique para selecionar este serviço
+                    </div>
+                    <div class="service-details">
+                        <span class="service-duration">
+                            <i class="fas fa-clock"></i>
+                            Duração variável
+                        </span>
+                        <span class="service-price">
+                            Ver detalhes
+                        </span>
+                    </div>
+                `;
+
+                serviceCard.addEventListener('click', function() {
+                    window.location.href = `?service=${this.dataset.serviceId}`;
+                });
+
+                servicesGrid.appendChild(serviceCard);
+            });
+
+            console.log(`${validOptions.length} serviço(s) carregado(s)`);
         }
-        
-        // Aguardar um pouco antes de criar os cards para garantir que tudo esteja carregado
-        setTimeout(() => {
-            console.log('Timeout executado, chamando createServiceCards...');
-            createServiceCards();
-        }, 100);
-        
-        // Sistema de força bruta - tentar várias vezes se necessário
-        let attempts = 0;
-        const maxAttempts = 5;
-        
-        function forceCreateCards() {
-            attempts++;
-            console.log(`Tentativa ${attempts} de ${maxAttempts}`);
-            
-            const servicesGrid = document.getElementById('servicesGrid');
-            if (servicesGrid && servicesGrid.children.length === 0) {
-                console.log('Grid vazio, tentando criar cards novamente...');
-                createServiceCards();
-                
-                if (attempts < maxAttempts) {
-                    setTimeout(forceCreateCards, 500);
-                }
-            } else {
-                console.log('Cards encontrados ou máximo de tentativas atingido');
-            }
-        }
-        
-        setTimeout(forceCreateCards, 500);
+
+        // Executar quando o DOM estiver pronto
+        createServiceCards();
         {% endif %}
 
         // Date selection - load slots when date changes
