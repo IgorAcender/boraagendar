@@ -99,9 +99,13 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
 
     bookings_raw = bookings_query.select_related('service', 'professional').order_by('scheduled_for')
 
+    print(f"DEBUG calendar_view: Total bookings encontrados: {bookings_raw.count()}")
+    print(f"DEBUG calendar_view: Período: {week_start_dt} até {week_end_dt}")
+
     # Process bookings for template
     bookings_by_cell = defaultdict(list)
     for booking in bookings_raw:
+        print(f"DEBUG calendar_view: Processando booking ID {booking.id} - {booking.customer_name} - {booking.scheduled_for}")
         local_scheduled_for = booking.scheduled_for.astimezone(tz)
         date = local_scheduled_for.date()
         # Usar apenas a hora (sem minutos) para agrupar na célula correta
@@ -133,6 +137,10 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
     bookings_list = []
     for bookings in bookings_by_cell.values():
         bookings_list.extend(bookings)
+
+    print(f"DEBUG calendar_view: Total bookings na lista final: {len(bookings_list)}")
+    for b in bookings_list:
+        print(f"  - ID {b['id']}: {b['customer_name']} em {b['date']} às {b['hour']} (status: {b['status']})")
 
     # Get availability rules (horários de atendimento)
     from ..models import AvailabilityRule
@@ -330,6 +338,7 @@ def booking_create(request: HttpRequest) -> HttpResponse:
             booking.tenant = tenant
             booking.created_by = request.user
             booking.save()
+            print(f"DEBUG booking_create: Booking criado - ID: {booking.id}, Cliente: {booking.customer_name}, Data/Hora: {booking.scheduled_for}, Status: {booking.status}")
             send_booking_confirmation(booking)
             messages.success(request, "Agendamento criado com sucesso.")
             return redirect(reverse("dashboard:booking_detail", kwargs={"pk": booking.pk}))
