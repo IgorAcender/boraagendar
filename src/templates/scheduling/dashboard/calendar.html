@@ -799,10 +799,19 @@ function openNewBookingModal() {
 
     console.log('DEBUG: Modal encontrado:', modal);
     console.log('DEBUG: ModalBody encontrado:', modalBody);
+    
+    // Verificar CSS do modal
+    console.log('DEBUG: Modal display:', getComputedStyle(modal).display);
+    console.log('DEBUG: Modal visibility:', getComputedStyle(modal).visibility);
+    console.log('DEBUG: Modal z-index:', getComputedStyle(modal).zIndex);
 
     // Mostrar modal
     modal.style.display = 'flex';
+    modal.style.visibility = 'visible';
+    modal.style.zIndex = '9999';
     document.body.style.overflow = 'hidden'; // Prevenir scroll da página
+    
+    console.log('DEBUG: Modal após forçar visibilidade:', getComputedStyle(modal).display);
 
     console.log('DEBUG: Fazendo fetch para {% url "dashboard:booking_create" %}');
     
@@ -834,11 +843,34 @@ function openNewBookingModal() {
             console.log('DEBUG: Content HTML (primeiros 200 chars):', content ? content.innerHTML.substring(0, 200) : 'NENHUM');
             
             if (content) {
+                console.log('DEBUG: Inserindo conteúdo no modalBody...');
                 modalBody.innerHTML = content.innerHTML;
+                console.log('DEBUG: ModalBody após inserção (primeiros 300 chars):', modalBody.innerHTML.substring(0, 300));
             } else {
                 console.log('DEBUG: Usando body como fallback');
                 modalBody.innerHTML = doc.body.innerHTML;
+                console.log('DEBUG: ModalBody usando body (primeiros 300 chars):', modalBody.innerHTML.substring(0, 300));
             }
+            
+            // Verificar se o modalBody tem conteúdo visível
+            console.log('DEBUG: ModalBody scrollHeight:', modalBody.scrollHeight);
+            console.log('DEBUG: ModalBody children count:', modalBody.children.length);
+            console.log('DEBUG: ModalBody primeiro child:', modalBody.children[0]);
+            
+            // Forçar visibilidade do modal
+            modal.style.display = 'flex';
+            modal.style.visibility = 'visible';
+            modal.style.opacity = '1';
+            console.log('DEBUG: Modal forçado para visível');
+            
+            // TESTE: Adicionar conteúdo simples para verificar se modal funciona
+            const testDiv = document.createElement('div');
+            testDiv.innerHTML = '<h3>TESTE: Modal está funcionando!</h3><p>Se você vê isso, o modal está visível.</p>';
+            testDiv.style.background = '#fff';
+            testDiv.style.padding = '20px';
+            testDiv.style.color = '#000';
+            modalBody.appendChild(testDiv);
+            console.log('DEBUG: Div de teste adicionada ao modal');
             
             // Reconfigurar o formulário para submissão via AJAX
             const formElement = modalBody.querySelector('form');
