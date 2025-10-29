@@ -848,8 +848,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Posição = (hora * 60) + (minutos * 60/60) + offset do header
         const calendarGrid = document.querySelector('.calendar-grid');
         if (calendarGrid) {
-            // Calcular altura do header (padding + conteúdo)
-            const headerHeight = 66; // Aproximadamente 32px de padding + 34px de conteúdo
+            // Calcular altura do header dinamicamente
+            const headerElement = document.querySelector('.day-header');
+            const headerHeight = headerElement ? headerElement.offsetHeight : 60;
             
             const indicator = document.createElement('div');
             indicator.id = 'current-time-indicator';
@@ -865,8 +866,15 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
 
             // 60px é a altura da célula de hora + offset do header
-            const topPosition = headerHeight + (currentHour * 60) + (currentMinutes);
+            // Cada minuto = 1 pixel (60 minutos = 60 pixels de altura da célula)
+            const topPosition = headerHeight + (currentHour * 60) + currentMinutes;
             indicator.style.top = `${topPosition}px`;
+            
+            // Debug - remover depois
+            console.log(`Debug: Hora atual: ${currentHour}:${currentMinutes.toString().padStart(2, '0')}`);
+            console.log(`Debug: Header height: ${headerHeight}px`);
+            console.log(`Debug: Top position: ${topPosition}px`);
+            console.log(`Debug: Cálculo: ${headerHeight} + (${currentHour} * 60) + ${currentMinutes} = ${topPosition}`);
 
             // Adicionar bolinha vermelha no início da linha
             const dot = document.createElement('div');
