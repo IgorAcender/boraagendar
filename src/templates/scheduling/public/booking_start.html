@@ -181,13 +181,15 @@
         padding: 1.5rem;
         margin-bottom: 1rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        max-width: 100%;
+        overflow: hidden;
     }
 
     .calendar-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
         padding-bottom: 1rem;
         border-bottom: 1px solid #e2e8f0;
     }
@@ -196,6 +198,8 @@
         font-size: 1.25rem;
         font-weight: 700;
         color: #1e293b;
+        text-align: center;
+        flex: 1;
     }
 
     .calendar-nav {
@@ -215,6 +219,7 @@
         cursor: pointer;
         transition: all 0.2s;
         color: #64748b;
+        flex-shrink: 0;
     }
 
     .calendar-nav-btn:hover {
@@ -225,7 +230,9 @@
     .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 4px;
+        gap: 2px;
+        width: 100%;
+        max-width: 100%;
     }
 
     .calendar-day-header {
@@ -233,8 +240,11 @@
         font-size: 0.75rem;
         font-weight: 600;
         color: #64748b;
-        padding: 0.5rem;
+        padding: 0.75rem 0.25rem;
         text-transform: uppercase;
+        background: #f8fafc;
+        border-radius: 4px;
+        margin-bottom: 4px;
     }
 
     .calendar-day {
@@ -247,6 +257,11 @@
         transition: all 0.2s;
         font-weight: 500;
         border: 2px solid transparent;
+        min-height: 40px;
+        font-size: 0.9rem;
+        max-width: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
     }
 
     .calendar-day:hover {
@@ -271,6 +286,7 @@
         background: var(--brand-primary);
         color: white;
         border-color: var(--brand-primary);
+        font-weight: 700;
     }
 
     .calendar-day.today {
@@ -282,6 +298,27 @@
     .calendar-day.today.selected {
         background: var(--brand-primary);
         color: white;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+        .calendar-widget {
+            padding: 1rem;
+        }
+        
+        .calendar-day {
+            min-height: 36px;
+            font-size: 0.85rem;
+        }
+        
+        .calendar-day-header {
+            font-size: 0.7rem;
+            padding: 0.5rem 0.125rem;
+        }
+        
+        .calendar-month {
+            font-size: 1.1rem;
+        }
     }
 
     /* Hide the native date input */
