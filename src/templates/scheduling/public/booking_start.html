@@ -528,11 +528,13 @@
         cursor: pointer;
         text-decoration: none;
         color: inherit;
-        display: flex;
-        flex-direction: column;
+        display: block !important;
         margin-bottom: 1rem;
-        min-height: 80px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        min-height: 120px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .service-card:hover {
@@ -871,16 +873,28 @@
         {% if not selected_service %}
                 // Função para criar os cards de serviço
         function createServiceCards() {
-            if (!serviceSelect) return;
+            console.log('Creating service cards...');
+            
+            if (!serviceSelect) {
+                console.error('Service select not found');
+                return;
+            }
             
             const servicesGrid = document.getElementById('servicesGrid');
-            if (!servicesGrid) return;
+            if (!servicesGrid) {
+                console.error('Services grid not found');
+                return;
+            }
             
             const options = serviceSelect.options;
+            console.log('Found options:', options.length);
             servicesGrid.innerHTML = '';
             
+            let cardsCreated = 0;
             for (let i = 0; i < options.length; i++) {
-                if (options[i].value) { // Ignorar Opção vazia
+                if (options[i].value && options[i].value !== '') { // Ignorar opção vazia
+                    console.log('Creating card for:', options[i].text, 'value:', options[i].value);
+                    
                     const serviceCard = document.createElement('div');
                     serviceCard.className = 'service-card';
                     if (options[i].value === selectedServiceId) {
@@ -903,21 +917,49 @@
                     serviceCard.innerHTML = `
                         <div class="service-name">${serviceName}</div>
                         <div class="service-description">
-                            ${serviceInfo ? `<div class="service-info">${serviceInfo}</div>` : ''}
+                            ${serviceInfo ? `<div class="service-info">${serviceInfo}</div>` : 'Clique para selecionar este serviço'}
+                        </div>
+                        <div class="service-details">
+                            <span class="service-duration">
+                                <i class="fas fa-clock"></i>
+                                30 min
+                            </span>
+                            <span class="service-price">
+                                Consultar preço
+                            </span>
                         </div>
                     `;
                     
                     serviceCard.addEventListener('click', function() {
+                        console.log('Service card clicked:', this.dataset.serviceId);
                         window.location.href = `?service=${this.dataset.serviceId}`;
                     });
                     
                     servicesGrid.appendChild(serviceCard);
+                    cardsCreated++;
                 }
+            }
+            
+            console.log('Cards created:', cardsCreated);
+            
+            // Se não houver serviços, mostrar mensagem
+            if (cardsCreated === 0) {
+                servicesGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-concierge-bell"></i>
+                        </div>
+                        <h3>Nenhum serviço disponível</h3>
+                        <p>Entre em contato para verificar nossos serviços.</p>
+                    </div>
+                `;
             }
         }
         
-        // Criar os cards de serviço ao carregar a página
-        createServiceCards();
+        // Aguardar um pouco antes de criar os cards para garantir que tudo esteja carregado
+        setTimeout(() => {
+            createServiceCards();
+        }, 100);
         {% endif %}
 
         // Date selection - load slots when date changes
