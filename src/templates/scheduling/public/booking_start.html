@@ -967,9 +967,36 @@
             console.log('Grid HTML:', servicesGrid.innerHTML.substring(0, 200));
         }
 
-        // Executar quando o DOM estiver pronto
-        console.log('Pronto para criar cards...');
-        createServiceCards();
+        // Executar IMEDIATAMENTE (não esperar DOMContentLoaded pois já estamos dentro dele)
+        console.log('=== INICIANDO CRIAÇÃO DE CARDS ===');
+        console.log('Timestamp:', new Date().toISOString());
+
+        // Tentar múltiplas vezes para garantir
+        try {
+            createServiceCards();
+        } catch (error) {
+            console.error('Erro ao criar cards (tentativa 1):', error);
+        }
+
+        // Tentar novamente após 100ms
+        setTimeout(() => {
+            try {
+                console.log('Tentativa 2 de criar cards...');
+                createServiceCards();
+            } catch (error) {
+                console.error('Erro ao criar cards (tentativa 2):', error);
+            }
+        }, 100);
+
+        // E mais uma vez após 500ms
+        setTimeout(() => {
+            try {
+                console.log('Tentativa 3 de criar cards...');
+                createServiceCards();
+            } catch (error) {
+                console.error('Erro ao criar cards (tentativa 3):', error);
+            }
+        }, 500);
         {% endif %}
 
         // Date selection - load slots when date changes
