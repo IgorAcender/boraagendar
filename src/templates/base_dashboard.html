@@ -883,43 +883,92 @@
 
         // ========== MODAL DE NOVO AGENDAMENTO (GLOBAL) ==========
         function openNewBookingModal() {
+            console.log('DEBUG: openNewBookingModal() chamado');
             const modal = document.getElementById('newBookingModal');
             const modalBody = document.getElementById('newBookingModalBody');
 
+            if (!modal) {
+                console.error('ERRO: Modal #newBookingModal não encontrado');
+                alert('Erro: Modal não encontrado. Verifique o console.');
+                return;
+            }
+
+            if (!modalBody) {
+                console.error('ERRO: Modal body #newBookingModalBody não encontrado');
+                alert('Erro: Modal body não encontrado. Verifique o console.');
+                return;
+            }
+
+            console.log('DEBUG: Abrindo modal...');
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
 
-            modalBody.innerHTML = '<div style="text-align: center; padding: 3rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i><p style="margin-top: 1rem; color: #64748b;">Carregando...</p></div>';
+            modalBody.innerHTML = '<div style="text-align: center; padding: 3rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i><p style="margin-top: 1rem; color: #64748b;">Carregando formulário...</p></div>';
 
-            fetch('{% url "dashboard:booking_create" %}')
-                .then(response => response.text())
+            const url = '{% url "dashboard:booking_create" %}';
+            console.log('DEBUG: Fazendo fetch para:', url);
+
+            fetch(url)
+                .then(response => {
+                    console.log('DEBUG: Resposta recebida:', response.status, response.statusText);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.text();
+                })
                 .then(html => {
+                    console.log('DEBUG: HTML recebido, tamanho:', html.length);
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
                     // Buscar o card que contém o formulário
-                    const card = doc.querySelector('.card');
+                    const card = doc.querySelector('.card, .booking-form-card');
+                    const form = doc.querySelector('form');
+
+                    console.log('DEBUG: Card encontrado?', !!card);
+                    console.log('DEBUG: Form encontrado?', !!form);
+
                     if (card) {
+                        console.log('DEBUG: Usando conteúdo do card');
                         modalBody.innerHTML = card.innerHTML;
+                    } else if (form) {
+                        console.log('DEBUG: Usando form diretamente');
+                        modalBody.innerHTML = form.outerHTML;
                     } else {
-                        // Fallback: buscar o formulário diretamente
-                        const form = doc.querySelector('form');
-                        if (form) {
-                            modalBody.innerHTML = '<h2>Novo agendamento</h2>' + form.outerHTML;
-                        } else {
-                            modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Formulário não encontrado.</p>';
-                            return;
-                        }
+                        console.error('ERRO: Nem card nem form encontrado no HTML');
+                        modalBody.innerHTML = `
+                            <div style="padding: 2rem; text-align: center;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                                <h3 style="color: #ef4444; margin-bottom: 1rem;">Formulário não encontrado</h3>
+                                <p style="color: #64748b;">O formulário de agendamento não pôde ser carregado.</p>
+                                <button onclick="closeNewBookingModal()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                    Fechar
+                                </button>
+                            </div>
+                        `;
+                        return;
                     }
 
                     // Attach form submit handler
-                    const form = modalBody.querySelector('form');
-                    if (form) {
-                        form.addEventListener('submit', function handleSubmit(e) {
+                    const formInModal = modalBody.querySelector('form');
+                    if (formInModal) {
+                        console.log('DEBUG: Anexando handler de submit ao form');
+                        formInModal.addEventListener('submit', function handleSubmit(e) {
                             e.preventDefault();
-                            const formData = new FormData(form);
+                            console.log('DEBUG: Form submit interceptado');
 
-                            fetch(form.action, {
+                            const formData = new FormData(formInModal);
+                            const submitUrl = formInModal.action || url;
+                            console.log('DEBUG: Enviando para:', submitUrl);
+
+                            // Mostrar loading
+                            const submitBtn = formInModal.querySelector('button[type="submit"]');
+                            if (submitBtn) {
+                                submitBtn.disabled = true;
+                                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                            }
+
+                            fetch(submitUrl, {
                                 method: 'POST',
                                 body: formData,
                                 headers: {
@@ -927,23 +976,24 @@
                                 }
                             })
                             .then(response => {
+                                console.log('DEBUG: Resposta do submit:', response.status);
                                 if (response.ok) {
-                                    // Success - reload page to show new booking
-                                    window.location.reload();
+                                    console.log('DEBUG: Agendamento criado com sucesso, recarregando página');
+                                    showNotification('Sucesso!', 'Agendamento criado com sucesso', 'success');
+                                    setTimeout(() => window.location.reload(), 1000);
                                 } else {
+                                    console.log('DEBUG: Erro no submit, recarregando form com erros');
                                     return response.text().then(html => {
                                         const parser = new DOMParser();
                                         const doc = parser.parseFromString(html, 'text/html');
 
-                                        // Buscar o card que contém o formulário com erros
-                                        const card = doc.querySelector('.card');
+                                        const card = doc.querySelector('.card, .booking-form-card');
+                                        const form = doc.querySelector('form');
+
                                         if (card) {
                                             modalBody.innerHTML = card.innerHTML;
-                                        } else {
-                                            const form = doc.querySelector('form');
-                                            if (form) {
-                                                modalBody.innerHTML = '<h2>Novo agendamento</h2>' + form.outerHTML;
-                                            }
+                                        } else if (form) {
+                                            modalBody.innerHTML = form.outerHTML;
                                         }
 
                                         // Reattach submit handler to new form
@@ -955,15 +1005,31 @@
                                 }
                             })
                             .catch(error => {
-                                console.error('Error submitting form:', error);
-                                showNotification('Erro', 'Erro ao criar agendamento. Por favor, tente novamente.', 'error');
+                                console.error('ERRO no submit do form:', error);
+                                showNotification('Erro', 'Erro ao criar agendamento: ' + error.message, 'error');
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Salvar Agendamento';
+                                }
                             });
                         });
+                    } else {
+                        console.error('ERRO: Form não encontrado após inserir no modal');
                     }
                 })
                 .catch(error => {
-                    modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Erro ao carregar formulário.</p>';
-                    console.error('Error loading booking form:', error);
+                    console.error('ERRO ao carregar form:', error);
+                    modalBody.innerHTML = `
+                        <div style="padding: 2rem; text-align: center;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                            <h3 style="color: #ef4444; margin-bottom: 1rem;">Erro ao carregar formulário</h3>
+                            <p style="color: #64748b; margin-bottom: 0.5rem;">${error.message}</p>
+                            <p style="color: #94a3b8; font-size: 0.875rem;">Verifique o console para mais detalhes.</p>
+                            <button onclick="closeNewBookingModal()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                Fechar
+                            </button>
+                        </div>
+                    `;
                 });
         }
 
