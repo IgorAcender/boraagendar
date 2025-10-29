@@ -530,6 +530,9 @@
         color: inherit;
         display: flex;
         flex-direction: column;
+        margin-bottom: 1rem;
+        min-height: 80px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .service-card:hover {
@@ -739,33 +742,13 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM Content Loaded');
-        
         const serviceSelect = document.getElementById('id_service');
-        console.log('serviceSelect search result:', serviceSelect);
-        
-        // Verificar se existe outro elemento com id similar
-        const allSelects = document.querySelectorAll('select');
-        console.log('All selects found:', allSelects);
-        allSelects.forEach((select, index) => {
-            console.log(`Select ${index}:`, select, 'id:', select.id, 'name:', select.name);
-        });
-        
         const dateInput = document.getElementById('date_input');
-        const tenantSlug = '{{ tenant.slug }}';
-        const labelProfissional = '{{ tenant.label_profissional }}';
-        let selectedServiceId = '{{ selected_service.id|default:"" }}';
-        let selectedProfessionalId = '{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %}';
-        let selectedDate = '{{ selected_date|date:"Y-m-d"|default:"" }}';
-        
-        console.log('Initial values:', {
-            tenantSlug,
-            selectedServiceId,
-            selectedProfessionalId,
-            selectedDate
-        });
-        
-        // Calendar Widget Implementation
+        const tenantSlug = 'igorejunior';
+        const labelProfissional = 'Profissional';
+        let selectedServiceId = '';
+        let selectedProfessionalId = 'any';
+        let selectedDate = '';        // Calendar Widget Implementation
         class CustomCalendar {
             constructor() {
                 this.currentDate = new Date();
@@ -888,28 +871,15 @@
         {% if not selected_service %}
                 // Função para criar os cards de serviço
         function createServiceCards() {
-            console.log('createServiceCards called');
-            console.log('serviceSelect:', serviceSelect);
-            
-            if (!serviceSelect) {
-                console.error('serviceSelect not found!');
-                return;
-            }
+            if (!serviceSelect) return;
             
             const servicesGrid = document.getElementById('servicesGrid');
-            console.log('servicesGrid:', servicesGrid);
-            
-            if (!servicesGrid) {
-                console.error('servicesGrid not found!');
-                return;
-            }
+            if (!servicesGrid) return;
             
             const options = serviceSelect.options;
-            console.log('options:', options, 'length:', options.length);
             servicesGrid.innerHTML = '';
             
             for (let i = 0; i < options.length; i++) {
-                console.log(`Option ${i}:`, options[i].value, options[i].text);
                 if (options[i].value) { // Ignorar Opção vazia
                     const serviceCard = document.createElement('div');
                     serviceCard.className = 'service-card';
@@ -944,8 +914,6 @@
                     servicesGrid.appendChild(serviceCard);
                 }
             }
-            
-            console.log('Cards created:', servicesGrid.children.length);
         }
         
         // Criar os cards de serviço ao carregar a página
