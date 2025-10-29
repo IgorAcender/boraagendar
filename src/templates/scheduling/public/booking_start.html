@@ -870,15 +870,28 @@
         {% if not selected_service %}
                 // Função para criar os cards de serviço
         function createServiceCards() {
-            if (!serviceSelect) return;
+            console.log('createServiceCards called');
+            console.log('serviceSelect:', serviceSelect);
+            
+            if (!serviceSelect) {
+                console.error('serviceSelect not found!');
+                return;
+            }
             
             const servicesGrid = document.getElementById('servicesGrid');
-            if (!servicesGrid) return;
+            console.log('servicesGrid:', servicesGrid);
+            
+            if (!servicesGrid) {
+                console.error('servicesGrid not found!');
+                return;
+            }
             
             const options = serviceSelect.options;
+            console.log('options:', options, 'length:', options.length);
             servicesGrid.innerHTML = '';
             
             for (let i = 0; i < options.length; i++) {
+                console.log(`Option ${i}:`, options[i].value, options[i].text);
                 if (options[i].value) { // Ignorar Opção vazia
                     const serviceCard = document.createElement('div');
                     serviceCard.className = 'service-card';
@@ -913,6 +926,8 @@
                     servicesGrid.appendChild(serviceCard);
                 }
             }
+            
+            console.log('Cards created:', servicesGrid.children.length);
         }
         
         // Criar os cards de serviço ao carregar a página
