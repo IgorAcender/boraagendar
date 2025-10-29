@@ -527,7 +527,7 @@
                 </div>
 
                 <!-- New Booking Button -->
-                <button onclick="window.location.href='{% url 'dashboard:booking_create' %}'" class="btn-new-booking">
+                <button onclick="openNewBookingModal()" class="btn-new-booking">
                     <i class="fas fa-plus"></i>
                     Novo Agendamento
                 </button>
@@ -616,7 +616,7 @@
     </div>
 </div>
 
-<!-- Modal for Booking Details -->
+<!-- Modal de Agendamento -->
 <div id="bookingModal" class="modal">
     <div class="modal-overlay" onclick="closeBookingModal()"></div>
     <div class="modal-content">
@@ -625,6 +625,25 @@
         </button>
         <div id="modalBody">
             <p style="padding: 2rem; text-align: center; color: #6b7280;">Carregando...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Novo Agendamento -->
+<div id="newBookingModal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeNewBookingModal()"></div>
+    <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <h2><i class="fas fa-plus"></i> Novo Agendamento</h2>
+            <button class="modal-close" onclick="closeNewBookingModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="newModalBody">
+            <div style="text-align: center; padding: 3rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
+                <p style="margin-top: 1rem; color: #64748b;">Carregando...</p>
+            </div>
         </div>
     </div>
 </div>
@@ -673,6 +692,98 @@ function closeBookingModal() {
     const modal = document.getElementById('bookingModal');
     modal.style.display = 'none';
     document.body.style.overflow = '';
+}
+
+// Funções do Modal de Novo Agendamento
+function openNewBookingModal() {
+    const modal = document.getElementById('newBookingModal');
+    const modalBody = document.getElementById('newModalBody');
+
+    // Mostrar modal
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Carregar formulário de novo agendamento via AJAX
+    fetch('/dashboard/agendamentos/novo/')
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const form = doc.querySelector('form') || doc.querySelector('.booking-form') || doc.querySelector('main') || doc.body;
+            
+            modalBody.innerHTML = form.innerHTML;
+            
+            const formElement = modalBody.querySelector('form');
+            if (formElement) {
+                formElement.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitNewBookingForm(formElement);
+                });
+            }
+        })
+        .catch(error => {
+            modalBody.innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ef4444;"></i>
+                    <p style="margin-top: 1rem; color: #64748b;">Erro ao carregar formulário.</p>
+                </div>
+            `;
+            console.error('Erro ao carregar formulário:', error);
+        });
+}
+
+function closeNewBookingModal() {
+    const modal = document.getElementById('newBookingModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function submitNewBookingForm(form) {
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    }
+    
+    fetch('/dashboard/agendamentos/novo/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => {
+        if (response.redirected) {
+            closeNewBookingModal();
+            window.location.reload();
+        } else {
+            return response.text();
+        }
+    })
+    .then(html => {
+        if (html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const form = doc.querySelector('form') || doc.querySelector('.booking-form') || doc.querySelector('main') || doc.body;
+            
+            document.getElementById('newModalBody').innerHTML = form.innerHTML;
+            
+            const newForm = document.getElementById('newModalBody').querySelector('form');
+            if (newForm) {
+                newForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitNewBookingForm(newForm);
+                });
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao enviar formulário:', error);
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmar';
+        }
+    });
 }
 
 // Update clock in real-time

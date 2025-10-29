@@ -338,6 +338,81 @@
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
     }
 
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        position: relative;
+        width: 90%;
+        max-width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -393,7 +468,7 @@
             <p>Visão geral do seu sistema de agendamentos</p>
         </div>
         <div class="hero-actions">
-            <button onclick="window.location.href='{% url 'dashboard:booking_create' %}'" class="btn-hero">
+            <button onclick="openNewBookingModal()" class="btn-hero">
                 <i class="fas fa-plus"></i>
                 Novo Agendamento
             </button>
@@ -506,7 +581,7 @@
         </div>
         <h3>Nenhum agendamento encontrado</h3>
         <p>Comece criando seu primeiro agendamento!</p>
-        <button onclick="window.location.href='{% url 'dashboard:booking_create' %}'" class="btn-hero">
+        <button onclick="openNewBookingModal()" class="btn-hero">
             <i class="fas fa-plus"></i>
             Criar Primeiro Agendamento
         </button>
@@ -514,8 +589,119 @@
     {% endif %}
 </div>
 
+<!-- Modal de Novo Agendamento -->
+<div id="newBookingModal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeNewBookingModal()"></div>
+    <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <h2><i class="fas fa-plus"></i> Novo Agendamento</h2>
+            <button class="modal-close" onclick="closeNewBookingModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="newModalBody">
+            <div style="text-align: center; padding: 3rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
+                <p style="margin-top: 1rem; color: #64748b;">Carregando...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Floating Action Button -->
-<button onclick="window.location.href='{% url 'dashboard:booking_create' %}'" class="fab" title="Novo Agendamento">
+<button onclick="openNewBookingModal()" class="fab" title="Novo Agendamento">
     <i class="fas fa-plus"></i>
 </button>
+
+<script>
+// Funções do Modal de Novo Agendamento
+function openNewBookingModal() {
+    const modal = document.getElementById('newBookingModal');
+    const modalBody = document.getElementById('newModalBody');
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    fetch('/dashboard/agendamentos/novo/')
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const form = doc.querySelector('form') || doc.querySelector('.booking-form') || doc.querySelector('main') || doc.body;
+            
+            modalBody.innerHTML = form.innerHTML;
+            
+            const formElement = modalBody.querySelector('form');
+            if (formElement) {
+                formElement.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitNewBookingForm(formElement);
+                });
+            }
+        })
+        .catch(error => {
+            modalBody.innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ef4444;"></i>
+                    <p style="margin-top: 1rem; color: #64748b;">Erro ao carregar formulário.</p>
+                </div>
+            `;
+            console.error('Erro ao carregar formulário:', error);
+        });
+}
+
+function closeNewBookingModal() {
+    const modal = document.getElementById('newBookingModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function submitNewBookingForm(form) {
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    }
+    
+    fetch('/dashboard/agendamentos/novo/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => {
+        if (response.redirected) {
+            closeNewBookingModal();
+            window.location.reload();
+        } else {
+            return response.text();
+        }
+    })
+    .then(html => {
+        if (html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const form = doc.querySelector('form') || doc.querySelector('.booking-form') || doc.querySelector('main') || doc.body;
+            
+            document.getElementById('newModalBody').innerHTML = form.innerHTML;
+            
+            const newForm = document.getElementById('newModalBody').querySelector('form');
+            if (newForm) {
+                newForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitNewBookingForm(newForm);
+                });
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao enviar formulário:', error);
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmar';
+        }
+    });
+}
+</script>
 {% endblock %}
