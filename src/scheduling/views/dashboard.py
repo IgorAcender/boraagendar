@@ -331,6 +331,8 @@ def booking_create(request: HttpRequest) -> HttpResponse:
     if redirect_response:
         return redirect_response
     tenant = membership.tenant
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    
     if request.method == "POST":
         form = BookingForm(tenant=tenant, data=request.POST)
         if form.is_valid():
@@ -338,16 +340,27 @@ def booking_create(request: HttpRequest) -> HttpResponse:
             booking.tenant = tenant
             booking.created_by = request.user
             booking.save()
-            print(f"DEBUG booking_create: Booking criado - ID: {booking.id}, Cliente: {booking.customer_name}, Data/Hora: {booking.scheduled_for}, Status: {booking.status}")
             send_booking_confirmation(booking)
             messages.success(request, "Agendamento criado com sucesso.")
+            if is_ajax:
+                return JsonResponse({"success": True})
             return redirect(reverse("dashboard:booking_detail", kwargs={"pk": booking.pk}))
-    else:
+        else: # Form is invalid
+            if is_ajax:
+                # For AJAX, re-render the form snippet with errors and a 400 status
+                return render(
+                    request,
+                    "scheduling/dashboard/booking_form_modal.html",
+                    {"tenant": tenant, "form": form},
+                    status=400
+                )
+    else: # GET request
         form = BookingForm(tenant=tenant)
 
+    template_name = "scheduling/dashboard/booking_form_modal.html" if is_ajax else "scheduling/dashboard/booking_form.html"
     return render(
         request,
-        "scheduling/dashboard/booking_form.html",
+        template_name,
         {"tenant": tenant, "form": form},
     )
 

@@ -793,108 +793,44 @@ function closeBookingModal() {
 
 // Funções do Modal de Novo Agendamento
 function openNewBookingModal() {
-    console.log('DEBUG: openNewBookingModal() chamada');
     const modal = document.getElementById('newBookingModal');
     const modalBody = document.getElementById('newModalBody');
 
-    console.log('DEBUG: Modal encontrado:', modal);
-    console.log('DEBUG: ModalBody encontrado:', modalBody);
-    
-    // Verificar CSS do modal
-    console.log('DEBUG: Modal display:', getComputedStyle(modal).display);
-    console.log('DEBUG: Modal visibility:', getComputedStyle(modal).visibility);
-    console.log('DEBUG: Modal z-index:', getComputedStyle(modal).zIndex);
+    // Reset modal body to loading state
+    modalBody.innerHTML = `
+        <div style="text-align: center; padding: 3rem;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
+            <p style="margin-top: 1rem; color: #64748b;">Carregando...</p>
+        </div>
+    `;
 
-    // Mostrar modal
+    // Show modal
     modal.style.display = 'flex';
-    modal.style.visibility = 'visible';
-    modal.style.zIndex = '9999';
-    document.body.style.overflow = 'hidden'; // Prevenir scroll da página
-    
-    console.log('DEBUG: Modal após forçar visibilidade:', getComputedStyle(modal).display);
+    document.body.style.overflow = 'hidden';
 
-    console.log('DEBUG: Fazendo fetch para {% url "dashboard:booking_create" %}');
-    
-    // Carregar formulário de novo agendamento via AJAX
+    // Load form content via AJAX
     fetch('{% url "dashboard:booking_create" %}')
-        .then(response => {
-            console.log('DEBUG: Response recebido:', response);
-            console.log('DEBUG: Response status:', response.status);
-            console.log('DEBUG: Response ok:', response.ok);
-            return response.text();
-        })
+        .then(response => response.text())
         .then(html => {
-            console.log('DEBUG: HTML recebido (primeiros 200 chars):', html.substring(0, 200));
+            modalBody.innerHTML = html;
             
-            // Extrair apenas o formulário (sem o layout completo)
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Tentar diferentes seletores para encontrar o conteúdo
-            let content = doc.querySelector('.booking-form-card') || 
-                         doc.querySelector('.form-grid') ||
-                         doc.querySelector('form') || 
-                         doc.querySelector('main .container') ||
-                         doc.querySelector('main') ||
-                         doc.querySelector('.content');
-            
-            console.log('DEBUG: Elemento content encontrado:', content);
-            console.log('DEBUG: Content tag name:', content ? content.tagName : 'NENHUM');
-            console.log('DEBUG: Content HTML (primeiros 200 chars):', content ? content.innerHTML.substring(0, 200) : 'NENHUM');
-            
-            if (content) {
-                console.log('DEBUG: Inserindo conteúdo no modalBody...');
-                modalBody.innerHTML = content.innerHTML;
-                console.log('DEBUG: ModalBody após inserção (primeiros 300 chars):', modalBody.innerHTML.substring(0, 300));
-            } else {
-                console.log('DEBUG: Usando body como fallback');
-                modalBody.innerHTML = doc.body.innerHTML;
-                console.log('DEBUG: ModalBody usando body (primeiros 300 chars):', modalBody.innerHTML.substring(0, 300));
-            }
-            
-            // Verificar se o modalBody tem conteúdo visível
-            console.log('DEBUG: ModalBody scrollHeight:', modalBody.scrollHeight);
-            console.log('DEBUG: ModalBody children count:', modalBody.children.length);
-            console.log('DEBUG: ModalBody primeiro child:', modalBody.children[0]);
-            
-            // Forçar visibilidade do modal
-            modal.style.display = 'flex';
-            modal.style.visibility = 'visible';
-            modal.style.opacity = '1';
-            console.log('DEBUG: Modal forçado para visível');
-            
-            // TESTE: Adicionar conteúdo simples para verificar se modal funciona
-            const testDiv = document.createElement('div');
-            testDiv.innerHTML = '<h3>TESTE: Modal está funcionando!</h3><p>Se você vê isso, o modal está visível.</p>';
-            testDiv.style.background = '#fff';
-            testDiv.style.padding = '20px';
-            testDiv.style.color = '#000';
-            modalBody.appendChild(testDiv);
-            console.log('DEBUG: Div de teste adicionada ao modal');
-            
-            // Reconfigurar o formulário para submissão via AJAX
+            // Attach submit handler to the new form
             const formElement = modalBody.querySelector('form');
             if (formElement) {
-                console.log('DEBUG: Configurando evento submit no formulário');
                 formElement.addEventListener('submit', function(e) {
                     e.preventDefault();
                     submitNewBookingForm(formElement);
                 });
-            } else {
-                console.log('DEBUG: ERRO - Nenhum formulário encontrado no modalBody');
-                console.log('DEBUG: ModalBody innerHTML (primeiros 500 chars):', modalBody.innerHTML.substring(0, 500));
             }
         })
         .catch(error => {
-            console.error('DEBUG: ERRO no fetch:', error);
             modalBody.innerHTML = `
                 <div style="text-align: center; padding: 3rem;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ef4444;"></i>
-                    <p style="margin-top: 1rem; color: #64748b;">Erro ao carregar formulário de agendamento.</p>
-                    <p style="font-size: 0.8rem; color: #94a3b8;">Erro: ${error.message}</p>
+                    <p style="margin-top: 1rem; color: #64748b;">Erro ao carregar formulário.</p>
                 </div>
             `;
-            console.error('Erro ao carregar formulário:', error);
+            console.error('Error loading new booking form:', error);
         });
 }
 
@@ -908,13 +844,14 @@ function closeNewBookingModal() {
 function submitNewBookingForm(form) {
     const formData = new FormData(form);
     const submitButton = form.querySelector('button[type="submit"]');
-    
-    // Desabilitar botão durante envio
+    const modalBody = document.getElementById('newModalBody');
+
+    // Disable button during submission
     if (submitButton) {
         submitButton.disabled = true;
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
     }
-    
+
     fetch('{% url "dashboard:booking_create" %}', {
         method: 'POST',
         body: formData,
@@ -923,39 +860,45 @@ function submitNewBookingForm(form) {
         }
     })
     .then(response => {
-        if (response.redirected) {
-            // Se houve redirecionamento (sucesso), fechar modal e recarregar página
+        if (response.ok) {
+            return response.json();
+        }
+        // If response is not OK, it's likely a validation error (400)
+        return response.text().then(html => {
+            throw new Error(html);
+        });
+    })
+    .then(data => {
+        if (data.success) {
             closeNewBookingModal();
-            window.location.reload();
-        } else {
-            // Se não houve redirecionamento, provavelmente há erros no formulário
-            return response.text();
+            window.location.reload(); // Reload the calendar to show the new booking
         }
     })
-    .then(html => {
-        if (html) {
-            // Atualizar o modal com os erros
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const form = doc.querySelector('form') || doc.querySelector('.booking-form') || doc.querySelector('main') || doc.body;
-            
-            document.getElementById('newModalBody').innerHTML = form.innerHTML;
-            
-            // Reconfigurar o evento de submit
-            const newForm = document.getElementById('newModalBody').querySelector('form');
+    .catch(error => {
+        const html = error.message;
+
+        // Check if the error message contains form HTML
+        if (html && (html.includes('<form') || html.includes('booking-form-card'))) {
+            modalBody.innerHTML = html;
+
+            // Re-attach the submit handler to the new form
+            const newForm = modalBody.querySelector('form');
             if (newForm) {
                 newForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     submitNewBookingForm(newForm);
                 });
             }
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao enviar formulário:', error);
-        if (submitButton) {
-            submitButton.disabled = false;
-            submitButton.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmar agendamento';
+        } else {
+            // Handle other errors (network, server errors, etc.)
+            console.error('Error submitting form:', error);
+            // Optionally display a generic error message in the modal
+            modalBody.innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #ef4444;"></i>
+                    <p style="margin-top: 1rem; color: #64748b;">Ocorreu um erro inesperado.</p>
+                </div>
+            `;
         }
     });
 }
