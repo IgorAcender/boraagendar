@@ -867,7 +867,7 @@
             }, 4000);
         }
 
-        // Adicionar animaÃ§Ãµes
+        // Adicionar animações
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideInRight {
@@ -897,17 +897,17 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
 
-                    // Buscar o card que contÃ©m o formulÃ¡rio
+                    // Buscar o card que contém o formulário
                     const card = doc.querySelector('.card');
                     if (card) {
                         modalBody.innerHTML = card.innerHTML;
                     } else {
-                        // Fallback: buscar o formulÃ¡rio diretamente
+                        // Fallback: buscar o formulário diretamente
                         const form = doc.querySelector('form');
                         if (form) {
                             modalBody.innerHTML = '<h2>Novo agendamento</h2>' + form.outerHTML;
                         } else {
-                            modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">FormulÃ¡rio nÃ£o encontrado.</p>';
+                            modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Formulário não encontrado.</p>';
                             return;
                         }
                     }
@@ -935,7 +935,7 @@
                                         const parser = new DOMParser();
                                         const doc = parser.parseFromString(html, 'text/html');
 
-                                        // Buscar o card que contÃ©m o formulÃ¡rio com erros
+                                        // Buscar o card que contém o formulário com erros
                                         const card = doc.querySelector('.card');
                                         if (card) {
                                             modalBody.innerHTML = card.innerHTML;
@@ -962,7 +962,7 @@
                     }
                 })
                 .catch(error => {
-                    modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Erro ao carregar formulÃ¡rio.</p>';
+                    modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Erro ao carregar formulário.</p>';
                     console.error('Error loading booking form:', error);
                 });
         }

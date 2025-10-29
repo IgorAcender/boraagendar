@@ -396,7 +396,7 @@
 
             <div style="margin-bottom: 1.5rem;">
                 <h4 style="font-size: 1rem; color: #64748b; margin-bottom: 1rem; font-weight: 600;">
-                    <i class="fas fa-briefcase" style="color: var(--brand-primary);"></i> Como vocÃª chama o que oferece?
+                    <i class="fas fa-briefcase" style="color: var(--brand-primary);"></i> Como você chama o que oferece?
                 </h4>
                 <div class="form-row">
                     <div class="form-group">
@@ -425,7 +425,7 @@
 
             <div>
                 <h4 style="font-size: 1rem; color: #64748b; margin-bottom: 1rem; font-weight: 600;">
-                    <i class="fas fa-user-tie" style="color: var(--brand-primary);"></i> Como vocÃª chama quem atende?
+                    <i class="fas fa-user-tie" style="color: var(--brand-primary);"></i> Como você chama quem atende?
                 </h4>
                 <div class="form-row">
                     <div class="form-group">
@@ -453,10 +453,10 @@
             </div>
         </div>
 
-        <!-- PersonalizaÃ§Ã£o Visual -->
+        <!-- Personalização Visual -->
         <div class="form-section">
             <h3 class="form-section-title">
-                <i class="fas fa-palette"></i> PersonalizaÃ§Ã£o Visual
+                <i class="fas fa-palette"></i> Personalização Visual
             </h3>
 
             <div class="form-row">
@@ -514,10 +514,10 @@
             </div>
         </div>
 
-        <!-- BotÃµes de AÃ§Ã£o -->
+        <!-- Botões de Ação -->
         <div class="form-actions">
-            <button type="submit" class="btn-primary">
-                <i class="fas fa-save"></i> Salvar ConfiguraÃ§Ãµes
+            <button type="submit" class="btn-save">
+                <i class="fas fa-save"></i> Salvar Configurações
             </button>
             <a href="{% url 'dashboard:index' %}" class="btn-secondary">
                 <i class="fas fa-times"></i> Cancelar
@@ -544,7 +544,7 @@
             document.getElementById('slug-preview-value').textContent = slugValue;
         });
 
-        // ConfirmaÃ§Ã£o antes de salvar se o slug foi alterado
+        // Confirmação antes de salvar se o slug foi alterado
         const originalSlug = '{{ tenant.slug }}';
         const form = slugInput.closest('form');
 
@@ -553,16 +553,16 @@
 
             if (newSlug !== originalSlug) {
                 const confirmed = confirm(
-                    'âš ï¸ ATENÃ‡ÃƒO!\n\n' +
-                    'VocÃª estÃ¡ prestes a mudar a URL de agendamento:\n\n' +
+                    '⚠️ ATENÇÃO!\n\n' +
+                    'Você está prestes a mudar a URL de agendamento:\n\n' +
                     'DE: /agendar/' + originalSlug + '/\n' +
                     'PARA: /agendar/' + newSlug + '/\n\n' +
-                    'ðŸ”´ CONSEQUÃŠNCIAS:\n' +
-                    'â€¢ Links antigos pararÃ£o de funcionar\n' +
-                    'â€¢ QR Codes em materiais impressos ficarÃ£o invÃ¡lidos\n' +
-                    'â€¢ Posts em redes sociais quebrarÃ£o\n' +
-                    'â€¢ Clientes podem nÃ£o conseguir agendar\n\n' +
-                    'âœ… VocÃª tem CERTEZA que deseja continuar?'
+                    '🔴 CONSEQUÊNCIAS:\n' +
+                    '• Links antigos pararão de funcionar\n' +
+                    '• QR Codes em materiais impressos ficarão inválidos\n' +
+                    '• Posts em redes sociais quebrarão\n' +
+                    '• Clientes podem não conseguir agendar\n\n' +
+                    '✅ Você tem CERTEZA que deseja continuar?'
                 );
 
                 if (!confirmed) {

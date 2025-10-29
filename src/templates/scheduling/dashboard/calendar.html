@@ -765,12 +765,12 @@ function filterByProfessional(professionalId) {
 <script>
 // Marcar células como disponíveis/indisponíveis baseado nos horários de atendimento
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DEBUG - Iniciando marcaÃ§Ã£o de disponibilidade');
+    console.log('DEBUG - Iniciando marcação de disponibilidade');
 
     const availabilityByWeekday = JSON.parse(document.getElementById('availability-data').textContent);
     console.log('DEBUG - availability_by_weekday:', availabilityByWeekday);
 
-    // Para cada cÃ©lula do calendÃ¡rio
+    // Para cada célula do calendário
     document.querySelectorAll('.day-cell').forEach(cell => {
         const weekday = parseInt(cell.dataset.weekday);
         const hourStr = cell.dataset.hour;
@@ -783,7 +783,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let isAvailable = false;
         let isBreakTime = false;
 
-        // Verificar se estÃ¡ em algum perÃ­odo de disponibilidade
+        // Verificar se está em algum período de disponibilidade
         availability.forEach(rule => {
             const startTime = rule.start_time;
             const endTime = rule.end_time;
@@ -791,16 +791,16 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`DEBUG - Comparando ${hourStr} com ${startTime} - ${endTime}`);
 
             if (hourStr >= startTime && hourStr < endTime) {
-                // Verificar se nÃ£o estÃ¡ no intervalo
+                // Verificar se não está no intervalo
                 if (rule.break_start && rule.break_end) {
                     if (hourStr >= rule.break_start && hourStr < rule.break_end) {
                         isBreakTime = true;
-                        console.log(`DEBUG - ${hourStr} estÃ¡ no intervalo`);
+                        console.log(`DEBUG - ${hourStr} está no intervalo`);
                         return;
                     }
                 }
                 isAvailable = true;
-                console.log(`DEBUG - ${hourStr} estÃ¡ disponÃ­vel`);
+                console.log(`DEBUG - ${hourStr} está disponível`);
             }
         });
 
@@ -813,7 +813,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Atualizar relÃ³gio em tempo real
+    // Atualizar relógio em tempo real
     function updateClock() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -832,7 +832,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateClock();
     setInterval(updateClock, 1000);
 
-    // Adicionar indicador de hora atual no calendÃ¡rio
+    // Adicionar indicador de hora atual no calendário
     function updateTimeIndicator() {
         const now = new Date();
         const currentHour = now.getHours();
@@ -844,8 +844,8 @@ document.addEventListener('DOMContentLoaded', function() {
             oldIndicator.remove();
         }
 
-        // Calcular posiÃ§Ã£o: cada hora tem 60px (altura da cÃ©lula)
-        // PosiÃ§Ã£o = (hora * 60) + (minutos * 60/60) + offset do header
+        // Calcular posição: cada hora tem 60px (altura da célula)
+        // Posição = (hora * 60) + (minutos * 60/60) + offset do header
         const calendarGrid = document.querySelector('.calendar-grid');
         if (calendarGrid) {
             const indicator = document.createElement('div');
@@ -861,11 +861,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
             `;
 
-            // 60px Ã© a altura da cÃ©lula de hora
+            // 60px é a altura da célula de hora
             const topPosition = (currentHour * 60) + (currentMinutes * 60 / 60);
             indicator.style.top = `${topPosition}px`;
 
-            // Adicionar bolinha vermelha no inÃ­cio da linha
+            // Adicionar bolinha vermelha no início da linha
             const dot = document.createElement('div');
             dot.style.cssText = `
                 position: absolute;

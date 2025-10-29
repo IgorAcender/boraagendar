@@ -13,7 +13,7 @@
 
 <div class="header-gradient">
   <h2 style="margin:0">Equipe</h2>
-  <p class="subtitle" style="opacity:.9">Gerencie acessos e papÃ©is da sua equipe</p>
+  <p class="subtitle" style="opacity:.9">Gerencie acessos e papéis da sua equipe</p>
   </div>
 
 <div class="cardx">
@@ -40,7 +40,7 @@
         <th>E-mail</th>
         <th>Papel</th>
         <th>Status</th>
-        <th>AÃ§Ãµes</th>
+        <th>Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -60,7 +60,7 @@
             <button type="submit" class="button">Salvar</button>
           </form>
         </td>
-        <td>{{ m.is_active|yesno:"Sim,NÃ£o" }}</td>
+        <td>{{ m.is_active|yesno:"Sim,Não" }}</td>
         <td>
           <form action="{% url 'dashboard:team_remove' m.id %}" method="post" style="display:inline">
             {% csrf_token %}

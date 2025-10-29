@@ -1,5 +1,5 @@
 ﻿{% extends "base_dashboard.html" %}
-{% block title %}ServiÃ§os - {{ professional.display_name }}{% endblock %}
+{% block title %}Serviços - {{ professional.display_name }}{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -188,15 +188,15 @@
 
 {% block content %}
 <div class="hero-header">
-    <h1>ServiÃ§os e PreÃ§os</h1>
+    <h1>Serviços e Preços</h1>
     <p style="opacity: 0.9; margin: 0.5rem 0 0 0;">Profissional: {{ professional.display_name }}</p>
 </div>
 
 <div class="section-card">
     <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem; color: #1e293b;">
-        <i class="fas fa-briefcase"></i> ServiÃ§os Oferecidos
+        <i class="fas fa-briefcase"></i> Serviços Oferecidos
     </h2>
-    <p style="color: #64748b; margin: 0 0 1rem 0;">Gerencie os serviÃ§os que este profissional realiza e defina preÃ§os personalizados.</p>
+    <p style="color: #64748b; margin: 0 0 1rem 0;">Gerencie os serviços que este profissional realiza e defina preços personalizados.</p>
 
     {% if professional_services %}
     <div class="services-grid">
@@ -206,17 +206,17 @@
                 <h3>{{ ps.service.name }}</h3>
                 <div class="service-prices">
                     <div class="price-item">
-                        <span class="price-label">ðŸ’° PreÃ§o:</span>
+                        <span class="price-label">💰 Preço:</span>
                         <span class="price-value {% if ps.price %}price-custom{% endif %}">
                             R$ {{ ps.price|default:ps.service.price }}
-                            {% if ps.price %}<small style="color: #94a3b8;">(padrÃ£o: R$ {{ ps.service.price }})</small>{% endif %}
+                            {% if ps.price %}<small style="color: #94a3b8;">(padrão: R$ {{ ps.service.price }})</small>{% endif %}
                         </span>
                     </div>
                     <div class="price-item">
-                        <span class="price-label">â±ï¸ DuraÃ§Ã£o:</span>
+                        <span class="price-label">⏱️ Duração:</span>
                         <span class="price-value {% if ps.duration_minutes %}price-custom{% endif %}">
                             {{ ps.duration_minutes|default:ps.service.duration_minutes }}min
-                            {% if ps.duration_minutes %}<small style="color: #94a3b8;">(padrÃ£o: {{ ps.service.duration_minutes }}min)</small>{% endif %}
+                            {% if ps.duration_minutes %}<small style="color: #94a3b8;">(padrão: {{ ps.service.duration_minutes }}min)</small>{% endif %}
                         </span>
                     </div>
                 </div>
@@ -230,7 +230,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="remove_service">
                 <input type="hidden" name="ps_id" value="{{ ps.id }}">
-                <button type="submit" class="btn-remove" onclick="return confirm('Remover este serviÃ§o?')">
+                <button type="submit" class="btn-remove" onclick="return confirm('Remover este serviço?')">>
                     <i class="fas fa-trash"></i>
                 </button>
             </form>
@@ -238,21 +238,21 @@
         {% endfor %}
     </div>
     {% else %}
-    <p style="color: #94a3b8; padding: 2rem; text-align: center;">Nenhum serviÃ§o adicionado ainda.</p>
+    <p style="color: #94a3b8; padding: 2rem; text-align: center;">Nenhum serviço adicionado ainda.</p>
     {% endif %}
 
     <!-- Add Service Form -->
     {% if available_services %}
     <div class="add-service-form">
         <h3 style="margin: 0 0 1rem 0; font-size: 1.125rem; color: #1e293b;">
-            <i class="fas fa-plus-circle"></i> Adicionar Novo ServiÃ§o
+            <i class="fas fa-plus-circle"></i> Adicionar Novo Serviço
         </h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="add_service">
             <div class="form-row">
                 <div class="form-group">
-                    <label>ServiÃ§o</label>
+                    <label>Serviço</label>
                     <select name="service_id" required>
                         <option value="">Selecione...</option>
                         {% for service in available_services %}
@@ -261,12 +261,12 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>PreÃ§o (R$)</label>
-                    <input type="number" name="custom_price" step="0.01" placeholder="PadrÃ£o">
+                    <label>Preço (R$)</label>
+                    <input type="number" name="custom_price" step="0.01" placeholder="Padrão">
                 </div>
                 <div class="form-group">
-                    <label>DuraÃ§Ã£o (min)</label>
-                    <input type="number" name="custom_duration" placeholder="PadrÃ£o">
+                    <label>Duração (min)</label>
+                    <input type="number" name="custom_duration" placeholder="Padrão">
                 </div>
                 <button type="submit" class="btn-add">
                     <i class="fas fa-plus"></i> Adicionar
@@ -281,7 +281,7 @@
 <div id="editModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 id="modalTitle">Editar ServiÃ§o</h3>
+            <h3 id="modalTitle">Editar Serviço</h3>
         </div>
         <form method="post" id="editForm">
             {% csrf_token %}
@@ -289,14 +289,14 @@
             <input type="hidden" name="ps_id" id="edit_ps_id">
 
             <div style="margin-bottom: 1rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">PreÃ§o Personalizado (R$)</label>
-                <input type="number" name="custom_price" id="edit_price" step="0.01" placeholder="Deixe vazio para usar padrÃ£o" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 10px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Preço Personalizado (R$)</label>
+                <input type="number" name="custom_price" id="edit_price" step="0.01" placeholder="Deixe vazio para usar padrão" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 10px;">
                 <small style="color: #64748b;" id="defaultPrice"></small>
             </div>
 
             <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">DuraÃ§Ã£o Personalizada (min)</label>
-                <input type="number" name="custom_duration" id="edit_duration" placeholder="Deixe vazio para usar padrÃ£o" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 10px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Duração Personalizada (min)</label>
+                <input type="number" name="custom_duration" id="edit_duration" placeholder="Deixe vazio para usar padrão" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 10px;">
                 <small style="color: #64748b;" id="defaultDuration"></small>
             </div>
 
@@ -319,8 +319,8 @@ function openEditModal(psId, serviceName, currentPrice, currentDuration, default
     document.getElementById('edit_ps_id').value = psId;
     document.getElementById('edit_price').value = currentPrice || '';
     document.getElementById('edit_duration').value = currentDuration || '';
-    document.getElementById('defaultPrice').textContent = 'PadrÃ£o: R$ ' + defaultPrice;
-    document.getElementById('defaultDuration').textContent = 'PadrÃ£o: ' + defaultDuration + ' min';
+    document.getElementById('defaultPrice').textContent = 'Padrão: R$ ' + defaultPrice;
+    document.getElementById('defaultDuration').textContent = 'Padrão: ' + defaultDuration + ' min';
 }
 
 function closeEditModal() {

@@ -51,7 +51,7 @@ def dashboard_profile_view(request: HttpRequest) -> HttpResponse:
         from scheduling.models import Professional
         professional = Professional.objects.get(user=request.user, tenant=tenant)
 
-        # Se for profissional, permitir edição do perfil
+                # Se for profissional, permitir edição do perfil
         if request.method == "POST":
             from scheduling.forms import ProfessionalUpdateForm
             form = ProfessionalUpdateForm(

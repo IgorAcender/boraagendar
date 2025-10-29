@@ -1,10 +1,10 @@
 ﻿{% extends "base_dashboard.html" %}
-{% block title %}HorÃ¡rio PadrÃ£o da Empresa{% endblock %}
+{% block title %}Horário Padrão da Empresa{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1><i class="fas fa-clock"></i> HorÃ¡rio PadrÃ£o de Atendimento</h1>
-    <p>Configure o horÃ¡rio padrÃ£o da empresa. Novos profissionais receberÃ£o automaticamente esses horÃ¡rios.</p>
+    <h1><i class="fas fa-clock"></i> Horário Padrão de Atendimento</h1>
+    <p>Configure o horário padrão da empresa. Novos profissionais receberão automaticamente esses horários.</p>
 </div>
 
 <form method="post" action="{% url 'dashboard:default_availability_save' %}" id="availabilityForm">
@@ -19,7 +19,7 @@
                     {% for rule in weekday.rules %}
                     <div class="period-row">
                         <div class="period-inputs">
-                            <label>InÃ­cio</label>
+                            <label>Início</label>
                             <input type="time" name="weekday_{{ weekday.value }}_{{ forloop.counter0 }}_start" value="{{ rule.start_time|time:'H:i' }}" class="time-input">
 
                             <label>Fim</label>
@@ -32,7 +32,7 @@
 
                         {% if rule.break_start %}
                         <div class="break-inputs">
-                            <label>Intervalo InÃ­cio</label>
+                            <label>Intervalo Início</label>
                             <input type="time" name="weekday_{{ weekday.value }}_{{ forloop.counter0 }}_break_start" value="{{ rule.break_start|time:'H:i' }}" class="time-input">
 
                             <label>Intervalo Fim</label>
@@ -40,7 +40,7 @@
                         </div>
                         {% else %}
                         <div class="break-inputs">
-                            <label>Intervalo InÃ­cio</label>
+                            <label>Intervalo Início</label>
                             <input type="time" name="weekday_{{ weekday.value }}_{{ forloop.counter0 }}_break_start" class="time-input">
 
                             <label>Intervalo Fim</label>
@@ -50,11 +50,11 @@
                     </div>
                     {% endfor %}
                 {% else %}
-                    <p class="no-periods">Sem horÃ¡rios configurados</p>
+                    <p class="no-periods">Sem horários configurados</p>
                 {% endif %}
             </div>
             <button type="button" class="btn-add-period" onclick="addPeriod({{ weekday.value }})">
-                <i class="fas fa-plus"></i> Adicionar PerÃ­odo
+                <i class="fas fa-plus"></i> Adicionar Período
             </button>
         </div>
         {% endfor %}
@@ -62,7 +62,7 @@
 
     <div class="form-actions">
         <button type="submit" class="btn-primary">
-            <i class="fas fa-save"></i> Salvar HorÃ¡rios PadrÃ£o
+            <i class="fas fa-save"></i> Salvar Horários Padrão
         </button>
     </div>
 </form>
@@ -241,7 +241,7 @@ function addPeriod(weekday) {
     periodRow.className = 'period-row';
     periodRow.innerHTML = `
         <div class="period-inputs">
-            <label>InÃ­cio</label>
+            <label>Início</label>
             <input type="time" name="weekday_${weekday}_${periodCount}_start" class="time-input" required>
 
             <label>Fim</label>
@@ -253,7 +253,7 @@ function addPeriod(weekday) {
         </div>
 
         <div class="break-inputs">
-            <label>Intervalo InÃ­cio</label>
+            <label>Intervalo Início</label>
             <input type="time" name="weekday_${weekday}_${periodCount}_break_start" class="time-input">
 
             <label>Intervalo Fim</label>
@@ -269,9 +269,9 @@ function removePeriod(button) {
     const container = periodRow.parentElement;
     periodRow.remove();
 
-    // Se nÃ£o sobrou nenhum perÃ­odo, mostrar mensagem
+    // Se não sobrou nenhum período, mostrar mensagem
     if (container.querySelectorAll('.period-row').length === 0) {
-        container.innerHTML = '<p class="no-periods">Sem horÃ¡rios configurados</p>';
+        container.innerHTML = '<p class="no-periods">Sem horários configurados</p>';
     }
 }
 </script>

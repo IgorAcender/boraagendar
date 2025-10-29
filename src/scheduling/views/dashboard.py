@@ -138,7 +138,7 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
     from ..models import AvailabilityRule
     availability_rules = AvailabilityRule.objects.filter(
         tenant=tenant,
-        professional__isnull=True,  # Horário padrão da empresa
+                professional__isnull=True,  # Horário padrão da empresa
         is_active=True
     ).order_by('weekday', 'start_time')
 
@@ -176,7 +176,7 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def calendar_day_view(request: HttpRequest) -> HttpResponse:
-    """Visualização diária mostrando todos os profissionais em colunas"""
+    ""    """Visualização diária mostrando todos os profissionais em colunas"""""
     membership, redirect_response = _membership_or_redirect(
         request,
         allowed_roles=["owner", "manager", "staff", "professional"],
@@ -262,7 +262,7 @@ def calendar_day_view(request: HttpRequest) -> HttpResponse:
         )
 
         if not rules.exists():
-            # Usar regras padrão da empresa
+                        # Usar regras padrão da empresa
             rules = AvailabilityRule.objects.filter(
                 tenant=tenant,
                 professional__isnull=True,
@@ -984,7 +984,7 @@ def default_availability_view(request: HttpRequest) -> HttpResponse:
         return redirect_response
     tenant = membership.tenant
 
-    # Buscar horários padrão (professional=None significa padrão da empresa)
+        # Buscar horários padrão (professional=None significa padrão da empresa)
     default_rules = AvailabilityRule.objects.filter(
         tenant=tenant,
         professional__isnull=True,

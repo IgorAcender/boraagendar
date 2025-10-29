@@ -490,7 +490,7 @@
         </h2>
 
         <div class="professionals-grid">
-            <!-- Opção: Qualquer Profissional -->
+                        <!-- Opção: Qualquer Profissional -->
             <div class="professional-card professional-card-any"
                  data-professional-id="any">
                 <div class="professional-card-avatar" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
@@ -576,7 +576,7 @@
         let selectedDate = '{{ selected_date|date:"Y-m-d"|default:"" }}';
         
         {% if not selected_service %}
-        // Função para criar os cards de serviço
+                // Função para criar os cards de serviço
         function createServiceCards() {
             if (!serviceSelect) return;
             
@@ -600,7 +600,7 @@
                     let serviceName = serviceText;
                     let serviceInfo = '';
                     
-                    // Verificar se o texto contm informações de preço/duração entre parênteses
+                    // Verificar se o texto contém informações de preço/duração entre parênteses
                     const match = serviceText.match(/(.*?)(\(.*\))?$/);
                     if (match) {
                         serviceName = match[1].trim();
