@@ -564,26 +564,6 @@
         display: block !important;
     }
 
-    .service-details {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        margin-top: 0.5rem !important;
-    }
-
-    .service-duration {
-        color: #64748b !important;
-        font-size: 0.875rem !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.25rem !important;
-    }
-
-    .service-price {
-        font-weight: 600 !important;
-        color: var(--brand-primary) !important;
-    }
-
     .service-description {
         margin-top: 0.5rem !important;
         color: #64748b !important;
@@ -626,15 +606,6 @@
                     <div class="service-name">{{ service.name }}</div>
                     <div class="service-description">
                         {% if service.description %}{{ service.description }}{% else %}Clique para selecionar este serviço{% endif %}
-                    </div>
-                    <div class="service-details">
-                        <span class="service-duration">
-                            <i class="fas fa-clock"></i>
-                            {{ service.duration_minutes }} min
-                        </span>
-                        <span class="service-price">
-                            {% if service.price %}R$ {{ service.price }}{% else %}Consultar{% endif %}
-                        </span>
                     </div>
                 </div>
                 {% empty %}
@@ -974,15 +945,6 @@
                     <div class="service-name">${serviceName}</div>
                     <div class="service-description">
                         Clique para selecionar este serviço
-                    </div>
-                    <div class="service-details">
-                        <span class="service-duration">
-                            <i class="fas fa-clock"></i>
-                            Duração variável
-                        </span>
-                        <span class="service-price">
-                            Ver detalhes
-                        </span>
                     </div>
                 `;
 
