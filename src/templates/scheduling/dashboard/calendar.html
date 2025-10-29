@@ -533,7 +533,9 @@
 {% block content %}
 <script>
 console.log('DEBUG calendar template: Total de bookings recebidos:', {{ bookings|length }});
-console.log('DEBUG calendar template: Bookings:', {{ bookings|safe }});
+{% for booking in bookings %}
+console.log('  Booking {{ booking.id }}: {{ booking.customer_name }} em {{ booking.date }} às {{ booking.hour }}');
+{% endfor %}
 </script>
 <div class="calendar-page">
     <!-- Hero Header -->
@@ -641,6 +643,7 @@ console.log('DEBUG calendar template: Bookings:', {{ bookings|safe }});
 
                     <!-- Bookings for this cell -->
                     {% for booking in bookings %}
+                        <!-- DEBUG: booking.date={{ booking.date }}, day.date={{ day.date }}, booking.hour={{ booking.hour }}, hour={{ hour }} -->
                         {% if booking.date == day.date and booking.hour == hour %}
                         <div class="booking status-{{ booking.status }}"
                              style="top: {{ booking.offset|stringformat:'f' }}%; height: {{ booking.height|stringformat:'f' }}%; min-height: 35px; z-index: 100;"
@@ -674,6 +677,39 @@ console.log('DEBUG calendar template: Bookings:', {{ bookings|safe }});
                 <span>Agendamento</span>
             </div>
         </div>
+    </div>
+
+    <!-- DEBUG: Painel de Bookings -->
+    <div style="margin-top: 1rem; padding: 1rem; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px;">
+        <h3 style="margin: 0 0 1rem 0; color: #92400e;">🐛 DEBUG: Bookings Carregados ({{ bookings|length }})</h3>
+        {% if bookings %}
+        <table style="width: 100%; font-size: 0.875rem; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #fde68a;">
+                    <th style="padding: 0.5rem; text-align: left; border: 1px solid #f59e0b;">ID</th>
+                    <th style="padding: 0.5rem; text-align: left; border: 1px solid #f59e0b;">Cliente</th>
+                    <th style="padding: 0.5rem; text-align: left; border: 1px solid #f59e0b;">Data</th>
+                    <th style="padding: 0.5rem; text-align: left; border: 1px solid #f59e0b;">Hora</th>
+                    <th style="padding: 0.5rem; text-align: left; border: 1px solid #f59e0b;">Serviço</th>
+                    <th style="padding: 0.5rem; text-align: left; border: 1px solid #f59e0b;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr style="background: white;">
+                    <td style="padding: 0.5rem; border: 1px solid #fde68a;">{{ booking.id }}</td>
+                    <td style="padding: 0.5rem; border: 1px solid #fde68a;">{{ booking.customer_name }}</td>
+                    <td style="padding: 0.5rem; border: 1px solid #fde68a;">{{ booking.date }}</td>
+                    <td style="padding: 0.5rem; border: 1px solid #fde68a;">{{ booking.hour }} (exibir: {{ booking.time_display }})</td>
+                    <td style="padding: 0.5rem; border: 1px solid #fde68a;">{{ booking.service.name }}</td>
+                    <td style="padding: 0.5rem; border: 1px solid #fde68a;">{{ booking.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color: #92400e; margin: 0;">Nenhum booking encontrado para exibir.</p>
+        {% endif %}
     </div>
 
     <!-- Modal de Detalhes do Agendamento -->
