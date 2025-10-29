@@ -793,8 +793,17 @@ function closeBookingModal() {
 
 // Funções do Modal de Novo Agendamento
 function openNewBookingModal() {
+    console.log('DEBUG: openNewBookingModal() chamada');
     const modal = document.getElementById('newBookingModal');
     const modalBody = document.getElementById('newModalBody');
+
+    console.log('DEBUG: Modal encontrado:', modal ? 'SIM' : 'NÃO');
+    console.log('DEBUG: ModalBody encontrado:', modalBody ? 'SIM' : 'NÃO');
+
+    if (!modal || !modalBody) {
+        console.error('DEBUG: ERRO - Modal ou ModalBody não encontrado!');
+        return;
+    }
 
     // Reset modal body to loading state
     modalBody.innerHTML = `
@@ -808,19 +817,50 @@ function openNewBookingModal() {
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
+    console.log('DEBUG: Modal exibido, fazendo fetch para {% url "dashboard:booking_create" %}');
+
     // Load form content via AJAX
     fetch('{% url "dashboard:booking_create" %}')
-        .then(response => response.text())
+        .then(response => {
+            console.log('DEBUG: Response recebido, status:', response.status);
+            return response.text();
+        })
         .then(html => {
-            modalBody.innerHTML = html;
+            console.log('DEBUG: HTML recebido, tamanho:', html.length);
+            
+            // Parse HTML and extract only the form content
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Try different selectors to find the correct content
+            let content = doc.querySelector('.booking-form-card') || 
+                         doc.querySelector('.form-grid') ||
+                         doc.querySelector('form') || 
+                         doc.querySelector('main .container') ||
+                         doc.querySelector('main') ||
+                         doc.querySelector('.content');
+            
+            console.log('DEBUG: Content encontrado:', content ? content.tagName : 'NENHUM');
+            
+            if (content) {
+                modalBody.innerHTML = content.innerHTML;
+            } else {
+                // Fallback: extract everything inside body
+                modalBody.innerHTML = doc.body.innerHTML;
+            }
+            
+            console.log('DEBUG: ModalBody após inserção, children:', modalBody.children.length);
             
             // Attach submit handler to the new form
             const formElement = modalBody.querySelector('form');
             if (formElement) {
+                console.log('DEBUG: Form encontrado, anexando handler');
                 formElement.addEventListener('submit', function(e) {
                     e.preventDefault();
                     submitNewBookingForm(formElement);
                 });
+            } else {
+                console.log('DEBUG: ERRO - Nenhum form encontrado');
             }
         })
         .catch(error => {
