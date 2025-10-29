@@ -20,6 +20,12 @@ class Tenant(models.Model):
     label_servico_plural = models.CharField("Nome para Serviço (plural)", max_length=50, default="Serviços")
     label_profissional = models.CharField("Nome para Profissional (singular)", max_length=50, default="Profissional")
     label_profissional_plural = models.CharField("Nome para Profissional (plural)", max_length=50, default="Profissionais")
+    slot_interval_minutes = models.PositiveIntegerField(
+        "Intervalo entre horários (min)",
+        default=15,
+        choices=[(5, "5 minutos"), (10, "10 minutos"), (15, "15 minutos"), (20, "20 minutos"), (30, "30 minutos"), (45, "45 minutos"), (60, "60 minutos")],
+        help_text="Define de quantos em quantos minutos os horários aparecem no agendamento público.",
+    )
     is_active = models.BooleanField("Ativo", default=True)
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
     updated_at = models.DateTimeField("Atualizado em", auto_now=True)

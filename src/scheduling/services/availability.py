@@ -26,11 +26,11 @@ class AvailableSlot:
 
 
 class AvailabilityService:
-    slot_granularity = timedelta(minutes=15)
-
     def __init__(self, tenant):
         self.tenant = tenant
         self.timezone = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+        interval = getattr(tenant, "slot_interval_minutes", 15) or 15
+        self.slot_granularity = timedelta(minutes=interval)
 
     def get_available_slots(
         self, service: Service, professional: Optional[Professional], target_date

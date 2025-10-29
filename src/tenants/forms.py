@@ -51,6 +51,7 @@ class TenantUpdateForm(forms.ModelForm):
             "label_servico_plural",
             "label_profissional",
             "label_profissional_plural",
+            "slot_interval_minutes",
         ]
         labels = {
             "name": "Nome da Empresa",
@@ -66,6 +67,7 @@ class TenantUpdateForm(forms.ModelForm):
             "label_servico_plural": "Plural",
             "label_profissional": "Singular",
             "label_profissional_plural": "Plural",
+            "slot_interval_minutes": "Intervalo entre horários",
         }
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nome da sua empresa"}),
@@ -81,6 +83,7 @@ class TenantUpdateForm(forms.ModelForm):
             "label_servico_plural": forms.TextInput(attrs={"class": "form-control", "placeholder": "Serviços"}),
             "label_profissional": forms.TextInput(attrs={"class": "form-control", "placeholder": "Profissional"}),
             "label_profissional_plural": forms.TextInput(attrs={"class": "form-control", "placeholder": "Profissionais"}),
+            "slot_interval_minutes": forms.Select(attrs={"class": "form-control"}),
         }
         help_texts = {
             "name": "Nome que aparece na interface e para os clientes",
@@ -91,6 +94,7 @@ class TenantUpdateForm(forms.ModelForm):
             "label_servico_plural": "Ex: Serviços, Modalidades, Tipos de Eventos",
             "label_profissional": "Ex: Profissional, Quadra, Salão",
             "label_profissional_plural": "Ex: Profissionais, Quadras, Salões",
+            "slot_interval_minutes": "Controle de espaçamento entre os horários disponíveis na agenda pública.",
         }
 
 
