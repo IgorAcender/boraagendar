@@ -268,7 +268,7 @@
                         <label for="{{ form.service.id_for_label }}">
                             <i class="fas fa-cut"></i> <span>Serviço</span>
                         </label>
-                        {{ form.service.as_widget }}
+                        {{ form.service }}
                         {{ form.service.errors }}
                     </div>
 
@@ -276,7 +276,7 @@
                         <label for="{{ form.professional.id_for_label }}">
                             <i class="fas fa-user-tie"></i> <span>Profissional</span>
                         </label>
-                        {{ form.professional.as_widget }}
+                        {{ form.professional }}
                         {{ form.professional.errors }}
                     </div>
                 </div>
@@ -290,7 +290,7 @@
                         <label for="{{ form.date.id_for_label }}">
                             <i class="fas fa-calendar-alt"></i> <span>Data</span>
                         </label>
-                        {{ form.date.as_widget }}
+                        {{ form.date }}
                         {{ form.date.errors }}
                     </div>
 
@@ -298,7 +298,7 @@
                         <label for="{{ form.time.id_for_label }}">
                             <i class="fas fa-clock"></i> <span>Hora</span>
                         </label>
-                        {{ form.time.as_widget }}
+                        {{ form.time }}
                         {{ form.time.errors }}
                     </div>
                 </div>
@@ -312,7 +312,7 @@
                         <label for="{{ form.customer_name.id_for_label }}">
                             <i class="fas fa-user"></i> <span>Nome</span>
                         </label>
-                        {{ form.customer_name.as_widget }}
+                        {{ form.customer_name }}
                         {{ form.customer_name.errors }}
                     </div>
 
@@ -320,7 +320,7 @@
                         <label for="{{ form.customer_phone.id_for_label }}">
                             <i class="fas fa-phone"></i> <span>Telefone</span>
                         </label>
-                        {{ form.customer_phone.as_widget }}
+                        {{ form.customer_phone }}
                         {{ form.customer_phone.errors }}
                     </div>
                 </div>
@@ -332,7 +332,7 @@
                     <label for="{{ form.notes.id_for_label }}">
                         <i class="fas fa-sticky-note"></i> <span>Observações (opcional)</span>
                     </label>
-                    {{ form.notes.as_widget }}
+                    {{ form.notes }}
                     {{ form.notes.errors }}
                 </div>
             </div>
