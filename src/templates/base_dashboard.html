@@ -1036,6 +1036,7 @@
 
                             if (!response.ok) {
                                 console.log('DEBUG: Erro no submit, recarregando form com erros');
+                                console.log('DEBUG: HTML de erro retornado:', responseText.substring(0, 500));
                                 renderFormFromHtml(responseText);
                                 return;
                             }
