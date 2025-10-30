@@ -975,6 +975,12 @@
                             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
                         }
 
+                        // Se o submitUrl for o mesmo do GET sem termo "novo", significa que a URL está errada
+                        if (!submitUrl.includes('/agendamentos/novo')) {
+                            console.warn('DEBUG: Corrigindo action do formulário para apontar para /agendamentos/novo/');
+                            formInModal.setAttribute('action', url);
+                        }
+
                         const renderFormFromHtml = (html) => {
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(html, 'text/html');
