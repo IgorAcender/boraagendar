@@ -953,71 +953,105 @@
 
                     // Attach form submit handler
                     const formInModal = modalBody.querySelector('form');
-                    if (formInModal) {
-                        console.log('DEBUG: Anexando handler de submit ao form');
-                        formInModal.addEventListener('submit', function handleSubmit(e) {
-                            e.preventDefault();
-                            console.log('DEBUG: Form submit interceptado');
+                    if (!formInModal) {
+                        console.error('ERRO: Form não encontrado após inserir no modal');
+                        return;
+                    }
 
-                            const formData = new FormData(formInModal);
-                            const submitUrl = formInModal.action || url;
-                            console.log('DEBUG: Enviando para:', submitUrl);
+                    formInModal.addEventListener('submit', function handleSubmit(e) {
+                        e.preventDefault();
+                        console.log('DEBUG: Form submit interceptado');
 
-                            // Mostrar loading
-                            const submitBtn = formInModal.querySelector('button[type="submit"]');
-                            if (submitBtn) {
-                                submitBtn.disabled = true;
-                                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                        const formData = new FormData(formInModal);
+                        const submitUrl = formInModal.action || url;
+                        console.log('DEBUG: Enviando para:', submitUrl);
+
+                        // Mostrar loading
+                        const submitBtn = formInModal.querySelector('button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.dataset.originalLabel = submitBtn.innerHTML;
+                            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                        }
+
+                        const renderFormFromHtml = (html) => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const card = doc.querySelector('.card, .booking-form-card');
+                            const formElement = doc.querySelector('form');
+
+                            if (card) {
+                                modalBody.innerHTML = card.innerHTML;
+                            } else if (formElement) {
+                                modalBody.innerHTML = formElement.outerHTML;
+                            } else {
+                                modalBody.innerHTML = html;
                             }
 
-                            fetch(submitUrl, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                }
-                            })
-                            .then(response => {
-                                console.log('DEBUG: Resposta do submit:', response.status);
-                                if (response.ok) {
-                                    console.log('DEBUG: Agendamento criado com sucesso, recarregando página');
+                            const rehydratedForm = modalBody.querySelector('form');
+                            if (rehydratedForm) {
+                                rehydratedForm.addEventListener('submit', handleSubmit);
+                            }
+                        };
+
+                        fetch(submitUrl, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            credentials: 'same-origin'
+                        })
+                        .then(async response => {
+                            console.log('DEBUG: Resposta do submit:', response.status);
+                            const contentType = response.headers.get('Content-Type') || '';
+
+                            if (response.ok && contentType.includes('application/json')) {
+                                const data = await response.json();
+                                console.log('DEBUG: JSON recebido:', data);
+                                if (data && data.success) {
                                     showNotification('Sucesso!', 'Agendamento criado com sucesso', 'success');
                                     setTimeout(() => window.location.reload(), 1000);
-                                } else {
-                                    console.log('DEBUG: Erro no submit, recarregando form com erros');
-                                    return response.text().then(html => {
-                                        const parser = new DOMParser();
-                                        const doc = parser.parseFromString(html, 'text/html');
-
-                                        const card = doc.querySelector('.card, .booking-form-card');
-                                        const form = doc.querySelector('form');
-
-                                        if (card) {
-                                            modalBody.innerHTML = card.innerHTML;
-                                        } else if (form) {
-                                            modalBody.innerHTML = form.outerHTML;
-                                        }
-
-                                        // Reattach submit handler to new form
-                                        const newForm = modalBody.querySelector('form');
-                                        if (newForm) {
-                                            newForm.addEventListener('submit', handleSubmit);
-                                        }
-                                    });
+                                    return;
                                 }
-                            })
-                            .catch(error => {
-                                console.error('ERRO no submit do form:', error);
-                                showNotification('Erro', 'Erro ao criar agendamento: ' + error.message, 'error');
+
+                                console.warn('DEBUG: JSON sem sucesso esperado:', data);
+                                showNotification('Erro', 'Resposta inesperada do servidor ao salvar o agendamento.', 'error');
                                 if (submitBtn) {
                                     submitBtn.disabled = false;
-                                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Salvar Agendamento';
+                                    submitBtn.innerHTML = submitBtn.dataset.originalLabel || '<i class="fas fa-save"></i> Salvar Agendamento';
                                 }
-                            });
+                                return;
+                            }
+
+                            const responseText = await response.text();
+
+                            if (!response.ok) {
+                                console.log('DEBUG: Erro no submit, recarregando form com erros');
+                                renderFormFromHtml(responseText);
+                                return;
+                            }
+
+                            console.warn('DEBUG: Resposta OK porém não JSON. Tentando interpretar como HTML.');
+                            if (responseText.includes('<form')) {
+                                renderFormFromHtml(responseText);
+                            } else {
+                                showNotification('Erro', 'Não foi possível interpretar a resposta do servidor.', 'error');
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = submitBtn.dataset.originalLabel || '<i class="fas fa-save"></i> Salvar Agendamento';
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('ERRO no submit do form:', error);
+                            showNotification('Erro', 'Erro ao criar agendamento: ' + error.message, 'error');
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = submitBtn.dataset.originalLabel || '<i class="fas fa-save"></i> Salvar Agendamento';
+                            }
                         });
-                    } else {
-                        console.error('ERRO: Form não encontrado após inserir no modal');
-                    }
+                    });
                 })
                 .catch(error => {
                     console.error('ERRO ao carregar form:', error);

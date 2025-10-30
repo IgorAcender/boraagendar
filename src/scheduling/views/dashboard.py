@@ -336,16 +336,29 @@ def booking_create(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = BookingForm(tenant=tenant, data=request.POST)
         if form.is_valid():
+            print("DEBUG booking_create: form válido. Dados limpos:", form.cleaned_data)
             booking = form.save(commit=False)
             booking.tenant = tenant
             booking.created_by = request.user
             booking.save()
+            print(f"DEBUG booking_create: booking salvo com ID {booking.pk} para {booking.customer_name} em {booking.scheduled_for}")
             send_booking_confirmation(booking)
             messages.success(request, "Agendamento criado com sucesso.")
             if is_ajax:
-                return JsonResponse({"success": True})
+                return JsonResponse(
+                    {
+                        "success": True,
+                        "booking": {
+                            "id": booking.pk,
+                            "customer_name": booking.customer_name,
+                            "scheduled_for": booking.scheduled_for.isoformat(),
+                            "status": booking.status,
+                        },
+                    }
+                )
             return redirect(reverse("dashboard:booking_detail", kwargs={"pk": booking.pk}))
         else: # Form is invalid
+            print("DEBUG booking_create: form inválido:", form.errors)
             if is_ajax:
                 # For AJAX, re-render the form snippet with errors and a 400 status
                 return render(
