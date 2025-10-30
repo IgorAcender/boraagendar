@@ -963,7 +963,8 @@
                         console.log('DEBUG: Form submit interceptado');
 
                         const formData = new FormData(formInModal);
-                        const submitUrl = formInModal.action || url;
+                        const formActionAttr = formInModal.getAttribute('action');
+                        const submitUrl = formActionAttr ? new URL(formActionAttr, window.location.href).href : url;
                         console.log('DEBUG: Enviando para:', submitUrl);
 
                         // Mostrar loading
@@ -998,7 +999,8 @@
                             method: 'POST',
                             body: formData,
                             headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json, text/html;q=0.9'
                             },
                             credentials: 'same-origin'
                         })
