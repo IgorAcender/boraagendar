@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from typing import Optional
 
 import requests
 from django.conf import settings
@@ -15,7 +16,7 @@ class WhatsappMessage:
 
 
 class EvolutionApiClient:
-    def __init__(self, base_url: str | None = None, api_key: str | None = None) -> None:
+    def __init__(self, base_url: Optional[str] = None, api_key: Optional[str] = None) -> None:
         self.base_url = base_url or getattr(settings, "EVOLUTION_API_URL", "")
         self.api_key = api_key or getattr(settings, "EVOLUTION_API_KEY", "")
 

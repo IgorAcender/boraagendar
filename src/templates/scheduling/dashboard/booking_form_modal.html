@@ -597,8 +597,12 @@
             // Re-render to show selection
             this.render();
             
-            // Load available times
-            loadAvailableTimesModal();
+            // Nova lógica: após selecionar data, verificar se tem serviço e carregar profissionais
+            const serviceSelect = document.querySelector('#newBookingModalBody select[name="service"]');
+            if (serviceSelect && serviceSelect.value) {
+                // Carregar profissionais disponíveis para o serviço na data selecionada
+                loadProfessionalsByServiceAndDate(serviceSelect.value, dateString);
+            }
         }
     }
     
@@ -611,7 +615,7 @@
         // Initialize service cards
         createServiceCardsModal();
         
-        // Initialize professional cards
+        // Initialize professional cards (com mensagem inicial)
         createProfessionalCardsModal();
     }, 200);
     
@@ -679,6 +683,12 @@
                 
                 // Trigger change event
                 serviceSelect.dispatchEvent(new Event('change'));
+                
+                // Limpar seleções seguintes (profissional e horário)
+                clearProfessionalAndTimeSelections();
+                
+                // Mostrar mensagem para selecionar data
+                showDateSelectionMessage();
             });
 
             servicesGrid.appendChild(serviceCard);
@@ -688,15 +698,63 @@
         console.log('Service cards criados com sucesso!');
     }
     
-    // FUNCTION TO CREATE PROFESSIONAL CARDS - Com fotos via AJAX
-    function createProfessionalCardsModal() {
-        console.log('createProfessionalCardsModal() chamada');
-
+    // FUNCTION TO CLEAR PROFESSIONAL AND TIME SELECTIONS
+    function clearProfessionalAndTimeSelections() {
+        // Limpar profissional selecionado
         const professionalSelect = document.querySelector('#newBookingModalBody select[name="professional"]');
+        if (professionalSelect) {
+            professionalSelect.value = '';
+        }
+        
+        // Limpar horário selecionado
+        const timeSelect = document.querySelector('#newBookingModalBody select[name="time"]');
+        if (timeSelect) {
+            timeSelect.value = '';
+        }
+        
+        // Limpar cards de profissional
+        document.querySelectorAll('#professionalsGridModal .professional-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Limpar slots de horário
+        document.querySelectorAll('#timesGridModal .time-slot').forEach(slot => {
+            slot.classList.remove('selected');
+        });
+    }
+    
+    // FUNCTION TO SHOW DATE SELECTION MESSAGE
+    function showDateSelectionMessage() {
+        const professionalsGrid = document.getElementById('professionalsGridModal');
+        const timesGrid = document.getElementById('timesGridModal');
+        
+        if (professionalsGrid) {
+            professionalsGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                    <i class="fas fa-calendar-alt" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Agora selecione uma data no calendário</p>
+                </div>
+            `;
+        }
+        
+        if (timesGrid) {
+            timesGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                    <i class="fas fa-clock" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Selecione uma data e profissional para ver os horários</p>
+                </div>
+            `;
+        }
+    }
+    
+    // FUNCTION TO LOAD PROFESSIONALS BY SERVICE AND DATE - Nova lógica
+    function loadProfessionalsByServiceAndDate(serviceId, selectedDate) {
+        console.log('loadProfessionalsByServiceAndDate() chamada com serviceId:', serviceId, 'e data:', selectedDate);
+
         const professionalsGrid = document.getElementById('professionalsGridModal');
 
-        if (!professionalSelect || !professionalsGrid) {
-            console.log('Professional select ou grid não encontrado no modal');
+        if (!professionalsGrid) {
+            console.log('Professionals grid não encontrado no modal');
             return;
         }
 
@@ -704,28 +762,28 @@
         professionalsGrid.innerHTML = `
             <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
                 <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                <p>Carregando profissionais...</p>
+                <p>Carregando profissionais disponíveis...</p>
             </div>
         `;
 
-        // Buscar dados dos profissionais via AJAX
-        fetch('{% url "dashboard:get_professionals_data" %}', {
+        // Buscar profissionais do serviço na data via AJAX
+        fetch('{% url "dashboard:get_professionals_by_service" %}?service=' + serviceId + '&date=' + selectedDate, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Dados dos profissionais recebidos:', data);
+            console.log('Profissionais disponíveis recebidos:', data);
             
             // Limpar grid
             professionalsGrid.innerHTML = '';
             
             if (!data.professionals || data.professionals.length === 0) {
-                professionalsGrid.innerHTML = `
+                profissionalsGrid.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
                         <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p>Nenhum profissional disponível</p>
+                        <p>Nenhum profissional disponível para este serviço nesta data</p>
                     </div>
                 `;
                 return;
@@ -771,12 +829,13 @@
                     this.classList.add('selected');
                     
                     // Atualizar select hidden
-                    professionalSelect.value = this.dataset.professionalId;
+                    const professionalSelect = document.querySelector('#newBookingModalBody select[name="professional"]');
+                    if (professionalSelect) {
+                        professionalSelect.value = this.dataset.professionalId;
+                        professionalSelect.dispatchEvent(new Event('change'));
+                    }
                     
-                    // Trigger change event
-                    professionalSelect.dispatchEvent(new Event('change'));
-                    
-                    // Load available times
+                    // Carregar horários disponíveis para este profissional
                     loadAvailableTimesModal();
                 });
 
@@ -787,7 +846,7 @@
             console.log('Professional cards criados com sucesso!');
         })
         .catch(error => {
-            console.error('Erro ao carregar profissionais:', error);
+            console.error('Erro ao carregar profissionais disponíveis:', error);
             professionalsGrid.innerHTML = `
                 <div style="text-align: center; padding: 2rem; color: #ef4444; grid-column: 1 / -1;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
@@ -797,12 +856,42 @@
         });
     }
     
-    // FUNCTION TO LOAD AVAILABLE TIMES
+    // FUNCTION TO LOAD PROFESSIONALS BY SERVICE - Função antiga substituída
+    function loadProfessionalsByService(serviceId) {
+        console.log('loadProfessionalsByService() - Função obsoleta, use loadProfessionalsByServiceAndDate()');
+        
+        const professionalsGrid = document.getElementById('professionalsGridModal');
+        if (professionalsGrid) {
+            professionalsGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                    <i class="fas fa-calendar-alt" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Selecione uma data para ver os profissionais disponíveis</p>
+                </div>
+            `;
+        }
+    }
+    
+    // FUNCTION TO CREATE PROFESSIONAL CARDS - Função antiga substituída
+    function createProfessionalCardsModal() {
+        console.log('createProfessionalCardsModal() - Esta função foi substituída por loadProfessionalsByService()');
+        
+        const professionalsGrid = document.getElementById('professionalsGridModal');
+        if (professionalsGrid) {
+            professionalsGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                    <i class="fas fa-hand-point-up" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Primeiro selecione um serviço acima</p>
+                </div>
+            `;
+        }
+    
+    // FUNCTION TO LOAD AVAILABLE TIMES - Nova lógica Serviço > Data > Profissional > Horário
     function loadAvailableTimesModal() {
         console.log('loadAvailableTimesModal() chamada');
         
         const dateInput = document.querySelector('#newBookingModalBody input[name="date"]');
         const professionalSelect = document.querySelector('#newBookingModalBody select[name="professional"]');
+        const serviceSelect = document.querySelector('#newBookingModalBody select[name="service"]');
         const timesGrid = document.getElementById('timesGridModal');
         const timeSelect = document.querySelector('#newBookingModalBody select[name="time"]');
         
@@ -813,15 +902,38 @@
         
         const selectedDate = dateInput.value;
         const selectedProfessional = professionalSelect ? professionalSelect.value : '';
+        const selectedService = serviceSelect ? serviceSelect.value : '';
         
         console.log('Data selecionada:', selectedDate);
         console.log('Profissional selecionado:', selectedProfessional);
+        console.log('Serviço selecionado:', selectedService);
+        
+        // Validações na ordem correta: Serviço > Data > Profissional > Horário
+        if (!selectedService) {
+            timesGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                    <i class="fas fa-hand-point-up" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Primeiro selecione um serviço</p>
+                </div>
+            `;
+            return;
+        }
         
         if (!selectedDate) {
             timesGrid.innerHTML = `
                 <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
                     <i class="fas fa-calendar-alt" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Selecione uma data para ver os horários</p>
+                    <p>Selecione uma data no calendário</p>
+                </div>
+            `;
+            return;
+        }
+        
+        if (!selectedProfessional) {
+            timesGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                    <i class="fas fa-user" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Selecione um profissional para ver os horários</p>
                 </div>
             `;
             return;
@@ -835,8 +947,8 @@
             </div>
         `;
         
-        // Build URL
-        let url = '{% url "dashboard:get_available_times" %}?date=' + selectedDate;
+        // Build URL com serviço obrigatório
+        let url = '{% url "dashboard:get_available_times" %}?date=' + selectedDate + '&service=' + selectedService;
         if (selectedProfessional) {
             url += '&professional=' + selectedProfessional;
         }

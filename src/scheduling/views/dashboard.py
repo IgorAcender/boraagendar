@@ -413,6 +413,81 @@ def get_professionals_data(request: HttpRequest) -> JsonResponse:
 
 
 @login_required
+def get_professionals_by_service(request: HttpRequest) -> JsonResponse:
+    """Retorna profissionais que atendem um serviço específico.
+    Opcionalmente filtra por disponibilidade em uma data específica."""
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff"],
+    )
+    if redirect_response:
+        return JsonResponse({"error": "Access denied"}, status=403)
+    
+    tenant = membership.tenant
+    service_id = request.GET.get('service')
+    selected_date = request.GET.get('date')
+    
+    if not service_id:
+        return JsonResponse({"error": "Service ID is required"}, status=400)
+    
+    try:
+        service = Service.objects.get(id=service_id, tenant=tenant)
+    except Service.DoesNotExist:
+        return JsonResponse({"error": "Service not found"}, status=404)
+    
+    # Buscar profissionais que fazem esse serviço
+    professionals = service.professionals.filter(is_active=True).order_by('display_name')
+    
+    # Se foi passada uma data, filtrar por disponibilidade
+    if selected_date:
+        from ..services.availability import AvailabilityService
+        availability_service = AvailabilityService(tenant)
+        
+        # Filtrar apenas profissionais que têm disponibilidade na data
+        available_professionals = []
+        for professional in professionals:
+            try:
+                available_times = availability_service.get_available_times_for_professional(
+                    professional=professional,
+                    service=service,
+                    date=selected_date
+                )
+                if available_times:  # Se tem horários disponíveis
+                    available_professionals.append(professional)
+            except Exception as e:
+                # Log do erro mas continue com os outros profissionais
+                print(f"Erro ao verificar disponibilidade do profissional {professional.id}: {e}")
+                continue
+        
+        professionals = available_professionals
+    
+    professionals_data = []
+    for professional in professionals:
+        prof_data = {
+            "id": professional.id,
+            "name": professional.display_name,
+            "color": professional.color,
+            "photo_url": None,
+            "photo_base64": None,
+        }
+        
+        # Adicionar foto se disponível
+        if professional.photo_base64:
+            prof_data["photo_base64"] = professional.photo_base64
+        elif professional.photo:
+            prof_data["photo_url"] = professional.photo.url
+            
+        professionals_data.append(prof_data)
+    
+    return JsonResponse({
+        "professionals": professionals_data,
+        "service_name": service.name,
+        "date": selected_date,
+        "total": len(professionals_data)
+    })
+
+
+@login_required
 def get_available_times(request: HttpRequest) -> JsonResponse:
     """Retorna horários disponíveis para uma data e profissional específicos."""
     membership, redirect_response = _membership_or_redirect(
@@ -425,9 +500,13 @@ def get_available_times(request: HttpRequest) -> JsonResponse:
     tenant = membership.tenant
     date_str = request.GET.get('date')
     professional_id = request.GET.get('professional')
+    service_id = request.GET.get('service')
     
     if not date_str:
         return JsonResponse({"error": "Date is required"}, status=400)
+    
+    if not service_id:
+        return JsonResponse({"error": "Service is required"}, status=400)
     
     try:
         from datetime import datetime
@@ -435,8 +514,14 @@ def get_available_times(request: HttpRequest) -> JsonResponse:
     except ValueError:
         return JsonResponse({"error": "Invalid date format"}, status=400)
     
+    # Buscar serviço (obrigatório)
+    try:
+        service = Service.objects.get(id=service_id, tenant=tenant)
+    except Service.DoesNotExist:
+        return JsonResponse({"error": "Service not found"}, status=404)
+    
     # Importar o serviço de disponibilidade
-    from .services.availability import AvailabilityService
+    from ..services.availability import AvailabilityService
     
     # Buscar profissional se especificado
     professional = None
@@ -445,16 +530,6 @@ def get_available_times(request: HttpRequest) -> JsonResponse:
             professional = Professional.objects.get(id=professional_id, tenant=tenant)
         except Professional.DoesNotExist:
             return JsonResponse({"error": "Professional not found"}, status=404)
-    
-    # Precisamos de um serviço para buscar slots
-    # Vamos buscar o primeiro serviço ativo como fallback
-    try:
-        from .models import Service as ServiceModel
-        service = ServiceModel.objects.filter(tenant=tenant, is_active=True).first()
-        if not service:
-            return JsonResponse({"error": "No active service found"}, status=404)
-    except Exception as e:
-        return JsonResponse({"error": f"Service error: {str(e)}"}, status=500)
     
     # Criar instância do serviço de disponibilidade
     try:
