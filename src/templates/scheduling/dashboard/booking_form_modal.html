@@ -487,13 +487,6 @@
             </div>
 
             <!-- Seção: Cliente -->
-                                    {{ form.time.as_widget }}
-                        {{ form.time.errors }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Seção: Cliente -->
             <div class="form-section">
                 <h3 class="form-section-title">
                     <div class="section-icon">
@@ -540,26 +533,6 @@
             <button type="submit" class="btn-primary">
                 <i class="fas fa-calendar-check"></i>
                 Criar Agendamento
-            </button>
-        </div>
-    </form>
-</div>
-
-            <!-- Observações -->
-            <div class="form-section">
-                <div class="form-group">
-                    <label for="{{ form.notes.id_for_label }}">
-                        <i class="fas fa-sticky-note"></i> <span>Observações (opcional)</span>
-                    </label>
-                    {{ form.notes.as_widget }}
-                    {{ form.notes.errors }}
-                </div>
-            </div>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn-primary">
-                <i class="fas fa-save"></i> Salvar Agendamento
             </button>
         </div>
     </form>
