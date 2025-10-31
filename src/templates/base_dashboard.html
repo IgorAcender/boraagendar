@@ -932,7 +932,24 @@
 
                     if (card) {
                         console.log('DEBUG: Usando conteúdo do card');
-                        modalBody.innerHTML = card.innerHTML;
+                        modalBody.innerHTML = card.outerHTML;
+                        
+                        // Executar scripts que podem estar no conteúdo
+                        const scripts = modalBody.querySelectorAll('script');
+                        scripts.forEach(script => {
+                            const newScript = document.createElement('script');
+                            newScript.textContent = script.textContent;
+                            document.head.appendChild(newScript);
+                            document.head.removeChild(newScript);
+                        });
+                        
+                        // Forçar esconder header do modal
+                        setTimeout(() => {
+                            const modalHeader = document.querySelector('#newBookingModal .modal-header');
+                            if (modalHeader) {
+                                modalHeader.style.display = 'none';
+                            }
+                        }, 50);
                     } else if (form) {
                         console.log('DEBUG: Usando form diretamente');
                         modalBody.innerHTML = form.outerHTML;
