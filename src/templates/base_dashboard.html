@@ -910,7 +910,11 @@
             const url = '{% url "dashboard:booking_create" %}';
             console.log('DEBUG: Fazendo fetch para:', url);
 
-            fetch(url)
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
                 .then(response => {
                     console.log('DEBUG: Resposta recebida:', response.status, response.statusText);
                     if (!response.ok) {
