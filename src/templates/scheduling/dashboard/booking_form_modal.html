@@ -320,6 +320,84 @@
         opacity: 0 !important;
     }
     
+    /* PROFESSIONAL CARDS STYLES - Igual ao público */
+    #newBookingModalBody .professionals-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 1rem !important;
+        margin-top: 1rem !important;
+        width: 100% !important;
+    }
+
+    #newBookingModalBody .professional-card {
+        background: white !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 0.75rem !important;
+        text-align: center !important;
+        transition: all 0.3s !important;
+        cursor: pointer !important;
+        text-decoration: none !important;
+        color: inherit !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    #newBookingModalBody .professional-card:hover {
+        border-color: #6366f1 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+    }
+
+    #newBookingModalBody .professional-card.selected {
+        border-color: #6366f1 !important;
+        border-width: 3px !important;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)) !important;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+    }
+
+    #newBookingModalBody .professional-card-avatar {
+        width: 60px !important;
+        height: 60px !important;
+        margin: 0 auto 0.5rem !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: white !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    #newBookingModalBody .professional-card-avatar img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        border-radius: 50% !important;
+    }
+
+    #newBookingModalBody .professional-card-name {
+        font-size: 0.7rem !important;
+        font-weight: 600 !important;
+        color: #1e293b !important;
+        margin-top: 0.25rem !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        line-height: 1.2 !important;
+        height: auto !important;
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    #newBookingModalBody .professional-card-any .professional-card-name {
+        color: #6366f1 !important;
+        font-weight: 700 !important;
+    }
+    
     /* ESCONDER HEADER PADRÃO DO MODAL */
     #newBookingModal .modal-header {
         display: none !important;
@@ -480,6 +558,9 @@
         
         // Initialize service cards
         createServiceCardsModal();
+        
+        // Initialize professional cards
+        createProfessionalCardsModal();
     }, 200);
     
     // FUNCTION TO CREATE SERVICE CARDS - Igual ao público
@@ -554,6 +635,90 @@
 
         console.log('Service cards criados com sucesso!');
     }
+    
+    // FUNCTION TO CREATE PROFESSIONAL CARDS - Igual ao público
+    function createProfessionalCardsModal() {
+        console.log('createProfessionalCardsModal() chamada');
+
+        const professionalSelect = document.querySelector('#newBookingModalBody select[name="professional"]');
+        const professionalsGrid = document.getElementById('professionalsGridModal');
+
+        if (!professionalSelect || !professionalsGrid) {
+            console.log('Professional select ou grid não encontrado no modal');
+            return;
+        }
+
+        console.log('professionalSelect encontrado:', professionalSelect);
+        console.log('professionalsGrid encontrado:', professionalsGrid);
+
+        // Limpar grid
+        professionalsGrid.innerHTML = '';
+
+        // Obter opções do select (excluindo a primeira opção vazia)
+        const options = Array.from(professionalSelect.options).filter(option => option.value && option.value !== '');
+        
+        console.log('Opções de profissional encontradas:', options.length);
+
+        if (options.length === 0) {
+            professionalsGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                    <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Nenhum profissional disponível</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Criar cards para cada profissional
+        options.forEach((option, index) => {
+            const professionalCard = document.createElement('div');
+            professionalCard.className = 'professional-card';
+            professionalCard.dataset.professionalId = option.value;
+
+            const professionalName = option.textContent.trim();
+            
+            // Gerar cor de fundo baseada no nome
+            const colors = [
+                '#6366f1', '#8b5cf6', '#06b6d4', '#10b981', 
+                '#f59e0b', '#ef4444', '#84cc16', '#ec4899'
+            ];
+            const colorIndex = index % colors.length;
+            const backgroundColor = colors[colorIndex];
+            
+            // Primeira letra do nome
+            const firstLetter = professionalName.charAt(0).toUpperCase();
+            
+            professionalCard.innerHTML = `
+                <div class="professional-card-avatar" style="background: ${backgroundColor} !important;">
+                    ${firstLetter}
+                </div>
+                <div class="professional-card-name">${professionalName}</div>
+            `;
+
+            professionalCard.addEventListener('click', function() {
+                console.log('Professional card clicado, ID:', this.dataset.professionalId);
+                
+                // Limpar seleção anterior
+                document.querySelectorAll('#professionalsGridModal .professional-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Marcar como selecionado
+                this.classList.add('selected');
+                
+                // Atualizar select hidden
+                professionalSelect.value = this.dataset.professionalId;
+                
+                // Trigger change event
+                professionalSelect.dispatchEvent(new Event('change'));
+            });
+
+            professionalsGrid.appendChild(professionalCard);
+            console.log(`Professional card ${index + 1} adicionado: ${professionalName}`);
+        });
+
+        console.log('Professional cards criados com sucesso!');
+    }
     </script>
     <div class="hero-section" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; padding: 2rem !important; margin: 0 !important; position: relative; overflow: hidden;">
         <span class="hero-badge" style="display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; font-size: 0.75rem !important; text-transform: uppercase !important; background: rgba(255, 255, 255, 0.2) !important; color: white !important; padding: 0.4rem 0.8rem !important; border-radius: 999px !important; font-weight: 700 !important; margin-bottom: 1rem !important;">
@@ -596,10 +761,19 @@
                 
                 <!-- Profissional -->
                 <div class="form-group" style="margin-bottom: 1.5rem !important;">
-                    <label for="{{ form.professional.id_for_label }}" style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
+                    <label style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
                         Selecione o profissional <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
                     </label>
-                    {{ form.professional.as_widget }}
+                    
+                    <!-- Select hidden para compatibilidade -->
+                    <div class="hidden-select">
+                        {{ form.professional.as_widget }}
+                    </div>
+                    
+                    <!-- Grid de cards visuais -->
+                    <div class="professionals-grid" id="professionalsGridModal">
+                        <!-- Cards serão gerados por JavaScript -->
+                    </div>
                     {{ form.professional.errors }}
                 </div>
             </div>
