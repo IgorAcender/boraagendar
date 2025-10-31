@@ -260,6 +260,66 @@
         color: white !important;
     }
     
+    /* SERVICE CARDS STYLES - Igual ao público */
+    #newBookingModalBody .services-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+        margin-top: 1rem !important;
+        width: 100% !important;
+    }
+
+    #newBookingModalBody .service-card {
+        background: white !important;
+        border: 3px solid #e2e8f0 !important;
+        border-radius: 14px !important;
+        padding: 1.25rem !important;
+        transition: all 0.3s !important;
+        cursor: pointer !important;
+        text-decoration: none !important;
+        color: inherit !important;
+        display: block !important;
+        margin-bottom: 1rem !important;
+        min-height: 120px !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    #newBookingModalBody .service-card:hover {
+        border-color: #6366f1 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+    }
+
+    #newBookingModalBody .service-card.selected {
+        border-color: #6366f1 !important;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)) !important;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+    }
+
+    #newBookingModalBody .service-name {
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        color: #1e293b !important;
+        margin-bottom: 0.5rem !important;
+        display: block !important;
+    }
+
+    #newBookingModalBody .service-description {
+        margin-top: 0.5rem !important;
+        color: #64748b !important;
+        font-size: 0.875rem !important;
+        line-height: 1.4 !important;
+        display: block !important;
+    }
+
+    #newBookingModalBody .hidden-select {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    
     /* ESCONDER HEADER PADRÃO DO MODAL */
     #newBookingModal .modal-header {
         display: none !important;
@@ -417,7 +477,83 @@
         if (document.getElementById('calendar-grid-modal')) {
             new ModalCalendar();
         }
+        
+        // Initialize service cards
+        createServiceCardsModal();
     }, 200);
+    
+    // FUNCTION TO CREATE SERVICE CARDS - Igual ao público
+    function createServiceCardsModal() {
+        console.log('createServiceCardsModal() chamada');
+
+        const serviceSelect = document.querySelector('#newBookingModalBody select[name="service"]');
+        const servicesGrid = document.getElementById('servicesGridModal');
+
+        if (!serviceSelect || !servicesGrid) {
+            console.log('Service select ou grid não encontrado no modal');
+            return;
+        }
+
+        console.log('serviceSelect encontrado:', serviceSelect);
+        console.log('servicesGrid encontrado:', servicesGrid);
+
+        // Limpar grid
+        servicesGrid.innerHTML = '';
+
+        // Obter opções do select (excluindo a primeira opção vazia)
+        const options = Array.from(serviceSelect.options).filter(option => option.value && option.value !== '');
+        
+        console.log('Opções de serviço encontradas:', options.length);
+
+        if (options.length === 0) {
+            servicesGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b;">
+                    <i class="fas fa-concierge-bell" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Nenhum serviço disponível</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Criar cards para cada serviço
+        options.forEach((option, index) => {
+            const serviceCard = document.createElement('div');
+            serviceCard.className = 'service-card';
+            serviceCard.dataset.serviceId = option.value;
+
+            const serviceName = option.textContent.trim();
+            
+            serviceCard.innerHTML = `
+                <div class="service-name">${serviceName}</div>
+                <div class="service-description">
+                    Clique para selecionar este serviço
+                </div>
+            `;
+
+            serviceCard.addEventListener('click', function() {
+                console.log('Service card clicado, ID:', this.dataset.serviceId);
+                
+                // Limpar seleção anterior
+                document.querySelectorAll('#servicesGridModal .service-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Marcar como selecionado
+                this.classList.add('selected');
+                
+                // Atualizar select hidden
+                serviceSelect.value = this.dataset.serviceId;
+                
+                // Trigger change event
+                serviceSelect.dispatchEvent(new Event('change'));
+            });
+
+            servicesGrid.appendChild(serviceCard);
+            console.log(`Service card ${index + 1} adicionado: ${serviceName}`);
+        });
+
+        console.log('Service cards criados com sucesso!');
+    }
     </script>
     <div class="hero-section" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; padding: 2rem !important; margin: 0 !important; position: relative; overflow: hidden;">
         <span class="hero-badge" style="display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; font-size: 0.75rem !important; text-transform: uppercase !important; background: rgba(255, 255, 255, 0.2) !important; color: white !important; padding: 0.4rem 0.8rem !important; border-radius: 999px !important; font-weight: 700 !important; margin-bottom: 1rem !important;">
@@ -436,24 +572,35 @@
         <div class="form-grid" style="background: #ffffff !important; padding: 2rem !important;">
             <div class="form-section" style="margin-bottom: 2rem !important; padding: 1.5rem !important; background: #f8fafc !important; border-radius: 12px !important; border: 1px solid #e2e8f0 !important;">
                 <h3 class="form-section-title" style="font-size: 1.25rem !important; font-weight: 700 !important; color: #1e293b !important; margin-bottom: 1.5rem !important; display: flex !important; align-items: center !important; gap: 0.75rem !important;">
-                    <div class="section-icon" style="width: 2.5rem !important; height: 2.5rem !important; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.1rem !important;"><i class="fas fa-cut"></i></div>
-                    Serviço & Profissional
+                    <div class="section-icon" style="width: 2.5rem !important; height: 2.5rem !important; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.1rem !important;"><i class="fas fa-concierge-bell"></i></div>
+                    Serviço
                 </h3>
-                <div class="form-row" style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 1.5rem !important; margin: 0 !important;">
-                    <div class="form-group" style="margin-bottom: 1.5rem !important;">
-                        <label for="{{ form.service.id_for_label }}" style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
-                            Escolha o serviço <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
-                        </label>
+                
+                <!-- Service Cards igual ao público -->
+                <div class="form-group" style="margin-bottom: 1.5rem !important;">
+                    <label style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
+                        Qual serviço você deseja? <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
+                    </label>
+                    
+                    <!-- Select hidden para compatibilidade -->
+                    <div class="hidden-select">
                         {{ form.service.as_widget }}
-                        {{ form.service.errors }}
                     </div>
-                    <div class="form-group" style="margin-bottom: 1.5rem !important;">
-                        <label for="{{ form.professional.id_for_label }}" style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
-                            Selecione o profissional <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
-                        </label>
-                        {{ form.professional.as_widget }}
-                        {{ form.professional.errors }}
+                    
+                    <!-- Grid de cards visuais -->
+                    <div class="services-grid" id="servicesGridModal">
+                        <!-- Cards serão gerados por JavaScript -->
                     </div>
+                    {{ form.service.errors }}
+                </div>
+                
+                <!-- Profissional -->
+                <div class="form-group" style="margin-bottom: 1.5rem !important;">
+                    <label for="{{ form.professional.id_for_label }}" style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
+                        Selecione o profissional <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
+                    </label>
+                    {{ form.professional.as_widget }}
+                    {{ form.professional.errors }}
                 </div>
             </div>
 
