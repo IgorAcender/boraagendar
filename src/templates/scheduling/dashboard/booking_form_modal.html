@@ -636,7 +636,7 @@
         console.log('Service cards criados com sucesso!');
     }
     
-    // FUNCTION TO CREATE PROFESSIONAL CARDS - Igual ao público
+    // FUNCTION TO CREATE PROFESSIONAL CARDS - Com fotos via AJAX
     function createProfessionalCardsModal() {
         console.log('createProfessionalCardsModal() chamada');
 
@@ -648,76 +648,98 @@
             return;
         }
 
-        console.log('professionalSelect encontrado:', professionalSelect);
-        console.log('professionalsGrid encontrado:', professionalsGrid);
+        // Limpar grid e mostrar loading
+        professionalsGrid.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <p>Carregando profissionais...</p>
+            </div>
+        `;
 
-        // Limpar grid
-        professionalsGrid.innerHTML = '';
-
-        // Obter opções do select (excluindo a primeira opção vazia)
-        const options = Array.from(professionalSelect.options).filter(option => option.value && option.value !== '');
-        
-        console.log('Opções de profissional encontradas:', options.length);
-
-        if (options.length === 0) {
-            professionalsGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                    <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Nenhum profissional disponível</p>
-                </div>
-            `;
-            return;
-        }
-
-        // Criar cards para cada profissional
-        options.forEach((option, index) => {
-            const professionalCard = document.createElement('div');
-            professionalCard.className = 'professional-card';
-            professionalCard.dataset.professionalId = option.value;
-
-            const professionalName = option.textContent.trim();
+        // Buscar dados dos profissionais via AJAX
+        fetch('{% url "dashboard:get_professionals_data" %}', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Dados dos profissionais recebidos:', data);
             
-            // Gerar cor de fundo baseada no nome
-            const colors = [
-                '#6366f1', '#8b5cf6', '#06b6d4', '#10b981', 
-                '#f59e0b', '#ef4444', '#84cc16', '#ec4899'
-            ];
-            const colorIndex = index % colors.length;
-            const backgroundColor = colors[colorIndex];
+            // Limpar grid
+            professionalsGrid.innerHTML = '';
             
-            // Primeira letra do nome
-            const firstLetter = professionalName.charAt(0).toUpperCase();
-            
-            professionalCard.innerHTML = `
-                <div class="professional-card-avatar" style="background: ${backgroundColor} !important;">
-                    ${firstLetter}
-                </div>
-                <div class="professional-card-name">${professionalName}</div>
-            `;
+            if (!data.professionals || data.professionals.length === 0) {
+                professionalsGrid.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                        <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>Nenhum profissional disponível</p>
+                    </div>
+                `;
+                return;
+            }
 
-            professionalCard.addEventListener('click', function() {
-                console.log('Professional card clicado, ID:', this.dataset.professionalId);
+            // Criar cards para cada profissional
+            data.professionals.forEach((professional, index) => {
+                const professionalCard = document.createElement('div');
+                professionalCard.className = 'professional-card';
+                professionalCard.dataset.professionalId = professional.id;
+
+                // Determinar avatar
+                let avatarContent = '';
+                if (professional.photo_base64) {
+                    avatarContent = `<img src="${professional.photo_base64}" alt="${professional.name}">`;
+                } else if (professional.photo_url) {
+                    avatarContent = `<img src="${professional.photo_url}" alt="${professional.name}">`;
+                } else {
+                    // Primeira letra do nome
+                    const firstLetter = professional.name.charAt(0).toUpperCase();
+                    avatarContent = firstLetter;
+                }
                 
-                // Limpar seleção anterior
-                document.querySelectorAll('#professionalsGridModal .professional-card').forEach(card => {
-                    card.classList.remove('selected');
+                // Usar cor do profissional ou cor padrão
+                const backgroundColor = professional.color || '#6366f1';
+                
+                professionalCard.innerHTML = `
+                    <div class="professional-card-avatar" style="background: ${backgroundColor} !important;">
+                        ${avatarContent}
+                    </div>
+                    <div class="professional-card-name">${professional.name}</div>
+                `;
+
+                professionalCard.addEventListener('click', function() {
+                    console.log('Professional card clicado, ID:', this.dataset.professionalId);
+                    
+                    // Limpar seleção anterior
+                    document.querySelectorAll('#professionalsGridModal .professional-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    
+                    // Marcar como selecionado
+                    this.classList.add('selected');
+                    
+                    // Atualizar select hidden
+                    professionalSelect.value = this.dataset.professionalId;
+                    
+                    // Trigger change event
+                    professionalSelect.dispatchEvent(new Event('change'));
                 });
-                
-                // Marcar como selecionado
-                this.classList.add('selected');
-                
-                // Atualizar select hidden
-                professionalSelect.value = this.dataset.professionalId;
-                
-                // Trigger change event
-                professionalSelect.dispatchEvent(new Event('change'));
+
+                professionalsGrid.appendChild(professionalCard);
+                console.log(`Professional card ${index + 1} adicionado: ${professional.name}`);
             });
 
-            professionalsGrid.appendChild(professionalCard);
-            console.log(`Professional card ${index + 1} adicionado: ${professionalName}`);
+            console.log('Professional cards criados com sucesso!');
+        })
+        .catch(error => {
+            console.error('Erro ao carregar profissionais:', error);
+            professionalsGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #ef4444; grid-column: 1 / -1;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p>Erro ao carregar profissionais</p>
+                </div>
+            `;
         });
-
-        console.log('Professional cards criados com sucesso!');
     }
     </script>
     <div class="hero-section" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; padding: 2rem !important; margin: 0 !important; position: relative; overflow: hidden;">

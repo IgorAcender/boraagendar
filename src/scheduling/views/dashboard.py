@@ -379,6 +379,40 @@ def booking_create(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+def get_professionals_data(request: HttpRequest) -> JsonResponse:
+    """Retorna dados dos profissionais incluindo fotos para AJAX."""
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff"],
+    )
+    if redirect_response:
+        return JsonResponse({"error": "Access denied"}, status=403)
+    
+    tenant = membership.tenant
+    professionals = Professional.objects.filter(tenant=tenant, is_active=True)
+    
+    professionals_data = []
+    for professional in professionals:
+        prof_data = {
+            "id": professional.id,
+            "name": professional.display_name,
+            "color": professional.color,
+            "photo_url": None,
+            "photo_base64": None,
+        }
+        
+        # Adicionar foto se disponível
+        if professional.photo_base64:
+            prof_data["photo_base64"] = professional.photo_base64
+        elif professional.photo:
+            prof_data["photo_url"] = professional.photo.url
+            
+        professionals_data.append(prof_data)
+    
+    return JsonResponse({"professionals": professionals_data})
+
+
+@login_required
 def service_list(request: HttpRequest) -> HttpResponse:
     membership, redirect_response = _membership_or_redirect(
         request,
