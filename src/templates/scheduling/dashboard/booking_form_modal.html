@@ -398,6 +398,55 @@
         font-weight: 700 !important;
     }
     
+    /* TIME SLOTS STYLES - Igual ao público */
+    #newBookingModalBody .times-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+        gap: 0.75rem !important;
+        margin-top: 1rem !important;
+        width: 100% !important;
+    }
+
+    #newBookingModalBody .time-slot {
+        background: white !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        padding: 0.75rem !important;
+        text-align: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        color: #1e293b !important;
+    }
+
+    #newBookingModalBody .time-slot:hover {
+        border-color: #6366f1 !important;
+        background: #f8fafc !important;
+        transform: translateY(-1px) !important;
+    }
+
+    #newBookingModalBody .time-slot.selected {
+        background: #6366f1 !important;
+        border-color: #6366f1 !important;
+        color: white !important;
+        font-weight: 700 !important;
+    }
+
+    #newBookingModalBody .time-slot.unavailable {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        color: #94a3b8 !important;
+        cursor: not-allowed !important;
+        opacity: 0.5 !important;
+    }
+
+    #newBookingModalBody .time-slot.unavailable:hover {
+        transform: none !important;
+        border-color: #e2e8f0 !important;
+        background: #f8fafc !important;
+    }
+    
     /* ESCONDER HEADER PADRÃO DO MODAL */
     #newBookingModal .modal-header {
         display: none !important;
@@ -547,6 +596,9 @@
             
             // Re-render to show selection
             this.render();
+            
+            // Load available times
+            loadAvailableTimesModal();
         }
     }
     
@@ -723,6 +775,9 @@
                     
                     // Trigger change event
                     professionalSelect.dispatchEvent(new Event('change'));
+                    
+                    // Load available times
+                    loadAvailableTimesModal();
                 });
 
                 professionalsGrid.appendChild(professionalCard);
@@ -737,6 +792,114 @@
                 <div style="text-align: center; padding: 2rem; color: #ef4444; grid-column: 1 / -1;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
                     <p>Erro ao carregar profissionais</p>
+                </div>
+            `;
+        });
+    }
+    
+    // FUNCTION TO LOAD AVAILABLE TIMES
+    function loadAvailableTimesModal() {
+        console.log('loadAvailableTimesModal() chamada');
+        
+        const dateInput = document.querySelector('#newBookingModalBody input[name="date"]');
+        const professionalSelect = document.querySelector('#newBookingModalBody select[name="professional"]');
+        const timesGrid = document.getElementById('timesGridModal');
+        const timeSelect = document.querySelector('#newBookingModalBody select[name="time"]');
+        
+        if (!dateInput || !timesGrid) {
+            console.log('Date input ou times grid não encontrado');
+            return;
+        }
+        
+        const selectedDate = dateInput.value;
+        const selectedProfessional = professionalSelect ? professionalSelect.value : '';
+        
+        console.log('Data selecionada:', selectedDate);
+        console.log('Profissional selecionado:', selectedProfessional);
+        
+        if (!selectedDate) {
+            timesGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                    <i class="fas fa-calendar-alt" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Selecione uma data para ver os horários</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Show loading
+        timesGrid.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <p>Carregando horários disponíveis...</p>
+            </div>
+        `;
+        
+        // Build URL
+        let url = '{% url "dashboard:get_available_times" %}?date=' + selectedDate;
+        if (selectedProfessional) {
+            url += '&professional=' + selectedProfessional;
+        }
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Horários recebidos:', data);
+            
+            // Clear times grid
+            timesGrid.innerHTML = '';
+            
+            if (!data.available_times || data.available_times.length === 0) {
+                timesGrid.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
+                        <i class="fas fa-calendar-times" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>Nenhum horário disponível para esta data</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create time slots
+            data.available_times.forEach(timeSlot => {
+                const slotElement = document.createElement('div');
+                slotElement.className = 'time-slot';
+                slotElement.textContent = timeSlot.time;
+                slotElement.dataset.time = timeSlot.value;
+                
+                slotElement.addEventListener('click', function() {
+                    if (this.classList.contains('unavailable')) return;
+                    
+                    // Clear previous selection
+                    document.querySelectorAll('#timesGridModal .time-slot').forEach(slot => {
+                        slot.classList.remove('selected');
+                    });
+                    
+                    // Mark as selected
+                    this.classList.add('selected');
+                    
+                    // Update hidden select
+                    if (timeSelect) {
+                        timeSelect.value = this.dataset.time;
+                    }
+                    
+                    console.log('Horário selecionado:', this.dataset.time);
+                });
+                
+                timesGrid.appendChild(slotElement);
+            });
+            
+            console.log('Time slots criados com sucesso!');
+        })
+        .catch(error => {
+            console.error('Erro ao carregar horários:', error);
+            timesGrid.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #ef4444; grid-column: 1 / -1;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p>Erro ao carregar horários disponíveis</p>
                 </div>
             `;
         });
@@ -835,10 +998,22 @@
                 </div>
                 
                 <div class="form-group" style="margin-bottom: 1.5rem !important;">
-                    <label for="{{ form.time.id_for_label }}" style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
+                    <label style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
                         Horário disponível <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
                     </label>
-                    {{ form.time.as_widget }}
+                    
+                    <!-- Select hidden para compatibilidade -->
+                    <div class="hidden-select">
+                        {{ form.time.as_widget }}
+                    </div>
+                    
+                    <!-- Grid de horários disponíveis -->
+                    <div class="times-grid" id="timesGridModal">
+                        <div style="text-align: center; padding: 2rem; color: #64748b;">
+                            <i class="fas fa-hand-pointer" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <p>Selecione uma data e profissional para ver os horários</p>
+                        </div>
+                    </div>
                     {{ form.time.errors }}
                 </div>
             </div>

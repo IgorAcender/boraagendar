@@ -11,6 +11,7 @@ urlpatterns = [
     path("agendamentos/<int:pk>/", dashboard_views.booking_detail, name="booking_detail"),
     path("agendamentos/novo/", dashboard_views.booking_create, name="booking_create"),
     path("agendamentos/dados-profissionais/", dashboard_views.get_professionals_data, name="get_professionals_data"),
+    path("agendamentos/horarios-disponiveis/", dashboard_views.get_available_times, name="get_available_times"),
     path("agendamentos/<int:pk>/mover/", dashboard_views.booking_move, name="booking_move"),
     path("servicos/", dashboard_views.service_list, name="service_list"),
     path("servicos/<int:pk>/editar/", dashboard_views.service_update, name="service_update"),

@@ -413,6 +413,59 @@ def get_professionals_data(request: HttpRequest) -> JsonResponse:
 
 
 @login_required
+def get_available_times(request: HttpRequest) -> JsonResponse:
+    """Retorna horários disponíveis para uma data e profissional específicos."""
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff"],
+    )
+    if redirect_response:
+        return JsonResponse({"error": "Access denied"}, status=403)
+    
+    tenant = membership.tenant
+    date_str = request.GET.get('date')
+    professional_id = request.GET.get('professional')
+    
+    if not date_str:
+        return JsonResponse({"error": "Date is required"}, status=400)
+    
+    try:
+        from datetime import datetime
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({"error": "Invalid date format"}, status=400)
+    
+    # Importar o serviço de disponibilidade
+    from .services.availability import get_available_slots
+    
+    # Buscar profissional se especificado
+    professional = None
+    if professional_id:
+        try:
+            professional = Professional.objects.get(id=professional_id, tenant=tenant)
+        except Professional.DoesNotExist:
+            return JsonResponse({"error": "Professional not found"}, status=404)
+    
+    # Buscar slots disponíveis
+    available_slots = get_available_slots(
+        tenant=tenant,
+        date=selected_date,
+        professional=professional
+    )
+    
+    # Converter para formato JSON
+    slots_data = []
+    for slot in available_slots:
+        slots_data.append({
+            "time": slot.start.strftime("%H:%M"),
+            "value": slot.start.strftime("%H:%M"),
+            "available": True
+        })
+    
+    return JsonResponse({"available_times": slots_data})
+
+
+@login_required
 def service_list(request: HttpRequest) -> HttpResponse:
     membership, redirect_response = _membership_or_redirect(
         request,
