@@ -436,7 +436,7 @@ def get_available_times(request: HttpRequest) -> JsonResponse:
         return JsonResponse({"error": "Invalid date format"}, status=400)
     
     # Importar o serviço de disponibilidade
-    from .services.availability import get_available_slots
+    from .services.availability import AvailabilityService
     
     # Buscar profissional se especificado
     professional = None
@@ -446,12 +446,26 @@ def get_available_times(request: HttpRequest) -> JsonResponse:
         except Professional.DoesNotExist:
             return JsonResponse({"error": "Professional not found"}, status=404)
     
-    # Buscar slots disponíveis
-    available_slots = get_available_slots(
-        tenant=tenant,
-        date=selected_date,
-        professional=professional
-    )
+    # Precisamos de um serviço para buscar slots
+    # Vamos buscar o primeiro serviço ativo como fallback
+    try:
+        from .models import Service as ServiceModel
+        service = ServiceModel.objects.filter(tenant=tenant, is_active=True).first()
+        if not service:
+            return JsonResponse({"error": "No active service found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": f"Service error: {str(e)}"}, status=500)
+    
+    # Criar instância do serviço de disponibilidade
+    try:
+        availability_service = AvailabilityService(tenant)
+        available_slots = availability_service.get_available_slots(
+            service=service,
+            professional=professional,
+            target_date=selected_date
+        )
+    except Exception as e:
+        return JsonResponse({"error": f"Availability error: {str(e)}"}, status=500)
     
     # Converter para formato JSON
     slots_data = []
