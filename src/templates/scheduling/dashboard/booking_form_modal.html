@@ -185,22 +185,22 @@
         .modal-content .form-section { padding: 1rem !important; }
     }
     </style>
-    <div class="hero-section">
-        <span class="hero-badge">
+    <div class="hero-section" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; padding: 2rem !important; margin: 0 !important; position: relative; overflow: hidden;">
+        <span class="hero-badge" style="display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; font-size: 0.75rem !important; text-transform: uppercase !important; background: rgba(255, 255, 255, 0.2) !important; color: white !important; padding: 0.4rem 0.8rem !important; border-radius: 999px !important; font-weight: 700 !important; margin-bottom: 1rem !important;">
             <i class="fas fa-sparkles"></i> Novo agendamento
         </span>
-        <h2 class="hero-title">Crie um agendamento em segundos ✨</h2>
-        <p class="hero-subtitle">Interface moderna e intuitiva para organizar atendimentos</p>
-        <div class="hero-features">
-            <div class="hero-feature">
+        <h2 class="hero-title" style="margin: 0 0 0.75rem 0 !important; font-size: 1.5rem !important; font-weight: 700 !important; color: white !important;">Crie um agendamento em segundos ✨</h2>
+        <p class="hero-subtitle" style="margin: 0 0 1.5rem 0 !important; font-size: 1rem !important; color: rgba(255, 255, 255, 0.9) !important;">Interface moderna e intuitiva para organizar atendimentos</p>
+        <div class="hero-features" style="display: flex !important; flex-wrap: wrap !important; gap: 0.75rem !important;">
+            <div class="hero-feature" style="display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; background: rgba(255, 255, 255, 0.15) !important; color: white !important; padding: 0.5rem 0.75rem !important; border-radius: 8px !important; font-size: 0.8rem !important;">
                 <i class="fas fa-check-circle"></i>
                 Formulário inteligente
             </div>
-            <div class="hero-feature">
+            <div class="hero-feature" style="display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; background: rgba(255, 255, 255, 0.15) !important; color: white !important; padding: 0.5rem 0.75rem !important; border-radius: 8px !important; font-size: 0.8rem !important;">
                 <i class="fas fa-clock"></i>
                 Horários em tempo real
             </div>
-            <div class="hero-feature">
+            <div class="hero-feature" style="display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; background: rgba(255, 255, 255, 0.15) !important; color: white !important; padding: 0.5rem 0.75rem !important; border-radius: 8px !important; font-size: 0.8rem !important;">
                 <i class="fas fa-user-shield"></i>
                 Dados seguros
             </div>
@@ -213,23 +213,23 @@
         <div class="errorlist">{{ form.non_field_errors }}</div>
         {% endif %}
 
-        <div class="form-grid">
-            <div class="form-section">
-                <h3 class="form-section-title">
-                    <div class="section-icon"><i class="fas fa-cut"></i></div>
+        <div class="form-grid" style="background: #ffffff !important; padding: 2rem !important;">
+            <div class="form-section" style="margin-bottom: 2rem !important; padding: 1.5rem !important; background: #f8fafc !important; border-radius: 12px !important; border: 1px solid #e2e8f0 !important;">
+                <h3 class="form-section-title" style="font-size: 1.25rem !important; font-weight: 700 !important; color: #1e293b !important; margin-bottom: 1.5rem !important; display: flex !important; align-items: center !important; gap: 0.75rem !important;">
+                    <div class="section-icon" style="width: 2.5rem !important; height: 2.5rem !important; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.1rem !important;"><i class="fas fa-cut"></i></div>
                     Serviço & Profissional
                 </h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="{{ form.service.id_for_label }}">
-                            Escolha o serviço <span class="required">*</span>
+                <div class="form-row" style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 1.5rem !important; margin: 0 !important;">
+                    <div class="form-group" style="margin-bottom: 1.5rem !important;">
+                        <label for="{{ form.service.id_for_label }}" style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
+                            Escolha o serviço <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
                         </label>
                         {{ form.service.as_widget }}
                         {{ form.service.errors }}
                     </div>
-                    <div class="form-group">
-                        <label for="{{ form.professional.id_for_label }}">
-                            Selecione o profissional <span class="required">*</span>
+                    <div class="form-group" style="margin-bottom: 1.5rem !important;">
+                        <label for="{{ form.professional.id_for_label }}" style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
+                            Selecione o profissional <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
                         </label>
                         {{ form.professional.as_widget }}
                         {{ form.professional.errors }}
@@ -237,9 +237,9 @@
                 </div>
             </div>
 
-            <div class="form-section">
-                <h3 class="form-section-title">
-                    <div class="section-icon"><i class="fas fa-calendar-day"></i></div>
+            <div class="form-section" style="margin-bottom: 2rem !important; padding: 1.5rem !important; background: #f8fafc !important; border-radius: 12px !important; border: 1px solid #e2e8f0 !important;">
+                <h3 class="form-section-title" style="font-size: 1.25rem !important; font-weight: 700 !important; color: #1e293b !important; margin-bottom: 1.5rem !important; display: flex !important; align-items: center !important; gap: 0.75rem !important;">
+                    <div class="section-icon" style="width: 2.5rem !important; height: 2.5rem !important; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.1rem !important;"><i class="fas fa-calendar-day"></i></div>
                     Data & Horário
                 </h3>
                 <div class="form-row">
@@ -297,7 +297,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-primary">
+            <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border: none !important; padding: 1rem 2rem !important; border-radius: 8px !important; font-size: 1rem !important; font-weight: 600 !important; cursor: pointer !important; transition: all 0.2s ease !important; display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; margin-top: 1rem !important; width: 100% !important; justify-content: center !important;">
                 <i class="fas fa-calendar-check"></i>
                 Criar Agendamento
             </button>
