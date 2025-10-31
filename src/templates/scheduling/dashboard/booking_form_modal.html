@@ -1,0 +1,567 @@
+﻿<style>
+    /* ========== DESIGN MODERNO PARA MODAL ========== */
+    .booking-form-card {
+        background: transparent;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+        margin: 0;
+    }
+
+    /* Header com gradiente bonito */
+    .hero-section {
+        background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+        color: white;
+        padding: 2rem;
+        margin: 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(50px, -50px);
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 999px;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-title {
+        margin: 0 0 0.75rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-subtitle {
+        margin: 0 0 1.5rem 0;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-feature {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Formulário moderno */
+    .form-grid {
+        background: #ffffff;
+        padding: 2rem;
+        gap: 2rem;
+    }
+
+    .form-section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e2e8f0;
+        text-transform: none;
+        letter-spacing: normal;
+    }
+
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #334155;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control,
+    .form-select {
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.2s;
+        background: white;
+        color: #1e293b;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .btn-primary {
+        min-width: 280px;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        margin: 2rem auto 0;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .required {
+        color: #ef4444;
+        font-weight: 700;
+        margin-left: 2px;
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 1.5rem;
+        }
+        .form-grid {
+            padding: 1.5rem;
+        }
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        .btn-primary {
+            min-width: 100%;
+        }
+    }
+</style>
+
+    .form-group label {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+    }
+
+    .form-group label i {
+        color: var(--brand-primary);
+        font-size: 1rem;
+        width: 18px;
+        text-align: center;
+    }
+
+    .form-control, .form-select {
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.3s;
+        background: #fafbfc;
+    }
+
+    .form-control:hover {
+        border-color: #cbd5e1;
+        background: white;
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.08);
+        transform: translateY(-1px);
+    }
+
+    .form-control[type="date"],
+    .form-control[type="time"] {
+        cursor: pointer;
+        background-image: linear-gradient(to right, #fafbfc 0%, #f8fafc 100%);
+    }
+
+    .form-control[type="date"]:hover,
+    .form-control[type="time"]:hover {
+        background: white;
+    }
+
+    .form-control[type="date"]::-webkit-calendar-picker-indicator,
+    .form-control[type="time"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        font-size: 1.25rem;
+        padding: 0.25rem;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .form-control[type="date"]::-webkit-calendar-picker-indicator:hover,
+    .form-control[type="time"]::-webkit-calendar-picker-indicator:hover {
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-color: #fafbfc;
+        padding-right: 2.75rem;
+        font-weight: 500;
+    }
+
+    select.form-control:hover {
+        background-color: white;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 90px;
+        line-height: 1.6;
+        font-family: inherit;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .errorlist {
+        list-style: none;
+        margin: 0.625rem 0 0 0;
+        padding: 0;
+        color: #dc2626;
+        font-size: 0.875rem;
+    }
+
+    .errorlist li {
+        padding: 0.75rem 1rem;
+        background: #fef2f2;
+        border-left: 3px solid #ef4444;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .errorlist li:before {
+        content: 'âš ';
+        font-size: 1.1rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin: 0;
+        padding: 2rem;
+        padding-top: 1rem;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 1.125rem 2rem;
+        background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-family: inherit;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.625rem;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-primary i {
+        font-size: 1.1rem;
+    }
+
+    /* Inputs com ícones */
+    .input-with-icon {
+        position: relative;
+    }
+
+    .input-with-icon i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        pointer-events: none;
+    }
+
+    .input-with-icon .form-control {
+        padding-left: 2.75rem;
+    }
+
+    /* Placeholder styling */
+    .form-control::placeholder {
+        color: #94a3b8;
+        font-weight: 400;
+    }
+
+    @media (max-width: 768px) {
+        .form-grid {
+            padding: 1.5rem;
+            gap: 2rem;
+        }
+
+        .form-section {
+            gap: 1rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .form-actions {
+            padding: 1.5rem;
+            padding-top: 1rem;
+        }
+
+        .btn-primary {
+            padding: 1rem 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="booking-form-card card">
+    <!-- Header Moderno -->
+    <div class="hero-section">
+        <span class="hero-badge">
+            <i class="fas fa-sparkles"></i> Novo agendamento
+        </span>
+        <h2 class="hero-title">Crie um agendamento em segundos ✨</h2>
+        <p class="hero-subtitle">Interface moderna e intuitiva para organizar atendimentos. Selecione serviço, profissional e horário com facilidade.</p>
+        <div class="hero-features">
+            <div class="hero-feature">
+                <i class="fas fa-check-circle"></i>
+                Formulário inteligente
+            </div>
+            <div class="hero-feature">
+                <i class="fas fa-clock"></i>
+                Horários em tempo real
+            </div>
+            <div class="hero-feature">
+                <i class="fas fa-user-shield"></i>
+                Dados seguros
+            </div>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="errorlist">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="form-grid">
+            <!-- Seção: Serviço -->
+            <div class="form-section">
+                <h3 class="form-section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-cut"></i>
+                    </div>
+                    Serviço & Profissional
+                </h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.service.id_for_label }}">
+                            Escolha o serviço <span class="required">*</span>
+                        </label>
+                        {{ form.service.as_widget }}
+                        {{ form.service.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.professional.id_for_label }}">
+                            Selecione o profissional <span class="required">*</span>
+                        </label>
+                        {{ form.professional.as_widget }}
+                        {{ form.professional.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Agendamento -->
+            <div class="form-section">
+                <h3 class="form-section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    Data & Horário
+                </h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.date.id_for_label }}">
+                            Data do atendimento <span class="required">*</span>
+                        </label>
+                        {{ form.date.as_widget }}
+                        {{ form.date.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.time.id_for_label }}">
+                            Horário disponível <span class="required">*</span>
+                        </label>
+                        {{ form.time.as_widget }}
+                        {{ form.time.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Cliente -->
+                                    {{ form.time.as_widget }}
+                        {{ form.time.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Cliente -->
+            <div class="form-section">
+                <h3 class="form-section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    Dados do Cliente
+                </h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.customer_name.id_for_label }}">
+                            Nome completo <span class="required">*</span>
+                        </label>
+                        {{ form.customer_name.as_widget }}
+                        {{ form.customer_name.errors }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.customer_phone.id_for_label }}">
+                            WhatsApp/Telefone <span class="required">*</span>
+                        </label>
+                        {{ form.customer_phone.as_widget }}
+                        {{ form.customer_phone.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Observações -->
+            <div class="form-section">
+                <h3 class="form-section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    Observações Especiais
+                </h3>
+                <div class="form-group">
+                    <label for="{{ form.notes.id_for_label }}">
+                        Detalhes importantes (opcional)
+                    </label>
+                    {{ form.notes.as_widget }}
+                    {{ form.notes.errors }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-calendar-check"></i>
+                Criar Agendamento
+            </button>
+        </div>
+    </form>
+</div>
+
+            <!-- Observações -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="{{ form.notes.id_for_label }}">
+                        <i class="fas fa-sticky-note"></i> <span>Observações (opcional)</span>
+                    </label>
+                    {{ form.notes.as_widget }}
+                    {{ form.notes.errors }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Salvar Agendamento
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
