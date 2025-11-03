@@ -333,6 +333,8 @@ def booking_create(request: HttpRequest) -> HttpResponse:
     tenant = membership.tenant
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     
+    services_qs = Service.objects.filter(tenant=tenant, is_active=True).prefetch_related("professionals")
+    services_list = list(services_qs)
     if request.method == "POST":
         form = BookingForm(tenant=tenant, data=request.POST)
         if form.is_valid():
@@ -370,11 +372,50 @@ def booking_create(request: HttpRequest) -> HttpResponse:
     else: # GET request
         form = BookingForm(tenant=tenant)
 
+    services_payload: list[dict[str, object]] = []
+    professionals_cache = {}
+
+    for service in services_list:
+        professionals_qs = service.professionals.filter(is_active=True).order_by("display_name")
+        professionals_data = []
+        for professional in professionals_qs:
+            professionals_cache[professional.pk] = professional
+            professionals_data.append(
+                {
+                    "id": professional.pk,
+                    "name": professional.display_name,
+                    "color": professional.color,
+                    "allow_auto_assign": getattr(professional, "allow_auto_assign", True),
+                    "photo_base64": professional.photo_base64 or "",
+                    "photo_url": professional.photo.url if professional.photo else "",
+                    "initial": (professional.display_name[:1] or "?").upper(),
+                }
+            )
+
+        services_payload.append(
+            {
+                "id": service.pk,
+                "name": service.name,
+                "category": (service.category or "").strip(),
+                "description": service.description,
+                "duration_minutes": service.duration_minutes or 0,
+                "price": format(service.price, "f"),
+                "professionals": professionals_data,
+                "has_auto_assign": any(p["allow_auto_assign"] for p in professionals_data),
+            }
+        )
+
     template_name = "scheduling/dashboard/booking_form_modal.html" if is_ajax else "scheduling/dashboard/booking_form.html"
     return render(
         request,
         template_name,
-        {"tenant": tenant, "form": form},
+        {
+            "tenant": tenant,
+            "form": form,
+            "services": sorted(services_list, key=lambda svc: ((svc.category or "").lower(), svc.name.lower())),
+            "services_json": json.dumps(services_payload, ensure_ascii=False),
+            "today": datetime.now(ZoneInfo(tenant.timezone or settings.TIME_ZONE)).date(),
+        },
     )
 
 
