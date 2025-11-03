@@ -1,1176 +1,400 @@
-<div class="booking-form-card card">
-    <style>
-    /* FORÇAR APLICAÇÃO DO DESIGN MODERNO NO MODAL */
-    #newBookingModalBody * {
-        box-sizing: border-box !important;
-    }
-    
-    #newBookingModalBody .booking-form-card {
-        background: transparent !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        margin: 0 !important;
-        border: none !important;
+<style>
+    .booking-modal {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        border-radius: 22px;
+        padding: 1.75rem;
+        box-shadow: 0 25px 50px -20px rgba(30, 41, 59, 0.4);
+        color: #0f172a;
     }
 
-    #newBookingModalBody .hero-section {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
-        color: white !important;
-        padding: 2rem !important;
-        margin: 0 !important;
-        position: relative !important;
-        overflow: hidden !important;
-        border-radius: 0 !important;
+    .booking-modal__hero {
+        background: rgba(255, 255, 255, 0.14);
+        border-radius: 18px;
+        padding: 1.65rem 2rem;
+        margin-bottom: 1.75rem;
+        color: #f8fafc;
     }
 
-    #newBookingModalBody .hero-badge {
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 0.5rem !important;
-        font-size: 0.75rem !important;
-        text-transform: uppercase !important;
-        background: rgba(255, 255, 255, 0.2) !important;
-        color: white !important;
-        padding: 0.4rem 0.8rem !important;
-        border-radius: 999px !important;
-        font-weight: 700 !important;
-        margin-bottom: 1rem !important;
+    .booking-modal__badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        background: rgba(15, 23, 42, 0.35);
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        margin-bottom: 0.9rem;
     }
 
-    #newBookingModalBody .hero-title {
-        margin: 0 0 0.75rem 0 !important;
-        font-size: 1.5rem !important;
-        font-weight: 700 !important;
-        color: white !important;
+    .booking-modal__hero h3 {
+        margin: 0;
+        font-size: 1.55rem;
+        font-weight: 700;
+        line-height: 1.3;
     }
 
-    #newBookingModalBody .hero-subtitle {
-        margin: 0 0 1.5rem 0 !important;
-        font-size: 1rem !important;
-        color: rgba(255, 255, 255, 0.9) !important;
+    .booking-modal__hero p {
+        margin: 0.75rem 0 1rem 0;
+        font-size: 1rem;
+        color: rgba(248, 250, 252, 0.85);
     }
 
-    #newBookingModalBody .hero-features {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        gap: 0.75rem !important;
+    .booking-modal__hero-highlights {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
     }
 
-    #newBookingModalBody .hero-feature {
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 0.5rem !important;
-        background: rgba(255, 255, 255, 0.15) !important;
-        color: white !important;
-        padding: 0.5rem 0.75rem !important;
-        border-radius: 8px !important;
-        font-size: 0.8rem !important;
+    .booking-modal__hero-highlights span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.82rem;
+        background: rgba(15, 23, 42, 0.28);
+        padding: 0.45rem 0.75rem;
+        border-radius: 12px;
     }
 
-    #newBookingModalBody .form-grid {
-        background: #ffffff !important;
-        padding: 2rem !important;
+    .booking-modal__form-wrapper {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
     }
 
-    #newBookingModalBody .form-section {
-        margin-bottom: 2rem !important;
-        padding: 1.5rem !important;
-        background: #f8fafc !important;
-        border-radius: 12px !important;
-        border: 1px solid #e2e8f0 !important;
+    .booking-modal__alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem 1.2rem;
+        border-radius: 12px;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        background: #fef2f2;
+        color: #b91c1c;
+        font-size: 0.92rem;
     }
 
-    #newBookingModalBody .form-section-title {
-        font-size: 1.25rem !important;
-        font-weight: 700 !important;
-        color: #1e293b !important;
-        margin-bottom: 1.5rem !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.75rem !important;
+    .booking-modal__grid {
+        display: grid;
+        gap: 1.4rem;
     }
 
-    #newBookingModalBody .section-icon {
-        width: 2.5rem !important;
-        height: 2.5rem !important;
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
-        color: white !important;
-        border-radius: 50% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 1.1rem !important;
+    @media (min-width: 900px) {
+        .booking-modal__grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .booking-modal__grid .span-2 {
+            grid-column: 1 / -1;
+        }
     }
 
-    #newBookingModalBody .form-row {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 1.5rem !important;
-        margin: 0 !important;
+    .booking-modal__section {
+        background: #f8fafc;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+        position: relative;
     }
 
-    #newBookingModalBody .form-group {
-        margin-bottom: 1.5rem !important;
+    .booking-modal__section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
     }
 
-    #newBookingModalBody .form-group label {
-        display: block !important;
-        font-weight: 600 !important;
-        color: #374151 !important;
-        margin-bottom: 0.5rem !important;
-        font-size: 0.9rem !important;
+    .booking-modal__section-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: linear-gradient(140deg, var(--brand-primary), var(--brand-secondary));
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
     }
 
-    #newBookingModalBody .required {
-        color: #ef4444 !important;
-        font-weight: 700 !important;
+    .booking-modal__section-title h4 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
     }
 
-    #newBookingModalBody .form-group select,
-    #newBookingModalBody .form-group input,
-    #newBookingModalBody .form-group textarea {
-        width: 100% !important;
-        padding: 0.75rem 1rem !important;
-        border: 2px solid #e5e7eb !important;
-        border-radius: 8px !important;
-        font-size: 1rem !important;
-        transition: all 0.2s ease !important;
-        background-color: white !important;
+    .booking-modal__section-title span {
+        display: block;
+        margin-top: 0.2rem;
+        font-size: 0.85rem;
+        color: #64748b;
     }
 
-    #newBookingModalBody .form-group select:focus,
-    #newBookingModalBody .form-group input:focus,
-    #newBookingModalBody .form-group textarea:focus {
-        outline: none !important;
-        border-color: #6366f1 !important;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+    .booking-modal__row {
+        display: grid;
+        gap: 1.1rem;
     }
 
-    #newBookingModalBody .form-group textarea {
-        resize: vertical !important;
-        min-height: 80px !important;
+    @media (min-width: 720px) {
+        .booking-modal__row.two-columns {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 
-    #newBookingModalBody .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
-        color: white !important;
-        border: none !important;
-        padding: 1rem 2rem !important;
-        border-radius: 8px !important;
-        font-size: 1rem !important;
-        font-weight: 600 !important;
-        cursor: pointer !important;
-        transition: all 0.2s ease !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 0.5rem !important;
-        margin-top: 1rem !important;
-        width: 100% !important;
-        justify-content: center !important;
+    .booking-modal__field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
     }
 
-    #newBookingModalBody .btn-primary:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3) !important;
+    .booking-modal__field label {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 0.92rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
     }
 
-    #newBookingModalBody .errorlist {
-        background: #fef2f2 !important;
-        border: 1px solid #fecaca !important;
-        color: #dc2626 !important;
-        padding: 1rem !important;
-        border-radius: 8px !important;
-        margin-bottom: 1.5rem !important;
+    .booking-modal__field label .required {
+        color: #ef4444;
+        font-weight: 700;
+    }
+
+    .booking-modal__field select,
+    .booking-modal__field input,
+    .booking-modal__field textarea {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: #ffffff;
+        color: #0f172a;
+        font-family: inherit;
+    }
+
+    .booking-modal__field select:hover,
+    .booking-modal__field input:hover,
+    .booking-modal__field textarea:hover {
+        border-color: #cbd5f5;
+    }
+
+    .booking-modal__field select:focus,
+    .booking-modal__field input:focus,
+    .booking-modal__field textarea:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.18);
+    }
+
+    .booking-modal__field textarea {
+        min-height: 96px;
+        resize: vertical;
+    }
+
+    .booking-modal__errors {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-size: 0.82rem;
+        color: #b91c1c;
+    }
+
+    .booking-modal__errors li {
+        background: #fef2f2;
+        border-left: 3px solid #ef4444;
+        border-radius: 10px;
+        padding: 0.6rem 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .booking-modal__actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .booking-modal__submit {
+        min-width: 220px;
+        padding: 1rem 1.6rem;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        box-shadow: 0 10px 25px -12px rgba(99, 102, 241, 0.6);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .booking-modal__submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px -14px rgba(99, 102, 241, 0.65);
     }
 
     @media (max-width: 768px) {
-        #newBookingModalBody .hero-section { padding: 1.5rem !important; }
-        #newBookingModalBody .form-grid { padding: 1.5rem !important; }
-        #newBookingModalBody .form-row { grid-template-columns: 1fr !important; gap: 1rem !important; }
-        #newBookingModalBody .form-section { padding: 1rem !important; }
-    }
-    
-    /* CALENDAR STYLES - Igual ao público */
-    #newBookingModalBody .calendar-day-header {
-        text-align: center !important;
-        font-size: 0.75rem !important;
-        font-weight: 600 !important;
-        color: #64748b !important;
-        padding: 0.75rem 0.25rem !important;
-        text-transform: uppercase !important;
-        background: #f8fafc !important;
-        border-radius: 4px !important;
-        margin-bottom: 4px !important;
-    }
-
-    #newBookingModalBody .calendar-day {
-        aspect-ratio: 1 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        border-radius: 8px !important;
-        cursor: pointer !important;
-        transition: all 0.2s !important;
-        font-weight: 500 !important;
-        border: 2px solid transparent !important;
-        min-height: 40px !important;
-        font-size: 0.9rem !important;
-        box-sizing: border-box !important;
-    }
-
-    #newBookingModalBody .calendar-day:hover {
-        background: #f1f5f9 !important;
-    }
-
-    #newBookingModalBody .calendar-day.disabled {
-        color: #cbd5e1 !important;
-        cursor: not-allowed !important;
-        background: #f8fafc !important;
-    }
-
-    #newBookingModalBody .calendar-day.disabled:hover {
-        background: #f8fafc !important;
-    }
-
-    #newBookingModalBody .calendar-day.other-month {
-        color: #cbd5e1 !important;
-    }
-
-    #newBookingModalBody .calendar-day.selected {
-        background: #6366f1 !important;
-        color: white !important;
-        border-color: #6366f1 !important;
-        font-weight: 700 !important;
-    }
-
-    #newBookingModalBody .calendar-day.today {
-        border-color: #6366f1 !important;
-        color: #6366f1 !important;
-        font-weight: 700 !important;
-    }
-
-    #newBookingModalBody .calendar-day.today.selected {
-        background: #6366f1 !important;
-        color: white !important;
-    }
-
-    #newBookingModalBody .calendar-nav-btn:hover {
-        background: #6366f1 !important;
-        color: white !important;
-    }
-    
-    /* SERVICE CARDS STYLES - Igual ao público */
-    #newBookingModalBody .services-grid {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-        margin-top: 1rem !important;
-        width: 100% !important;
-    }
-
-    #newBookingModalBody .service-card {
-        background: white !important;
-        border: 3px solid #e2e8f0 !important;
-        border-radius: 14px !important;
-        padding: 1.25rem !important;
-        transition: all 0.3s !important;
-        cursor: pointer !important;
-        text-decoration: none !important;
-        color: inherit !important;
-        display: block !important;
-        margin-bottom: 1rem !important;
-        min-height: 120px !important;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    #newBookingModalBody .service-card:hover {
-        border-color: #6366f1 !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
-    }
-
-    #newBookingModalBody .service-card.selected {
-        border-color: #6366f1 !important;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)) !important;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
-    }
-
-    #newBookingModalBody .service-name {
-        font-size: 1.1rem !important;
-        font-weight: 600 !important;
-        color: #1e293b !important;
-        margin-bottom: 0.5rem !important;
-        display: block !important;
-    }
-
-    #newBookingModalBody .service-description {
-        margin-top: 0.5rem !important;
-        color: #64748b !important;
-        font-size: 0.875rem !important;
-        line-height: 1.4 !important;
-        display: block !important;
-    }
-
-    #newBookingModalBody .hidden-select {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-    }
-    
-    /* PROFESSIONAL CARDS STYLES - Igual ao público */
-    #newBookingModalBody .professionals-grid {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 1rem !important;
-        margin-top: 1rem !important;
-        width: 100% !important;
-    }
-
-    #newBookingModalBody .professional-card {
-        background: white !important;
-        border: 2px solid #e2e8f0 !important;
-        border-radius: 12px !important;
-        padding: 0.75rem !important;
-        text-align: center !important;
-        transition: all 0.3s !important;
-        cursor: pointer !important;
-        text-decoration: none !important;
-        color: inherit !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    #newBookingModalBody .professional-card:hover {
-        border-color: #6366f1 !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
-    }
-
-    #newBookingModalBody .professional-card.selected {
-        border-color: #6366f1 !important;
-        border-width: 3px !important;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05)) !important;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
-    }
-
-    #newBookingModalBody .professional-card-avatar {
-        width: 60px !important;
-        height: 60px !important;
-        margin: 0 auto 0.5rem !important;
-        border-radius: 50% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 1.5rem !important;
-        font-weight: 700 !important;
-        color: white !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    #newBookingModalBody .professional-card-avatar img {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
-        border-radius: 50% !important;
-    }
-
-    #newBookingModalBody .professional-card-name {
-        font-size: 0.7rem !important;
-        font-weight: 600 !important;
-        color: #1e293b !important;
-        margin-top: 0.25rem !important;
-        white-space: normal !important;
-        word-wrap: break-word !important;
-        line-height: 1.2 !important;
-        height: auto !important;
-        width: 100% !important;
-        text-align: center !important;
-    }
-
-    #newBookingModalBody .professional-card-any .professional-card-name {
-        color: #6366f1 !important;
-        font-weight: 700 !important;
-    }
-    
-    /* TIME SLOTS STYLES - Igual ao público */
-    #newBookingModalBody .times-grid {
-        display: grid !important;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
-        gap: 0.75rem !important;
-        margin-top: 1rem !important;
-        width: 100% !important;
-    }
-
-    #newBookingModalBody .time-slot {
-        background: white !important;
-        border: 2px solid #e2e8f0 !important;
-        border-radius: 8px !important;
-        padding: 0.75rem !important;
-        text-align: center !important;
-        cursor: pointer !important;
-        transition: all 0.2s !important;
-        font-weight: 600 !important;
-        font-size: 0.9rem !important;
-        color: #1e293b !important;
-    }
-
-    #newBookingModalBody .time-slot:hover {
-        border-color: #6366f1 !important;
-        background: #f8fafc !important;
-        transform: translateY(-1px) !important;
-    }
-
-    #newBookingModalBody .time-slot.selected {
-        background: #6366f1 !important;
-        border-color: #6366f1 !important;
-        color: white !important;
-        font-weight: 700 !important;
-    }
-
-    #newBookingModalBody .time-slot.unavailable {
-        background: #f8fafc !important;
-        border-color: #e2e8f0 !important;
-        color: #94a3b8 !important;
-        cursor: not-allowed !important;
-        opacity: 0.5 !important;
-    }
-
-    #newBookingModalBody .time-slot.unavailable:hover {
-        transform: none !important;
-        border-color: #e2e8f0 !important;
-        background: #f8fafc !important;
-    }
-    
-    /* ESCONDER HEADER PADRÃO DO MODAL */
-    #newBookingModal .modal-header {
-        display: none !important;
-    }
-    
-    /* AJUSTAR MODAL BODY PARA OCUPAR TODO ESPAÇO */
-    #newBookingModal .modal-body {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    </style>
-    
-    <script>
-    // Esconder header do modal quando este conteúdo for carregado
-    document.addEventListener('DOMContentLoaded', function() {
-        const modalHeader = document.querySelector('#newBookingModal .modal-header');
-        if (modalHeader) {
-            modalHeader.style.display = 'none';
+        .booking-modal {
+            padding: 1.25rem;
         }
-        
-        const modalBody = document.querySelector('#newBookingModal .modal-body');
-        if (modalBody) {
-            modalBody.style.padding = '0';
-            modalBody.style.margin = '0';
+        .booking-modal__form-wrapper {
+            padding: 1.5rem;
         }
-    });
-    
-    // Também executar quando o conteúdo for inserido via innerHTML
-    setTimeout(function() {
-        const modalHeader = document.querySelector('#newBookingModal .modal-header');
-        if (modalHeader) {
-            modalHeader.style.display = 'none';
-        }
-        
-        const modalBody = document.querySelector('#newBookingModal .modal-body');
-        if (modalBody) {
-            modalBody.style.padding = '0';
-            modalBody.style.margin = '0';
-        }
-    }, 100);
-    
-    // CALENDAR JAVASCRIPT - Igual ao público
-    class ModalCalendar {
-        constructor() {
-            this.currentDate = new Date();
-            this.selectedDate = null;
-            this.minDate = new Date();
-            this.dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-            this.monthNames = [
-                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-            ];
-            this.init();
-        }
-
-        init() {
-            // Event listeners for navigation
-            document.getElementById('prev-month-modal').addEventListener('click', () => {
-                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                this.render();
-            });
-
-            document.getElementById('next-month-modal').addEventListener('click', () => {
-                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                this.render();
-            });
-
-            this.render();
-        }
-
-        render() {
-            this.renderHeader();
-            this.renderGrid();
-        }
-
-        renderHeader() {
-            const monthYear = document.getElementById('calendar-month-year-modal');
-            monthYear.textContent = `${this.monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
-        }
-
-        renderGrid() {
-            const grid = document.getElementById('calendar-grid-modal');
-            grid.innerHTML = '';
-
-            // Add day headers
-            this.dayNames.forEach(day => {
-                const dayHeader = document.createElement('div');
-                dayHeader.className = 'calendar-day-header';
-                dayHeader.textContent = day;
-                grid.appendChild(dayHeader);
-            });
-
-            // Get first day of month and number of days
-            const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
-            const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            const startingDay = firstDay.getDay();
-
-            // Add empty cells for days before month starts
-            for (let i = 0; i < startingDay; i++) {
-                const emptyDay = document.createElement('div');
-                emptyDay.className = 'calendar-day other-month';
-                grid.appendChild(emptyDay);
-            }
-
-            // Add days of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                dayElement.textContent = day;
-
-                const cellDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), day);
-
-                // Check if day is disabled (before min date)
-                if (cellDate < this.minDate) {
-                    dayElement.classList.add('disabled');
-                } else {
-                    dayElement.addEventListener('click', () => {
-                        this.selectDate(cellDate);
-                    });
-                }
-
-                // Check if day is today
-                const today = new Date();
-                if (cellDate.toDateString() === today.toDateString()) {
-                    dayElement.classList.add('today');
-                }
-
-                // Check if day is selected
-                if (this.selectedDate && cellDate.toDateString() === this.selectedDate.toDateString()) {
-                    dayElement.classList.add('selected');
-                }
-
-                grid.appendChild(dayElement);
-            }
-        }
-
-        selectDate(date) {
-            this.selectedDate = date;
-            const dateString = date.toISOString().split('T')[0];
-            
-            // Update hidden input
-            const dateInput = document.querySelector('#newBookingModalBody input[type="hidden"][name="date"]');
-            if (dateInput) {
-                dateInput.value = dateString;
-            }
-            
-            // Re-render to show selection
-            this.render();
-            
-            // Nova lógica: após selecionar data, verificar se tem serviço e carregar profissionais
-            const serviceSelect = document.querySelector('#newBookingModalBody select[name="service"]');
-            if (serviceSelect && serviceSelect.value) {
-                // Carregar profissionais disponíveis para o serviço na data selecionada
-                loadProfessionalsByServiceAndDate(serviceSelect.value, dateString);
-            }
+        .booking-modal__hero {
+            padding: 1.4rem 1.5rem;
         }
     }
-    
-    // Initialize calendar when modal content is loaded
-    setTimeout(() => {
-        if (document.getElementById('calendar-grid-modal')) {
-            new ModalCalendar();
-        }
-        
-        // Initialize service cards
-        createServiceCardsModal();
-        
-        // Initialize professional cards (com mensagem inicial)
-        createProfessionalCardsModal();
-    }, 200);
-    
-    // FUNCTION TO CREATE SERVICE CARDS - Igual ao público
-    function createServiceCardsModal() {
-        console.log('createServiceCardsModal() chamada');
+</style>
 
-        const serviceSelect = document.querySelector('#newBookingModalBody select[name="service"]');
-        const servicesGrid = document.getElementById('servicesGridModal');
-
-        if (!serviceSelect || !servicesGrid) {
-            console.log('Service select ou grid não encontrado no modal');
-            return;
-        }
-
-        // Limpar grid
-        servicesGrid.innerHTML = '';
-
-        // Obter opções do select (excluindo a primeira opção vazia)
-        const options = Array.from(serviceSelect.options).filter(option => option.value && option.value !== '');
-        
-        console.log('Opções de serviço encontradas:', options.length);
-
-        if (options.length === 0) {
-            servicesGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #64748b;">
-                    <i class="fas fa-concierge-bell" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Nenhum serviço disponível</p>
-                </div>
-            `;
-            return;
-        }
-
-        // Criar cards para cada serviço
-        options.forEach((option, index) => {
-            const serviceCard = document.createElement('div');
-            serviceCard.className = 'service-card';
-            serviceCard.dataset.serviceId = option.value;
-
-            const serviceName = option.textContent.trim();
-            
-            serviceCard.innerHTML = `
-                <div class="service-icon" style="width: 3rem !important; height: 3rem !important; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.3rem !important; margin-bottom: 1rem !important;">
-                    <i class="fas fa-concierge-bell"></i>
-                </div>
-                <div class="service-name" style="font-size: 1rem !important; font-weight: 600 !important; color: #1e293b !important; margin-bottom: 0.5rem !important; text-align: center !important;">${serviceName}</div>
-                <div class="service-description" style="font-size: 0.8rem !important; color: #64748b !important; text-align: center !important;">
-                    Clique para selecionar este serviço
-                </div>
-            `;
-
-            serviceCard.addEventListener('click', function() {
-                console.log('Service card clicado, ID:', this.dataset.serviceId);
-                
-                // Limpar seleção anterior
-                document.querySelectorAll('#servicesGridModal .service-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
-                
-                // Marcar como selecionado
-                this.classList.add('selected');
-                
-                // Atualizar select hidden
-                serviceSelect.value = this.dataset.serviceId;
-                
-                // Trigger change event
-                serviceSelect.dispatchEvent(new Event('change'));
-                
-                // Limpar seleções seguintes (profissional e horário)
-                clearProfessionalAndTimeSelections();
-                
-                // Mostrar mensagem para selecionar data
-                showDateSelectionMessage();
-            });
-
-            servicesGrid.appendChild(serviceCard);
-            console.log(`Service card ${index + 1} adicionado: ${serviceName}`);
-        });
-
-        console.log('Service cards criados com sucesso!');
-    }
-    
-    // FUNCTION TO CLEAR PROFESSIONAL AND TIME SELECTIONS
-    function clearProfessionalAndTimeSelections() {
-        // Limpar profissional selecionado
-        const professionalSelect = document.querySelector('#newBookingModalBody select[name="professional"]');
-        if (professionalSelect) {
-            professionalSelect.value = '';
-        }
-        
-        // Limpar horário selecionado
-        const timeSelect = document.querySelector('#newBookingModalBody select[name="time"]');
-        if (timeSelect) {
-            timeSelect.value = '';
-        }
-        
-        // Limpar cards de profissional
-        document.querySelectorAll('#professionalsGridModal .professional-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-        
-        // Limpar slots de horário
-        document.querySelectorAll('#timesGridModal .time-slot').forEach(slot => {
-            slot.classList.remove('selected');
-        });
-    }
-    
-    // FUNCTION TO SHOW DATE SELECTION MESSAGE
-    function showDateSelectionMessage() {
-        const professionalsGrid = document.getElementById('professionalsGridModal');
-        const timesGrid = document.getElementById('timesGridModal');
-        
-        if (professionalsGrid) {
-            professionalsGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                    <i class="fas fa-calendar-alt" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Agora selecione uma data no calendário</p>
-                </div>
-            `;
-        }
-        
-        if (timesGrid) {
-            timesGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                    <i class="fas fa-clock" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Selecione uma data e profissional para ver os horários</p>
-                </div>
-            `;
-        }
-    }
-    
-    // FUNCTION TO LOAD PROFESSIONALS BY SERVICE AND DATE - Nova lógica
-    function loadProfessionalsByServiceAndDate(serviceId, selectedDate) {
-        console.log('loadProfessionalsByServiceAndDate() chamada com serviceId:', serviceId, 'e data:', selectedDate);
-
-        const professionalsGrid = document.getElementById('professionalsGridModal');
-
-        if (!professionalsGrid) {
-            console.log('Professionals grid não encontrado no modal');
-            return;
-        }
-
-        // Limpar grid e mostrar loading
-        professionalsGrid.innerHTML = `
-            <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                <p>Carregando profissionais disponíveis...</p>
-            </div>
-        `;
-
-        // Buscar profissionais do serviço na data via AJAX
-        fetch('{% url "dashboard:get_professionals_by_service" %}?service=' + serviceId + '&date=' + selectedDate, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Profissionais disponíveis recebidos:', data);
-            
-            // Limpar grid
-            professionalsGrid.innerHTML = '';
-            
-            if (!data.professionals || data.professionals.length === 0) {
-                profissionalsGrid.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                        <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p>Nenhum profissional disponível para este serviço nesta data</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Criar cards para cada profissional
-            data.professionals.forEach((professional, index) => {
-                const professionalCard = document.createElement('div');
-                professionalCard.className = 'professional-card';
-                professionalCard.dataset.professionalId = professional.id;
-
-                // Determinar avatar
-                let avatarContent = '';
-                if (professional.photo_base64) {
-                    avatarContent = `<img src="${professional.photo_base64}" alt="${professional.name}">`;
-                } else if (professional.photo_url) {
-                    avatarContent = `<img src="${professional.photo_url}" alt="${professional.name}">`;
-                } else {
-                    // Primeira letra do nome
-                    const firstLetter = professional.name.charAt(0).toUpperCase();
-                    avatarContent = firstLetter;
-                }
-                
-                // Usar cor do profissional ou cor padrão
-                const backgroundColor = professional.color || '#6366f1';
-                
-                professionalCard.innerHTML = `
-                    <div class="professional-card-avatar" style="background: ${backgroundColor} !important;">
-                        ${avatarContent}
-                    </div>
-                    <div class="professional-card-name">${professional.name}</div>
-                `;
-
-                professionalCard.addEventListener('click', function() {
-                    console.log('Professional card clicado, ID:', this.dataset.professionalId);
-                    
-                    // Limpar seleção anterior
-                    document.querySelectorAll('#professionalsGridModal .professional-card').forEach(card => {
-                        card.classList.remove('selected');
-                    });
-                    
-                    // Marcar como selecionado
-                    this.classList.add('selected');
-                    
-                    // Atualizar select hidden
-                    const professionalSelect = document.querySelector('#newBookingModalBody select[name="professional"]');
-                    if (professionalSelect) {
-                        professionalSelect.value = this.dataset.professionalId;
-                        professionalSelect.dispatchEvent(new Event('change'));
-                    }
-                    
-                    // Carregar horários disponíveis para este profissional
-                    loadAvailableTimesModal();
-                });
-
-                professionalsGrid.appendChild(professionalCard);
-                console.log(`Professional card ${index + 1} adicionado: ${professional.name}`);
-            });
-
-            console.log('Professional cards criados com sucesso!');
-        })
-        .catch(error => {
-            console.error('Erro ao carregar profissionais disponíveis:', error);
-            professionalsGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #ef4444; grid-column: 1 / -1;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                    <p>Erro ao carregar profissionais</p>
-                </div>
-            `;
-        });
-    }
-    
-    // FUNCTION TO LOAD PROFESSIONALS BY SERVICE - Função antiga substituída
-    function loadProfessionalsByService(serviceId) {
-        console.log('loadProfessionalsByService() - Função obsoleta, use loadProfessionalsByServiceAndDate()');
-        
-        const professionalsGrid = document.getElementById('professionalsGridModal');
-        if (professionalsGrid) {
-            professionalsGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                    <i class="fas fa-calendar-alt" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Selecione uma data para ver os profissionais disponíveis</p>
-                </div>
-            `;
-        }
-    }
-    
-    // FUNCTION TO CREATE PROFESSIONAL CARDS - Função antiga substituída
-    function createProfessionalCardsModal() {
-        console.log('createProfessionalCardsModal() - Esta função foi substituída por loadProfessionalsByService()');
-        
-        const professionalsGrid = document.getElementById('professionalsGridModal');
-        if (professionalsGrid) {
-            professionalsGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                    <i class="fas fa-hand-point-up" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Primeiro selecione um serviço acima</p>
-                </div>
-            `;
-        }
-    
-    // FUNCTION TO LOAD AVAILABLE TIMES - Nova lógica Serviço > Data > Profissional > Horário
-    function loadAvailableTimesModal() {
-        console.log('loadAvailableTimesModal() chamada');
-        
-        const dateInput = document.querySelector('#newBookingModalBody input[name="date"]');
-        const professionalSelect = document.querySelector('#newBookingModalBody select[name="professional"]');
-        const serviceSelect = document.querySelector('#newBookingModalBody select[name="service"]');
-        const timesGrid = document.getElementById('timesGridModal');
-        const timeSelect = document.querySelector('#newBookingModalBody select[name="time"]');
-        
-        if (!dateInput || !timesGrid) {
-            console.log('Date input ou times grid não encontrado');
-            return;
-        }
-        
-        const selectedDate = dateInput.value;
-        const selectedProfessional = professionalSelect ? professionalSelect.value : '';
-        const selectedService = serviceSelect ? serviceSelect.value : '';
-        
-        console.log('Data selecionada:', selectedDate);
-        console.log('Profissional selecionado:', selectedProfessional);
-        console.log('Serviço selecionado:', selectedService);
-        
-        // Validações na ordem correta: Serviço > Data > Profissional > Horário
-        if (!selectedService) {
-            timesGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                    <i class="fas fa-hand-point-up" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Primeiro selecione um serviço</p>
-                </div>
-            `;
-            return;
-        }
-        
-        if (!selectedDate) {
-            timesGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                    <i class="fas fa-calendar-alt" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Selecione uma data no calendário</p>
-                </div>
-            `;
-            return;
-        }
-        
-        if (!selectedProfessional) {
-            timesGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                    <i class="fas fa-user" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>Selecione um profissional para ver os horários</p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Show loading
-        timesGrid.innerHTML = `
-            <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                <p>Carregando horários disponíveis...</p>
-            </div>
-        `;
-        
-        // Build URL com serviço obrigatório
-        let url = '{% url "dashboard:get_available_times" %}?date=' + selectedDate + '&service=' + selectedService;
-        if (selectedProfessional) {
-            url += '&professional=' + selectedProfessional;
-        }
-        
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Horários recebidos:', data);
-            
-            // Clear times grid
-            timesGrid.innerHTML = '';
-            
-            if (!data.available_times || data.available_times.length === 0) {
-                timesGrid.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #64748b; grid-column: 1 / -1;">
-                        <i class="fas fa-calendar-times" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p>Nenhum horário disponível para esta data</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Create time slots
-            data.available_times.forEach(timeSlot => {
-                const slotElement = document.createElement('div');
-                slotElement.className = 'time-slot';
-                slotElement.textContent = timeSlot.time;
-                slotElement.dataset.time = timeSlot.value;
-                
-                slotElement.addEventListener('click', function() {
-                    if (this.classList.contains('unavailable')) return;
-                    
-                    // Clear previous selection
-                    document.querySelectorAll('#timesGridModal .time-slot').forEach(slot => {
-                        slot.classList.remove('selected');
-                    });
-                    
-                    // Mark as selected
-                    this.classList.add('selected');
-                    
-                    // Update hidden select
-                    if (timeSelect) {
-                        timeSelect.value = this.dataset.time;
-                    }
-                    
-                    console.log('Horário selecionado:', this.dataset.time);
-                });
-                
-                timesGrid.appendChild(slotElement);
-            });
-            
-            console.log('Time slots criados com sucesso!');
-        })
-        .catch(error => {
-            console.error('Erro ao carregar horários:', error);
-            timesGrid.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: #ef4444; grid-column: 1 / -1;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                    <p>Erro ao carregar horários disponíveis</p>
-                </div>
-            `;
-        });
-    }
-    </script>
-    <div class="hero-section" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; padding: 2rem !important; margin: 0 !important; position: relative; overflow: hidden;">
-        <span class="hero-badge" style="display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; font-size: 0.75rem !important; text-transform: uppercase !important; background: rgba(255, 255, 255, 0.2) !important; color: white !important; padding: 0.4rem 0.8rem !important; border-radius: 999px !important; font-weight: 700 !important; margin-bottom: 1rem !important;">
-            <i class="fas fa-sparkles"></i> Novo agendamento
+<div class="booking-modal">
+    <div class="booking-modal__hero">
+        <span class="booking-modal__badge">
+            <i class="fas fa-bolt"></i> Novo agendamento
         </span>
-        <h2 class="hero-title" style="margin: 0 0 0.75rem 0 !important; font-size: 1.5rem !important; font-weight: 700 !important; color: white !important;">Crie um agendamento em segundos ✨</h2>
-        <p class="hero-subtitle" style="margin: 0 !important; font-size: 1rem !important; color: rgba(255, 255, 255, 0.9) !important;">Interface moderna e intuitiva para organizar atendimentos</p>
+        <h3>Crie um agendamento em segundos ✨</h3>
+        <p>Escolha o serviço, defina o profissional e registre os dados do cliente. O horário fica bloqueado automaticamente na agenda.</p>
+        <div class="booking-modal__hero-highlights">
+            <span><i class="fas fa-check-circle"></i> Somente horários disponíveis</span>
+            <span><i class="fas fa-user-check"></i> Dados essenciais do cliente</span>
+            <span><i class="fas fa-clock"></i> Notificações automáticas</span>
+        </div>
     </div>
 
-    <form method="post">
-        {% csrf_token %}
-        {% if form.non_field_errors %}
-        <div class="errorlist">{{ form.non_field_errors }}</div>
-        {% endif %}
+    <div class="booking-modal__form-wrapper">
+        <form method="post">
+            {% csrf_token %}
 
-        <div class="form-grid" style="background: #ffffff !important; padding: 2rem !important;">
-            <div class="form-section" style="margin-bottom: 2rem !important; padding: 1.5rem !important; background: #f8fafc !important; border-radius: 12px !important; border: 1px solid #e2e8f0 !important;">
-                <h3 class="form-section-title" style="font-size: 1.25rem !important; font-weight: 700 !important; color: #1e293b !important; margin-bottom: 1.5rem !important; display: flex !important; align-items: center !important; gap: 0.75rem !important;">
-                    <div class="section-icon" style="width: 2.5rem !important; height: 2.5rem !important; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.1rem !important;"><i class="fas fa-concierge-bell"></i></div>
-                    Serviço
-                </h3>
-                
-                <!-- Service Cards igual ao público -->
-                <div class="form-group" style="margin-bottom: 1.5rem !important;">
-                    <label style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
-                        Qual serviço você deseja? <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
-                    </label>
-                    
-                    <!-- Select hidden para compatibilidade -->
-                    <div class="hidden-select">
-                        {{ form.service.as_widget }}
-                    </div>
-                    
-                    <!-- Grid de cards visuais -->
-                    <div class="services-grid" id="servicesGridModal">
-                        <!-- Cards serão gerados por JavaScript -->
-                    </div>
-                    {{ form.service.errors }}
-                </div>
-                
-                <!-- Profissional -->
-                <div class="form-group" style="margin-bottom: 1.5rem !important;">
-                    <label style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
-                        Selecione o profissional <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
-                    </label>
-                    
-                    <!-- Select hidden para compatibilidade -->
-                    <div class="hidden-select">
-                        {{ form.professional.as_widget }}
-                    </div>
-                    
-                    <!-- Grid de cards visuais -->
-                    <div class="professionals-grid" id="professionalsGridModal">
-                        <!-- Cards serão gerados por JavaScript -->
-                    </div>
-                    {{ form.professional.errors }}
-                </div>
+            {% if form.non_field_errors %}
+            <div class="booking-modal__alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>{{ form.non_field_errors }}</div>
             </div>
+            {% endif %}
 
-            <div class="form-section" style="margin-bottom: 2rem !important; padding: 1.5rem !important; background: #f8fafc !important; border-radius: 12px !important; border: 1px solid #e2e8f0 !important;">
-                <h3 class="form-section-title" style="font-size: 1.25rem !important; font-weight: 700 !important; color: #1e293b !important; margin-bottom: 1.5rem !important; display: flex !important; align-items: center !important; gap: 0.75rem !important;">
-                    <div class="section-icon" style="width: 2.5rem !important; height: 2.5rem !important; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.1rem !important;"><i class="fas fa-calendar-day"></i></div>
-                    Data & Horário
-                </h3>
-                
-                <!-- Calendar Widget igual ao público -->
-                <div class="form-group" style="margin-bottom: 1.5rem !important;">
-                    <label style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
-                        Qual data você prefere? <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
-                    </label>
-                    
-                    <div class="calendar-widget" style="background: white !important; border: 2px solid #e2e8f0 !important; border-radius: 12px !important; padding: 1.5rem !important; margin-bottom: 1rem !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;">
-                        <div class="calendar-header" style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-bottom: 1.5rem !important; padding-bottom: 1rem !important; border-bottom: 1px solid #e2e8f0 !important;">
-                            <div class="calendar-month" id="calendar-month-year-modal" style="font-size: 1.25rem !important; font-weight: 700 !important; color: #1e293b !important; text-align: center !important; flex: 1 !important;"></div>
-                            <div class="calendar-nav" style="display: flex !important; gap: 0.5rem !important;">
-                                <button type="button" class="calendar-nav-btn" id="prev-month-modal" style="width: 36px !important; height: 36px !important; border: none !important; background: #f1f5f9 !important; border-radius: 8px !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; color: #64748b !important;">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button type="button" class="calendar-nav-btn" id="next-month-modal" style="width: 36px !important; height: 36px !important; border: none !important; background: #f1f5f9 !important; border-radius: 8px !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; color: #64748b !important;">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
+            <div class="booking-modal__grid">
+                <div class="booking-modal__section">
+                    <div class="booking-modal__section-header">
+                        <div class="booking-modal__section-icon">
+                            <i class="fas fa-cut"></i>
                         </div>
-                        
-                        <div class="calendar-grid" id="calendar-grid-modal" style="display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 2px !important; width: 100% !important;">
-                            <!-- Calendar content will be generated by JavaScript -->
+                        <div class="booking-modal__section-title">
+                            <h4>Serviço & profissional</h4>
+                            <span>Defina o tipo de atendimento e quem irá realizá-lo</span>
                         </div>
                     </div>
-                    
-                    <!-- Hidden input for form submission -->
-                    {{ form.date.as_hidden }}
-                </div>
-                
-                <div class="form-group" style="margin-bottom: 1.5rem !important;">
-                    <label style="display: block !important; font-weight: 600 !important; color: #374151 !important; margin-bottom: 0.5rem !important; font-size: 0.9rem !important;">
-                        Horário disponível <span class="required" style="color: #ef4444 !important; font-weight: 700 !important;">*</span>
-                    </label>
-                    
-                    <!-- Select hidden para compatibilidade -->
-                    <div class="hidden-select">
-                        {{ form.time.as_widget }}
-                    </div>
-                    
-                    <!-- Grid de horários disponíveis -->
-                    <div class="times-grid" id="timesGridModal">
-                        <div style="text-align: center; padding: 2rem; color: #64748b;">
-                            <i class="fas fa-hand-pointer" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                            <p>Selecione uma data e profissional para ver os horários</p>
+                    <div class="booking-modal__row two-columns">
+                        <div class="booking-modal__field">
+                            <label for="{{ form.service.id_for_label }}">
+                                Serviço <span class="required">*</span>
+                            </label>
+                            {{ form.service }}
+                            {{ form.service.errors }}
+                        </div>
+                        <div class="booking-modal__field">
+                            <label for="{{ form.professional.id_for_label }}">
+                                Profissional <span class="required">*</span>
+                            </label>
+                            {{ form.professional }}
+                            {{ form.professional.errors }}
                         </div>
                     </div>
-                    {{ form.time.errors }}
                 </div>
-            </div>
 
-            <div class="form-section">
-                <h3 class="form-section-title">
-                    <div class="section-icon"><i class="fas fa-user-circle"></i></div>
-                    Dados do Cliente
-                </h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="{{ form.customer_name.id_for_label }}">
-                            Nome completo <span class="required">*</span>
-                        </label>
-                        {{ form.customer_name.as_widget }}
-                        {{ form.customer_name.errors }}
+                <div class="booking-modal__section">
+                    <div class="booking-modal__section-header">
+                        <div class="booking-modal__section-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="booking-modal__section-title">
+                            <h4>Data & horário</h4>
+                            <span>Escolha um horário livre para o atendimento</span>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="{{ form.customer_phone.id_for_label }}">
-                            WhatsApp/Telefone <span class="required">*</span>
-                        </label>
-                        {{ form.customer_phone.as_widget }}
-                        {{ form.customer_phone.errors }}
+                    <div class="booking-modal__row two-columns">
+                        <div class="booking-modal__field">
+                            <label for="{{ form.date.id_for_label }}">
+                                Data <span class="required">*</span>
+                            </label>
+                            {{ form.date }}
+                            {{ form.date.errors }}
+                        </div>
+                        <div class="booking-modal__field">
+                            <label for="{{ form.time.id_for_label }}">
+                                Hora <span class="required">*</span>
+                            </label>
+                            {{ form.time }}
+                            {{ form.time.errors }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-modal__section span-2">
+                    <div class="booking-modal__section-header">
+                        <div class="booking-modal__section-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="booking-modal__section-title">
+                            <h4>Dados do cliente</h4>
+                            <span>Use para confirmar e enviar lembretes</span>
+                        </div>
+                    </div>
+                    <div class="booking-modal__row two-columns">
+                        <div class="booking-modal__field">
+                            <label for="{{ form.customer_name.id_for_label }}">
+                                Nome <span class="required">*</span>
+                            </label>
+                            {{ form.customer_name }}
+                            {{ form.customer_name.errors }}
+                        </div>
+                        <div class="booking-modal__field">
+                            <label for="{{ form.customer_phone.id_for_label }}">
+                                Telefone/WhatsApp <span class="required">*</span>
+                            </label>
+                            {{ form.customer_phone }}
+                            {{ form.customer_phone.errors }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-modal__section span-2">
+                    <div class="booking-modal__section-header">
+                        <div class="booking-modal__section-icon">
+                            <i class="fas fa-sticky-note"></i>
+                        </div>
+                        <div class="booking-modal__section-title">
+                            <h4>Observações</h4>
+                            <span>Detalhes que ajudam o time a se preparar</span>
+                        </div>
+                    </div>
+                    <div class="booking-modal__row">
+                        <div class="booking-modal__field">
+                            {{ form.notes }}
+                            {{ form.notes.errors }}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="form-section">
-                <h3 class="form-section-title">
-                    <div class="section-icon"><i class="fas fa-comment-dots"></i></div>
-                    Observações Especiais
-                </h3>
-                <div class="form-group">
-                    <label for="{{ form.notes.id_for_label }}">
-                        Detalhes importantes (opcional)
-                    </label>
-                    {{ form.notes.as_widget }}
-                    {{ form.notes.errors }}
-                </div>
+            <div class="booking-modal__actions">
+                <button type="submit" class="booking-modal__submit">
+                    <i class="fas fa-calendar-check"></i>
+                    Salvar agendamento
+                </button>
             </div>
-
-            <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border: none !important; padding: 1rem 2rem !important; border-radius: 8px !important; font-size: 1rem !important; font-weight: 600 !important; cursor: pointer !important; transition: all 0.2s ease !important; display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; margin-top: 1rem !important; width: 100% !important; justify-content: center !important;">
-                <i class="fas fa-calendar-check"></i>
-                Criar Agendamento
-            </button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
