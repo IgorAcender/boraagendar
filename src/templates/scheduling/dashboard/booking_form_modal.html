@@ -177,6 +177,11 @@
         text-decoration: none;
         color: inherit;
         display: block;
+        width: 100%;
+        text-align: left;
+        appearance: none;
+        font: inherit;
+        outline: none;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
@@ -191,6 +196,11 @@
         border-width: 3px;
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .service-card:focus-visible {
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
     }
 
     .service-card .service-name {
@@ -521,7 +531,7 @@
             {% endif %}
 
             <div class="booking-modal__grid">
-                <div class="booking-modal__section span-2">
+                <div class="booking-modal__section span-2" id="bmServiceSection">
                     <div class="booking-modal__section-header">
                         <div class="booking-modal__section-icon"><i class="fas fa-concierge-bell"></i></div>
                         <div class="booking-modal__section-title">
@@ -535,7 +545,10 @@
                     {% if services %}
                     <div class="services-grid" id="bmServiceCards">
                         {% for service in services %}
-                        <div class="service-card" data-service-id="{{ service.id }}" data-category="{{ service.category|default_if_none:'' }}">
+                        <button type="button"
+                                class="service-card"
+                                data-service-id="{{ service.id }}"
+                                data-category="{{ service.category|default_if_none:'' }}">
                             {% if service.category %}
                             <div class="service-meta"><span><i class="fas fa-tag"></i> {{ service.category }}</span></div>
                             {% endif %}
@@ -547,7 +560,7 @@
                                 <span><i class="fas fa-clock"></i> {{ service.duration_minutes|default:"-" }} min</span>
                                 <span><i class="fas fa-dollar-sign"></i> R$ {{ service.price|floatformat:2 }}</span>
                             </div>
-                        </div>
+                        </button>
                         {% endfor %}
                     </div>
                     {% else %}
@@ -559,7 +572,7 @@
                     {{ form.service.errors }}
                 </div>
 
-                <div class="booking-modal__section span-2">
+                <div class="booking-modal__section span-2" id="bmDateSection">
                     <div class="booking-modal__section-header">
                         <div class="booking-modal__section-icon"><i class="fas fa-calendar-alt"></i></div>
                         <div class="booking-modal__section-title">
@@ -584,7 +597,7 @@
                     {{ form.date.errors }}
                 </div>
 
-                <div class="booking-modal__section span-2">
+                <div class="booking-modal__section span-2" id="bmProfessionalSection">
                     <div class="booking-modal__section-header">
                         <div class="booking-modal__section-icon"><i class="fas fa-user-tie"></i></div>
                         <div class="booking-modal__section-title">
@@ -603,7 +616,7 @@
                     {{ form.professional.errors }}
                 </div>
 
-                <div class="booking-modal__section span-2">
+                <div class="booking-modal__section span-2" id="bmTimeSection">
                     <div class="booking-modal__section-header">
                         <div class="booking-modal__section-icon"><i class="fas fa-clock"></i></div>
                         <div class="booking-modal__section-title">
@@ -695,6 +708,10 @@
         const professionalPlaceholder = container.querySelector('#bmProfessionalPlaceholder');
         const slotsInfo = container.querySelector('#bmSlotsInfo');
         const slotList = container.querySelector('#bmSlotList');
+        const serviceSection = container.querySelector('#bmServiceSection');
+        const dateSection = container.querySelector('#bmDateSection');
+        const professionalSection = container.querySelector('#bmProfessionalSection');
+        const timeSection = container.querySelector('#bmTimeSection');
 
         let selectedServiceId = serviceSelect ? serviceSelect.value || null : null;
         let selectedProfessionalId = professionalSelect ? professionalSelect.value || null : null;
@@ -704,6 +721,12 @@
 
         if (dateInput) {
             dateInput.setAttribute('min', todayString);
+        }
+
+        function scrollToSection(section) {
+            if (section && typeof section.scrollIntoView === 'function') {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         function resetProfessionalSelection() {
@@ -739,7 +762,7 @@
             renderSlots([]);
         }
 
-        function setService(serviceId) {
+        function setService(serviceId, { scroll = true } = {}) {
             if (!serviceSelect) {
                 return;
             }
@@ -756,6 +779,9 @@
             resetDateAndTime();
             resetProfessionalSelection();
             renderProfessionalCards();
+            if (scroll) {
+                scrollToSection(dateSection);
+            }
         }
 
         function renderProfessionalCards() {
@@ -857,6 +883,7 @@
                 }
                 renderSlots([]);
                 loadSlots();
+                scrollToSection(timeSection);
             });
 
             return button;
@@ -958,6 +985,9 @@
                         selectedSlotIso = matchedSlot ? matchedSlot.start : null;
                     }
                     renderSlots(slots);
+                    if (slots.length) {
+                        scrollToSection(timeSection);
+                    }
                 })
                 .catch(() => {
                     if (slotsInfo) {
@@ -989,7 +1019,7 @@
             const initialTime = timeInput ? timeInput.value : null;
 
             if (initialServiceId && servicesMap[initialServiceId]) {
-                setService(initialServiceId);
+                setService(initialServiceId, { scroll: false });
 
                 if (initialProfessionalId !== null && initialProfessionalId !== undefined) {
                     const serviceData = servicesMap[initialServiceId];
@@ -1137,6 +1167,7 @@
                 resetProfessionalSelection();
                 renderProfessionalCards();
                 loadSlots();
+                scrollToSection(professionalSection);
             }
         });
 
