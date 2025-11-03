@@ -658,8 +658,11 @@
             const serviceName = option.textContent.trim();
             
             serviceCard.innerHTML = `
-                <div class="service-name">${serviceName}</div>
-                <div class="service-description">
+                <div class="service-icon" style="width: 3rem !important; height: 3rem !important; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important; color: white !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.3rem !important; margin-bottom: 1rem !important;">
+                    <i class="fas fa-concierge-bell"></i>
+                </div>
+                <div class="service-name" style="font-size: 1rem !important; font-weight: 600 !important; color: #1e293b !important; margin-bottom: 0.5rem !important; text-align: center !important;">${serviceName}</div>
+                <div class="service-description" style="font-size: 0.8rem !important; color: #64748b !important; text-align: center !important;">
                     Clique para selecionar este serviço
                 </div>
             `;
