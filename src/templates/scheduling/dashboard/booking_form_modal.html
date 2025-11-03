@@ -295,6 +295,10 @@
         color: #94a3b8;
     }
 
+    .professional-card-any .professional-card-name {
+        color: var(--brand-primary);
+    }
+
     .bm-placeholder {
         background: #f1f5f9;
         border-radius: 14px;
@@ -497,7 +501,7 @@
     <div class="booking-modal__hero">
         <span class="booking-modal__badge"><i class="fas fa-bolt"></i> Fluxo guiado</span>
         <h3>Crie um agendamento em segundos ✨</h3>
-        <p>Escolha o serviço, defina quem atende, selecione o horário disponível e finalize com os dados do cliente.</p>
+        <p>Escolha o serviço, selecione a data, defina quem atende, escolha o horário e finalize com os dados do cliente.</p>
         <div class="booking-modal__hero-highlights">
             <span><i class="fas fa-check-circle"></i> Somente horários livres</span>
             <span><i class="fas fa-user-friends"></i> Serviços e profissionais sincronizados</span>
@@ -531,10 +535,7 @@
                     {% if services %}
                     <div class="services-grid" id="bmServiceCards">
                         {% for service in services %}
-                        <button type="button"
-                                class="service-card"
-                                data-service-id="{{ service.id }}"
-                                data-category="{{ service.category|default_if_none:'' }}">
+                        <div class="service-card" data-service-id="{{ service.id }}" data-category="{{ service.category|default_if_none:'' }}">
                             {% if service.category %}
                             <div class="service-meta"><span><i class="fas fa-tag"></i> {{ service.category }}</span></div>
                             {% endif %}
@@ -546,7 +547,7 @@
                                 <span><i class="fas fa-clock"></i> {{ service.duration_minutes|default:"-" }} min</span>
                                 <span><i class="fas fa-dollar-sign"></i> R$ {{ service.price|floatformat:2 }}</span>
                             </div>
-                        </button>
+                        </div>
                         {% endfor %}
                     </div>
                     {% else %}
@@ -560,34 +561,14 @@
 
                 <div class="booking-modal__section span-2">
                     <div class="booking-modal__section-header">
-                        <div class="booking-modal__section-icon"><i class="fas fa-user-tie"></i></div>
+                        <div class="booking-modal__section-icon"><i class="fas fa-calendar-alt"></i></div>
                         <div class="booking-modal__section-title">
-                            <h4>2. Escolha o profissional</h4>
-                            <span>Selecione quem irá realizar o atendimento</span>
-                        </div>
-                    </div>
-
-                    <div class="booking-modal__hidden-field">{{ form.professional }}</div>
-
-                    <div id="bmProfessionalCards" class="professionals-grid"></div>
-                    <div id="bmProfessionalPlaceholder" class="bm-placeholder">
-                        Selecione primeiro um serviço para ver os profissionais disponíveis.
-                    </div>
-
-                    {{ form.professional.errors }}
-                </div>
-
-                <div class="booking-modal__section span-2">
-                    <div class="booking-modal__section-header">
-                        <div class="booking-modal__section-icon"><i class="fas fa-calendar-check"></i></div>
-                        <div class="booking-modal__section-title">
-                            <h4>3. Data e horário</h4>
-                            <span>Escolha o dia e selecione um dos horários livres</span>
+                            <h4>2. Escolha a data</h4>
+                            <span>Selecione o dia para desbloquear os horários</span>
                         </div>
                     </div>
 
                     <div class="booking-modal__hidden-field">{{ form.date }}</div>
-                    <div class="booking-modal__hidden-field">{{ form.time }}</div>
 
                     <div class="calendar-widget">
                         <div class="calendar-header">
@@ -600,15 +581,47 @@
                         <div class="calendar-grid" id="bmCalendarGrid"></div>
                     </div>
 
+                    {{ form.date.errors }}
+                </div>
+
+                <div class="booking-modal__section span-2">
+                    <div class="booking-modal__section-header">
+                        <div class="booking-modal__section-icon"><i class="fas fa-user-tie"></i></div>
+                        <div class="booking-modal__section-title">
+                            <h4>3. Escolha o profissional</h4>
+                            <span>Selecione quem irá realizar o atendimento</span>
+                        </div>
+                    </div>
+
+                    <div class="booking-modal__hidden-field">{{ form.professional }}</div>
+
+                    <div id="bmProfessionalCards" class="professionals-grid"></div>
+                    <div id="bmProfessionalPlaceholder" class="bm-placeholder">
+                        Selecione um serviço e uma data para ver os profissionais disponíveis.
+                    </div>
+
+                    {{ form.professional.errors }}
+                </div>
+
+                <div class="booking-modal__section span-2">
+                    <div class="booking-modal__section-header">
+                        <div class="booking-modal__section-icon"><i class="fas fa-clock"></i></div>
+                        <div class="booking-modal__section-title">
+                            <h4>4. Escolha o horário</h4>
+                            <span>Defina o melhor horário disponível para o atendimento</span>
+                        </div>
+                    </div>
+
+                    <div class="booking-modal__hidden-field">{{ form.time }}</div>
+
                     <div class="slots-section">
                         <div class="slots-info" id="bmSlotsInfo">
                             <i class="fas fa-info-circle"></i>
-                            <span>Selecione um serviço, profissional e data para listar os horários disponíveis.</span>
+                            <span>Selecione um serviço, uma data e um profissional para listar os horários disponíveis.</span>
                         </div>
                         <div class="slots-grid" id="bmSlotList"></div>
                     </div>
 
-                    {{ form.date.errors }}
                     {{ form.time.errors }}
                 </div>
 
@@ -616,7 +629,7 @@
                     <div class="booking-modal__section-header">
                         <div class="booking-modal__section-icon"><i class="fas fa-user-circle"></i></div>
                         <div class="booking-modal__section-title">
-                            <h4>4. Dados do cliente</h4>
+                            <h4>5. Dados do cliente</h4>
                             <span>Confirme as informações para contato e lembretes</span>
                         </div>
                     </div>
@@ -698,12 +711,16 @@
             if (professionalSelect) {
                 professionalSelect.value = '';
             }
+            selectedSlotIso = null;
+            if (timeInput) {
+                timeInput.value = '';
+            }
             if (professionalContainer) {
                 professionalContainer.innerHTML = '';
             }
             if (professionalPlaceholder) {
                 professionalPlaceholder.style.display = 'block';
-                professionalPlaceholder.innerHTML = 'Selecione primeiro um serviço para ver os profissionais disponíveis.';
+                professionalPlaceholder.innerHTML = 'Selecione um serviço e uma data para ver os profissionais disponíveis.';
             }
         }
 
@@ -731,12 +748,14 @@
             serviceSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
             serviceCards.forEach(card => {
-                card.classList.toggle('selected', card.dataset.serviceId === serviceId);
+                const isSelected = card.dataset.serviceId === serviceId;
+                card.classList.toggle('selected', isSelected);
+                card.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
             });
 
+            resetDateAndTime();
             resetProfessionalSelection();
             renderProfessionalCards();
-            resetDateAndTime();
         }
 
         function renderProfessionalCards() {
@@ -748,6 +767,12 @@
             professionalPlaceholder.style.display = 'block';
 
             if (!selectedServiceId || !servicesMap[selectedServiceId]) {
+                professionalPlaceholder.innerHTML = 'Selecione um serviço para ver os profissionais disponíveis.';
+                return;
+            }
+
+            if (!selectedDate) {
+                professionalPlaceholder.innerHTML = 'Selecione uma data antes de escolher o profissional.';
                 return;
             }
 
@@ -765,7 +790,7 @@
             if (allowAutoAssign) {
                 fragment.appendChild(createProfessionalCard({
                     id: '',
-                    name: 'Qualquer profissional',
+                    name: 'Sem preferência',
                     color: '#6366f1',
                     initial: '∞',
                     isAuto: true,
@@ -784,6 +809,9 @@
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'professional-card';
+            if (professional.isAuto) {
+                button.classList.add('professional-card-any');
+            }
             button.dataset.professionalId = professional.id === '' ? '' : String(professional.id);
 
             const avatar = document.createElement('div');
@@ -810,7 +838,7 @@
 
             const info = document.createElement('div');
             info.className = 'professional-card-info';
-            info.textContent = professional.isAuto ? 'Escolha automática' : 'Selecionar';
+            info.textContent = professional.isAuto ? 'Distribuição inteligente' : 'Selecionar';
 
             button.appendChild(avatar);
             button.appendChild(name);
@@ -823,7 +851,12 @@
                     professionalSelect.dispatchEvent(new Event('change', { bubbles: true }));
                 }
                 updateProfessionalCardSelection();
-                resetDateAndTime();
+                selectedSlotIso = null;
+                if (timeInput) {
+                    timeInput.value = '';
+                }
+                renderSlots([]);
+                loadSlots();
             });
 
             return button;
@@ -845,14 +878,19 @@
             }
 
             slotList.innerHTML = '';
-            slotsInfo.innerHTML = '<i class="fas fa-info-circle"></i><span>Selecione um serviço, profissional e data para listar os horários disponíveis.</span>';
+            slotsInfo.innerHTML = '<i class="fas fa-info-circle"></i><span>Selecione um serviço, uma data e um profissional para listar os horários disponíveis.</span>';
 
-            if (!selectedServiceId || (!selectedProfessionalId && selectedProfessionalId !== '')) {
+            if (!selectedServiceId) {
                 return;
             }
 
             if (!selectedDate) {
-                slotsInfo.innerHTML = '<i class="fas fa-hand-pointer"></i><span>Selecione uma data no calendário para listar os horários disponíveis.</span>';
+                slotsInfo.innerHTML = '<i class="fas fa-hand-pointer"></i><span>Selecione uma data no calendário para continuar.</span>';
+                return;
+            }
+
+            if (selectedProfessionalId === null || selectedProfessionalId === undefined) {
+                slotsInfo.innerHTML = '<i class="fas fa-user-clock"></i><span>Escolha um profissional para listar os horários livres.</span>';
                 return;
             }
 
@@ -929,8 +967,18 @@
         }
 
         serviceCards.forEach(card => {
+            card.style.cursor = 'pointer';
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('aria-pressed', card.classList.contains('selected') ? 'true' : 'false');
             card.addEventListener('click', () => {
                 setService(card.dataset.serviceId);
+            });
+            card.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    setService(card.dataset.serviceId);
+                }
             });
         });
 
@@ -973,7 +1021,9 @@
                 }
             }
 
-            if (selectedServiceId && (selectedProfessionalId !== null) && selectedDate) {
+            renderProfessionalCards();
+            highlightSelectedSlot();
+            if (selectedServiceId && selectedDate && (selectedProfessionalId !== null)) {
                 loadSlots();
             }
         }
@@ -1084,6 +1134,8 @@
                     dateInput.value = isoDate;
                     dateInput.dispatchEvent(new Event('change', { bubbles: true }));
                 }
+                resetProfessionalSelection();
+                renderProfessionalCards();
                 loadSlots();
             }
         });
