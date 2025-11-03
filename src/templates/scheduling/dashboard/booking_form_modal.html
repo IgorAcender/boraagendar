@@ -161,134 +161,138 @@
         display: none;
     }
 
-    .bm-service-card-list,
-    .bm-professional-card-list {
+    .services-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .service-card {
+        background: #ffffff;
+        border: 3px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1.25rem;
+        transition: all 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .service-card:hover {
+        border-color: var(--brand-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .service-card.selected {
+        border-color: var(--brand-primary);
+        border-width: 3px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .service-card .service-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.35rem;
+    }
+
+    .service-card .service-meta {
+        font-size: 0.85rem;
+        color: #64748b;
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+    }
+
+    .service-card .service-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .service-description {
+        margin-top: 0.4rem;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .professionals-grid {
         display: grid;
         gap: 1rem;
     }
 
     @media (min-width: 720px) {
-        .bm-professional-card-list {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+        .professionals-grid {
+            grid-template-columns: repeat(3, 1fr);
         }
     }
 
-    .bm-service-card {
-        border: 2px solid transparent;
-        border-radius: 14px;
-        background: #ffffff;
-        padding: 1.1rem 1.25rem;
-        text-align: left;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 6px 16px -12px rgba(15, 23, 42, 0.45);
-        position: relative;
-        display: block;
-    }
-
-    .bm-service-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 32px -18px rgba(79, 70, 229, 0.45);
-    }
-
-    .bm-service-card--selected {
-        border-color: var(--brand-primary);
-        box-shadow: 0 14px 36px -20px rgba(99, 102, 241, 0.6);
-    }
-
-    .bm-service-card__category {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        padding: 0.3rem 0.65rem;
-        font-size: 0.72rem;
-        border-radius: 999px;
-        background: rgba(99, 102, 241, 0.1);
-        color: #4338ca;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .bm-service-card__title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0.35rem 0;
-    }
-
-    .bm-service-card__description {
-        font-size: 0.9rem;
-        color: #64748b;
-        margin: 0;
-    }
-
-    .bm-service-card__meta {
-        display: flex;
-        gap: 0.6rem;
-        margin-top: 0.9rem;
-        font-size: 0.8rem;
-        color: #475569;
-        font-weight: 600;
-    }
-
-    .bm-professional-card {
+    .professional-card {
+        background: white;
         border: 2px solid #e2e8f0;
-        border-radius: 14px;
-        background: #ffffff;
-        padding: 0.85rem;
+        border-radius: 12px;
+        padding: 0.75rem;
         text-align: center;
+        transition: all 0.3s;
         cursor: pointer;
-        transition: all 0.2s ease;
+        text-decoration: none;
+        color: inherit;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.6rem;
-        min-height: 140px;
     }
 
-    .bm-professional-card:hover {
+    .professional-card:hover {
         border-color: var(--brand-primary);
         transform: translateY(-2px);
-        box-shadow: 0 12px 28px -20px rgba(99, 102, 241, 0.35);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
     }
 
-    .bm-professional-card--selected {
+    .professional-card.selected {
         border-color: var(--brand-primary);
         border-width: 3px;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
-        box-shadow: 0 14px 30px -18px rgba(99, 102, 241, 0.45);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
 
-    .bm-professional-card__avatar {
-        width: 58px;
-        height: 58px;
+    .professional-card-avatar {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 0.5rem;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 1.5rem;
         font-weight: 700;
-        color: #ffffff;
-        font-size: 1.35rem;
-        box-shadow: 0 10px 18px -12px rgba(15, 23, 42, 0.55);
-        overflow: hidden;
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .bm-professional-card__avatar img {
+    .professional-card-avatar img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        border-radius: 50%;
     }
 
-    .bm-professional-card__name {
-        font-size: 0.92rem;
+    .professional-card-name {
+        font-size: 0.85rem;
         font-weight: 600;
         color: #1e293b;
+        margin-top: 0.25rem;
+        text-align: center;
     }
 
-    .bm-professional-card__info {
-        font-size: 0.78rem;
-        color: #64748b;
+    .professional-card-info {
+        font-size: 0.75rem;
+        color: #94a3b8;
     }
 
     .bm-placeholder {
@@ -300,100 +304,113 @@
         color: #475569;
     }
 
-    .bm-calendar {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 1.25rem;
-        box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.05);
+    .calendar-widget {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
-    .bm-calendar__header {
+    .calendar-header {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        margin-bottom: 1.1rem;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e2e8f0;
     }
 
-    .bm-calendar__month {
+    .calendar-month {
+        font-size: 1.1rem;
         font-weight: 700;
-        font-size: 1rem;
         color: #1e293b;
     }
 
-    .bm-calendar__nav {
+    .calendar-nav {
         display: flex;
         gap: 0.5rem;
     }
 
-    .bm-calendar__nav button {
+    .calendar-nav-btn {
         width: 36px;
         height: 36px;
         border: none;
-        border-radius: 10px;
         background: #f1f5f9;
-        color: #475569;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .bm-calendar__nav button:hover {
-        background: var(--brand-primary);
-        color: #ffffff;
-    }
-
-    .bm-calendar__grid {
-        display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 6px;
-    }
-
-    .bm-calendar__dayname {
-        text-align: center;
-        font-size: 0.7rem;
-        font-weight: 600;
-        color: #64748b;
-        padding: 0.4rem 0;
-        text-transform: uppercase;
-    }
-
-    .bm-calendar__cell {
-        aspect-ratio: 1;
-        border-radius: 10px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        font-weight: 600;
-        color: #475569;
-        transition: all 0.2s ease;
+        transition: all 0.2s;
+        color: #64748b;
     }
 
-    .bm-calendar__cell:hover {
-        background: #e2e8f0;
-    }
-
-    .bm-calendar__cell--disabled {
-        color: #cbd5e1;
-        pointer-events: none;
-    }
-
-    .bm-calendar__cell--today {
-        border: 2px solid var(--brand-primary);
-    }
-
-    .bm-calendar__cell--selected {
+    .calendar-nav-btn:hover {
         background: var(--brand-primary);
-        color: #ffffff;
-        border: 2px solid var(--brand-primary);
+        color: white;
     }
 
-    .bm-slots {
+    .calendar-grid {
         display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+    }
+
+    .calendar-day-header {
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        padding: 0.75rem 0.25rem;
+        text-transform: uppercase;
+        background: #f8fafc;
+        border-radius: 4px;
+    }
+
+    .calendar-day {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        border: 2px solid transparent;
+    }
+
+    .calendar-day:hover {
+        background: #f1f5f9;
+    }
+
+    .calendar-day.disabled,
+    .calendar-day.other-month {
+        color: #cbd5e1;
+        cursor: not-allowed;
+        background: #f8fafc;
+    }
+
+    .calendar-day.selected {
+        background: var(--brand-primary);
+        color: white;
+        border-color: var(--brand-primary);
+        font-weight: 700;
+    }
+
+    .calendar-day.today {
+        border-color: var(--brand-primary);
+        color: var(--brand-primary);
+        font-weight: 700;
+    }
+
+    .slots-section {
+        display: flex;
+        flex-direction: column;
         gap: 0.75rem;
     }
 
-    .bm-slots__info {
+    .slots-info {
         background: #eef2ff;
         border-radius: 12px;
         padding: 0.85rem 1rem;
@@ -404,32 +421,35 @@
         gap: 0.6rem;
     }
 
-    .bm-slot-list {
+    .slots-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         gap: 0.65rem;
     }
 
-    .bm-slot {
-        border: 2px solid #dbeafe;
-        border-radius: 12px;
-        padding: 0.75rem 0.5rem;
-        text-align: center;
-        cursor: pointer;
-        font-weight: 600;
-        color: #1e293b;
-        transition: all 0.2s ease;
+    .slot-card {
         background: #ffffff;
+        border: 3px solid #cbd5e1;
+        border-radius: 14px;
+        padding: 0.875rem 0.5rem;
+        text-align: center;
+        transition: all 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: #1e293b;
+        font-weight: 600;
     }
 
-    .bm-slot:hover {
+    .slot-card:hover {
+        background: #f8fafc;
         border-color: var(--brand-primary);
-        box-shadow: 0 8px 20px -14px rgba(99, 102, 241, 0.65);
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
     }
 
-    .bm-slot--selected {
+    .slot-card.selected {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
         border-color: var(--brand-primary);
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
     }
 
     .booking-modal__actions {
@@ -509,20 +529,20 @@
                     <div class="booking-modal__hidden-field">{{ form.service }}</div>
 
                     {% if services %}
-                    <div class="bm-service-card-list" id="bmServiceCards">
+                    <div class="services-grid" id="bmServiceCards">
                         {% for service in services %}
                         <button type="button"
-                                class="bm-service-card"
+                                class="service-card"
                                 data-service-id="{{ service.id }}"
                                 data-category="{{ service.category|default_if_none:'' }}">
                             {% if service.category %}
-                            <div class="bm-service-card__category"><i class="fas fa-tag"></i> {{ service.category }}</div>
+                            <div class="service-meta"><span><i class="fas fa-tag"></i> {{ service.category }}</span></div>
                             {% endif %}
-                            <div class="bm-service-card__title">{{ service.name }}</div>
+                            <div class="service-name">{{ service.name }}</div>
                             {% if service.description %}
-                            <p class="bm-service-card__description">{{ service.description }}</p>
+                            <p class="service-description">{{ service.description }}</p>
                             {% endif %}
-                            <div class="bm-service-card__meta">
+                            <div class="service-meta">
                                 <span><i class="fas fa-clock"></i> {{ service.duration_minutes|default:"-" }} min</span>
                                 <span><i class="fas fa-dollar-sign"></i> R$ {{ service.price|floatformat:2 }}</span>
                             </div>
@@ -549,7 +569,7 @@
 
                     <div class="booking-modal__hidden-field">{{ form.professional }}</div>
 
-                    <div id="bmProfessionalCards" class="bm-professional-card-list"></div>
+                    <div id="bmProfessionalCards" class="professionals-grid"></div>
                     <div id="bmProfessionalPlaceholder" class="bm-placeholder">
                         Selecione primeiro um serviço para ver os profissionais disponíveis.
                     </div>
@@ -569,23 +589,23 @@
                     <div class="booking-modal__hidden-field">{{ form.date }}</div>
                     <div class="booking-modal__hidden-field">{{ form.time }}</div>
 
-                    <div class="bm-calendar">
-                        <div class="bm-calendar__header">
-                            <div class="bm-calendar__month" id="bmCalendarMonth"></div>
-                            <div class="bm-calendar__nav">
-                                <button type="button" id="bmCalendarPrev" aria-label="Mês anterior"><i class="fas fa-chevron-left"></i></button>
-                                <button type="button" id="bmCalendarNext" aria-label="Próximo mês"><i class="fas fa-chevron-right"></i></button>
+                    <div class="calendar-widget">
+                        <div class="calendar-header">
+                            <div class="calendar-month" id="bmCalendarMonth"></div>
+                            <div class="calendar-nav">
+                                <button type="button" class="calendar-nav-btn" id="bmCalendarPrev" aria-label="Mês anterior"><i class="fas fa-chevron-left"></i></button>
+                                <button type="button" class="calendar-nav-btn" id="bmCalendarNext" aria-label="Próximo mês"><i class="fas fa-chevron-right"></i></button>
                             </div>
                         </div>
-                        <div class="bm-calendar__grid" id="bmCalendarGrid"></div>
+                        <div class="calendar-grid" id="bmCalendarGrid"></div>
                     </div>
 
-                    <div class="bm-slots">
-                        <div class="bm-slots__info" id="bmSlotsInfo">
+                    <div class="slots-section">
+                        <div class="slots-info" id="bmSlotsInfo">
                             <i class="fas fa-info-circle"></i>
                             <span>Selecione um serviço, profissional e data para listar os horários disponíveis.</span>
                         </div>
-                        <div class="bm-slot-list" id="bmSlotList"></div>
+                        <div class="slots-grid" id="bmSlotList"></div>
                     </div>
 
                     {{ form.date.errors }}
@@ -657,7 +677,7 @@
         const dateInput = container.querySelector('#id_date');
         const timeInput = container.querySelector('#id_time');
 
-        const serviceCards = Array.from(container.querySelectorAll('.bm-service-card'));
+        const serviceCards = Array.from(container.querySelectorAll('.service-card'));
         const professionalContainer = container.querySelector('#bmProfessionalCards');
         const professionalPlaceholder = container.querySelector('#bmProfessionalPlaceholder');
         const slotsInfo = container.querySelector('#bmSlotsInfo');
@@ -711,7 +731,7 @@
             serviceSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
             serviceCards.forEach(card => {
-                card.classList.toggle('bm-service-card--selected', card.dataset.serviceId === serviceId);
+                card.classList.toggle('selected', card.dataset.serviceId === serviceId);
             });
 
             resetProfessionalSelection();
@@ -763,11 +783,11 @@
         function createProfessionalCard(professional) {
             const button = document.createElement('button');
             button.type = 'button';
-            button.className = 'bm-professional-card';
+            button.className = 'professional-card';
             button.dataset.professionalId = professional.id === '' ? '' : String(professional.id);
 
             const avatar = document.createElement('div');
-            avatar.className = 'bm-professional-card__avatar';
+            avatar.className = 'professional-card-avatar';
             avatar.style.background = professional.color || '#6366f1';
 
             if (professional.photo_base64) {
@@ -785,11 +805,11 @@
             }
 
             const name = document.createElement('div');
-            name.className = 'bm-professional-card__name';
+            name.className = 'professional-card-name';
             name.textContent = professional.name;
 
             const info = document.createElement('div');
-            info.className = 'bm-professional-card__info';
+            info.className = 'professional-card-info';
             info.textContent = professional.isAuto ? 'Escolha automática' : 'Selecionar';
 
             button.appendChild(avatar);
@@ -813,9 +833,9 @@
             if (!professionalContainer) {
                 return;
             }
-            const cards = professionalContainer.querySelectorAll('.bm-professional-card');
+            const cards = professionalContainer.querySelectorAll('.professional-card');
             cards.forEach(card => {
-                card.classList.toggle('bm-professional-card--selected', card.dataset.professionalId === String(selectedProfessionalId ?? ''));
+                card.classList.toggle('selected', card.dataset.professionalId === String(selectedProfessionalId ?? ''));
             });
         }
 
@@ -846,7 +866,7 @@
             slots.forEach(slot => {
                 const button = document.createElement('button');
                 button.type = 'button';
-                button.className = 'bm-slot';
+                button.className = 'slot-card';
                 button.textContent = slot.time;
                 button.dataset.slotStart = slot.start;
 
@@ -869,9 +889,9 @@
             if (!slotList) {
                 return;
             }
-            const buttons = slotList.querySelectorAll('.bm-slot');
+            const buttons = slotList.querySelectorAll('.slot-card');
             buttons.forEach(button => {
-                button.classList.toggle('bm-slot--selected', button.dataset.slotStart === selectedSlotIso);
+                button.classList.toggle('selected', button.dataset.slotStart === selectedSlotIso);
             });
         }
 
@@ -995,12 +1015,12 @@
                 this.monthLabel.textContent = `${this.monthNames[month]} ${year}`;
                 this.grid.innerHTML = '';
 
-                this.dayNames.forEach(day => {
-                    const header = document.createElement('div');
-                    header.className = 'bm-calendar__dayname';
-                    header.textContent = day;
-                    this.grid.appendChild(header);
-                });
+            this.dayNames.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                this.grid.appendChild(header);
+            });
 
                 const firstDay = new Date(year, month, 1);
                 const startDay = firstDay.getDay();
@@ -1008,20 +1028,20 @@
 
                 for (let i = 0; i < startDay; i++) {
                     const placeholder = document.createElement('div');
-                    placeholder.className = 'bm-calendar__cell bm-calendar__cell--disabled';
+                    placeholder.className = 'calendar-day disabled other-month';
                     this.grid.appendChild(placeholder);
                 }
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     const date = new Date(year, month, day);
                     const cell = document.createElement('div');
-                    cell.className = 'bm-calendar__cell';
+                    cell.className = 'calendar-day';
                     cell.textContent = day;
 
                     const isoDate = date.toISOString().split('T')[0];
                     const minDateIso = this.minDate.toISOString().split('T')[0];
                     if (isoDate < minDateIso) {
-                        cell.classList.add('bm-calendar__cell--disabled');
+                        cell.classList.add('disabled');
                     } else {
                         cell.addEventListener('click', () => {
                             this.selectedDate = date;
@@ -1033,12 +1053,12 @@
                     }
 
                     if (this.selectedDate && this.isSameDate(date, this.selectedDate)) {
-                        cell.classList.add('bm-calendar__cell--selected');
+                        cell.classList.add('selected');
                     }
 
                     const today = new Date();
                     if (this.isSameDate(date, today)) {
-                        cell.classList.add('bm-calendar__cell--today');
+                        cell.classList.add('today');
                     }
 
                     this.grid.appendChild(cell);
