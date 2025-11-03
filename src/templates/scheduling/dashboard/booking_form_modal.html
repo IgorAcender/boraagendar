@@ -1,5 +1,18 @@
 {% load static %}
+<div class="booking-form-card booking-modal-wrapper">
 <style>
+    .booking-modal-wrapper {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .booking-modal-wrapper form {
+        margin: 0;
+    }
+
     .booking-modal {
         background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
         border-radius: 22px;
@@ -616,14 +629,22 @@
         </form>
     </div>
 </div>
+</div>
 
 {% if services_json %}
 {{ services_json|json_script:"booking-services-data" }}
 {% endif %}
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const servicesDataElement = document.getElementById('booking-services-data');
+    window.initializeDashboardBookingModal = function(rootElement) {
+        const root = rootElement || document.getElementById('newBookingModalBody') || document;
+        const container = root.querySelector('.booking-modal');
+        if (!container || container.dataset.initialized === 'true') {
+            return;
+        }
+        container.dataset.initialized = 'true';
+
+        const servicesDataElement = root.querySelector('#booking-services-data');
         const servicesData = servicesDataElement ? JSON.parse(servicesDataElement.textContent) : [];
         const servicesMap = {};
         servicesData.forEach(service => { servicesMap[String(service.id)] = service; });
@@ -631,16 +652,16 @@
         const tenantSlug = "{{ tenant.slug }}";
         const todayString = "{{ today|date:'Y-m-d' }}";
 
-        const serviceSelect = document.getElementById('id_service');
-        const professionalSelect = document.getElementById('id_professional');
-        const dateInput = document.getElementById('id_date');
-        const timeInput = document.getElementById('id_time');
+        const serviceSelect = container.querySelector('#id_service');
+        const professionalSelect = container.querySelector('#id_professional');
+        const dateInput = container.querySelector('#id_date');
+        const timeInput = container.querySelector('#id_time');
 
-        const serviceCards = Array.from(document.querySelectorAll('.bm-service-card'));
-        const professionalContainer = document.getElementById('bmProfessionalCards');
-        const professionalPlaceholder = document.getElementById('bmProfessionalPlaceholder');
-        const slotsInfo = document.getElementById('bmSlotsInfo');
-        const slotList = document.getElementById('bmSlotList');
+        const serviceCards = Array.from(container.querySelectorAll('.bm-service-card'));
+        const professionalContainer = container.querySelector('#bmProfessionalCards');
+        const professionalPlaceholder = container.querySelector('#bmProfessionalPlaceholder');
+        const slotsInfo = container.querySelector('#bmSlotsInfo');
+        const slotList = container.querySelector('#bmSlotList');
 
         let selectedServiceId = serviceSelect ? serviceSelect.value || null : null;
         let selectedProfessionalId = professionalSelect ? professionalSelect.value || null : null;
@@ -657,9 +678,13 @@
             if (professionalSelect) {
                 professionalSelect.value = '';
             }
-            professionalContainer.innerHTML = '';
-            professionalPlaceholder.style.display = 'block';
-            professionalPlaceholder.innerHTML = 'Selecione primeiro um serviço para ver os profissionais disponíveis.';
+            if (professionalContainer) {
+                professionalContainer.innerHTML = '';
+            }
+            if (professionalPlaceholder) {
+                professionalPlaceholder.style.display = 'block';
+                professionalPlaceholder.innerHTML = 'Selecione primeiro um serviço para ver os profissionais disponíveis.';
+            }
         }
 
         function resetDateAndTime(clearCalendar = true) {
@@ -678,19 +703,27 @@
         }
 
         function setService(serviceId) {
-            if (!serviceSelect) { return; }
+            if (!serviceSelect) {
+                return;
+            }
             selectedServiceId = serviceId;
             serviceSelect.value = serviceId;
-            serviceSelect.dispatchEvent(new Event('change'));
+            serviceSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
             serviceCards.forEach(card => {
                 card.classList.toggle('bm-service-card--selected', card.dataset.serviceId === serviceId);
             });
+
             resetProfessionalSelection();
             renderProfessionalCards();
             resetDateAndTime();
         }
 
         function renderProfessionalCards() {
+            if (!professionalContainer || !professionalPlaceholder) {
+                return;
+            }
+
             professionalContainer.innerHTML = '';
             professionalPlaceholder.style.display = 'block';
 
@@ -767,7 +800,7 @@
                 selectedProfessionalId = professional.id === '' ? '' : String(professional.id);
                 if (professionalSelect) {
                     professionalSelect.value = selectedProfessionalId;
-                    professionalSelect.dispatchEvent(new Event('change'));
+                    professionalSelect.dispatchEvent(new Event('change', { bubbles: true }));
                 }
                 updateProfessionalCardSelection();
                 resetDateAndTime();
@@ -777,13 +810,20 @@
         }
 
         function updateProfessionalCardSelection() {
+            if (!professionalContainer) {
+                return;
+            }
             const cards = professionalContainer.querySelectorAll('.bm-professional-card');
             cards.forEach(card => {
-                card.classList.toggle('bm-professional-card--selected', card.dataset.professionalId === String(selectedProfessionalId || ''));
+                card.classList.toggle('bm-professional-card--selected', card.dataset.professionalId === String(selectedProfessionalId ?? ''));
             });
         }
 
         function renderSlots(slots) {
+            if (!slotList || !slotsInfo) {
+                return;
+            }
+
             slotList.innerHTML = '';
             slotsInfo.innerHTML = '<i class="fas fa-info-circle"></i><span>Selecione um serviço, profissional e data para listar os horários disponíveis.</span>';
 
@@ -809,13 +849,12 @@
                 button.className = 'bm-slot';
                 button.textContent = slot.time;
                 button.dataset.slotStart = slot.start;
-                button.dataset.slotTime = slot.time;
 
                 button.addEventListener('click', () => {
                     selectedSlotIso = slot.start;
                     if (timeInput) {
                         timeInput.value = slot.time;
-                        timeInput.dispatchEvent(new Event('change'));
+                        timeInput.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                     highlightSelectedSlot();
                 });
@@ -827,6 +866,9 @@
         }
 
         function highlightSelectedSlot() {
+            if (!slotList) {
+                return;
+            }
             const buttons = slotList.querySelectorAll('.bm-slot');
             buttons.forEach(button => {
                 button.classList.toggle('bm-slot--selected', button.dataset.slotStart === selectedSlotIso);
@@ -839,8 +881,12 @@
                 return;
             }
 
-            slotsInfo.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Carregando horários disponíveis...</span>';
-            slotList.innerHTML = '';
+            if (slotsInfo) {
+                slotsInfo.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Carregando horários disponíveis...</span>';
+            }
+            if (slotList) {
+                slotList.innerHTML = '';
+            }
 
             const professionalQuery = selectedProfessionalId === '' ? 'any' : selectedProfessionalId;
             const url = `/agendar/${tenantSlug}/api/horarios/?service_id=${selectedServiceId}&professional_id=${professionalQuery}&date=${selectedDate}`;
@@ -856,7 +902,9 @@
                     renderSlots(slots);
                 })
                 .catch(() => {
-                    slotsInfo.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Erro ao carregar horários. Tente novamente.</span>';
+                    if (slotsInfo) {
+                        slotsInfo.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Erro ao carregar horários. Tente novamente.</span>';
+                    }
                 });
         }
 
@@ -900,7 +948,6 @@
             }
 
             if (initialTime) {
-                selectedSlotIso = null;
                 if (timeInput) {
                     timeInput.value = initialTime;
                 }
@@ -1007,20 +1054,23 @@
             initialDate: selectedDate || todayString,
             selectedDate: selectedDate,
             minDate: todayString,
-            monthLabel: document.getElementById('bmCalendarMonth'),
-            grid: document.getElementById('bmCalendarGrid'),
-            prevBtn: document.getElementById('bmCalendarPrev'),
-            nextBtn: document.getElementById('bmCalendarNext'),
+            monthLabel: container.querySelector('#bmCalendarMonth'),
+            grid: container.querySelector('#bmCalendarGrid'),
+            prevBtn: container.querySelector('#bmCalendarPrev'),
+            nextBtn: container.querySelector('#bmCalendarNext'),
             onSelect: (isoDate) => {
                 selectedDate = isoDate;
                 if (dateInput) {
                     dateInput.value = isoDate;
-                    dateInput.dispatchEvent(new Event('change'));
+                    dateInput.dispatchEvent(new Event('change', { bubbles: true }));
                 }
                 loadSlots();
             }
         });
 
         initialiseFromForm();
-    });
+    };
+
+    window.initializeDashboardBookingModal();
 </script>
+</div>

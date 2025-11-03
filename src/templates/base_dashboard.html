@@ -954,9 +954,16 @@
                                 modalHeader.style.display = 'none';
                             }
                         }, 50);
+
+                        if (typeof window.initializeDashboardBookingModal === 'function') {
+                            window.initializeDashboardBookingModal(modalBody);
+                        }
                     } else if (form) {
                         console.log('DEBUG: Usando form diretamente');
                         modalBody.innerHTML = form.outerHTML;
+                        if (typeof window.initializeDashboardBookingModal === 'function') {
+                            window.initializeDashboardBookingModal(modalBody);
+                        }
                     } else {
                         console.error('ERRO: Nem card nem form encontrado no HTML');
                         modalBody.innerHTML = `
@@ -1014,6 +1021,10 @@
                                 modalBody.innerHTML = formElement.outerHTML;
                             } else {
                                 modalBody.innerHTML = html;
+                            }
+
+                            if (typeof window.initializeDashboardBookingModal === 'function') {
+                                window.initializeDashboardBookingModal(modalBody);
                             }
 
                             const rehydratedForm = modalBody.querySelector('form');
