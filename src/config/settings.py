@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "scheduling.apps.SchedulingConfig",
     "notifications.apps.NotificationsConfig",
     "reports.apps.ReportsConfig",
+    "raffles.apps.RafflesConfig",
 ]
 
 MIDDLEWARE = [

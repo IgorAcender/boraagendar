@@ -2,11 +2,15 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from scheduling.api import viewsets as scheduling_viewsets
+from raffles.api import viewsets as raffles_viewsets
 
 router = DefaultRouter()
 router.register(r"bookings", scheduling_viewsets.BookingViewSet, basename="booking")
 router.register(r"services", scheduling_viewsets.ServiceViewSet, basename="service")
 router.register(r"professionals", scheduling_viewsets.ProfessionalViewSet, basename="professional")
+router.register(r"raffles", raffles_viewsets.RaffleViewSet, basename="raffle")
+router.register(r"raffle-orders", raffles_viewsets.RaffleOrderViewSet, basename="raffle-order")
+router.register(r"raffle-referrals", raffles_viewsets.ReferralInvitationViewSet, basename="raffle-referral")
 
 urlpatterns = [
     path("", include(router.urls)),
