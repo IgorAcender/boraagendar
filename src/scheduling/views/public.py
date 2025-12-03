@@ -16,7 +16,7 @@ from ..services.notification_dispatcher import send_booking_confirmation
 def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     """Página de landing/mini-site do tenant."""
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
-    business_hours = tenant.business_hours.all()
+    business_hours = tenant.business_hours.all().order_by('day_of_week')
     
     # Converter amenities e payment methods para listas
     amenities = [a.strip() for a in tenant.amenities.split(",") if a.strip()] if tenant.amenities else []
