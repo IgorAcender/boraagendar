@@ -5,7 +5,8 @@ import json
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from tenants.models import Tenant, BusinessHours
+from tenants.models import Tenant
+from ..models import AvailabilityRule
 
 from ..forms import AvailabilitySearchForm, BookingForm
 from ..models import Booking, Professional, Service
@@ -16,7 +17,25 @@ from ..services.notification_dispatcher import send_booking_confirmation
 def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     """Página de landing/mini-site do tenant."""
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
-    business_hours = tenant.business_hours.all().order_by('day_of_week')
+    
+    # Buscar horários padrão da empresa (professional=None)
+    availability_rules = AvailabilityRule.objects.filter(
+        tenant=tenant,
+        professional__isnull=True,
+        is_active=True
+    ).order_by('weekday', 'start_time')
+    
+    # Converter para formato para o template
+    business_hours = []
+    for rule in availability_rules:
+        business_hours.append({
+            'day_of_week': rule.weekday,
+            'day_name': dict(rule.WEEKDAYS)[rule.weekday],
+            'start_time': rule.start_time,
+            'end_time': rule.end_time,
+            'break_start': rule.break_start,
+            'break_end': rule.break_end,
+        })
     
     # Converter amenities e payment methods para listas
     amenities = [a.strip() for a in tenant.amenities.split(",") if a.strip()] if tenant.amenities else []
@@ -28,6 +47,7 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         "amenities": amenities,
         "payment_methods": payment_methods,
     }
+    return render(request, "scheduling/public/tenant_landing.html", context)
     return render(request, "scheduling/public/tenant_landing.html", context)
 
 

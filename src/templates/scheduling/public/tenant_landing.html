@@ -627,12 +627,15 @@
                     {% if business_hours %}
                         {% for hour in business_hours %}
                         <div class="hour-item">
-                            <span class="day-name">{{ hour.get_day_of_week_display }}</span>
-                            {% if hour.is_closed %}
-                                <span class="closed-badge">FECHADO</span>
-                            {% else %}
-                                <span class="hour-time">{{ hour.opening_time|time:"H:i" }} - {{ hour.closing_time|time:"H:i" }}</span>
-                            {% endif %}
+                            <span class="day-name">{{ hour.day_name }}</span>
+                            <span class="hour-time">
+                                {{ hour.start_time|time:"H:i" }} - {{ hour.end_time|time:"H:i" }}
+                                {% if hour.break_start %}
+                                    <span style="font-size: 0.85rem; color: var(--text-muted);">
+                                        (intervalo: {{ hour.break_start|time:"H:i" }} - {{ hour.break_end|time:"H:i" }})
+                                    </span>
+                                {% endif %}
+                            </span>
                         </div>
                         {% endfor %}
                     {% else %}
