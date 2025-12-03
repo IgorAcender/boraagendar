@@ -38,23 +38,97 @@
 
         /* Header com Logo */
         .header-section {
+            position: relative;
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(2, 6, 23, 0.9));
-            padding: 3rem 1rem;
             text-align: center;
             border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+            overflow: hidden;
         }
 
-        .logo-container {
-            width: 140px;
-            height: 140px;
-            margin: 0 auto 2rem;
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-            overflow: hidden;
+        /* Desktop: Logo pequena com layout horizontal */
+        @media (min-width: 768px) {
+            .header-section {
+                padding: 3rem 1rem;
+            }
+
+            .logo-container {
+                width: 140px;
+                height: 140px;
+                margin: 0 auto 2rem;
+                background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+                border-radius: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+                overflow: hidden;
+            }
+
+            .company-name {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: white;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        /* Mobile: Logo grande fullwidth hero */
+        @media (max-width: 767px) {
+            .header-section {
+                padding: 0;
+                min-height: 60vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-end;
+                padding-bottom: 2rem;
+            }
+
+            .logo-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                background: none;
+                border-radius: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: none;
+                overflow: hidden;
+                z-index: 1;
+            }
+
+            .logo-container img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                filter: brightness(0.7) contrast(1.1);
+            }
+
+            .logo-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(15, 23, 42, 0.8));
+                z-index: 2;
+            }
+
+            .company-name {
+                font-size: 2rem;
+                font-weight: 700;
+                color: white;
+                margin-bottom: 0;
+                position: relative;
+                z-index: 3;
+                text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+                padding: 0 1rem;
+            }
         }
 
         .logo-container img {
@@ -68,13 +142,6 @@
             color: white;
         }
 
-        .company-name {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 0.5rem;
-        }
-
         /* Navigation Menu */
         .menu-section {
             display: flex;
@@ -84,6 +151,15 @@
             flex-wrap: wrap;
             background: rgba(30, 41, 59, 0.5);
             border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (max-width: 767px) {
+            .menu-section {
+                gap: 1rem;
+                padding: 1.5rem 0.75rem;
+            }
         }
 
         .menu-item {
@@ -95,6 +171,12 @@
             transition: all 0.3s;
             text-decoration: none;
             color: var(--text-muted);
+        }
+
+        @media (max-width: 767px) {
+            .menu-item {
+                gap: 0.5rem;
+            }
         }
 
         .menu-item:hover {
@@ -111,6 +193,14 @@
             justify-content: center;
             font-size: 1.5rem;
             transition: all 0.3s;
+        }
+
+        @media (max-width: 767px) {
+            .menu-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
         }
 
         .menu-item:hover .menu-icon {
