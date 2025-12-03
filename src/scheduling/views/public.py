@@ -38,12 +38,10 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         })
     
     # Buscar profissionais ativos do tenant
-    from django.db.models import Q
     professionals = Professional.objects.filter(
-        Q(tenant_memberships__tenant=tenant, tenant_memberships__is_active=True) |
-        Q(user__is_staff=True),
+        tenant=tenant,
         is_active=True
-    ).distinct().order_by('display_name')
+    ).order_by('display_name')
     
     # Converter amenities e payment methods para listas
     amenities = [a.strip() for a in tenant.amenities.split(",") if a.strip()] if tenant.amenities else []
