@@ -5,12 +5,30 @@ import json
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from tenants.models import Tenant
+from tenants.models import Tenant, BusinessHours
 
 from ..forms import AvailabilitySearchForm, BookingForm
 from ..models import Booking, Professional, Service
 from ..services.availability import AvailabilityService
 from ..services.notification_dispatcher import send_booking_confirmation
+
+
+def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
+    """Página de landing/mini-site do tenant."""
+    tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
+    business_hours = tenant.business_hours.all()
+    
+    # Converter amenities e payment methods para listas
+    amenities = [a.strip() for a in tenant.amenities.split(",") if a.strip()] if tenant.amenities else []
+    payment_methods = [p.strip() for p in tenant.payment_methods.split(",") if p.strip()] if tenant.payment_methods else []
+    
+    context = {
+        "tenant": tenant,
+        "business_hours": business_hours,
+        "amenities": amenities,
+        "payment_methods": payment_methods,
+    }
+    return render(request, "scheduling/public/tenant_landing.html", context)
 
 
 def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:

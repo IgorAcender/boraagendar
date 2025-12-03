@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Tenant, TenantMembership
+from .models import Tenant, TenantMembership, BusinessHours
 
 
 class TenantMembershipInline(admin.TabularInline):
@@ -9,13 +9,44 @@ class TenantMembershipInline(admin.TabularInline):
     autocomplete_fields = ("user",)
 
 
+class BusinessHoursInline(admin.TabularInline):
+    model = BusinessHours
+    extra = 0
+    fields = ("day_of_week", "is_closed", "opening_time", "closing_time")
+
+
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
     list_display = ("name", "slug", "is_active", "created_at")
     search_fields = ("name", "slug", "email")
     list_filter = ("is_active", "timezone")
     prepopulated_fields = {"slug": ("name",)}
-    inlines = [TenantMembershipInline]
+    inlines = [TenantMembershipInline, BusinessHoursInline]
+    fieldsets = (
+        ("Informações Básicas", {
+            "fields": ("name", "slug", "document", "timezone", "is_active")
+        }),
+        ("Contato", {
+            "fields": ("phone_number", "whatsapp_number", "email")
+        }),
+        ("Aparência", {
+            "fields": ("avatar", "color_primary", "color_secondary")
+        }),
+        ("Configurações de Serviços", {
+            "fields": (
+                "label_servico", "label_servico_plural",
+                "label_profissional", "label_profissional_plural",
+                "slot_interval_minutes"
+            )
+        }),
+        ("Página de Landing", {
+            "fields": (
+                "about_us", "address", "neighborhood", "city", "state", "zip_code",
+                "instagram_url", "facebook_url", "payment_methods", "amenities"
+            ),
+            "description": "Configure as informações que aparecem na página de landing do seu negócio."
+        }),
+    )
 
 
 @admin.register(TenantMembership)
@@ -23,3 +54,10 @@ class TenantMembershipAdmin(admin.ModelAdmin):
     list_display = ("tenant", "user", "role", "is_active", "created_at")
     list_filter = ("role", "is_active", "tenant")
     search_fields = ("tenant__name", "user__email", "user__first_name", "user__last_name")
+
+
+@admin.register(BusinessHours)
+class BusinessHoursAdmin(admin.ModelAdmin):
+    list_display = ("tenant", "day_of_week", "is_closed", "opening_time", "closing_time")
+    list_filter = ("tenant", "day_of_week", "is_closed")
+    search_fields = ("tenant__name",)

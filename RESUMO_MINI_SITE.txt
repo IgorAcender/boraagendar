@@ -1,0 +1,160 @@
+/* 🎊 Mini-Site por Tenant - Resumo das Mudanças 🎊 */
+
+📦 ARQUIVOS MODIFICADOS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  src/tenants/models.py
+   ├─ ✨ Adicionado 10 novos campos ao Tenant:
+   │  ├─ about_us (TextField)
+   │  ├─ address, neighborhood, city, state, zip_code (CharField)
+   │  ├─ instagram_url, facebook_url (URLField)
+   │  ├─ payment_methods, amenities (TextField)
+   │
+   └─ 🆕 Novo Modelo: BusinessHours
+      ├─ tenant (ForeignKey)
+      ├─ day_of_week (IntegerField - Segunda a Domingo)
+      ├─ is_closed (BooleanField)
+      ├─ opening_time, closing_time (TimeField)
+
+2️⃣  src/scheduling/views/public.py
+   └─ 🆕 Nova view: tenant_landing()
+      └─ Renderiza a página de landing/mini-site do tenant
+
+3️⃣  src/scheduling/urls/public.py
+   └─ 🆕 Nova URL: "<slug:tenant_slug>/" → tenant_landing
+      └─ O agendamento continua em "/agendar/<slug:tenant_slug>/"
+
+4️⃣  src/templates/scheduling/public/tenant_landing.html
+   └─ 🆕 Novo template com design escuro e moderno
+      ├─ Header com logo e nome
+      ├─ Menu de navegação (Sobre, Agendar, Equipe, Localização)
+      ├─ Seção "Sobre Nós"
+      ├─ Comodidades com ícones automáticos
+      ├─ Horário de Funcionamento
+      ├─ Contato (Telefone, WhatsApp, Email)
+      ├─ Endereço completo
+      ├─ Formas de Pagamento
+      ├─ Redes Sociais (Instagram, Facebook, WhatsApp)
+      ├─ Botão CTA "Agendar Agora"
+      └─ Footer
+
+5️⃣  src/tenants/admin.py
+   ├─ 📝 Atualizado TenantAdmin com novos fieldsets
+   ├─ 🆕 BusinessHoursInline para gerenciar horários
+   └─ 🆕 BusinessHoursAdmin
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 MIGRATIONS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ tenants/migrations/0012_...
+   └─ Criada e aplicada com sucesso!
+
+🎯 FLUXO DE NAVEGAÇÃO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Antes:
+   URL de entrada → booking_start (agendamento direto)
+   
+Agora:
+   URL: /{tenant-slug}/
+      ↓
+   Landing Page (Mini-site) ← Botão "Agendar Agora"
+      ↓
+   URL: /agendar/{tenant-slug}/
+      ↓
+   booking_start (agendamento)
+
+📍 ESTRUTURA DA PÁGINA DE LANDING:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─────────────────────────────────────────────────────┐
+│  🏢 [LOGO]                                          │
+│      EAGLE21 BARBEARIA                              │
+├─────────────────────────────────────────────────────┤
+│  [🔔 Notícias] [📅 Agendar] [👥 Equipe] [🗺️ Mapa]  │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  📝 SOBRE NÓS                                      │
+│  Descrição do negócio...                           │
+│                                                     │
+│  ⭐ COMODIDADES                                    │
+│  [WiFi] [Estacionamento] [Acessibilidade]         │
+│                                                     │
+│  🕐 HORÁRIO DE FUNCIONAMENTO                       │
+│  Segunda-feira        09:00 - 20:00               │
+│  ...                                               │
+│                                                     │
+│  📞 CONTATO                                        │
+│  [Telefone] [WhatsApp] [Email]                     │
+│                                                     │
+│  📍 ENDEREÇO                                       │
+│  Rua X, 123 - Bairro - Cidade, MG                 │
+│                                                     │
+│  💳 FORMAS DE PAGAMENTO                            │
+│  [Dinheiro] [Cartão] [PIX]                        │
+│                                                     │
+│  🔗 REDES SOCIAIS                                  │
+│  [Instagram] [Facebook] [WhatsApp]                │
+│                                                     │
+│       [📅 AGENDAR AGORA] ← Grande botão CTA       │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│  © 2024 Eagle21 Barbearia - Todos os direitos    │
+└─────────────────────────────────────────────────────┘
+
+🎨 DESIGN FEATURES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ Tema Escuro (Dark Mode)
+✨ Cores dinâmicas baseadas em color_primary e color_secondary
+✨ Ícones automáticos para comodidades (WiFi, Estacionamento, etc)
+✨ Menu fixo com navegação suave
+✨ Links clicáveis (tel:, mailto:, WhatsApp)
+✨ Responsivo para mobile
+✨ Animações suaves
+✨ Gradientes moderno
+
+🚀 PRÓXIMOS PASSOS PARA O USUÁRIO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ir para admin: /admin/tenants/tenant/
+2. Editar seu tenant e preencher:
+   ✓ Sobre nós
+   ✓ Endereço completo
+   ✓ Redes Sociais
+   ✓ Formas de Pagamento
+   ✓ Comodidades
+
+3. Na seção "Horários de Funcionamento" (inline):
+   ✓ Configure Segunda a Domingo
+   ✓ Horários de abertura e fechamento
+   ✓ Marque como "Fechado" se necessário
+
+4. Testar:
+   ✓ Acesse: http://localhost:8000/{seu-tenant-slug}/
+   ✓ Veja a página de landing
+   ✓ Clique em "Agendar Agora"
+   ✓ Deve ir para /agendar/{seu-tenant-slug}/
+
+💡 DICAS EXTRAS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• Os ícones de comodidades são automáticos (detecta "WiFi", "Estacionamento", etc)
+• Links de WhatsApp funcionam em mobile (abre o app)
+• Telefone é clicável (abre dialer em mobile)
+• Email é clicável (abre cliente de email)
+• Tudo é 100% responsivo para mobile
+• O design usa as cores da sua marca (color_primary, color_secondary)
+
+📧 Para Popular Horários Padrão:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Execute no Django shell:
+  python manage.py shell < setup_business_hours.py
+
+Isso cria horários padrão para todos os tenants:
+  - Seg-Sex: 09:00 - 18:00
+  - Sab: 09:00 - 15:00
+  - Dom: Fechado

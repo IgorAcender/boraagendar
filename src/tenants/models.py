@@ -26,6 +26,17 @@ class Tenant(models.Model):
         choices=[(5, "5 minutos"), (10, "10 minutos"), (15, "15 minutos"), (20, "20 minutos"), (30, "30 minutos"), (45, "45 minutos"), (60, "60 minutos")],
         help_text="Define de quantos em quantos minutos os horários aparecem no agendamento público.",
     )
+    # Novos campos para página de landing do tenant
+    about_us = models.TextField("Sobre nós", blank=True, help_text="Descrição sobre o seu negócio/salão")
+    address = models.CharField("Endereço", max_length=300, blank=True)
+    neighborhood = models.CharField("Bairro", max_length=100, blank=True)
+    city = models.CharField("Cidade", max_length=100, blank=True)
+    state = models.CharField("Estado", max_length=2, blank=True)
+    zip_code = models.CharField("CEP", max_length=10, blank=True)
+    instagram_url = models.URLField("URL Instagram", blank=True)
+    facebook_url = models.URLField("URL Facebook", blank=True)
+    payment_methods = models.TextField("Formas de pagamento", blank=True, help_text="Separadas por vírgula: Ex: Dinheiro, Cartão de Crédito, Cartão de Débito, PIX")
+    amenities = models.TextField("Comodidades", blank=True, help_text="Separadas por vírgula: Ex: WiFi, Estacionamento, Acessibilidade")
     is_active = models.BooleanField("Ativo", default=True)
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
     updated_at = models.DateTimeField("Atualizado em", auto_now=True)
@@ -66,3 +77,35 @@ class TenantMembership(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.full_name} @ {self.tenant.name}"
+
+
+class BusinessHours(models.Model):
+    """Horários de funcionamento do tenant."""
+    
+    DAYS_OF_WEEK = [
+        (0, "Segunda-feira"),
+        (1, "Terça-feira"),
+        (2, "Quarta-feira"),
+        (3, "Quinta-feira"),
+        (4, "Sexta-feira"),
+        (5, "Sábado"),
+        (6, "Domingo"),
+    ]
+
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="business_hours")
+    day_of_week = models.IntegerField("Dia da semana", choices=DAYS_OF_WEEK)
+    is_closed = models.BooleanField("Fechado", default=False)
+    opening_time = models.TimeField("Horário de abertura", null=True, blank=True)
+    closing_time = models.TimeField("Horário de fechamento", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Horário de funcionamento"
+        verbose_name_plural = "Horários de funcionamento"
+        unique_together = ("tenant", "day_of_week")
+        ordering = ("day_of_week",)
+
+    def __str__(self) -> str:
+        day_name = dict(self.DAYS_OF_WEEK)[self.day_of_week]
+        if self.is_closed:
+            return f"{day_name} - FECHADO"
+        return f"{day_name} - {self.opening_time.strftime('%H:%M')} - {self.closing_time.strftime('%H:%M')}"

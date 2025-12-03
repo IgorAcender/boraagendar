@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ tenant.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-primary: {{ tenant.color_primary|default:"#667eea" }};
+            --brand-secondary: {{ tenant.color_secondary|default:"#764ba2" }};
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header com Logo */
+        .header-section {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(2, 6, 23, 0.9));
+            padding: 3rem 1rem;
+            text-align: center;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .logo-container {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            overflow: hidden;
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-container i {
+            font-size: 3.5rem;
+            color: white;
+        }
+
+        .company-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Navigation Menu */
+        .menu-section {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem 1rem;
+            flex-wrap: wrap;
+            background: rgba(30, 41, 59, 0.5);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-muted);
+        }
+
+        .menu-item:hover {
+            color: var(--brand-primary);
+        }
+
+        .menu-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover .menu-icon {
+            background: rgba(102, 126, 234, 0.3);
+            color: var(--brand-primary);
+        }
+
+        .menu-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Content Sections */
+        .content {
+            padding: 2rem 1rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--brand-primary);
+            font-size: 1.5rem;
+        }
+
+        /* Sobre Nós */
+        .about-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            text-align: justify;
+        }
+
+        /* Amenidades */
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .amenity-badge {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .amenity-badge:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .amenity-icon {
+            font-size: 2rem;
+            color: var(--brand-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .amenity-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        /* Horários */
+        .hours-container {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .hour-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .hour-item:last-child {
+            border-bottom: none;
+        }
+
+        .day-name {
+            font-weight: 600;
+            color: white;
+        }
+
+        .hour-time {
+            color: var(--brand-primary);
+            font-weight: 600;
+        }
+
+        .closed-badge {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* Contato */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .contact-item {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .contact-item:hover {
+            background: rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            color: var(--brand-primary);
+            margin-bottom: 1rem;
+        }
+
+        .contact-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .contact-value {
+            font-size: 1.1rem;
+            color: white;
+            word-break: break-word;
+        }
+
+        .contact-value a {
+            color: var(--brand-primary);
+            text-decoration: none;
+        }
+
+        .contact-value a:hover {
+            text-decoration: underline;
+        }
+
+        /* Endereço */
+        .address-card {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .address-line {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-light);
+        }
+
+        /* Formas de Pagamento */
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .payment-badge {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .payment-badge:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        /* Redes Sociais */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .social-link:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .social-icon {
+            font-size: 1.5rem;
+            color: var(--brand-primary);
+        }
+
+        /* CTA Button */
+        .cta-section {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .btn-schedule {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: white;
+            padding: 1.2rem 3rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.35);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-schedule:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.45);
+        }
+
+        .btn-schedule:active {
+            transform: translateY(-1px);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(2, 6, 23, 0.8);
+            border-top: 1px solid rgba(102, 126, 234, 0.1);
+            padding: 2rem 1rem;
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .company-name {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .menu-section {
+                gap: 1rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .amenities-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header-section">
+        <div class="container">
+            <div class="logo-container">
+                {% if tenant.avatar %}
+                    <img src="{{ tenant.avatar.url }}" alt="{{ tenant.name }}">
+                {% else %}
+                    <i class="fas fa-scissors"></i>
+                {% endif %}
+            </div>
+            <h1 class="company-name">{{ tenant.name }}</h1>
+        </div>
+    </div>
+
+    <!-- Menu -->
+    <div class="menu-section">
+        <a href="#about" class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <span class="menu-label">Sobre Nós</span>
+        </a>
+        <a href="#schedule" class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-calendar"></i>
+            </div>
+            <span class="menu-label">Agendar</span>
+        </a>
+        <a href="#team" class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <span class="menu-label">Equipe</span>
+        </a>
+        <a href="#location" class="menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <span class="menu-label">Localização</span>
+        </a>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="container">
+            <!-- Sobre Nós -->
+            <div class="section" id="about">
+                <h2 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    Sobre Nós
+                </h2>
+                {% if tenant.about_us %}
+                    <p class="about-text">{{ tenant.about_us }}</p>
+                {% else %}
+                    <p class="about-text">Bem-vindo ao {{ tenant.name }}! Estamos aqui para oferecer os melhores serviços com qualidade e excelência.</p>
+                {% endif %}
+            </div>
+
+            <!-- Comodidades -->
+            {% if amenities %}
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-star"></i>
+                    Comodidades
+                </h2>
+                <div class="amenities-grid">
+                    {% for amenity in amenities %}
+                    <div class="amenity-badge">
+                        <div class="amenity-icon">
+                            {% if "WiFi" in amenity or "wifi" in amenity %}
+                                <i class="fas fa-wifi"></i>
+                            {% elif "Estacionamento" in amenity or "Parking" in amenity %}
+                                <i class="fas fa-parking"></i>
+                            {% elif "Acessibilidade" in amenity or "Accessibility" in amenity %}
+                                <i class="fas fa-wheelchair"></i>
+                            {% elif "Ar" in amenity or "AC" in amenity %}
+                                <i class="fas fa-fan"></i>
+                            {% elif "Café" in amenity or "Coffee" in amenity %}
+                                <i class="fas fa-mug-hot"></i>
+                            {% else %}
+                                <i class="fas fa-check-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="amenity-name">{{ amenity }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Horários -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-clock"></i>
+                    Horário de Funcionamento
+                </h2>
+                <div class="hours-container">
+                    {% if business_hours %}
+                        {% for hour in business_hours %}
+                        <div class="hour-item">
+                            <span class="day-name">{{ hour.get_day_of_week_display }}</span>
+                            {% if hour.is_closed %}
+                                <span class="closed-badge">FECHADO</span>
+                            {% else %}
+                                <span class="hour-time">{{ hour.opening_time|time:"H:i" }} - {{ hour.closing_time|time:"H:i" }}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: var(--text-muted); text-align: center; padding: 1rem;">
+                            Horários não configurados
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Contato -->
+            <div class="section" id="contact">
+                <h2 class="section-title">
+                    <i class="fas fa-phone"></i>
+                    Contato
+                </h2>
+                <div class="contact-grid">
+                    {% if tenant.phone_number %}
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-label">Telefone</div>
+                        <div class="contact-value">
+                            <a href="tel:{{ tenant.phone_number }}">{{ tenant.phone_number }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tenant.whatsapp_number %}
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="contact-label">WhatsApp</div>
+                        <div class="contact-value">
+                            <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank">{{ tenant.whatsapp_number }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if tenant.email %}
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-label">E-mail</div>
+                        <div class="contact-value">
+                            <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Endereço -->
+            {% if tenant.address %}
+            <div class="section" id="location">
+                <h2 class="section-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Endereço
+                </h2>
+                <div class="address-card">
+                    <div class="address-line">
+                        {{ tenant.address }}{% if tenant.neighborhood %}, {{ tenant.neighborhood }}{% endif %}
+                    </div>
+                    {% if tenant.city or tenant.state or tenant.zip_code %}
+                    <div class="address-line">
+                        {% if tenant.city %}{{ tenant.city }}{% endif %}{% if tenant.state %} - {{ tenant.state }}{% endif %}
+                        {% if tenant.zip_code %}<br>CEP: {{ tenant.zip_code }}{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Formas de Pagamento -->
+            {% if payment_methods %}
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-credit-card"></i>
+                    Formas de Pagamento
+                </h2>
+                <div class="payment-grid">
+                    {% for method in payment_methods %}
+                    <div class="payment-badge">{{ method }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Redes Sociais -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-share-alt"></i>
+                    Redes Sociais
+                </h2>
+                <div class="social-links">
+                    {% if tenant.instagram_url %}
+                    <a href="{{ tenant.instagram_url }}" target="_blank" class="social-link">
+                        <i class="fab fa-instagram social-icon"></i>
+                        <span>Instagram</span>
+                    </a>
+                    {% endif %}
+
+                    {% if tenant.facebook_url %}
+                    <a href="{{ tenant.facebook_url }}" target="_blank" class="social-link">
+                        <i class="fab fa-facebook social-icon"></i>
+                        <span>Facebook</span>
+                    </a>
+                    {% endif %}
+
+                    {% if tenant.whatsapp_number %}
+                    <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank" class="social-link">
+                        <i class="fab fa-whatsapp social-icon"></i>
+                        <span>WhatsApp</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="cta-section" id="schedule">
+                <a href="{% url 'public:booking_start' tenant_slug=tenant.slug %}" class="btn-schedule">
+                    <i class="fas fa-calendar-check" style="margin-right: 0.75rem;"></i>
+                    Agendar Agora
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 {{ tenant.name }} - Todos os direitos reservados</p>
+        <p>Desenvolvido com <i class="fas fa-heart" style="color: #ef4444;"></i> por Bora Agendar</p>
+    </div>
+</body>
+</html>
