@@ -37,6 +37,14 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             'break_end': rule.break_end,
         })
     
+    # Buscar profissionais ativos do tenant
+    from django.db.models import Q
+    professionals = Professional.objects.filter(
+        Q(tenant_memberships__tenant=tenant, tenant_memberships__is_active=True) |
+        Q(user__is_staff=True),
+        is_active=True
+    ).distinct().order_by('display_name')
+    
     # Converter amenities e payment methods para listas
     amenities = [a.strip() for a in tenant.amenities.split(",") if a.strip()] if tenant.amenities else []
     payment_methods = [p.strip() for p in tenant.payment_methods.split(",") if p.strip()] if tenant.payment_methods else []
@@ -44,10 +52,10 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     context = {
         "tenant": tenant,
         "business_hours": business_hours,
+        "professionals": professionals,
         "amenities": amenities,
         "payment_methods": payment_methods,
     }
-    return render(request, "scheduling/public/tenant_landing.html", context)
     return render(request, "scheduling/public/tenant_landing.html", context)
 
 

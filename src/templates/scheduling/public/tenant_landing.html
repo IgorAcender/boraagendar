@@ -338,6 +338,64 @@
             font-weight: 600;
         }
 
+        /* Equipe / Profissionais */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .team-member-card {
+            background: rgba(102, 126, 234, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .team-member-card:hover {
+            background: rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.6);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .team-member-avatar {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 2rem;
+            color: white;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .team-member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-member-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-member-bio {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
         /* Contato */
         .contact-grid {
             display: grid;
@@ -611,6 +669,35 @@
                             {% endif %}
                         </div>
                         <div class="amenity-name">{{ amenity }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Equipe -->
+            {% if professionals %}
+            <div class="section" id="team">
+                <h2 class="section-title">
+                    <i class="fas fa-users"></i>
+                    Equipe
+                </h2>
+                <div class="team-grid">
+                    {% for professional in professionals %}
+                    <div class="team-member-card">
+                        <div class="team-member-avatar" {% if professional.color %}style="background: {{ professional.color }};"{% endif %}>
+                            {% if professional.photo_base64 %}
+                                <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}">
+                            {% elif professional.photo %}
+                                <img src="{{ professional.photo.url }}" alt="{{ professional.display_name }}">
+                            {% else %}
+                                {{ professional.display_name|first|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="team-member-name">{{ professional.display_name }}</div>
+                        {% if professional.bio %}
+                        <div class="team-member-bio">{{ professional.bio }}</div>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
