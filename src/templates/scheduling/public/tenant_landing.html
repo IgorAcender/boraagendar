@@ -76,12 +76,12 @@
         /* Mobile: Logo grande fullwidth hero */
         @media (max-width: 767px) {
             .header-section {
-                padding: 0;
+                padding: 0 !important;
+                margin: 0;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: flex-start;
-                padding-bottom: 2rem;
                 position: relative;
                 width: 100%;
                 left: 0;
@@ -93,7 +93,8 @@
                 position: relative;
                 width: 100%;
                 height: auto;
-                margin: 0;
+                margin: 0 !important;
+                padding: 0 !important;
                 background: none;
                 border-radius: 0;
                 display: flex;
@@ -109,6 +110,8 @@
                 height: auto;
                 filter: brightness(0.7) contrast(1.1);
                 display: block;
+                margin: 0;
+                padding: 0;
             }
 
             .logo-container::before {
