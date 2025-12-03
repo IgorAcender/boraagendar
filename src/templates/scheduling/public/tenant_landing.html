@@ -280,8 +280,8 @@
         /* Equipe / Profissionais */
         .team-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 1rem;
         }
 
         .team-member-card {
@@ -289,22 +289,23 @@
             border: 1px solid rgba(102, 126, 234, 0.3);
             border-radius: 16px;
             padding: 1.5rem;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
             transition: all 0.3s;
         }
 
         .team-member-card:hover {
             background: rgba(102, 126, 234, 0.15);
             border-color: rgba(102, 126, 234, 0.6);
-            transform: translateY(-4px);
+            transform: translateX(4px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
         }
 
         .team-member-avatar {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 1rem;
-            border-radius: 50%;
+            width: 90px;
+            height: 90px;
+            border-radius: 16px;
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
             display: flex;
             align-items: center;
@@ -314,6 +315,7 @@
             color: white;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            flex-shrink: 0;
         }
 
         .team-member-avatar img {
@@ -322,17 +324,63 @@
             object-fit: cover;
         }
 
+        .team-member-info {
+            flex: 1;
+        }
+
         .team-member-name {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             color: white;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
         .team-member-bio {
             font-size: 0.85rem;
             color: var(--text-muted);
-            line-height: 1.4;
+            line-height: 1.3;
+        }
+
+        .team-member-button {
+            background: var(--brand-primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .team-member-button:hover {
+            background: var(--brand-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .team-member-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .team-member-avatar {
+                width: 80px;
+                height: 80px;
+            }
+
+            .team-member-info {
+                width: 100%;
+            }
+
+            .team-member-button {
+                width: 100%;
+            }
         }
 
         /* Contato */
@@ -706,10 +754,15 @@
                                 {{ professional.display_name|first|upper }}
                             {% endif %}
                         </div>
-                        <div class="team-member-name">{{ professional.display_name }}</div>
-                        {% if professional.bio %}
-                        <div class="team-member-bio">{{ professional.bio }}</div>
-                        {% endif %}
+                        <div class="team-member-info">
+                            <div class="team-member-name">{{ professional.display_name }}</div>
+                            {% if professional.bio %}
+                            <div class="team-member-bio">{{ professional.bio }}</div>
+                            {% endif %}
+                        </div>
+                        <a href="/agendar/{{ tenant.slug }}/" class="team-member-button">
+                            Ver mais
+                        </a>
                     </div>
                     {% endfor %}
                 </div>
