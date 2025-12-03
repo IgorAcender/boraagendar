@@ -515,7 +515,7 @@
     .services-grid {
         display: grid !important;
         grid-template-columns: 1fr !important;
-        gap: 1rem !important;
+        gap: 0.5rem !important;
         margin-top: 1rem !important;
         width: 100% !important;
         position: relative !important;
@@ -536,22 +536,24 @@
     .service-category-grid {
         display: grid !important;
         grid-template-columns: 1fr !important;
-        gap: 1rem !important;
+        gap: 0.5rem !important;
     }
 
     .service-card {
         background: white !important;
-        border: 3px solid #e2e8f0 !important;
-        border-radius: 14px !important;
-        padding: 1.25rem !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 0.75rem !important;
         transition: all 0.3s !important;
         cursor: pointer !important;
         text-decoration: none !important;
         color: inherit !important;
-        display: block !important;
-        margin-bottom: 1rem !important;
-        min-height: 120px !important;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+        min-height: auto !important;
+        box-shadow: none !important;
         position: relative !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -563,29 +565,67 @@
 
     .service-card:hover {
         border-color: var(--brand-primary) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15) !important;
     }
 
     .service-card.selected {
         border-color: var(--brand-primary) !important;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05)) !important;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08)) !important;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2) !important;
+    }
+
+    .service-card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .service-card-image {
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+        background: #f1f5f9;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
     }
 
     .service-name {
-        font-size: 1.1rem !important;
-        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
         color: #1e293b !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.25rem !important;
         display: block !important;
     }
 
-    .service-description {
-        margin-top: 0.5rem !important;
+    .service-meta {
+        display: flex !important;
+        gap: 0.75rem !important;
+        align-items: center !important;
+        font-size: 0.8rem !important;
         color: #64748b !important;
-        font-size: 0.875rem !important;
-        line-height: 1.4 !important;
+    }
+
+    .service-price {
+        font-weight: 600 !important;
+        color: var(--brand-primary) !important;
+    }
+
+    .service-duration {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+    }
+
+    .service-description {
+        margin-top: 0.25rem !important;
+        color: #94a3b8 !important;
+        font-size: 0.75rem !important;
+        line-height: 1.3 !important;
         display: block !important;
     }
 
@@ -631,9 +671,25 @@
                         <div class="service-category-grid">
                             {% for service in category.list %}
                             <div class="service-card" data-service-id="{{ service.id }}" onclick="window.location.href='?service={{ service.id }}'">
-                                <div class="service-name">{{ service.name }}</div>
-                                <div class="service-description">
-                                    {% if service.description %}{{ service.description }}{% else %}Clique para selecionar este serviço{% endif %}
+                                <div class="service-card-image">
+                                    {% if service.photo %}
+                                        <img src="{{ service.photo.url }}" alt="{{ service.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                                    {% else %}
+                                        <i class="fas fa-scissors"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="service-card-content">
+                                    <div class="service-name">{{ service.name }}</div>
+                                    <div class="service-meta">
+                                        <span class="service-price">R$ {{ service.price|floatformat:2 }}</span>
+                                        <span class="service-duration">
+                                            <i class="fas fa-clock" style="font-size: 0.7rem;"></i>
+                                            {{ service.duration_minutes|default:"60" }} min
+                                        </span>
+                                    </div>
+                                    {% if service.description %}
+                                    <div class="service-description">{{ service.description }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                             {% endfor %}
@@ -651,9 +707,25 @@
                 {% else %}
                     {% for service in services %}
                     <div class="service-card" data-service-id="{{ service.id }}" onclick="window.location.href='?service={{ service.id }}'">
-                        <div class="service-name">{{ service.name }}</div>
-                        <div class="service-description">
-                            {% if service.description %}{{ service.description }}{% else %}Clique para selecionar este serviço{% endif %}
+                        <div class="service-card-image">
+                            {% if service.photo %}
+                                <img src="{{ service.photo.url }}" alt="{{ service.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                            {% else %}
+                                <i class="fas fa-scissors"></i>
+                            {% endif %}
+                        </div>
+                        <div class="service-card-content">
+                            <div class="service-name">{{ service.name }}</div>
+                            <div class="service-meta">
+                                <span class="service-price">R$ {{ service.price|floatformat:2 }}</span>
+                                <span class="service-duration">
+                                    <i class="fas fa-clock" style="font-size: 0.7rem;"></i>
+                                    {{ service.duration_minutes|default:"60" }} min
+                                </span>
+                            </div>
+                            {% if service.description %}
+                            <div class="service-description">{{ service.description }}</div>
+                            {% endif %}
                         </div>
                     </div>
                     {% empty %}
