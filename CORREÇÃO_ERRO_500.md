@@ -38,21 +38,23 @@ Os dados do usuário continuam sendo editáveis através dos campos customizados
 FileNotFoundError: [Errno 2] No such file or directory: '/app/media/professionals/59294150-43ee-42d8-b14f-992b561b727d.jpg'
 ```
 
-Quando o código tentava verificar `if photo and hasattr(photo, 'read')`, se `photo` era um arquivo existente (ImageFieldFile) que foi deletado do disco, Django tentava abri-lo, causando erro.
+Quando o código tentava verificar `if photo and hasattr(photo, 'read')`, Django tentava acessar a propriedade `read`, o que dispara o carregamento do arquivo FieldFile do disco. Se o arquivo foi deletado, causava erro.
 
 **Solução:**
-Distinguir entre:
-- **Upload novo:** `InMemoryUploadedFile` (tem atributo `_file`)
-- **Arquivo existente no banco:** `ImageFieldFile` (pode não existir no disco)
+Usar `isinstance()` para verificar o tipo de objeto **sem disparar o carregamento do arquivo**:
+- **Upload novo:** `UploadedFile` (em memória, seguro de acessar)
+- **Arquivo existente:** `FieldFile` (pode não existir no disco)
 
 ```python
-# ANTES
+# ANTES (❌ Dispara carregamento do arquivo)
 if photo and hasattr(photo, 'read'):
-    # Tenta acessar arquivo - pode falhar se não existir no disco
+    # Django tenta abrir o arquivo para verificar hasattr
+    # Se não existir no disco = FileNotFoundError
 
-# DEPOIS
-if photo and hasattr(photo, 'read') and hasattr(photo, '_file'):
-    # Verifica se é um upload novo antes de tentar acessar
+# DEPOIS (✅ Seguro)
+from django.core.files.uploadedfile import UploadedFile
+if photo and isinstance(photo, UploadedFile):
+    # Apenas verifica o tipo sem carregar do disco
     try:
         photo_data = photo.read()
         photo_base64 = base64.b64encode(photo_data).decode('utf-8')

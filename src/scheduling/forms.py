@@ -198,9 +198,10 @@ class ProfessionalUpdateForm(TenantAwareForm):
 
         # Converter foto para base64 se houver upload novo (não arquivo existente)
         photo = self.cleaned_data.get("photo")
-        # Verificar se é um upload novo (tem o atributo 'file' do InMemoryUploadedFile)
-        # e não um arquivo existente do disco (ImageFieldFile)
-        if photo and hasattr(photo, 'read') and hasattr(photo, '_file'):
+        # Verificar se é um arquivo enviado (UploadedFile) e não um arquivo existente (FieldFile)
+        # UploadedFile tem o método 'read' e não tenta acessar o disco
+        from django.core.files.uploadedfile import UploadedFile
+        if photo and isinstance(photo, UploadedFile):
             try:
                 # Ler o arquivo e converter para base64
                 photo_data = photo.read()
