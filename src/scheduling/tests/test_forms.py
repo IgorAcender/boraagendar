@@ -174,3 +174,34 @@ class ProfessionalUpdateFormTest(TestCase):
         
         # Verificar que bio foi salvo
         self.assertEqual(saved_professional.bio, "This is a professional with a bio")
+
+    def test_form_with_missing_photo_file(self):
+        """Testar se o formulário funciona quando a foto referenciada não existe no disco"""
+        # Simular que a foto foi deletada do disco mas ainda está registrada no banco
+        self.professional.photo = "professionals/deleted-photo.jpg"
+        self.professional.save()
+        
+        form_data = {
+            "display_name": "Professional Without Photo File",
+            "bio": "Bio when photo file is missing",
+            "color": "#FF0000",
+            "is_active": True,
+            "allow_auto_assign": False,
+            "user_full_name": "Test User",
+            "user_email": "test@example.com",
+            "user_phone_number": "123456789",
+            "user_password": "",
+        }
+        
+        form = ProfessionalUpdateForm(
+            data=form_data,
+            instance=self.professional,
+            tenant=self.tenant
+        )
+        
+        # O formulário deve ser válido mesmo com arquivo de foto faltando
+        self.assertTrue(form.is_valid(), form.errors)
+        saved_professional = form.save()
+        
+        # Verificar que bio foi salvo corretamente
+        self.assertEqual(saved_professional.bio, "Bio when photo file is missing")

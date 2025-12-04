@@ -196,9 +196,11 @@ class ProfessionalUpdateForm(TenantAwareForm):
             if commit:
                 user.save()
 
-        # Converter foto para base64 se houver upload
+        # Converter foto para base64 se houver upload novo (não arquivo existente)
         photo = self.cleaned_data.get("photo")
-        if photo and hasattr(photo, 'read'):
+        # Verificar se é um upload novo (tem o atributo 'file' do InMemoryUploadedFile)
+        # e não um arquivo existente do disco (ImageFieldFile)
+        if photo and hasattr(photo, 'read') and hasattr(photo, '_file'):
             try:
                 # Ler o arquivo e converter para base64
                 photo_data = photo.read()
@@ -206,6 +208,8 @@ class ProfessionalUpdateForm(TenantAwareForm):
                 # Adicionar o prefixo do tipo MIME
                 content_type = photo.content_type or 'image/jpeg'
                 self.instance.photo_base64 = f"data:{content_type};base64,{photo_base64}"
+                # Rewind o arquivo para que Django possa processá-lo normalmente
+                photo.seek(0)
             except Exception as e:
                 # Se houver erro na conversão, apenas ignora e continua
                 pass
