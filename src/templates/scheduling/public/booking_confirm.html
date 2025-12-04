@@ -24,28 +24,29 @@
     .booking-header h2 {
         font-size: 1.75rem;
         font-weight: 700;
-        color: #1e293b;
+        color: var(--text-light);
         margin-bottom: 0.5rem;
     }
 
     .booking-header p {
-        color: #64748b;
+        color: rgba(var(--text-light), 0.7);
         font-size: 1rem;
     }
 
     .booking-summary {
-        background: white;
+        background: var(--bg-dark);
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         padding: 1.5rem;
         margin-bottom: 2rem;
+        border: 1px solid color-mix(in srgb, var(--text-light) 20%, transparent);
     }
 
     .summary-item {
         display: flex;
         justify-content: space-between;
         padding: 0.75rem 0;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid color-mix(in srgb, var(--text-light) 20%, transparent);
     }
 
     .summary-item:last-child {
@@ -54,13 +55,13 @@
 
     .summary-label {
         font-weight: 600;
-        color: #64748b;
+        color: rgba(var(--text-light), 0.6);
         font-size: 0.9rem;
     }
 
     .summary-value {
         font-weight: 600;
-        color: #1e293b;
+        color: var(--text-light);
         font-size: 1rem;
     }
 
@@ -71,19 +72,20 @@
     }
 
     .form-section {
-        background: white;
+        background: var(--bg-dark);
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         padding: 1.5rem;
+        border: 1px solid color-mix(in srgb, var(--text-light) 20%, transparent);
     }
 
     .form-section h3 {
         font-size: 1.25rem;
         font-weight: 600;
-        color: #1e293b;
+        color: var(--text-light);
         margin-bottom: 1.5rem;
         padding-bottom: 0.75rem;
-        border-bottom: 2px solid #f1f5f9;
+        border-bottom: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent);
     }
 
     .form-group {
@@ -93,7 +95,7 @@
     .form-group label {
         display: block;
         font-weight: 600;
-        color: #334155;
+        color: var(--text-light);
         margin-bottom: 0.5rem;
         font-size: 0.875rem;
     }
@@ -102,12 +104,12 @@
     .form-group textarea {
         width: 100%;
         padding: 0.875rem 1rem;
-        border: 2px solid #e2e8f0;
+        border: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent);
         border-radius: 12px;
         font-size: 1rem;
         transition: all 0.2s;
-        background: white;
-        color: #1e293b;
+        background: var(--bg-dark);
+        color: var(--text-light);
         box-sizing: border-box;
     }
 
