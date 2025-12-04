@@ -292,36 +292,30 @@
         }
 
         .team-member-card {
-            background: rgba(102, 126, 234, 0.08);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 20px;
+            background: transparent;
+            border: none;
+            border-radius: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             transition: all 0.3s;
-            overflow: hidden;
+            overflow: visible;
             position: relative;
-            height: 100px;
-        }
-
-        @media (max-width: 480px) {
-            .team-member-card {
-                height: 110px;
-            }
+            height: auto;
         }
 
         .team-member-card:hover {
-            background: rgba(102, 126, 234, 0.15);
-            border-color: rgba(102, 126, 234, 0.6);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+            background: transparent;
+            border-color: transparent;
+            transform: none;
+            box-shadow: none;
         }
 
         .team-member-avatar {
             width: 100%;
-            height: 100%;
-            border-radius: 20px;
+            aspect-ratio: 1;
+            border-radius: 12px;
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
             display: flex;
             align-items: center;
@@ -330,17 +324,17 @@
             font-size: 2rem;
             color: white;
             overflow: hidden;
-            box-shadow: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             cursor: pointer;
             transition: all 0.3s;
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
+            top: auto;
+            left: auto;
         }
 
         .team-member-avatar:hover {
-            transform: scale(1.02);
-            filter: brightness(0.95);
+            transform: scale(1.03);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
         .team-member-avatar img {
@@ -352,32 +346,29 @@
         .team-member-info {
             width: 100%;
             text-align: center;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(180deg, transparent 0%, rgba(30, 41, 59, 0.9) 50%, rgba(30, 41, 59, 1) 100%);
-            padding: 0.5rem 0.4rem 0.35rem;
-            z-index: 10;
+            position: relative;
+            background: transparent;
+            padding: 0.4rem 0 0 0;
+            z-index: auto;
         }
 
         @media (max-width: 480px) {
             .team-member-info {
-                padding: 0.4rem 0.3rem 0.3rem;
+                padding: 0.35rem 0 0 0;
             }
         }
 
         .team-member-name {
             font-size: 0.75rem;
             font-weight: 700;
-            color: white;
-            margin-bottom: 0.05rem;
+            color: #1e293b;
+            margin-bottom: 0;
         }
 
         @media (max-width: 480px) {
             .team-member-name {
                 font-size: 0.7rem;
-                margin-bottom: 0.05rem;
+                margin-bottom: 0;
             }
         }
 
@@ -390,12 +381,11 @@
             line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            display: none;
         }
 
         @media (max-width: 480px) {
             .team-member-bio {
-                font-size: 0.5rem;
-                line-height: 1;
                 display: none;
             }
         }
