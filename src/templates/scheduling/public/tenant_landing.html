@@ -799,6 +799,80 @@
             }
         }
 
+        /* Barra de Navegação com Ícones */
+        .navigation-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 0 1 auto;
+        }
+
+        .nav-item:hover {
+            color: var(--brand-primary);
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            color: var(--brand-primary);
+        }
+
+        .nav-item:hover .nav-icon {
+            background: rgba(102, 126, 234, 0.25);
+            transform: scale(1.05);
+        }
+
+        .nav-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .nav-item:hover .nav-label {
+            color: var(--brand-primary);
+        }
+
+        @media (max-width: 767px) {
+            .navigation-bar {
+                gap: 1.5rem;
+                padding: 1.5rem 1rem;
+            }
+
+            .nav-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+
+            .nav-label {
+                font-size: 0.75rem;
+            }
+        }
+
         /* Footer */
         .footer {
             background: rgba(2, 6, 23, 0.8);
@@ -902,6 +976,34 @@
                 <i class="fas fa-calendar-check"></i>
             </div>
             <span class="schedule-label">Agendar Agora</span>
+        </a>
+    </div>
+
+    <!-- Barra de Navegação com Ícones -->
+    <div class="navigation-bar">
+        <a href="/agendar/{{ tenant.slug }}/" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-calendar"></i>
+            </div>
+            <div class="nav-label">Agendar</div>
+        </a>
+        <a href="#team" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="nav-label">Equipe</div>
+        </a>
+        <a href="#schedule" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="nav-label">Localização</div>
+        </a>
+        <a href="#schedule" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-list-check"></i>
+            </div>
+            <div class="nav-label">Meus Agendamentos</div>
         </a>
     </div>
 
