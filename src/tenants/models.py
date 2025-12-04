@@ -109,3 +109,78 @@ class BusinessHours(models.Model):
         if self.is_closed:
             return f"{day_name} - FECHADO"
         return f"{day_name} - {self.opening_time.strftime('%H:%M')} - {self.closing_time.strftime('%H:%M')}"
+
+
+class BrandingSettings(models.Model):
+    """Configurações de personalização de cores para o tenant."""
+
+    tenant = models.OneToOneField(
+        Tenant,
+        on_delete=models.CASCADE,
+        related_name="branding_settings",
+        verbose_name="Empresa"
+    )
+    
+    # Cores principais
+    background_color = models.CharField(
+        "Cor de Fundo",
+        max_length=7,
+        default="#0F172A",
+        help_text="Cor de fundo de todas as páginas"
+    )
+    text_color = models.CharField(
+        "Cor de Texto",
+        max_length=7,
+        default="#E2E8F0",
+        help_text="Cor padrão do texto/fontes"
+    )
+    
+    # Cores de botões
+    button_color_primary = models.CharField(
+        "Cor Primária do Botão",
+        max_length=7,
+        default="#667EEA",
+        help_text="Cor primária dos botões e destaque"
+    )
+    button_color_secondary = models.CharField(
+        "Cor Secundária do Botão",
+        max_length=7,
+        default="#764BA2",
+        help_text="Cor secundária (para gradientes)"
+    )
+    use_gradient_buttons = models.BooleanField(
+        "Usar Gradiente nos Botões",
+        default=True,
+        help_text="Se ativado, botões usarão gradiente com as duas cores. Se desativado, usa apenas a cor primária."
+    )
+    
+    # Cor de destaque
+    highlight_color = models.CharField(
+        "Cor de Destaque",
+        max_length=7,
+        default="#FBBF24",
+        help_text="Cor para textos em destaque, ícones destacados, contornos especiais"
+    )
+    
+    created_at = models.DateTimeField("Criado em", auto_now_add=True)
+    updated_at = models.DateTimeField("Atualizado em", auto_now=True)
+
+    class Meta:
+        verbose_name = "Configuração de Marca"
+        verbose_name_plural = "Configurações de Marca"
+
+    def __str__(self) -> str:
+        return f"Branding - {self.tenant.name}"
+
+    def get_hover_color(self, base_color: str) -> str:
+        """Calcula uma cor de hover automática (20% mais clara)."""
+        # Remove o # e converte para RGB
+        hex_color = base_color.lstrip("#")
+        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+        
+        # Aumenta luminosidade em 20%
+        r = min(255, int(r * 1.2))
+        g = min(255, int(g * 1.2))
+        b = min(255, int(b * 1.2))
+        
+        return f"#{r:02x}{g:02x}{b:02x}"

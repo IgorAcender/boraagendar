@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Tenant, TenantMembership, BusinessHours
+from .models import Tenant, TenantMembership, BusinessHours, BrandingSettings
 
 
 class TenantMembershipInline(admin.TabularInline):
@@ -15,13 +15,23 @@ class BusinessHoursInline(admin.TabularInline):
     fields = ("day_of_week", "is_closed", "opening_time", "closing_time")
 
 
+class BrandingSettingsInline(admin.StackedInline):
+    model = BrandingSettings
+    extra = 0
+    fields = (
+        "background_color", "text_color",
+        "button_color_primary", "button_color_secondary", "use_gradient_buttons",
+        "highlight_color"
+    )
+
+
 @admin.register(Tenant)
 class TenantAdmin(admin.ModelAdmin):
     list_display = ("name", "slug", "is_active", "created_at")
     search_fields = ("name", "slug", "email")
     list_filter = ("is_active", "timezone")
     prepopulated_fields = {"slug": ("name",)}
-    inlines = [TenantMembershipInline, BusinessHoursInline]
+    inlines = [BrandingSettingsInline, TenantMembershipInline, BusinessHoursInline]
     fieldsets = (
         ("Informações Básicas", {
             "fields": ("name", "slug", "document", "timezone", "is_active")
@@ -48,7 +58,6 @@ class TenantAdmin(admin.ModelAdmin):
         }),
     )
 
-
 @admin.register(TenantMembership)
 class TenantMembershipAdmin(admin.ModelAdmin):
     list_display = ("tenant", "user", "role", "is_active", "created_at")
@@ -61,3 +70,20 @@ class BusinessHoursAdmin(admin.ModelAdmin):
     list_display = ("tenant", "day_of_week", "is_closed", "opening_time", "closing_time")
     list_filter = ("tenant", "day_of_week", "is_closed")
     search_fields = ("tenant__name",)
+
+
+@admin.register(BrandingSettings)
+class BrandingSettingsAdmin(admin.ModelAdmin):
+    list_display = ("tenant", "background_color", "text_color", "highlight_color")
+    search_fields = ("tenant__name",)
+    fieldsets = (
+        ("Cores Gerais", {
+            "fields": ("tenant", "background_color", "text_color")
+        }),
+        ("Cores de Botões", {
+            "fields": ("button_color_primary", "button_color_secondary", "use_gradient_buttons")
+        }),
+        ("Destaque", {
+            "fields": ("highlight_color",)
+        }),
+    )
