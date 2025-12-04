@@ -23,7 +23,8 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: var(--bg-dark);
+            color: var(--text-light);
             min-height: 100vh;
             padding: 2rem 1rem;
         }
@@ -63,13 +64,13 @@
         .company-name {
             font-size: 2rem;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--text-light);
             margin-bottom: 0.5rem;
         }
 
         .company-subtitle {
             font-size: 1.1rem;
-            color: #64748b;
+            color: rgba(var(--text-light), 0.7);
         }
 
         /* Progress Steps */
@@ -87,7 +88,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: #e2e8f0;
+            background: color-mix(in srgb, var(--text-light) 20%, transparent);
             z-index: 0;
         }
 
@@ -112,13 +113,13 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: white;
-            border: 4px solid #e2e8f0;
+            background: var(--bg-dark);
+            border: 4px solid color-mix(in srgb, var(--text-light) 20%, transparent);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            color: #94a3b8;
+            color: rgba(var(--text-light), 0.5);
             margin-bottom: 0.5rem;
             transition: all 0.3s;
         }
@@ -131,30 +132,31 @@
         }
 
         .step.completed .step-circle {
-            border-color: #10b981;
-            background: #10b981;
-            color: white;
+            border-color: var(--highlight-color);
+            background: var(--highlight-color);
+            color: var(--bg-dark);
         }
 
         .step-label {
             font-size: 0.875rem;
-            color: #64748b;
+            color: rgba(var(--text-light), 0.6);
             font-weight: 500;
         }
 
         .step.active .step-label {
-            color: #1e293b;
+            color: var(--text-light);
             font-weight: 600;
         }
 
         /* Card */
         .glass-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: color-mix(in srgb, var(--bg-dark) 90%, white);
             backdrop-filter: blur(15px);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            border: 1px solid color-mix(in srgb, var(--text-light) 20%, transparent);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             padding: 2rem;
+            color: var(--text-light);
         }
 
         /* Animations */
