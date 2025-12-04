@@ -284,6 +284,13 @@
             gap: 1.5rem;
         }
 
+        @media (max-width: 480px) {
+            .team-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 1rem;
+            }
+        }
+
         .team-member-card {
             background: rgba(102, 126, 234, 0.08);
             border: 1px solid rgba(102, 126, 234, 0.3);
