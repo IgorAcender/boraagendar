@@ -1,6 +1,8 @@
 # Generated migration to simplify BrandingSettings model
+# Removes button_color_secondary, use_gradient_buttons, highlight_color
+# Keeps only: background_color, text_color, button_color_primary, button_text_color
 
-from django.db import migrations, models
+from django.db import migrations
 
 
 class Migration(migrations.Migration):
