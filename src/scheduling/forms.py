@@ -131,7 +131,7 @@ class ProfessionalUpdateForm(TenantAwareForm):
 
     class Meta:
         model = Professional
-        fields = ["user", "display_name", "photo", "bio", "color", "is_active", "allow_auto_assign"]
+        fields = ["display_name", "photo", "bio", "color", "is_active", "allow_auto_assign"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

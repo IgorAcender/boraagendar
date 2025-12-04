@@ -709,9 +709,19 @@ def professional_update(request: HttpRequest, pk: int) -> HttpResponse:
     if request.method == "POST":
         form = ProfessionalUpdateForm(tenant=tenant, data=request.POST, files=request.FILES, instance=professional)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Profissional atualizado com sucesso.")
-            return redirect("dashboard:professional_list")
+            try:
+                form.save()
+                messages.success(request, "Profissional atualizado com sucesso.")
+                return redirect("dashboard:professional_list")
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Erro ao salvar profissional {pk}: {str(e)}", exc_info=True)
+                messages.error(request, f"Erro ao salvar profissional: {str(e)}")
+        else:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Formulário inválido para profissional {pk}: {form.errors}")
     else:
         form = ProfessionalUpdateForm(tenant=tenant, instance=professional)
 
