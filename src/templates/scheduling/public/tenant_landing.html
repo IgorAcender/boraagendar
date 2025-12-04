@@ -280,7 +280,7 @@
         /* Equipe / Profissionais */
         .team-grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
         }
 
@@ -288,11 +288,12 @@
             background: rgba(102, 126, 234, 0.08);
             border: 1px solid rgba(102, 126, 234, 0.3);
             border-radius: 20px;
-            padding: 2rem;
+            padding: 1.5rem;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
-            gap: 1.5rem;
+            text-align: center;
+            gap: 1rem;
             transition: all 0.3s;
         }
 
@@ -304,8 +305,8 @@
         }
 
         .team-member-avatar {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 24px;
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
             display: flex;
@@ -316,7 +317,6 @@
             color: white;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            flex-shrink: 0;
         }
 
         .team-member-avatar img {
@@ -326,8 +326,8 @@
         }
 
         .team-member-info {
-            flex: 1;
-            text-align: left;
+            width: 100%;
+            text-align: center;
         }
 
         .team-member-name {
@@ -355,7 +355,6 @@
             border: none;
             cursor: pointer;
             white-space: nowrap;
-            flex-shrink: 0;
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
 
@@ -365,16 +364,19 @@
         }
 
         @media (max-width: 768px) {
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
             .team-member-card {
                 padding: 1.5rem;
                 gap: 1rem;
-                flex-direction: row;
+                flex-direction: column;
             }
 
             .team-member-avatar {
                 width: 80px;
                 height: 80px;
-                flex-shrink: 0;
             }
 
             .team-member-name {
@@ -382,9 +384,8 @@
             }
 
             .team-member-button {
-                padding: 0.6rem 1rem;
-                font-size: 0.85rem;
-                flex-shrink: 0;
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
             }
         }
 
