@@ -142,6 +142,13 @@ class ProfessionalUpdateForm(TenantAwareForm):
             self.fields["user_email"].initial = user.email
             self.fields["user_phone_number"].initial = user.phone_number
 
+    def clean_bio(self):
+        bio = self.cleaned_data.get("bio", "")
+        # Garantir que bio é uma string válida
+        if bio is None:
+            bio = ""
+        return str(bio).strip()
+
     def clean_user_email(self):
         email = self.cleaned_data.get("user_email", "").strip()
         if email:
@@ -153,6 +160,13 @@ class ProfessionalUpdateForm(TenantAwareForm):
         return email
 
     def save(self, commit=True):
+        # Limpar e garantir que bio é válido
+        bio = self.cleaned_data.get("bio", "")
+        if bio is not None:
+            self.instance.bio = str(bio).strip()
+        else:
+            self.instance.bio = ""
+
         # Atualizar dados do usuário ANTES de salvar o professional
         if self.instance.user:
             user = self.instance.user
@@ -185,15 +199,29 @@ class ProfessionalUpdateForm(TenantAwareForm):
         # Converter foto para base64 se houver upload
         photo = self.cleaned_data.get("photo")
         if photo and hasattr(photo, 'read'):
-            # Ler o arquivo e converter para base64
-            photo_data = photo.read()
-            photo_base64 = base64.b64encode(photo_data).decode('utf-8')
-            # Adicionar o prefixo do tipo MIME
-            content_type = photo.content_type or 'image/jpeg'
-            self.instance.photo_base64 = f"data:{content_type};base64,{photo_base64}"
+            try:
+                # Ler o arquivo e converter para base64
+                photo_data = photo.read()
+                photo_base64 = base64.b64encode(photo_data).decode('utf-8')
+                # Adicionar o prefixo do tipo MIME
+                content_type = photo.content_type or 'image/jpeg'
+                self.instance.photo_base64 = f"data:{content_type};base64,{photo_base64}"
+            except Exception as e:
+                # Se houver erro na conversão, apenas ignora e continua
+                pass
 
         # Agora salva o professional normalmente (incluindo arquivos como photo)
-        return super().save(commit=commit)
+        if commit:
+            try:
+                return super().save(commit=True)
+            except Exception as e:
+                # Log do erro para debugging
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Erro ao salvar Professional {self.instance.id}: {str(e)}", exc_info=True)
+                raise
+        else:
+            return super().save(commit=False)
 
 
 
