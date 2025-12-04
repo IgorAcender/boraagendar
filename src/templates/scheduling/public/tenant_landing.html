@@ -305,6 +305,12 @@
             height: 100px;
         }
 
+        @media (max-width: 480px) {
+            .team-member-card {
+                height: 80px;
+            }
+        }
+
         .team-member-card:hover {
             background: rgba(102, 126, 234, 0.15);
             border-color: rgba(102, 126, 234, 0.6);
@@ -355,11 +361,24 @@
             z-index: 10;
         }
 
+        @media (max-width: 480px) {
+            .team-member-info {
+                padding: 0.3rem 0.3rem 0.25rem;
+            }
+        }
+
         .team-member-name {
             font-size: 0.75rem;
             font-weight: 700;
             color: white;
             margin-bottom: 0.05rem;
+        }
+
+        @media (max-width: 480px) {
+            .team-member-name {
+                font-size: 0.65rem;
+                margin-bottom: 0;
+            }
         }
 
         .team-member-bio {
@@ -371,6 +390,14 @@
             line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        @media (max-width: 480px) {
+            .team-member-bio {
+                font-size: 0.5rem;
+                line-height: 1;
+                display: none;
+            }
         }
 
         .team-member-button {
