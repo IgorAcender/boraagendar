@@ -124,8 +124,8 @@
     }
 
     .slot-card {
-        background: #ffffff;
-        border: 3px solid #cbd5e1 !important;
+        background: var(--bg-dark);
+        border: 3px solid color-mix(in srgb, var(--text-light) 20%, transparent) !important;
         border-radius: 14px;
         padding: 0.875rem 0.5rem !important;
         text-align: center;
@@ -141,7 +141,7 @@
     }
 
     .slot-card:hover {
-        background: #f8fafc;
+        background: color-mix(in srgb, var(--bg-dark) 95%, white);
         border-color: var(--brand-primary);
         border-width: 4px;
         transform: scale(1.02);
@@ -391,8 +391,8 @@
     }
 
     .professional-card {
-        background: white;
-        border: 2px solid #e2e8f0;
+        background: var(--bg-dark);
+        border: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent);
         border-radius: 12px;
         padding: 0.75rem;
         text-align: center;
@@ -491,12 +491,12 @@
     .date-selection-section input[type="date"] {
         width: 100%;
         padding: 0.875rem 1rem;
-        border: 2px solid #e2e8f0;
+        border: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent);
         border-radius: 12px;
         font-size: 1rem;
         transition: all 0.2s;
-        background: white;
-        color: #1e293b;
+        background: var(--bg-dark);
+        color: var(--text-light);
         box-sizing: border-box;
     }
 
@@ -548,8 +548,8 @@
     }
 
     .service-card {
-        background: white !important;
-        border: 2px solid #e2e8f0 !important;
+        background: var(--bg-dark) !important;
+        border: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent) !important;
         border-radius: 12px !important;
         padding: 0.75rem !important;
         transition: all 0.3s !important;
