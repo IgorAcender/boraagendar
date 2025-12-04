@@ -525,28 +525,6 @@
             gap: 1rem;
         }
 
-        .modal-schedule-btn {
-            flex: 1;
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            color: white;
-            padding: 1rem;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-schedule-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
         .modal-close-btn {
             flex: 1;
             background: rgba(102, 126, 234, 0.2);
@@ -1168,9 +1146,6 @@
             <div class="modal-name" id="modalName"></div>
             <div class="modal-bio" id="modalBio"></div>
             <div class="modal-actions">
-                <a href="/agendar/{{ tenant.slug }}/" class="modal-schedule-btn">
-                    <i class="fas fa-calendar"></i>&nbsp; Agendar
-                </a>
                 <button class="modal-close-btn" onclick="closeProfessionalModal()">Fechar</button>
             </div>
         </div>
