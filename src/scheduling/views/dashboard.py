@@ -13,8 +13,8 @@ from django.utils.timezone import make_aware, now
 from django.views.decorators.http import require_POST
 
 from tenants.services import TenantSelectionRequired, ensure_membership_for_request
-from tenants.forms import TeamMemberCreateForm, TeamMemberUpdateForm, TenantUpdateForm
-from tenants.models import TenantMembership
+from tenants.forms import TeamMemberCreateForm, TeamMemberUpdateForm, TenantUpdateForm, BrandingSettingsForm
+from tenants.models import TenantMembership, BrandingSettings
 
 from ..forms import BookingForm, ProfessionalForm, ProfessionalUpdateForm, ServiceForm
 from ..models import Booking, Professional, Service
@@ -1342,3 +1342,37 @@ def default_availability_save(request: HttpRequest) -> HttpResponse:
 
     messages.success(request, f"Horários padrão salvos! ({created_count} regras)")
     return redirect("dashboard:default_availability")
+
+
+@login_required
+def branding_settings(request: HttpRequest) -> HttpResponse:
+    """Configurações de personalização de cores - apenas para donos"""
+    membership, redirect_response = _membership_or_redirect(request, allowed_roles=["owner"])
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+
+    # Obter ou criar BrandingSettings
+    branding, created = BrandingSettings.objects.get_or_create(tenant=tenant)
+
+    if request.method == "POST":
+        try:
+            form = BrandingSettingsForm(request.POST, instance=branding)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Configurações de cores atualizadas com sucesso!")
+                return redirect("dashboard:branding_settings")
+            else:
+                messages.error(request, f"Erros no formulário: {form.errors}")
+        except Exception as e:
+            messages.error(request, f"Erro ao salvar: {str(e)}")
+            import traceback
+            traceback.print_exc()
+    else:
+        form = BrandingSettingsForm(instance=branding)
+
+    return render(
+        request,
+        "scheduling/dashboard/branding_settings.html",
+        {"tenant": tenant, "form": form, "branding": branding},
+    )

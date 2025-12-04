@@ -8,7 +8,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from .models import Tenant, TenantMembership
+from .models import Tenant, TenantMembership, BrandingSettings
 
 User = get_user_model()
 
@@ -159,3 +159,42 @@ class TeamMemberUpdateForm(forms.ModelForm):
     class Meta:
         model = TenantMembership
         fields = ["role", "is_active"]
+
+
+class BrandingSettingsForm(forms.ModelForm):
+    """Formulário para personalização de cores do tenant"""
+
+    class Meta:
+        model = BrandingSettings
+        fields = [
+            "background_color",
+            "text_color",
+            "button_color_primary",
+            "button_color_secondary",
+            "use_gradient_buttons",
+            "highlight_color",
+        ]
+        labels = {
+            "background_color": "Cor de Fundo",
+            "text_color": "Cor de Texto",
+            "button_color_primary": "Cor Primária do Botão",
+            "button_color_secondary": "Cor Secundária do Botão",
+            "use_gradient_buttons": "Usar Gradiente nos Botões",
+            "highlight_color": "Cor de Destaque",
+        }
+        widgets = {
+            "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+            "text_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+            "button_color_primary": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+            "button_color_secondary": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+            "use_gradient_buttons": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "highlight_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+        }
+        help_texts = {
+            "background_color": "Define o fundo de todas as páginas",
+            "text_color": "Cor padrão do texto em todas as páginas",
+            "button_color_primary": "Cor principal dos botões",
+            "button_color_secondary": "Cor secundária (usada em gradientes)",
+            "use_gradient_buttons": "Se ativado, os botões terão gradiente com as duas cores",
+            "highlight_color": "Cor para destaque (textos especiais, ícones, contornos)",
+        }
