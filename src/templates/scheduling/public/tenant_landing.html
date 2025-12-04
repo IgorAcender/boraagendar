@@ -388,6 +388,160 @@
             }
         }
 
+        /* Modal Professional */
+        .professional-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .professional-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(30, 41, 59, 0.95));
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(102, 126, 234, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: white;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-bio {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            text-align: center;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .modal-schedule-btn {
+            flex: 1;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-schedule-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-close-btn {
+            flex: 1;
+            background: rgba(102, 126, 234, 0.2);
+            color: white;
+            padding: 1rem;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Contato */
         .contact-grid {
             display: grid;
@@ -666,6 +820,49 @@
             }
         }
     </style>
+
+    <script>
+        function openProfessionalModal(button) {
+            const card = button.closest('.team-member-card');
+            const name = card.dataset.professionalName;
+            const bio = card.dataset.professionalBio || 'Sem descrição';
+            const photo = card.dataset.professionalPhoto;
+            const color = card.dataset.professionalColor || '#667EEA';
+
+            // Preencher modal
+            document.getElementById('modalName').textContent = name;
+            document.getElementById('modalBio').textContent = bio;
+
+            // Avatar
+            const avatarDiv = document.getElementById('modalAvatar');
+            avatarDiv.style.background = color;
+            
+            if (photo) {
+                avatarDiv.innerHTML = `<img src="${photo}" alt="${name}">`;
+            } else {
+                avatarDiv.innerHTML = name.charAt(0).toUpperCase();
+            }
+
+            // Mostrar modal
+            document.getElementById('professionalModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProfessionalModal(event) {
+            // Se clicou no X ou no botão Fechar, fechar sempre
+            if (!event || event.target.id === 'professionalModal' || event.target.classList.contains('modal-close') || event.target.classList.contains('modal-close-btn')) {
+                document.getElementById('professionalModal').classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Fechar modal ao pressionar ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeProfessionalModal();
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- Header -->
@@ -749,7 +946,11 @@
                 </h2>
                 <div class="team-grid">
                     {% for professional in professionals %}
-                    <div class="team-member-card">
+                    <div class="team-member-card" 
+                         data-professional-name="{{ professional.display_name }}"
+                         data-professional-bio="{{ professional.bio|escapejs }}"
+                         data-professional-color="{{ professional.color }}"
+                         {% if professional.photo_base64 %}data-professional-photo="{{ professional.photo_base64 }}"{% elif professional.photo %}data-professional-photo="{{ professional.photo.url }}"{% endif %}>
                         <div class="team-member-avatar" {% if professional.color %}style="background: {{ professional.color }};"{% endif %}>
                             {% if professional.photo_base64 %}
                                 <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}">
@@ -765,9 +966,9 @@
                             <div class="team-member-bio">{{ professional.bio }}</div>
                             {% endif %}
                         </div>
-                        <a href="/agendar/{{ tenant.slug }}/" class="team-member-button">
+                        <button class="team-member-button" onclick="openProfessionalModal(this)">
                             Ver mais
-                        </a>
+                        </button>
                     </div>
                     {% endfor %}
                 </div>
@@ -920,6 +1121,22 @@
                     <i class="fas fa-calendar-check" style="margin-right: 0.75rem;"></i>
                     Agendar Agora
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Professional Modal -->
+    <div id="professionalModal" class="professional-modal" onclick="closeProfessionalModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeProfessionalModal()">&times;</button>
+            <div class="modal-avatar" id="modalAvatar"></div>
+            <div class="modal-name" id="modalName"></div>
+            <div class="modal-bio" id="modalBio"></div>
+            <div class="modal-actions">
+                <a href="/agendar/{{ tenant.slug }}/" class="modal-schedule-btn">
+                    <i class="fas fa-calendar"></i>&nbsp; Agendar
+                </a>
+                <button class="modal-close-btn" onclick="closeProfessionalModal()">Fechar</button>
             </div>
         </div>
     </div>
