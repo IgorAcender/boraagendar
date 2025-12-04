@@ -18,6 +18,9 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     """Página de landing/mini-site do tenant."""
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
     
+    # Definir tenant no request para que o context processor possa acessar
+    request.tenant = tenant
+    
     # Buscar horários padrão da empresa (professional=None)
     availability_rules = AvailabilityRule.objects.filter(
         tenant=tenant,
@@ -47,18 +50,50 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     amenities = [a.strip() for a in tenant.amenities.split(",") if a.strip()] if tenant.amenities else []
     payment_methods = [p.strip() for p in tenant.payment_methods.split(",") if p.strip()] if tenant.payment_methods else []
     
+    # Obter configurações de branding
+    branding = None
+    try:
+        branding_settings = tenant.branding_settings
+        branding = {
+            "background_color": branding_settings.background_color,
+            "text_color": branding_settings.text_color,
+            "button_color_primary": branding_settings.button_color_primary,
+            "button_color_secondary": branding_settings.button_color_secondary,
+            "use_gradient_buttons": branding_settings.use_gradient_buttons,
+            "highlight_color": branding_settings.highlight_color,
+            "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
+            "highlight_hover_color": branding_settings.get_hover_color(branding_settings.highlight_color),
+        }
+    except:
+        # Se não houver BrandingSettings, usa cores padrão
+        branding = {
+            "background_color": "#0F172A",
+            "text_color": "#E2E8F0",
+            "button_color_primary": "#667EEA",
+            "button_color_secondary": "#764BA2",
+            "use_gradient_buttons": True,
+            "highlight_color": "#FBBF24",
+            "button_hover_color": "#8090F6",
+            "highlight_hover_color": "#FCC84B",
+        }
+    
     context = {
         "tenant": tenant,
         "business_hours": business_hours,
         "professionals": professionals,
         "amenities": amenities,
         "payment_methods": payment_methods,
+        "branding": branding,
     }
     return render(request, "scheduling/public/tenant_landing.html", context)
 
 
 def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
+    
+    # Definir tenant no request para que o context processor possa acessar
+    request.tenant = tenant
+    
     form = AvailabilitySearchForm(tenant=tenant, data=request.GET or None)
     available_slots = []
     selected_service = None
@@ -121,6 +156,33 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     services = list(services_queryset)
     has_service_categories = any((service.category or "").strip() for service in services)
 
+    # Obter configurações de branding
+    branding = None
+    try:
+        branding_settings = tenant.branding_settings
+        branding = {
+            "background_color": branding_settings.background_color,
+            "text_color": branding_settings.text_color,
+            "button_color_primary": branding_settings.button_color_primary,
+            "button_color_secondary": branding_settings.button_color_secondary,
+            "use_gradient_buttons": branding_settings.use_gradient_buttons,
+            "highlight_color": branding_settings.highlight_color,
+            "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
+            "highlight_hover_color": branding_settings.get_hover_color(branding_settings.highlight_color),
+        }
+    except:
+        # Se não houver BrandingSettings, usa cores padrão
+        branding = {
+            "background_color": "#0F172A",
+            "text_color": "#E2E8F0",
+            "button_color_primary": "#667EEA",
+            "button_color_secondary": "#764BA2",
+            "use_gradient_buttons": True,
+            "highlight_color": "#FBBF24",
+            "button_hover_color": "#8090F6",
+            "highlight_hover_color": "#FCC84B",
+        }
+
     context = {
         "tenant": tenant,
         "form": form,
@@ -134,12 +196,17 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         "today": date_type.today(),
         "services": services,
         "has_service_categories": has_service_categories,
+        "branding": branding,
     }
     return render(request, "scheduling/public/booking_start.html", context)
 
 
 def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
+    
+    # Definir tenant no request para que o context processor possa acessar
+    request.tenant = tenant
+    
     tz = ZoneInfo(tenant.timezone)
 
     service_id = request.GET.get("service") or request.POST.get("service")
@@ -301,6 +368,33 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         duration_minutes = service.duration_for(professional)
         price = service.price_for(professional)
         
+        # Obter configurações de branding
+        branding = None
+        try:
+            branding_settings = tenant.branding_settings
+            branding = {
+                "background_color": branding_settings.background_color,
+                "text_color": branding_settings.text_color,
+                "button_color_primary": branding_settings.button_color_primary,
+                "button_color_secondary": branding_settings.button_color_secondary,
+                "use_gradient_buttons": branding_settings.use_gradient_buttons,
+                "highlight_color": branding_settings.highlight_color,
+                "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
+                "highlight_hover_color": branding_settings.get_hover_color(branding_settings.highlight_color),
+            }
+        except:
+            # Se não houver BrandingSettings, usa cores padrão
+            branding = {
+                "background_color": "#0F172A",
+                "text_color": "#E2E8F0",
+                "button_color_primary": "#667EEA",
+                "button_color_secondary": "#764BA2",
+                "use_gradient_buttons": True,
+                "highlight_color": "#FBBF24",
+                "button_hover_color": "#8090F6",
+                "highlight_hover_color": "#FCC84B",
+            }
+        
         return render(
             request,
             "scheduling/public/booking_confirm.html",
@@ -312,6 +406,7 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
                 "start_datetime": start_datetime,
                 "duration_minutes": duration_minutes,
                 "price": price,
+                "branding": branding,
             },
         )
     except Exception as e:
@@ -323,10 +418,41 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
 
 def booking_success(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
+    
+    # Definir tenant no request para que o context processor possa acessar
+    request.tenant = tenant
+    
+    # Obter configurações de branding
+    branding = None
+    try:
+        branding_settings = tenant.branding_settings
+        branding = {
+            "background_color": branding_settings.background_color,
+            "text_color": branding_settings.text_color,
+            "button_color_primary": branding_settings.button_color_primary,
+            "button_color_secondary": branding_settings.button_color_secondary,
+            "use_gradient_buttons": branding_settings.use_gradient_buttons,
+            "highlight_color": branding_settings.highlight_color,
+            "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
+            "highlight_hover_color": branding_settings.get_hover_color(branding_settings.highlight_color),
+        }
+    except:
+        # Se não houver BrandingSettings, usa cores padrão
+        branding = {
+            "background_color": "#0F172A",
+            "text_color": "#E2E8F0",
+            "button_color_primary": "#667EEA",
+            "button_color_secondary": "#764BA2",
+            "use_gradient_buttons": True,
+            "highlight_color": "#FBBF24",
+            "button_hover_color": "#8090F6",
+            "highlight_hover_color": "#FCC84B",
+        }
+    
     return render(
         request,
         "scheduling/public/booking_success.html",
-        {"tenant": tenant},
+        {"tenant": tenant, "branding": branding},
     )
 
 
