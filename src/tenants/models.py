@@ -137,34 +137,15 @@ class BrandingSettings(models.Model):
     
     # Cores de botões
     button_color_primary = models.CharField(
-        "Cor Primária do Botão",
+        "Cor do Botão",
         max_length=7,
         default="#667EEA",
-        help_text="Cor primária dos botões e destaque"
-    )
-    button_color_secondary = models.CharField(
-        "Cor Secundária do Botão",
-        max_length=7,
-        default="#764BA2",
-        help_text="Cor secundária (para gradientes)"
-    )
-    use_gradient_buttons = models.BooleanField(
-        "Usar Gradiente nos Botões",
-        default=True,
-        help_text="Se ativado, botões usarão gradiente com as duas cores. Se desativado, usa apenas a cor primária."
-    )
-    
-    # Cor de destaque
-    highlight_color = models.CharField(
-        "Cor de Destaque",
-        max_length=7,
-        default="#FBBF24",
-        help_text="Cor para textos em destaque, ícones destacados, contornos especiais"
+        help_text="Cor primária dos botões (a cor secundária do gradiente é gerada automaticamente)"
     )
     
     # Cor de texto dos botões
     button_text_color = models.CharField(
-        "Cor de Texto dos Botões",
+        "Cor de Texto do Botão",
         max_length=7,
         default="#FFFFFF",
         help_text="Cor do texto dentro dos botões"
@@ -180,6 +161,18 @@ class BrandingSettings(models.Model):
     def __str__(self) -> str:
         return f"Branding - {self.tenant.name}"
 
+    def get_button_secondary_color(self) -> str:
+        """Calcula a cor secundária do botão (20% mais escura que a primária) para o gradiente."""
+        hex_color = self.button_color_primary.lstrip("#")
+        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+        
+        # Diminui luminosidade em 20%
+        r = max(0, int(r * 0.8))
+        g = max(0, int(g * 0.8))
+        b = max(0, int(b * 0.8))
+        
+        return f"#{r:02x}{g:02x}{b:02x}"
+    
     def get_hover_color(self, base_color: str) -> str:
         """Calcula uma cor de hover automática (20% mais clara)."""
         # Remove o # e converte para RGB
