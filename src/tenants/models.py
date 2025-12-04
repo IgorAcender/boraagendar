@@ -162,6 +162,14 @@ class BrandingSettings(models.Model):
         help_text="Cor para textos em destaque, ícones destacados, contornos especiais"
     )
     
+    # Cor de texto dos botões
+    button_text_color = models.CharField(
+        "Cor de Texto dos Botões",
+        max_length=7,
+        default="#FFFFFF",
+        help_text="Cor do texto dentro dos botões"
+    )
+    
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
     updated_at = models.DateTimeField("Atualizado em", auto_now=True)
 

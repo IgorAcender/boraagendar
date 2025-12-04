@@ -14,6 +14,7 @@
             --bg-darker: #020617;
             --text-light: {{ branding.text_color|default:"#e2e8f0" }};
             --text-muted: rgba({{ branding.text_color|default:"#e2e8f0" }}, 0.6);
+            --button-text: {{ branding.button_text_color|default:"#FFFFFF" }};
             --highlight-color: {{ branding.highlight_color|default:"#FBBF24" }};
             --button-hover: {{ branding.button_hover_color|default:"#8090F6" }};
             --highlight-hover: {{ branding.highlight_hover_color|default:"#FCC84B" }};
@@ -398,7 +399,7 @@
 
         .team-member-button {
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            color: var(--text-light);
+            color: var(--button-text);
             padding: 0.4rem 0.8rem;
             border-radius: 6px;
             text-decoration: none;
@@ -471,7 +472,7 @@
             right: 1rem;
             background: color-mix(in srgb, var(--brand-primary) 20%, transparent);
             border: none;
-            color: var(--text-light);
+            color: var(--button-text);
             font-size: 1.5rem;
             cursor: pointer;
             width: 40px;
@@ -497,7 +498,7 @@
             justify-content: center;
             font-weight: 700;
             font-size: 2.5rem;
-            color: var(--text-light);
+            color: var(--button-text);
             overflow: hidden;
             box-shadow: 0 4px 15px color-mix(in srgb, var(--brand-primary) 30%, transparent);
         }
@@ -511,7 +512,7 @@
         .modal-name {
             font-size: 1.4rem;
             font-weight: 700;
-            color: var(--text-light);
+            color: var(--button-text);
             text-align: center;
             margin-bottom: 1.5rem;
         }
@@ -534,7 +535,7 @@
         .modal-close-btn {
             flex: 1;
             background: color-mix(in srgb, var(--brand-primary) 20%, transparent);
-            color: var(--text-light);
+            color: var(--button-text);
             padding: 1rem;
             border: 1px solid color-mix(in srgb, var(--brand-primary) 30%, transparent);
             border-radius: 12px;
@@ -602,7 +603,7 @@
 
         .contact-value {
             font-size: 1.1rem;
-            color: var(--text-light);
+            color: var(--button-text);
             word-break: break-word;
         }
 
@@ -626,7 +627,7 @@
         .address-line {
             font-size: 1rem;
             line-height: 1.8;
-            color: var(--text-light);
+            color: var(--button-text);
         }
 
         /* Formas de Pagamento */
@@ -644,7 +645,7 @@
             text-align: center;
             font-size: 0.9rem;
             font-weight: 600;
-            color: var(--text-light);
+            color: var(--button-text);
             transition: all 0.3s;
         }
 
@@ -669,7 +670,7 @@
             border-radius: 10px;
             padding: 1rem 1.5rem;
             text-decoration: none;
-            color: var(--text-light);
+            color: var(--button-text);
             transition: all 0.3s;
             font-weight: 600;
         }
@@ -693,7 +694,7 @@
         .btn-schedule {
             display: inline-block;
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            color: var(--text-light);
+            color: var(--button-text);
             padding: 1.2rem 3rem;
             border-radius: 12px;
             text-decoration: none;
@@ -739,7 +740,7 @@
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
-            color: var(--text-light);
+            color: var(--button-text);
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
             padding: 1.25rem 2.5rem;
             border-radius: 50px;

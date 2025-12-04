@@ -8,6 +8,7 @@
         --brand-secondary: {{ branding.button_color_secondary|default:"#764ba2" }};
         --bg-dark: {{ branding.background_color|default:"#0f172a" }};
         --text-light: {{ branding.text_color|default:"#e2e8f0" }};
+        --button-text: {{ branding.button_text_color|default:"#FFFFFF" }};
         --highlight-color: {{ branding.highlight_color|default:"#FBBF24" }};
     }
 
@@ -129,7 +130,7 @@
         width: 100%;
         padding: 1rem;
         background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-        color: var(--text-light);
+        color: var(--button-text);
         border: none;
         border-radius: 12px;
         font-weight: 600;

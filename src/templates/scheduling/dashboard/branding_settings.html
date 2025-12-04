@@ -110,6 +110,19 @@
                                     {{ form.use_gradient_buttons.help_text }}
                                 </small>
                             </div>
+
+                            <div class="form-group">
+                                <label for="id_button_text_color" class="form-label">
+                                    {{ form.button_text_color.label }}
+                                </label>
+                                <div class="input-group">
+                                    {{ form.button_text_color }}
+                                    <span class="input-group-text" id="btn-text-preview" style="background-color: {{ branding.button_text_color }}; width: 50px; border-radius: 4px;"></span>
+                                </div>
+                                <small class="text-muted d-block mt-1">
+                                    {{ form.button_text_color.help_text }}
+                                </small>
+                            </div>
                         </div>
 
                         <hr>
@@ -201,6 +214,7 @@ function updatePreview() {
     const textColor = document.getElementById('id_text_color').value;
     const btnPrimary = document.getElementById('id_button_color_primary').value;
     const btnSecondary = document.getElementById('id_button_color_secondary').value;
+    const btnTextColor = document.getElementById('id_button_text_color').value;
     const highlightColor = document.getElementById('id_highlight_color').value;
     const useGradient = document.getElementById('id_use_gradient_buttons').checked;
 
@@ -226,12 +240,14 @@ function updatePreview() {
         previewBtn.style.backgroundColor = btnPrimary;
         previewBtn.textContent = 'Botão Sólido';
     }
+    previewBtn.style.color = btnTextColor;
 
     // Atualizar previews de cores
     document.getElementById('bg-preview').style.backgroundColor = bgColor;
     document.getElementById('text-preview').style.backgroundColor = textColor;
     document.getElementById('btn-primary-preview').style.backgroundColor = btnPrimary;
     document.getElementById('btn-secondary-preview').style.backgroundColor = btnSecondary;
+    document.getElementById('btn-text-preview').style.backgroundColor = btnTextColor;
     document.getElementById('highlight-preview').style.backgroundColor = highlightColor;
 }
 
