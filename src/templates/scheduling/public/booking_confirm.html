@@ -3,6 +3,14 @@
 
 {% block extra_head %}
 <style>
+    :root {
+        --brand-primary: {{ branding.button_color_primary|default:"#667eea" }};
+        --brand-secondary: {{ branding.button_color_secondary|default:"#764ba2" }};
+        --bg-dark: {{ branding.background_color|default:"#0f172a" }};
+        --text-light: {{ branding.text_color|default:"#e2e8f0" }};
+        --highlight-color: {{ branding.highlight_color|default:"#FBBF24" }};
+    }
+
     .booking-confirm-container {
         max-width: 600px;
         margin: 0 auto;
