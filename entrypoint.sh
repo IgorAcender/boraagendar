@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+echo "[entrypoint] Running migrations..."
+python manage.py migrate
+
 if [ "${SKIP_COLLECTSTATIC:-0}" = "1" ]; then
   echo "[entrypoint] Skipping collectstatic (SKIP_COLLECTSTATIC=1)."
 else
