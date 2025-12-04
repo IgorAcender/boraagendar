@@ -802,12 +802,11 @@
         /* Barra de Navegação com Ícones */
         .navigation-bar {
             display: flex;
-            justify-content: center;
-            gap: 2rem;
+            justify-content: space-around;
+            align-items: center;
             padding: 2rem 1rem;
             background: rgba(15, 23, 42, 0.5);
             border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-            flex-wrap: wrap;
         }
 
         .nav-item {
@@ -858,7 +857,6 @@
 
         @media (max-width: 767px) {
             .navigation-bar {
-                gap: 1.5rem;
                 padding: 1.5rem 1rem;
             }
 
@@ -967,16 +965,6 @@
             {% endif %}
         </div>
         <h1 class="company-name">{{ tenant.name }}</h1>
-    </div>
-
-    <!-- Botão de Agendamento -->
-    <div class="schedule-button-section">
-        <a href="/agendar/{{ tenant.slug }}/" class="btn-schedule-main">
-            <div class="schedule-icon">
-                <i class="fas fa-calendar-check"></i>
-            </div>
-            <span class="schedule-label">Agendar Agora</span>
-        </a>
     </div>
 
     <!-- Barra de Navegação com Ícones -->
