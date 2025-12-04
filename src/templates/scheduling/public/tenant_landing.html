@@ -280,7 +280,7 @@
         /* Equipe / Profissionais */
         .team-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 1fr) !important;
             gap: 1.5rem;
         }
 
@@ -317,6 +317,13 @@
             color: white;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .team-member-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
 
         .team-member-avatar img {
@@ -356,6 +363,7 @@
             cursor: pointer;
             white-space: nowrap;
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            display: none;
         }
 
         .team-member-button:hover {
@@ -364,28 +372,22 @@
         }
 
         @media (max-width: 480px) {
-            .team-grid {
-                grid-template-columns: 1fr;
-            }
-
             .team-member-card {
-                padding: 1.5rem;
-                gap: 1rem;
-                flex-direction: column;
+                padding: 1rem;
+                gap: 0.75rem;
             }
 
             .team-member-avatar {
-                width: 80px;
-                height: 80px;
+                width: 70px;
+                height: 70px;
             }
 
             .team-member-name {
-                font-size: 1rem;
+                font-size: 0.9rem;
             }
 
-            .team-member-button {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.75rem;
+            .team-member-bio {
+                font-size: 0.8rem;
             }
         }
 
@@ -952,7 +954,7 @@
                          data-professional-bio="{{ professional.bio|escapejs }}"
                          data-professional-color="{{ professional.color }}"
                          {% if professional.photo_base64 %}data-professional-photo="{{ professional.photo_base64 }}"{% elif professional.photo %}data-professional-photo="{{ professional.photo.url }}"{% endif %}>
-                        <div class="team-member-avatar" {% if professional.color %}style="background: {{ professional.color }};"{% endif %}>
+                        <div class="team-member-avatar" {% if professional.color %}style="background: {{ professional.color }};"{% endif %} onclick="openProfessionalModal(this)" title="Clique para ver mais informações">
                             {% if professional.photo_base64 %}
                                 <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}">
                             {% elif professional.photo %}
@@ -967,9 +969,6 @@
                             <div class="team-member-bio">{{ professional.bio }}</div>
                             {% endif %}
                         </div>
-                        <button class="team-member-button" onclick="openProfessionalModal(this)">
-                            Ver mais
-                        </button>
                     </div>
                     {% endfor %}
                 </div>
