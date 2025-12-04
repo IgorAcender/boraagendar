@@ -1,5 +1,4 @@
 {% extends "scheduling/public/base_public.html" %}
-{% load calendar_filters %}
 {% block title %}Agendar Horário{% endblock %}
 
 {% block progress %}
@@ -17,7 +16,7 @@
 <style>
     :root {
         --brand-primary: {{ branding.button_color_primary|default:"#667eea" }};
-        --brand-secondary: {{ branding.button_color_primary|darker_color }};
+        --brand-secondary: {{ branding.button_color_secondary|default:"#764ba2" }};
         --bg-dark: {{ branding.background_color|default:"#0f172a" }};
         --text-light: {{ branding.text_color|default:"#e2e8f0" }};
         --button-text: {{ branding.button_text_color|default:"#FFFFFF" }};

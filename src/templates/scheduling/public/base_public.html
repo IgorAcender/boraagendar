@@ -6,14 +6,14 @@
     <title>{% block title %}Agendar{% endblock %} - {{ tenant.name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    {% load calendar_filters %}
     <style>
         :root {
             --brand-primary: {{ branding.button_color_primary|default:"#667eea" }};
-            --brand-secondary: {{ branding.button_color_primary|darker_color }};
+            --brand-secondary: {{ branding.button_color_secondary|default:"#764ba2" }};
             --bg-dark: {{ branding.background_color|default:"#0f172a" }};
             --text-light: {{ branding.text_color|default:"#e2e8f0" }};
             --button-text: {{ branding.button_text_color|default:"#FFFFFF" }};
+            --highlight-color: {{ branding.highlight_color|default:"#FBBF24" }};
         }
 
         * {

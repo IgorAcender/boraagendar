@@ -20,7 +20,8 @@ class BrandingSettingsInline(admin.StackedInline):
     extra = 0
     fields = (
         "background_color", "text_color",
-        "button_color_primary", "button_text_color"
+        "button_color_primary", "button_color_secondary", "use_gradient_buttons",
+        "button_text_color", "highlight_color"
     )
 
 
@@ -73,13 +74,16 @@ class BusinessHoursAdmin(admin.ModelAdmin):
 
 @admin.register(BrandingSettings)
 class BrandingSettingsAdmin(admin.ModelAdmin):
-    list_display = ("tenant", "background_color", "text_color", "button_color_primary")
+    list_display = ("tenant", "background_color", "text_color", "highlight_color")
     search_fields = ("tenant__name",)
     fieldsets = (
         ("Cores Gerais", {
             "fields": ("tenant", "background_color", "text_color")
         }),
         ("Cores de Botões", {
-            "fields": ("button_color_primary", "button_text_color")
+            "fields": ("button_color_primary", "button_color_secondary", "use_gradient_buttons", "button_text_color")
+        }),
+        ("Destaque", {
+            "fields": ("highlight_color",)
         }),
     )
