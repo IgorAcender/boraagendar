@@ -954,7 +954,34 @@ document.addEventListener('DOMContentLoaded', updateSecondaryColor);
 
 // Inicializa controles de seções
 document.addEventListener('DOMContentLoaded', function() {
+    const hiddenField = document.getElementById('id_sections_config');
     const sectionFields = document.querySelectorAll('.section-field');
+    
+    // Carregar e restaurar ordem salva se existir
+    let sectionsData = {};
+    if (hiddenField && hiddenField.value) {
+        try {
+            const parsed = JSON.parse(hiddenField.value);
+            if (parsed && typeof parsed === 'object') {
+                sectionsData = parsed;
+            }
+        } catch (e) {
+            console.warn('Erro ao parsear sections_config:', e);
+        }
+    }
+    
+    // Restaurar checkboxes e aplicar ordem salva
+    sectionFields.forEach(field => {
+        const sectionId = field.dataset.sectionId;
+        const checkbox = field.querySelector('.section-visible-toggle');
+        
+        if (sectionId && sectionsData[sectionId]) {
+            // Restaurar checkbox state
+            if (checkbox) {
+                checkbox.checked = sectionsData[sectionId].visible !== false;
+            }
+        }
+    });
     
     // Sincronizar checkboxes dos campos dummy com a UI
     const teamVisible = document.getElementById('team_visible');
@@ -1004,6 +1031,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     updateButtonStates();
     updateSectionsState();
+    
+    // CRÍTICO: Listener no formulário para atualizar sections_config antes de enviar
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Atualizar sections_config com ordem e visibilidade atuais
+            updateSectionsState();
+        });
+    }
 });
 
 function moveSectionFieldUp(field) {

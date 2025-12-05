@@ -223,6 +223,12 @@ class BrandingSettingsForm(forms.ModelForm):
         self.fields["show_team"].initial = sections_config.get("team", {}).get("visible", True)
         self.fields["show_business_hours"].initial = sections_config.get("hours", {}).get("visible", True)
         
+        # Converter sections_config para JSON string para o formulário
+        import json
+        if self.instance and hasattr(self.instance, 'sections_config'):
+            sections_data = self.instance.sections_config or {}
+            self.fields["sections_config"].initial = json.dumps(sections_data)
+        
         # Garante que destaque tem valor inicial e não bloqueia o submit
         self.fields["highlight_color"].required = False
         if not self.instance.highlight_color:
@@ -291,6 +297,16 @@ class BrandingSettingsForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
+        import json
+        
+        # Processar sections_config se vier como string JSON
+        sections_config = self.cleaned_data.get("sections_config")
+        if sections_config and isinstance(sections_config, str):
+            try:
+                self.instance.sections_config = json.loads(sections_config)
+            except (json.JSONDecodeError, TypeError):
+                self.instance.sections_config = {}
+        
         branding = super().save(commit=commit)
 
         hero = self.cleaned_data.get("hero_image")
