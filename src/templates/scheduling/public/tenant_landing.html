@@ -245,10 +245,24 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 1rem;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
             box-shadow: 0 8px 20px color-mix(in srgb, var(--brand-primary) 40%, transparent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-schedule-header .btn-text {
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-schedule-header .btn-icon {
+            display: inline-block;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(-10px) scale(0.8);
         }
 
         .btn-schedule-header:hover {
@@ -258,6 +272,32 @@
 
         .btn-schedule-header:active {
             transform: translateY(-1px);
+        }
+
+        .btn-schedule-header:active .btn-text {
+            animation: slideOut 0.3s ease forwards;
+        }
+
+        .btn-schedule-header:active .btn-icon {
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        @keyframes slideOut {
+            to {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
         }
 
         /* Secondary Button - Meus Agendamentos */
@@ -1099,8 +1139,10 @@
     <!-- CTA Button - Overlay no topo -->
     <div class="header-cta-button" id="schedule">
         <a href="{% url 'public:booking_start' tenant_slug=tenant.slug %}" class="btn-schedule-header">
-            <i class="fas fa-calendar-check" style="margin-right: 0.75rem;"></i>
-            Agendar Agora
+            <span class="btn-text">Agendar Agora</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="btn-icon">
+                <path d="M0 11c2.761.575 6.312 1.688 9 3.438 3.157-4.23 8.828-8.187 15-11.438-5.861 5.775-10.711 12.328-14 18.917-2.651-3.766-5.547-7.271-10-10.917z" fill="currentColor"/>
+            </svg>
         </a>
     </div>
 
