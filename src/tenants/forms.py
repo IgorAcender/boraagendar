@@ -183,6 +183,18 @@ class BrandingSettingsForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 2, "placeholder": "Telefone, WhatsApp, e-mail..."}),
         help_text="Informações de contato exibidas no mini site."
     )
+    instagram_url = forms.URLField(
+        label="Instagram (mini site)",
+        required=False,
+        widget=forms.URLInput(attrs={"class": "form-control", "placeholder": "https://instagram.com/seu_perfil"}),
+        help_text="Link exibido na seção de redes sociais."
+    )
+    facebook_url = forms.URLField(
+        label="Facebook (mini site)",
+        required=False,
+        widget=forms.URLInput(attrs={"class": "form-control", "placeholder": "https://facebook.com/seu_perfil"}),
+        help_text="Link exibido na seção de redes sociais."
+    )
 
     def __init__(self, *args, tenant: Tenant, **kwargs):
         self.tenant = tenant
@@ -190,6 +202,8 @@ class BrandingSettingsForm(forms.ModelForm):
         # Preenche campo extra com valor do tenant
         self.fields["about_us"].initial = tenant.about_us
         self.fields["contact_info"].initial = tenant.contact_info
+        self.fields["instagram_url"].initial = tenant.instagram_url
+        self.fields["facebook_url"].initial = tenant.facebook_url
 
     class Meta:
         model = BrandingSettings
@@ -204,6 +218,8 @@ class BrandingSettingsForm(forms.ModelForm):
             "hero_image",  # campo extra (não no modelo)
             "about_us",    # campo extra (não no modelo)
             "contact_info",  # campo extra (não no modelo)
+            "instagram_url",
+            "facebook_url",
         ]
         labels = {
             "background_color": "Cor de Fundo",
@@ -216,6 +232,8 @@ class BrandingSettingsForm(forms.ModelForm):
             "hero_image": "Foto de capa / hero",
             "about_us": "Sobre nós (mini site)",
             "contact_info": "Contatos (mini site)",
+            "instagram_url": "Instagram (mini site)",
+            "facebook_url": "Facebook (mini site)",
         }
         widgets = {
             "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
@@ -237,6 +255,8 @@ class BrandingSettingsForm(forms.ModelForm):
             "hero_image": "Selecione uma imagem para o topo do mini site",
             "about_us": "Texto exibido na seção Sobre nós do mini site",
             "contact_info": "Telefone/WhatsApp/e-mail exibidos na seção de contato do mini site",
+            "instagram_url": "Link para Instagram (opcional)",
+            "facebook_url": "Link para Facebook (opcional)",
         }
 
     def save(self, commit=True):
@@ -260,5 +280,18 @@ class BrandingSettingsForm(forms.ModelForm):
         if contact_info is not None:
             self.tenant.contact_info = contact_info
             self.tenant.save(update_fields=["contact_info", "updated_at"])
+
+        instagram_url = self.cleaned_data.get("instagram_url")
+        facebook_url = self.cleaned_data.get("facebook_url")
+        fields_to_update = []
+        if instagram_url is not None:
+            self.tenant.instagram_url = instagram_url
+            fields_to_update.append("instagram_url")
+        if facebook_url is not None:
+            self.tenant.facebook_url = facebook_url
+            fields_to_update.append("facebook_url")
+        if fields_to_update:
+            fields_to_update.append("updated_at")
+            self.tenant.save(update_fields=fields_to_update)
 
         return branding
