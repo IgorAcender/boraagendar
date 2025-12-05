@@ -747,30 +747,34 @@
         }
 
         .contact-item {
-            background: color-mix(in srgb, var(--brand-primary) 10%, transparent);
-            border: 1px solid color-mix(in srgb, var(--brand-primary) 20%, transparent);
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0;
             transition: all 0.3s;
         }
 
         .contact-item:hover {
-            background: color-mix(in srgb, var(--brand-primary) 15%, transparent);
-            transform: translateY(-2px);
+            transform: none;
         }
 
         .contact-icon {
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: var(--brand-primary);
-            margin-bottom: 1rem;
+            min-width: 24px;
+            margin-top: 0.2rem;
+        }
+
+        .contact-content {
+            flex: 1;
+            text-align: left;
         }
 
         .contact-label {
             font-size: 0.85rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             font-weight: 600;
             letter-spacing: 0.5px;
         }
@@ -792,10 +796,7 @@
 
         /* Endereço */
         .address-card {
-            background: color-mix(in srgb, var(--brand-primary) 10%, transparent);
-            border: 1px solid color-mix(in srgb, var(--brand-primary) 20%, transparent);
-            border-radius: 12px;
-            padding: 1.5rem;
+            padding: 0;
         }
 
         .address-line {
@@ -1330,9 +1331,11 @@
                                 <div class="contact-icon">
                                     <i class="fas fa-address-book"></i>
                                 </div>
-                                <div class="contact-label">Contatos</div>
-                                <div class="contact-value">
-                                    {{ tenant.contact_info|linebreaksbr }}
+                                <div class="contact-content">
+                                    <div class="contact-label">Contatos</div>
+                                    <div class="contact-value">
+                                        {{ tenant.contact_info|linebreaksbr }}
+                                    </div>
                                 </div>
                             </div>
                             {% else %}
@@ -1341,9 +1344,11 @@
                                     <div class="contact-icon">
                                         <i class="fas fa-phone"></i>
                                     </div>
-                                    <div class="contact-label">Telefone</div>
-                                    <div class="contact-value">
-                                        <a href="tel:{{ tenant.phone_number }}">{{ tenant.phone_number }}</a>
+                                    <div class="contact-content">
+                                        <div class="contact-label">Telefone</div>
+                                        <div class="contact-value">
+                                            <a href="tel:{{ tenant.phone_number }}">{{ tenant.phone_number }}</a>
+                                        </div>
                                     </div>
                                 </div>
                                 {% endif %}
@@ -1353,9 +1358,11 @@
                                     <div class="contact-icon">
                                         <i class="fab fa-whatsapp"></i>
                                     </div>
-                                    <div class="contact-label">WhatsApp</div>
-                                    <div class="contact-value">
-                                        <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank">{{ tenant.whatsapp_number }}</a>
+                                    <div class="contact-content">
+                                        <div class="contact-label">WhatsApp</div>
+                                        <div class="contact-value">
+                                            <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank">{{ tenant.whatsapp_number }}</a>
+                                        </div>
                                     </div>
                                 </div>
                                 {% endif %}
@@ -1365,9 +1372,11 @@
                                     <div class="contact-icon">
                                         <i class="fas fa-envelope"></i>
                                     </div>
-                                    <div class="contact-label">E-mail</div>
-                                    <div class="contact-value">
-                                        <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a>
+                                    <div class="contact-content">
+                                        <div class="contact-label">E-mail</div>
+                                        <div class="contact-value">
+                                            <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a>
+                                        </div>
                                     </div>
                                 </div>
                                 {% endif %}
