@@ -87,21 +87,6 @@
 
                                 <div class="col-md-6 mb-3">
                                     <div class="form-group">
-                                        <label for="id_button_color_secondary" class="form-label">
-                                            {{ form.button_color_secondary.label }}
-                                        </label>
-                                        <div class="input-group">
-                                            {{ form.button_color_secondary }}
-                                            <span class="input-group-text" id="btn-secondary-preview" style="background-color: {{ branding.button_color_secondary|default:branding.button_color_primary }}; width: 50px; border-radius: 4px;"></span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.button_color_secondary.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <div class="form-group">
                                         <label for="id_button_text_color" class="form-label">
                                             {{ form.button_text_color.label }}
                                         </label>
@@ -115,16 +100,9 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="form-check form-switch mb-3">
-                                {{ form.use_gradient_buttons }}
-                                <label class="form-check-label" for="id_use_gradient_buttons">
-                                    {{ form.use_gradient_buttons.label }}
-                                </label>
-                                <small class="text-muted d-block">
-                                    {{ form.use_gradient_buttons.help_text }}
-                                </small>
-                            </div>
+                            <!-- Campos ocultos para manter compatibilidade com o modelo -->
+                            <input type="hidden" name="{{ form.button_color_secondary.name }}" id="id_button_color_secondary" value="{{ branding.button_color_secondary|default:branding.button_color_primary }}">
+                            <input type="hidden" name="{{ form.use_gradient_buttons.name }}" id="id_use_gradient_buttons" value="on">
                         </div>
 
                         <hr>
@@ -200,8 +178,22 @@
 </div>
 
 <script>
+// Função utilitária: escurece 20%
+function getDarkerColor(hexColor) {
+    const hex = hexColor.replace('#', '');
+    let r = parseInt(hex.substring(0, 2), 16);
+    let g = parseInt(hex.substring(2, 4), 16);
+    let b = parseInt(hex.substring(4, 6), 16);
+    
+    r = Math.max(0, Math.floor(r * 0.8));
+    g = Math.max(0, Math.floor(g * 0.8));
+    b = Math.max(0, Math.floor(b * 0.8));
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
 // Atualizar preview em tempo real
-document.querySelectorAll('input[type="color"], input[type="checkbox"]').forEach(input => {
+document.querySelectorAll('input[type="color"]').forEach(input => {
     input.addEventListener('change', updatePreview);
     input.addEventListener('input', updatePreview);
 });
@@ -210,9 +202,14 @@ function updatePreview() {
     const bgColor = document.getElementById('id_background_color').value;
     const textColor = document.getElementById('id_text_color').value;
     const btnPrimary = document.getElementById('id_button_color_primary').value;
-    const btnSecondary = document.getElementById('id_button_color_secondary').value || btnPrimary;
+    // Cor secundária calculada automaticamente (20% mais escura)
+    const btnSecondary = getDarkerColor(btnPrimary);
+    // Atualiza campo oculto para enviar ao backend
+    const hiddenSecondary = document.getElementById('id_button_color_secondary');
+    if (hiddenSecondary) hiddenSecondary.value = btnSecondary;
     const btnTextColor = document.getElementById('id_button_text_color').value;
-    const useGradient = document.getElementById('id_use_gradient_buttons').checked;
+    // Sempre usar gradiente (valor enviado via hidden)
+    const useGradient = true;
     const highlightColor = document.getElementById('id_highlight_color').value;
 
     // Atualizar box de preview
@@ -241,7 +238,6 @@ function updatePreview() {
     document.getElementById('bg-preview').style.backgroundColor = bgColor;
     document.getElementById('text-preview').style.backgroundColor = textColor;
     document.getElementById('btn-primary-preview').style.backgroundColor = btnPrimary;
-    document.getElementById('btn-secondary-preview').style.backgroundColor = btnSecondary;
     document.getElementById('btn-text-preview').style.backgroundColor = btnTextColor;
     document.getElementById('highlight-preview').style.backgroundColor = highlightColor;
 }
