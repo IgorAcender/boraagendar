@@ -1,266 +1,530 @@
-{% extends "base_dashboard.html" %}{% extends "base_dashboard.html" %}
+{% extends "base_dashboard.html" %}{% extends "base_dashboard.html" %}{% extends "base_dashboard.html" %}
+
+{% load static %}
 
 {% load static %}{% load static %}
 
-
-
-{% block title %}Configurações de Marca{% endblock %}{% block title %}Configurações de Marca{% endblock %}
+{% block title %}Configurações de Marca{% endblock %}
 
 
 
-{% block content %}{% block content %}
+{% block content %}
 
-<div class="container mt-5 mb-5"><div class="container mt-5 mb-5">
+<div class="container mt-5 mb-5">{% block title %}Configurações de Marca{% endblock %}{% block title %}Configurações de Marca{% endblock %}
 
-    <div class="row">    <div class="row">
+    <div class="row">
 
-        <div class="col-md-8 offset-md-2">        <div class="col-md-8 offset-md-2">
+        <div class="col-md-8 offset-md-2">
 
-            <div class="card shadow-sm">            <div class="card shadow-sm">
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-primary text-white">{% block content %}{% block content %}
+
+                    <h3 class="mb-0">
+
+                        <i class="fas fa-palette"></i> Configurações de Marca<div class="container mt-5 mb-5"><div class="container mt-5 mb-5">
+
+                    </h3>
+
+                </div>    <div class="row">    <div class="row">
+
+
+
+                <div class="card-body p-4">        <div class="col-md-8 offset-md-2">        <div class="col-md-8 offset-md-2">
+
+                    <p class="text-muted mb-4">
+
+                        Personalize as cores do seu mini site. Essas configurações afetam como o site aparece para seus clientes.            <div class="card shadow-sm">            <div class="card shadow-sm">
+
+                    </p>
 
                 <div class="card-header bg-primary text-white">                <div class="card-header bg-primary text-white">
 
-                    <h3 class="mb-0">                    <h3 class="mb-0">
+                    <form method="post" class="needs-validation" novalidate>
 
-                        <i class="fas fa-palette"></i> Configurações de Marca                        <i class="fas fa-palette"></i> Configurações de Marca
+                        {% csrf_token %}                    <h3 class="mb-0">                    <h3 class="mb-0">
 
-                    </h3>                    </h3>
 
-                </div>                </div>
 
+                        <!-- Cores Gerais -->                        <i class="fas fa-palette"></i> Configurações de Marca                        <i class="fas fa-palette"></i> Configurações de Marca
 
+                        <div class="mb-4">
 
-                <div class="card-body p-4">                <div class="card-body p-4">
+                            <h5 class="mb-3">                    </h3>                    </h3>
 
-                    <p class="text-muted mb-4">                    <p class="text-muted mb-4">
+                                <i class="fas fa-fill-drip"></i> Cores Gerais
 
-                        Personalize as cores do seu mini site. Essas configurações afetam como o site aparece para seus clientes.                        Personalize as cores do seu mini site. Essas configurações afetam como o site aparece para seus clientes.
+                            </h5>                </div>                </div>
 
-                    </p>                    </p>
+                            
 
+                            <div class="row mb-3">
 
+                                <div class="col-md-6">
 
-                    <form method="post" class="needs-validation" novalidate>                    <form method="post" class="needs-validation" novalidate>
+                                    <div class="form-group">                <div class="card-body p-4">                <div class="card-body p-4">
 
-                        {% csrf_token %}                        {% csrf_token %}
+                                        <label for="id_background_color" class="form-label">
 
-
-
-                        <!-- Cores Gerais -->                        <!-- Cores Gerais -->
-
-                        <div class="mb-4">                        <div class="mb-4">
-
-                            <h5 class="mb-3">                            <h5 class="mb-3">
-
-                                <i class="fas fa-fill-drip"></i> Cores Gerais                                <i class="fas fa-fill-drip"></i> Cores Gerais
-
-                            </h5>                            </h5>
-
-                                                        
-
-                            <div class="row mb-3">                            <div class="row mb-3">
-
-                                <div class="col-md-6">                                <div class="col-md-6">
-
-                                    <div class="form-group">                                    <div class="form-group">
-
-                                        <label for="id_background_color" class="form-label">                                        <label for="id_background_color" class="form-label">
-
-                                            {{ form.background_color.label }}                                            {{ form.background_color.label }}
-
-                                        </label>                                        </label>
-
-                                        <div class="input-group">                                        <div class="input-group">
-
-                                            {{ form.background_color }}                                            {{ form.background_color }}
-
-                                            <span class="input-group-text" id="bg-preview" style="background-color: {{ branding.background_color }}; width: 50px; border-radius: 4px;"></span>                                            <span class="input-group-text" id="bg-preview" style="background-color: {{ branding.background_color }}; width: 50px; border-radius: 4px;"></span>
-
-                                        </div>                                        </div>
-
-                                        <small class="text-muted d-block mt-1">                                        <small class="text-muted d-block mt-1">
-
-                                            {{ form.background_color.help_text }}                                            {{ form.background_color.help_text }}
-
-                                        </small>                                        </small>
-
-                                    </div>                                    </div>
-
-                                </div>                                </div>
-
-
-
-                                <div class="col-md-6">                                <div class="col-md-6">
-
-                                    <div class="form-group">                                    <div class="form-group">
-
-                                        <label for="id_text_color" class="form-label">                                        <label for="id_text_color" class="form-label">
-
-                                            {{ form.text_color.label }}                                            {{ form.text_color.label }}
-
-                                        </label>                                        </label>
-
-                                        <div class="input-group">                                        <div class="input-group">
-
-                                            {{ form.text_color }}                                            {{ form.text_color }}
-
-                                            <span class="input-group-text" id="text-preview" style="background-color: {{ branding.text_color }}; width: 50px; border-radius: 4px;"></span>                                            <span class="input-group-text" id="text-preview" style="background-color: {{ branding.text_color }}; width: 50px; border-radius: 4px;"></span>
-
-                                        </div>                                        </div>
-
-                                        <small class="text-muted d-block mt-1">                                        <small class="text-muted d-block mt-1">
-
-                                            {{ form.text_color.help_text }}                                            {{ form.text_color.help_text }}
-
-                                        </small>                                        </small>
-
-                                    </div>                                    </div>
-
-                                </div>                                </div>
-
-                            </div>                            </div>
-
-                        </div>                        </div>
-
-
-
-                        <hr>                        <hr>
-
-
-
-                        <!-- Botão e Ícones -->                        <!-- Botão e Ícones -->
-
-                        <div class="mb-4">                        <div class="mb-4">
-
-                            <h5 class="mb-3">                            <h5 class="mb-3">
-
-                                <i class="fas fa-square"></i> Botão e Ícones                                <i class="fas fa-square"></i> Botão e Ícones
-
-                            </h5>                            </h5>
-
-
-
-                            <div class="row mb-3">                            <div class="row mb-3">
-
-                                <div class="col-md-6 mb-3">                                <div class="col-md-6 mb-3">
-
-                                    <div class="form-group">                                    <div class="form-group">
-
-                                        <label for="id_button_color_primary" class="form-label">                                        <label for="id_button_color_primary" class="form-label">
-
-                                            {{ form.button_color_primary.label }}                                            {{ form.button_color_primary.label }}
-
-                                        </label>                                        </label>
-
-                                        <div class="input-group">                                        <div class="input-group">
-
-                                            {{ form.button_color_primary }}                                            {{ form.button_color_primary }}
-
-                                            <span class="input-group-text" id="btn-primary-preview" style="background-color: {{ branding.button_color_primary }}; width: 50px; border-radius: 4px;"></span>                                            <span class="input-group-text" id="btn-primary-preview" style="background-color: {{ branding.button_color_primary }}; width: 50px; border-radius: 4px;"></span>
-
-                                        </div>                                        </div>
-
-                                        <small class="text-muted d-block mt-1">                                        <small class="text-muted d-block mt-1">
-
-                                            {{ form.button_color_primary.help_text }}                                            {{ form.button_color_primary.help_text }}
-
-                                        </small>                                        </small>
-
-                                    </div>                                    </div>
-
-                                </div>                                </div>
-
-
-
-                                <div class="col-md-6 mb-3">                                <div class="col-md-6 mb-3">
-
-                                    <div class="form-group">                                    <div class="form-group">
-
-                                        <label for="id_button_color_secondary" class="form-label">                                        <label for="id_button_text_color" class="form-label">
-
-                                            {{ form.button_color_secondary.label }}                                            {{ form.button_text_color.label }}
-
-                                        </label>                                        </label>
-
-                                        <div class="input-group">                                        <div class="input-group">
-
-                                            {{ form.button_color_secondary }}                                            {{ form.button_text_color }}
-
-                                            <span class="input-group-text" id="btn-secondary-preview" style="background-color: {{ branding.button_color_secondary }}; width: 50px; border-radius: 4px;"></span>                                            <span class="input-group-text" id="btn-text-preview" style="background-color: {{ branding.button_text_color }}; width: 50px; border-radius: 4px;"></span>
-
-                                        </div>                                        </div>
-
-                                        <small class="text-muted d-block mt-1">                                        <small class="text-muted d-block mt-1">
-
-                                            {{ form.button_color_secondary.help_text }}                                            {{ form.button_text_color.help_text }}
-
-                                        </small>                                        </small>
-
-                                    </div>                                    </div>
-
-                                </div>                                </div>
-
-                            </div>
-
-                                <div class="col-md-6 mb-3">                            <!-- Campos ocultos para manter compatibilidade com o modelo -->
-
-                                    <div class="form-group">                            <input type="hidden" name="{{ form.button_color_secondary.name }}" id="id_button_color_secondary" value="{{ branding.button_color_secondary|default:branding.button_color_primary }}">
-
-                                        <label for="id_button_text_color" class="form-label">                            <input type="hidden" name="{{ form.use_gradient_buttons.name }}" id="id_use_gradient_buttons" value="on">
-
-                                            {{ form.button_text_color.label }}                        </div>
+                                            {{ form.background_color.label }}                    <p class="text-muted mb-4">                    <p class="text-muted mb-4">
 
                                         </label>
 
+                                        <div class="input-group">                        Personalize as cores do seu mini site. Essas configurações afetam como o site aparece para seus clientes.                        Personalize as cores do seu mini site. Essas configurações afetam como o site aparece para seus clientes.
+
+                                            {{ form.background_color }}
+
+                                            <span class="input-group-text" id="bg-preview" style="background-color: {{ branding.background_color }}; width: 50px; border-radius: 4px;"></span>                    </p>                    </p>
+
+                                        </div>
+
+                                        <small class="text-muted d-block mt-1">
+
+                                            {{ form.background_color.help_text }}
+
+                                        </small>                    <form method="post" class="needs-validation" novalidate>                    <form method="post" class="needs-validation" novalidate>
+
+                                    </div>
+
+                                </div>                        {% csrf_token %}                        {% csrf_token %}
+
+
+
+                                <div class="col-md-6">
+
+                                    <div class="form-group">
+
+                                        <label for="id_text_color" class="form-label">                        <!-- Cores Gerais -->                        <!-- Cores Gerais -->
+
+                                            {{ form.text_color.label }}
+
+                                        </label>                        <div class="mb-4">                        <div class="mb-4">
+
+                                        <div class="input-group">
+
+                                            {{ form.text_color }}                            <h5 class="mb-3">                            <h5 class="mb-3">
+
+                                            <span class="input-group-text" id="text-preview" style="background-color: {{ branding.text_color }}; width: 50px; border-radius: 4px;"></span>
+
+                                        </div>                                <i class="fas fa-fill-drip"></i> Cores Gerais                                <i class="fas fa-fill-drip"></i> Cores Gerais
+
+                                        <small class="text-muted d-block mt-1">
+
+                                            {{ form.text_color.help_text }}                            </h5>                            </h5>
+
+                                        </small>
+
+                                    </div>                                                        
+
+                                </div>
+
+                            </div>                            <div class="row mb-3">                            <div class="row mb-3">
+
+                        </div>
+
+                                <div class="col-md-6">                                <div class="col-md-6">
+
+                        <hr>
+
+                                    <div class="form-group">                                    <div class="form-group">
+
+                        <!-- Botão e Ícones -->
+
+                        <div class="mb-4">                                        <label for="id_background_color" class="form-label">                                        <label for="id_background_color" class="form-label">
+
+                            <h5 class="mb-3">
+
+                                <i class="fas fa-square"></i> Botão e Ícones                                            {{ form.background_color.label }}                                            {{ form.background_color.label }}
+
+                            </h5>
+
+                                        </label>                                        </label>
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-6 mb-3">                                        <div class="input-group">                                        <div class="input-group">
+
+                                    <div class="form-group">
+
+                                        <label for="id_button_color_primary" class="form-label">                                            {{ form.background_color }}                                            {{ form.background_color }}
+
+                                            {{ form.button_color_primary.label }}
+
+                                        </label>                                            <span class="input-group-text" id="bg-preview" style="background-color: {{ branding.background_color }}; width: 50px; border-radius: 4px;"></span>                                            <span class="input-group-text" id="bg-preview" style="background-color: {{ branding.background_color }}; width: 50px; border-radius: 4px;"></span>
+
+                                        <div class="input-group">
+
+                                            {{ form.button_color_primary }}                                        </div>                                        </div>
+
+                                            <span class="input-group-text" id="btn-primary-preview" style="background-color: {{ branding.button_color_primary }}; width: 50px; border-radius: 4px;"></span>
+
+                                        </div>                                        <small class="text-muted d-block mt-1">                                        <small class="text-muted d-block mt-1">
+
+                                        <small class="text-muted d-block mt-1">
+
+                                            {{ form.button_color_primary.help_text }}                                            {{ form.background_color.help_text }}                                            {{ form.background_color.help_text }}
+
+                                        </small>
+
+                                    </div>                                        </small>                                        </small>
+
+                                </div>
+
+                                    </div>                                    </div>
+
+                                <div class="col-md-6 mb-3">
+
+                                    <div class="form-group">                                </div>                                </div>
+
+                                        <label for="id_button_color_secondary" class="form-label">
+
+                                            {{ form.button_color_secondary.label }}
+
+                                        </label>
+
+                                        <div class="input-group">                                <div class="col-md-6">                                <div class="col-md-6">
+
+                                            {{ form.button_color_secondary }}
+
+                                            <span class="input-group-text" id="btn-secondary-preview" style="background-color: {{ branding.button_color_secondary }}; width: 50px; border-radius: 4px;"></span>                                    <div class="form-group">                                    <div class="form-group">
+
+                                        </div>
+
+                                        <small class="text-muted d-block mt-1">                                        <label for="id_text_color" class="form-label">                                        <label for="id_text_color" class="form-label">
+
+                                            {{ form.button_color_secondary.help_text }}
+
+                                        </small>                                            {{ form.text_color.label }}                                            {{ form.text_color.label }}
+
+                                    </div>
+
+                                </div>                                        </label>                                        </label>
+
+
+
+                                <div class="col-md-6 mb-3">                                        <div class="input-group">                                        <div class="input-group">
+
+                                    <div class="form-group">
+
+                                        <label for="id_button_text_color" class="form-label">                                            {{ form.text_color }}                                            {{ form.text_color }}
+
+                                            {{ form.button_text_color.label }}
+
+                                        </label>                                            <span class="input-group-text" id="text-preview" style="background-color: {{ branding.text_color }}; width: 50px; border-radius: 4px;"></span>                                            <span class="input-group-text" id="text-preview" style="background-color: {{ branding.text_color }}; width: 50px; border-radius: 4px;"></span>
+
+                                        <div class="input-group">
+
+                                            {{ form.button_text_color }}                                        </div>                                        </div>
+
+                                            <span class="input-group-text" id="btn-text-preview" style="background-color: {{ branding.button_text_color }}; width: 50px; border-radius: 4px;"></span>
+
+                                        </div>                                        <small class="text-muted d-block mt-1">                                        <small class="text-muted d-block mt-1">
+
+                                        <small class="text-muted d-block mt-1">
+
+                                            {{ form.button_text_color.help_text }}                                            {{ form.text_color.help_text }}                                            {{ form.text_color.help_text }}
+
+                                        </small>
+
+                                    </div>                                        </small>                                        </small>
+
+                                </div>
+
+                                    </div>                                    </div>
+
+                                <div class="col-md-6 mb-3">
+
+                                    <div class="form-group">                                </div>                                </div>
+
+                                        <label for="id_use_gradient_buttons" class="form-label">
+
+                                            {{ form.use_gradient_buttons.label }}                            </div>                            </div>
+
+                                        </label>
+
+                                        <div>                        </div>                        </div>
+
+                                            {{ form.use_gradient_buttons }}
+
+                                        </div>
+
+                                        <small class="text-muted d-block mt-1">
+
+                                            {{ form.use_gradient_buttons.help_text }}                        <hr>                        <hr>
+
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </div>                        <!-- Botão e Ícones -->                        <!-- Botão e Ícones -->
+
+                        </div>
+
+                        <div class="mb-4">                        <div class="mb-4">
+
+                        <hr>
+
+                            <h5 class="mb-3">                            <h5 class="mb-3">
+
+                        <!-- Preview do Mini Site -->
+
+                        <div class="mb-4">                                <i class="fas fa-square"></i> Botão e Ícones                                <i class="fas fa-square"></i> Botão e Ícones
+
+                            <h5 class="mb-3">
+
+                                <i class="fas fa-eye"></i> Preview do Mini Site                            </h5>                            </h5>
+
+                            </h5>
+
+                            <p class="text-muted mb-3" style="font-size: 0.9rem;">
+
+                                💡 Clique no botão abaixo para ver uma visualização completa e em tempo real do seu mini site. Você verá exatamente como seus clientes veem a página.
+
+                            </p>                            <div class="row mb-3">                            <div class="row mb-3">
+
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#previewModal">
+
+                                <i class="fas fa-mobile-alt"></i> Abrir Preview em Tela Cheia                                <div class="col-md-6 mb-3">                                <div class="col-md-6 mb-3">
+
+                            </button>
+
+                        </div>                                    <div class="form-group">                                    <div class="form-group">
+
+
+
+                        <!-- Botões -->                                        <label for="id_button_color_primary" class="form-label">                                        <label for="id_button_color_primary" class="form-label">
+
+                        <div class="d-flex gap-2 mt-4">
+
+                            <button type="submit" class="btn btn-primary">                                            {{ form.button_color_primary.label }}                                            {{ form.button_color_primary.label }}
+
+                                <i class="fas fa-save"></i> Salvar Configurações
+
+                            </button>                                        </label>                                        </label>
+
+                            <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary">
+
+                                <i class="fas fa-times"></i> Cancelar                                        <div class="input-group">                                        <div class="input-group">
+
+                            </a>
+
+                        </div>                                            {{ form.button_color_primary }}                                            {{ form.button_color_primary }}
+
+                    </form>
+
+                </div>                                            <span class="input-group-text" id="btn-primary-preview" style="background-color: {{ branding.button_color_primary }}; width: 50px; border-radius: 4px;"></span>                                            <span class="input-group-text" id="btn-primary-preview" style="background-color: {{ branding.button_color_primary }}; width: 50px; border-radius: 4px;"></span>
+
+            </div>
+
+                                        </div>                                        </div>
+
+            {% if messages %}
+
+            <div class="mt-3">                                        <small class="text-muted d-block mt-1">                                        <small class="text-muted d-block mt-1">
+
+                {% for message in messages %}
+
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">                                            {{ form.button_color_primary.help_text }}                                            {{ form.button_color_primary.help_text }}
+
+                    {{ message }}
+
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>                                        </small>                                        </small>
+
+                </div>
+
+                {% endfor %}                                    </div>                                    </div>
+
+            </div>
+
+            {% endif %}                                </div>                                </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+                                <div class="col-md-6 mb-3">                                <div class="col-md-6 mb-3">
+
+<!-- MODAL: Preview em Tela Cheia -->
+
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">                                    <div class="form-group">                                    <div class="form-group">
+
+    <div class="modal-dialog modal-fullscreen">
+
+        <div class="modal-content" style="background-color: #f8f9fa;">                                        <label for="id_button_color_secondary" class="form-label">                                        <label for="id_button_text_color" class="form-label">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="previewModalLabel">                                            {{ form.button_color_secondary.label }}                                            {{ form.button_text_color.label }}
+
+                    <i class="fas fa-mobile-alt"></i> Preview do Mini Site - {{ tenant.name }}
+
+                </h5>                                        </label>                                        </label>
+
+                <div class="ms-auto">
+
+                    <small class="text-muted me-3">                                        <div class="input-group">                                        <div class="input-group">
+
+                        Atualize esta página após salvar as cores para ver as mudanças
+
+                    </small>                                            {{ form.button_color_secondary }}                                            {{ form.button_text_color }}
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>                                            <span class="input-group-text" id="btn-secondary-preview" style="background-color: {{ branding.button_color_secondary }}; width: 50px; border-radius: 4px;"></span>                                            <span class="input-group-text" id="btn-text-preview" style="background-color: {{ branding.button_text_color }}; width: 50px; border-radius: 4px;"></span>
+
+            </div>
+
+            <div class="modal-body p-4" style="display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 120px);">                                        </div>                                        </div>
+
+                <!-- iPhone Mockup com iframe -->
+
+                <div style="position: relative; width: 375px; height: 812px; background: #000; border-radius: 60px; padding: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">                                        <small class="text-muted d-block mt-1">                                        <small class="text-muted d-block mt-1">
+
+                    <!-- Notch do iPhone -->
+
+                    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 180px; height: 28px; background: #000; border-radius: 0 0 30px 30px; z-index: 10;"></div>                                            {{ form.button_color_secondary.help_text }}                                            {{ form.button_text_color.help_text }}
+
+                    
+
+                    <!-- Frame do iPhone -->                                        </small>                                        </small>
+
+                    <iframe 
+
+                        src="{{ tenant_landing_url }}"                                     </div>                                    </div>
+
+                        style="width: 100%; height: 100%; border: none; border-radius: 50px; display: block;"
+
+                        title="Preview do Mini Site"                                </div>                                </div>
+
+                    ></iframe>
+
+                </div>                            </div>
+
+            </div>
+
+        </div>                                <div class="col-md-6 mb-3">                            <!-- Campos ocultos para manter compatibilidade com o modelo -->
+
+    </div>
+
+</div>                                    <div class="form-group">                            <input type="hidden" name="{{ form.button_color_secondary.name }}" id="id_button_color_secondary" value="{{ branding.button_color_secondary|default:branding.button_color_primary }}">
+
+
+
+<script>                                        <label for="id_button_text_color" class="form-label">                            <input type="hidden" name="{{ form.use_gradient_buttons.name }}" id="id_use_gradient_buttons" value="on">
+
+// Atualizar preview em tempo real
+
+document.querySelectorAll('input[type="color"]').forEach(input => {                                            {{ form.button_text_color.label }}                        </div>
+
+    input.addEventListener('change', updatePreview);
+
+    input.addEventListener('input', updatePreview);                                        </label>
+
+});
+
                                         <div class="input-group">                        <hr>
 
-                                            {{ form.button_text_color }}
+function updatePreview() {
 
-                                            <span class="input-group-text" id="btn-text-preview" style="background-color: {{ branding.button_text_color }}; width: 50px; border-radius: 4px;"></span>                        <!-- Preview -->
+    const bgColor = document.getElementById('id_background_color').value;                                            {{ form.button_text_color }}
 
-                                        </div>                        <div class="mb-4">
+    const textColor = document.getElementById('id_text_color').value;
 
-                                        <small class="text-muted d-block mt-1">                            <h5 class="mb-3">
+    const buttonPrimary = document.getElementById('id_button_color_primary').value;                                            <span class="input-group-text" id="btn-text-preview" style="background-color: {{ branding.button_text_color }}; width: 50px; border-radius: 4px;"></span>                        <!-- Preview -->
 
-                                            {{ form.button_text_color.help_text }}                                <i class="fas fa-eye"></i> Preview do Mini Site
+    const buttonSecondary = document.getElementById('id_button_color_secondary').value;
 
-                                        </small>                            </h5>
+    const buttonText = document.getElementById('id_button_text_color').value;                                        </div>                        <div class="mb-4">
 
-                                    </div>                            <div style="border: 2px solid #ddd; border-radius: 8px; overflow: hidden; background: white;">
 
-                                </div>                                <!-- Mobile Preview -->
 
-                                <div style="max-width: 375px; margin: 0 auto; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden;">
+    // Atualizar previews de cores                                        <small class="text-muted d-block mt-1">                            <h5 class="mb-3">
 
-                                <div class="col-md-6 mb-3">                                    <!-- Status Bar -->
+    document.getElementById('bg-preview').style.backgroundColor = bgColor;
 
-                                    <div class="form-group">                                    <div style="background: #000; height: 24px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 12px; color: white;">
+    document.getElementById('text-preview').style.backgroundColor = textColor;                                            {{ form.button_text_color.help_text }}                                <i class="fas fa-eye"></i> Preview do Mini Site
 
-                                        <label for="id_use_gradient_buttons" class="form-label">                                        <span>9:41</span>
+    document.getElementById('btn-primary-preview').style.backgroundColor = buttonPrimary;
+
+    document.getElementById('btn-secondary-preview').style.backgroundColor = buttonSecondary;                                        </small>                            </h5>
+
+    document.getElementById('btn-text-preview').style.backgroundColor = buttonText;
+
+}                                    </div>                            <div style="border: 2px solid #ddd; border-radius: 8px; overflow: hidden; background: white;">
+
+
+
+// Chamar ao carregar                                </div>                                <!-- Mobile Preview -->
+
+updatePreview();
+
+</script>                                <div style="max-width: 375px; margin: 0 auto; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden;">
+
+
+
+<style>                                <div class="col-md-6 mb-3">                                    <!-- Status Bar -->
+
+.color-picker {
+
+    height: 45px;                                    <div class="form-group">                                    <div style="background: #000; height: 24px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 12px; color: white;">
+
+    padding: 3px;
+
+    cursor: pointer;                                        <label for="id_use_gradient_buttons" class="form-label">                                        <span>9:41</span>
+
+}
 
                                             {{ form.use_gradient_buttons.label }}                                        <span>📶📡🔋</span>
 
-                                        </label>                                    </div>
+.input-group-text {
+
+    border: 1px solid #dee2e6;                                        </label>                                    </div>
+
+}
 
                                         <div>                                    
 
-                                            {{ form.use_gradient_buttons }}                                    <!-- Content -->
+.form-check-input {
 
-                                        </div>                                    <div id="preview-content" style="background-color: {{ branding.background_color }}; color: {{ branding.text_color }}; min-height: 600px; overflow-y: auto; padding: 1rem;">
+    width: 1.25em;                                            {{ form.use_gradient_buttons }}                                    <!-- Content -->
+
+    height: 1.25em;
+
+    margin-top: 0.3125em;                                        </div>                                    <div id="preview-content" style="background-color: {{ branding.background_color }}; color: {{ branding.text_color }}; min-height: 600px; overflow-y: auto; padding: 1rem;">
+
+}
 
                                         <small class="text-muted d-block mt-1">                                        <!-- Header Fixo -->
 
-                                            {{ form.use_gradient_buttons.help_text }}                                        <div style="background: {{ branding.background_color }}; padding: 1rem; margin: -1rem -1rem 1rem -1rem; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+.modal-fullscreen {
 
-                                        </small>                                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: {{ branding.text_color }};">{{ tenant.name|default:"Seu Salão" }}</h3>
+    display: flex !important;                                            {{ form.use_gradient_buttons.help_text }}                                        <div style="background: {{ branding.background_color }}; padding: 1rem; margin: -1rem -1rem 1rem -1rem; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+
+    align-items: center;
+
+    justify-content: center;                                        </small>                                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: {{ branding.text_color }};">{{ tenant.name|default:"Seu Salão" }}</h3>
+
+}
 
                                     </div>                                            <i class="fas fa-bars" style="color: {{ branding.text_color }}; cursor: pointer;"></i>
 
-                                </div>                                        </div>
+.modal-fullscreen .modal-body {
 
-                            </div>
+    display: flex;                                </div>                                        </div>
 
-                        </div>                                        <!-- Hero Image -->
+    align-items: center;
+
+    justify-content: center;                            </div>
+
+}
+
+</style>                        </div>                                        <!-- Hero Image -->
+
+{% endblock %}
 
                                         <div style="width: 100%; height: 200px; background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; overflow: hidden;">
 
