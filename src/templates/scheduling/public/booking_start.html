@@ -374,26 +374,26 @@
 
     .professionals-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 0.75rem;
         padding: 1rem 0;
         margin-top: 1rem;
         max-width: 100%;
     }
 
-    /* Em telas pequenas, 3 colunas */
+    /* Em telas pequenas, 4 colunas também */
     @media (max-width: 480px) {
         .professionals-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr) !important;
             gap: 0.75rem;
         }
     }
 
     .professional-card {
-        background: var(--bg-dark);
-        border: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent);
+        background: transparent;
+        border: none;
         border-radius: 12px;
-        padding: 1rem;
+        padding: 0;
         text-align: center;
         transition: all 0.3s;
         cursor: pointer;
@@ -407,21 +407,16 @@
     }
 
     .professional-card:hover {
-        border-color: var(--brand-primary);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
     }
 
     .professional-card.selected {
-        border-color: var(--brand-primary);
-        border-width: 3px;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        transform: scale(1.05);
     }
 
     .professional-card-avatar {
-        width: 80px;
-        height: 80px;
+        width: 100%;
+        aspect-ratio: 1;
         margin: 0 auto 0.5rem;
         border-radius: 12px;
         display: flex;
@@ -430,16 +425,14 @@
         font-size: 1.5rem;
         font-weight: 700;
         color: var(--text-light);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-        aspect-ratio: 1;
+        overflow: hidden;
     }
 
     /* Ajustar avatar no mobile */
     @media (max-width: 480px) {
         .professional-card-avatar {
-            width: 70px;
-            height: 70px;
             font-size: 1.25rem;
         }
     }
@@ -455,7 +448,7 @@
         font-size: 0.7rem;
         font-weight: 500;
         color: var(--text-light);
-        margin-top: 0.25rem;
+        margin-top: 0.35rem;
         white-space: normal;
         word-wrap: break-word;
         line-height: 1.2;
