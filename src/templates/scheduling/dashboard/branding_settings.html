@@ -135,19 +135,91 @@
                         <!-- Preview -->
                         <div class="mb-4">
                             <h5 class="mb-3">
-                                <i class="fas fa-eye"></i> Preview
+                                <i class="fas fa-eye"></i> Preview do Mini Site
                             </h5>
-                            <div class="p-3" id="preview-box" style="background-color: {{ branding.background_color }}; border-radius: 8px; min-height: 200px;">
-                                <p style="color: {{ branding.text_color }};">
-                                    <strong>Texto padrão:</strong> Este é um exemplo de como o texto padrão aparecerá no seu site.
-                                </p>
-                                <p class="highlight-preview-text" style="color: {{ branding.highlight_color }};">
-                                    <strong>Texto de destaque:</strong> Exemplo de como a cor de destaque aparecerá.
-                                </p>
-                                <button class="btn" id="preview-btn" style="background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); color: {{ branding.button_text_color }}; border: none; padding: 0.5rem 1rem; border-radius: 6px;">
-                                    Botão com Gradiente
-                                </button>
+                            <div style="border: 2px solid #ddd; border-radius: 8px; overflow: hidden; background: white;">
+                                <!-- Mobile Preview -->
+                                <div style="max-width: 375px; margin: 0 auto; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden;">
+                                    <!-- Status Bar -->
+                                    <div style="background: #000; height: 24px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 12px; color: white;">
+                                        <span>9:41</span>
+                                        <span>📶📡🔋</span>
+                                    </div>
+                                    
+                                    <!-- Content -->
+                                    <div id="preview-content" style="background-color: {{ branding.background_color }}; color: {{ branding.text_color }}; min-height: 600px; overflow-y: auto; padding: 1rem;">
+                                        <!-- Header Fixo -->
+                                        <div style="background: {{ branding.background_color }}; padding: 1rem; margin: -1rem -1rem 1rem -1rem; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: {{ branding.text_color }};">{{ tenant.name|default:"Seu Salão" }}</h3>
+                                            <i class="fas fa-bars" style="color: {{ branding.text_color }}; cursor: pointer;"></i>
+                                        </div>
+
+                                        <!-- Hero Image -->
+                                        <div style="width: 100%; height: 200px; background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
+                                            <i class="fas fa-cut"></i>
+                                        </div>
+
+                                        <!-- CTA Button -->
+                                        <button style="width: 100%; background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); color: {{ branding.button_text_color }}; border: none; padding: 1rem; border-radius: 12px; font-weight: 600; margin-bottom: 1rem; cursor: pointer; font-size: 1rem;">
+                                            <i class="fas fa-calendar-check"></i> Agendar Agora
+                                        </button>
+
+                                        <!-- Secondary Button -->
+                                        <button style="width: 100%; background: transparent; color: {{ branding.text_color }}; border: 1px solid rgba(255,255,255,0.2); padding: 0.75rem; border-radius: 8px; font-weight: 500; margin-bottom: 2rem; cursor: pointer; font-size: 0.9rem;">
+                                            <i class="fas fa-calendar-alt"></i> Meus Agendamentos
+                                        </button>
+
+                                        <!-- Section: Sobre Nós -->
+                                        <div style="margin-bottom: 2rem;">
+                                            <h4 style="color: {{ branding.highlight_color }}; margin-bottom: 1rem; font-size: 1.2rem;">
+                                                <i class="fas fa-info-circle"></i> Sobre Nós
+                                            </h4>
+                                            <p style="color: {{ branding.text_color }}; font-size: 0.95rem; line-height: 1.6; margin: 0;">
+                                                Bem-vindo ao {{ tenant.name|default:"nosso salão" }}! Estamos aqui para oferecer os melhores serviços com qualidade e excelência.
+                                            </p>
+                                        </div>
+
+                                        <!-- Section: Equipe -->
+                                        <div style="margin-bottom: 2rem;">
+                                            <h4 style="color: {{ branding.highlight_color }}; margin-bottom: 1rem; font-size: 1.2rem;">
+                                                <i class="fas fa-users"></i> Equipe
+                                            </h4>
+                                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+                                                <div style="aspect-ratio: 1; background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                <div style="aspect-ratio: 1; background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                <div style="aspect-ratio: 1; background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                <div style="aspect-ratio: 1; background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Section: Horários -->
+                                        <div>
+                                            <h4 style="color: {{ branding.highlight_color }}; margin-bottom: 1rem; font-size: 1.2rem;">
+                                                <i class="fas fa-clock"></i> Horários
+                                            </h4>
+                                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                                <span>Segunda</span>
+                                                <span style="color: {{ branding.highlight_color }};">08:00 - 17:00</span>
+                                            </div>
+                                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                                <span>Terça</span>
+                                                <span style="color: {{ branding.highlight_color }};">08:00 - 21:00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            <small style="display: block; margin-top: 1rem; color: #666;">
+                                💡 Este é um preview do seu mini site. As cores atualizarão em tempo real conforme você altera as configurações.
+                            </small>
                         </div>
 
                         <!-- Botões -->
@@ -197,6 +269,45 @@ document.querySelectorAll('input[type="color"]').forEach(input => {
     input.addEventListener('change', updatePreview);
     input.addEventListener('input', updatePreview);
 });
+
+function updatePreview() {
+    const bgColor = document.getElementById('id_background_color').value;
+    const textColor = document.getElementById('id_text_color').value;
+    const buttonPrimary = document.getElementById('id_button_color_primary').value;
+    const buttonSecondary = document.getElementById('id_button_color_secondary').value || buttonPrimary;
+    const buttonText = document.getElementById('id_button_text_color').value;
+    const highlightColor = document.getElementById('id_highlight_color').value;
+
+    // Atualizar preview
+    const previewContent = document.getElementById('preview-content');
+    if (previewContent) {
+        previewContent.style.backgroundColor = bgColor;
+        previewContent.style.color = textColor;
+        
+        // Atualizar todos os elementos com cores
+        const headers = previewContent.querySelectorAll('h4');
+        headers.forEach(h => h.style.color = highlightColor);
+        
+        const buttons = previewContent.querySelectorAll('button');
+        buttons.forEach(btn => {
+            btn.style.background = `linear-gradient(135deg, ${buttonPrimary}, ${buttonSecondary})`;
+            btn.style.color = buttonText;
+        });
+        
+        // Atualizar avatares
+        const avatars = previewContent.querySelectorAll('div[style*="aspect-ratio"]');
+        avatars.forEach(avatar => {
+            avatar.style.background = `linear-gradient(135deg, ${buttonPrimary}, ${buttonSecondary})`;
+        });
+        
+        // Atualizar horários highlight
+        const timeSpans = previewContent.querySelectorAll('span[style*="highlight"]');
+        timeSpans.forEach(span => span.style.color = highlightColor);
+    }
+}
+
+// Inicializar preview ao carregar
+document.addEventListener('DOMContentLoaded', updatePreview);
 
 function updatePreview() {
     const bgColor = document.getElementById('id_background_color').value;
