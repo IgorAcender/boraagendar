@@ -603,8 +603,8 @@
 
                     <div class="image-preview-box">
                         <div class="image-preview-label">Miniatura:</div>
-                        {% if branding.avatar_base64 or branding.hero_image %}
-                            <img src="{% if branding.avatar_base64 %}{{ branding.avatar_base64 }}{% else %}{{ branding.hero_image.url }}{% endif %}" alt="Capa atual" class="image-thumbnail">
+                        {% if tenant.avatar_base64 or tenant.avatar %}
+                            <img src="{% if tenant.avatar_base64 %}{{ tenant.avatar_base64 }}{% else %}{{ tenant.avatar.url }}{% endif %}" alt="Logo atual" class="image-thumbnail">
                         {% else %}
                             <div class="image-placeholder">
                                 <i class="fas fa-image"></i>
