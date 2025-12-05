@@ -237,6 +237,12 @@ class BrandingSettingsForm(forms.ModelForm):
         widget=forms.URLInput(attrs={"class": "form-control", "placeholder": "https://facebook.com/seu_perfil"}),
         help_text="Link exibido na seção de redes sociais."
     )
+    whatsapp_number = forms.CharField(
+        label="WhatsApp (mini site)",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "(00) 00000-0000"}),
+        help_text="Número do WhatsApp para botão de contato."
+    )
 
     def __init__(self, *args, tenant: Tenant, **kwargs):
         self.tenant = tenant
@@ -251,6 +257,7 @@ class BrandingSettingsForm(forms.ModelForm):
         self.fields["zip_code"].initial = tenant.zip_code
         self.fields["instagram_url"].initial = tenant.instagram_url
         self.fields["facebook_url"].initial = tenant.facebook_url
+        self.fields["whatsapp_number"].initial = tenant.whatsapp_number
         
         # Inicializar campos booleanos para equipe e horários
         # Estes são apenas campos dummy para controle na UI - não precisam estar no modelo
@@ -292,6 +299,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "zip_code",  # campo extra (não no modelo)
             "instagram_url",
             "facebook_url",
+            "whatsapp_number",
         ]
         labels = {
             "background_color": "Cor de Fundo",
@@ -313,6 +321,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "zip_code": "CEP",
             "instagram_url": "Instagram (mini site)",
             "facebook_url": "Facebook (mini site)",
+            "whatsapp_number": "WhatsApp (mini site)",
         }
         widgets = {
             "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
@@ -344,6 +353,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "zip_code": "CEP exibido no mini site",
             "instagram_url": "Link para Instagram (opcional)",
             "facebook_url": "Link para Facebook (opcional)",
+            "whatsapp_number": "Número para botão de WhatsApp no mini site",
         }
 
     def save(self, commit=True):
@@ -411,6 +421,7 @@ class BrandingSettingsForm(forms.ModelForm):
 
         instagram_url = self.cleaned_data.get("instagram_url")
         facebook_url = self.cleaned_data.get("facebook_url")
+        whatsapp_number = self.cleaned_data.get("whatsapp_number")
         fields_to_update = []
         if instagram_url is not None:
             self.tenant.instagram_url = instagram_url
@@ -418,6 +429,9 @@ class BrandingSettingsForm(forms.ModelForm):
         if facebook_url is not None:
             self.tenant.facebook_url = facebook_url
             fields_to_update.append("facebook_url")
+        if whatsapp_number is not None:
+            self.tenant.whatsapp_number = whatsapp_number
+            fields_to_update.append("whatsapp_number")
         if fields_to_update:
             fields_to_update.append("updated_at")
             self.tenant.save(update_fields=fields_to_update)
