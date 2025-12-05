@@ -250,126 +250,16 @@
             cursor: pointer;
             box-shadow: 0 8px 20px color-mix(in srgb, var(--brand-primary) 40%, transparent);
             position: relative;
-            overflow: visible;
-        }
-
-        .btn-schedule-header .btn-text {
-            display: inline-block;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 2;
-        }
-
-        .btn-schedule-header .btn-icon {
-            display: inline-block;
-            transition: all 0.3s ease;
-            opacity: 0;
-            transform: translateX(-10px) scale(0.8);
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Neon Border Lines */
-        .btn-schedule-header span.neon-line {
-            position: absolute;
-            display: block;
-        }
-
-        .btn-schedule-header span:nth-child(3) {
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--brand-primary));
-            animation: neonAnimateTop 1s linear infinite;
-        }
-
-        .btn-schedule-header span:nth-child(4) {
-            top: 0;
-            right: 0;
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(180deg, transparent, var(--brand-primary));
-            animation: neonAnimateRight 1s linear infinite;
-            animation-delay: 0.25s;
-        }
-
-        .btn-schedule-header span:nth-child(5) {
-            bottom: 0;
-            right: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(270deg, transparent, var(--brand-primary));
-            animation: neonAnimateBottom 1s linear infinite;
-            animation-delay: 0.5s;
-        }
-
-        .btn-schedule-header span:nth-child(6) {
-            bottom: 0;
-            left: 0;
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(360deg, transparent, var(--brand-primary));
-            animation: neonAnimateLeft 1s linear infinite;
-            animation-delay: 0.75s;
-        }
-
-        @keyframes neonAnimateTop {
-            0% { left: -100%; }
-            50%, 100% { left: 100%; }
-        }
-
-        @keyframes neonAnimateRight {
-            0% { top: -100%; }
-            50%, 100% { top: 100%; }
-        }
-
-        @keyframes neonAnimateBottom {
-            0% { right: -100%; }
-            50%, 100% { right: 100%; }
-        }
-
-        @keyframes neonAnimateLeft {
-            0% { bottom: -100%; }
-            50%, 100% { bottom: 100%; }
+            overflow: hidden;
         }
 
         .btn-schedule-header:hover {
             transform: translateY(-3px);
-            box-shadow: 0 0 10px var(--brand-primary), 
-                        0 0 25px var(--brand-primary), 
-                        0 0 50px var(--brand-primary),
-                        0 8px 20px color-mix(in srgb, var(--brand-primary) 60%, transparent);
+            box-shadow: 0 12px 30px color-mix(in srgb, var(--brand-primary) 60%, transparent);
         }
 
         .btn-schedule-header:active {
             transform: translateY(-1px);
-        }
-
-        .btn-schedule-header.clicked .btn-text {
-            animation: slideOut 0.3s ease forwards;
-        }
-
-        .btn-schedule-header.clicked .btn-icon {
-            animation: slideIn 0.3s ease forwards;
-        }
-
-        @keyframes slideOut {
-            to {
-                opacity: 0;
-                transform: translateX(10px);
-            }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px) scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
         }
 
         /* Secondary Button - Meus Agendamentos */
@@ -1186,25 +1076,6 @@
                 closeProfessionalModal();
             }
         });
-
-        // Animação do botão "Agendar Agora"
-        document.addEventListener('DOMContentLoaded', function() {
-            const scheduleBtn = document.querySelector('.btn-schedule-header');
-            if (scheduleBtn) {
-                scheduleBtn.addEventListener('click', function(e) {
-                    // Prevent navigation and add animation
-                    this.classList.add('clicked');
-                    
-                    // Delay navigation to show animation
-                    setTimeout(() => {
-                        window.location.href = this.href;
-                    }, 300);
-                    
-                    // Prevent default link behavior
-                    e.preventDefault();
-                });
-            }
-        });
     </script>
 </head>
 <body>
@@ -1230,14 +1101,8 @@
     <!-- CTA Button - Overlay no topo -->
     <div class="header-cta-button" id="schedule">
         <a href="{% url 'public:booking_start' tenant_slug=tenant.slug %}" class="btn-schedule-header">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span class="btn-text">Agendar Agora</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="btn-icon">
-                <path d="M0 11c2.761.575 6.312 1.688 9 3.438 3.157-4.23 8.828-8.187 15-11.438-5.861 5.775-10.711 12.328-14 18.917-2.651-3.766-5.547-7.271-10-10.917z" fill="currentColor"/>
-            </svg>
+            Agendar Agora
+            <i class="fas fa-calendar-check"></i>
         </a>
     </div>
 
