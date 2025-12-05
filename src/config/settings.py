@@ -100,6 +100,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.User"
 
+# Permitir iframes no mesmo domínio (necessário para o preview no dashboard)
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
