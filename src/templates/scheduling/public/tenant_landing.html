@@ -274,11 +274,11 @@
             transform: translateY(-1px);
         }
 
-        .btn-schedule-header:active .btn-text {
+        .btn-schedule-header.clicked .btn-text {
             animation: slideOut 0.3s ease forwards;
         }
 
-        .btn-schedule-header:active .btn-icon {
+        .btn-schedule-header.clicked .btn-icon {
             animation: slideIn 0.3s ease forwards;
         }
 
@@ -1112,6 +1112,25 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeProfessionalModal();
+            }
+        });
+
+        // Animação do botão "Agendar Agora"
+        document.addEventListener('DOMContentLoaded', function() {
+            const scheduleBtn = document.querySelector('.btn-schedule-header');
+            if (scheduleBtn) {
+                scheduleBtn.addEventListener('click', function(e) {
+                    // Prevent navigation and add animation
+                    this.classList.add('clicked');
+                    
+                    // Delay navigation to show animation
+                    setTimeout(() => {
+                        window.location.href = this.href;
+                    }, 300);
+                    
+                    // Prevent default link behavior
+                    e.preventDefault();
+                });
             }
         });
     </script>
