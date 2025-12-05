@@ -1035,10 +1035,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // CRÍTICO: Listener no formulário para atualizar sections_config antes de enviar
     const form = document.querySelector('form');
     if (form) {
+        console.log('✅ Form encontrado, adicionando listener de submit');
         form.addEventListener('submit', function(e) {
+            console.log('📤 Form submit disparado');
             // Atualizar sections_config com ordem e visibilidade atuais
             updateSectionsState();
+            console.log('✅ updateSectionsState() executado antes do submit');
+            const hiddenField = document.getElementById('id_sections_config');
+            if (hiddenField) {
+                console.log('📝 sections_config value:', hiddenField.value);
+            }
         });
+    } else {
+        console.error('❌ Nenhum form encontrado no DOM!');
     }
 });
 
@@ -1082,6 +1091,8 @@ function updateSectionsState() {
     const sectionsData = {};
     const sectionFields = document.querySelectorAll('.section-field');
     
+    console.log('🔄 updateSectionsState() chamado, seções encontradas:', sectionFields.length);
+    
     sectionFields.forEach((field, index) => {
         const sectionId = field.dataset.sectionId;
         const checkbox = field.querySelector('.section-visible-toggle');
@@ -1091,13 +1102,18 @@ function updateSectionsState() {
                 visible: checkbox ? checkbox.checked : true,
                 order: index
             };
+            console.log(`  → ${sectionId}: order=${index}, visible=${checkbox ? checkbox.checked : true}`);
         }
     });
     
     // Atualiza campo oculto se existir
     const hiddenField = document.getElementById('id_sections_config');
     if (hiddenField) {
-        hiddenField.value = JSON.stringify(sectionsData);
+        const jsonValue = JSON.stringify(sectionsData);
+        hiddenField.value = jsonValue;
+        console.log('✅ id_sections_config atualizado:', jsonValue);
+    } else {
+        console.error('❌ Campo id_sections_config NÃO ENCONTRADO no DOM!');
     }
 }
 
