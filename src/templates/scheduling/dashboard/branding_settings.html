@@ -831,7 +831,7 @@
 
             <!-- BOTÕES DE AÇÃO -->
             <div class="form-actions">
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="btn-submit" id="btn-save-branding">
                     <i class="fas fa-save"></i> Salvar Configurações
                 </button>
                 <a href="{% url 'dashboard:index' %}" class="btn-cancel">
@@ -1032,7 +1032,24 @@ document.addEventListener('DOMContentLoaded', function() {
     updateButtonStates();
     updateSectionsState();
     
-    // CRÍTICO: Listener no formulário para atualizar sections_config antes de enviar
+    // ===== MÉTODO 1: Listener no botão Salvar =====
+    const saveBtn = document.getElementById('btn-save-branding');
+    if (saveBtn) {
+        console.log('✅ Botão Salvar encontrado, adicionando listener');
+        saveBtn.addEventListener('click', function(e) {
+            console.log('🖱️ Clique no botão Salvar detectado');
+            // Atualizar sections_config ANTES de enviar
+            updateSectionsState();
+            const hiddenField = document.getElementById('id_sections_config');
+            if (hiddenField) {
+                console.log('✅ CRÍTICO: sections_config preenchido antes do submit:', hiddenField.value.substring(0, 100));
+            }
+        });
+    } else {
+        console.error('❌ Botão Salvar NÃO ENCONTRADO!');
+    }
+    
+    // ===== MÉTODO 2: Listener no formulário (backup) =====
     const form = document.querySelector('form');
     if (form) {
         console.log('✅ Form encontrado, adicionando listener de submit');
