@@ -402,18 +402,42 @@
         .hour-item {
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
             padding: 1rem 0;
             border-bottom: none;
+            gap: 1.5rem;
         }
 
         .day-name {
             font-weight: 500;
             color: var(--text-light);
+            min-width: 80px;
         }
 
-        .hour-time {
+        .hour-times {
+            flex: 1;
+            text-align: right;
+        }
+
+        .time-line {
             color: var(--brand-primary);
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .break-line {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .break-line i {
+            color: var(--highlight-color);
+            font-size: 0.85rem;
         }
 
         .closed-badge {
@@ -1273,14 +1297,17 @@
                                 {% for hour in business_hours %}
                                 <div class="hour-item">
                                     <span class="day-name">{{ hour.day_name }}</span>
-                                    <span class="hour-time">
-                                        {{ hour.start_time|time:"H:i" }} - {{ hour.end_time|time:"H:i" }}
+                                    <div class="hour-times">
+                                        <div class="time-line">
+                                            {{ hour.start_time|time:"H:i" }} - {{ hour.end_time|time:"H:i" }}
+                                        </div>
                                         {% if hour.break_start %}
-                                            <span style="font-size: 0.85rem; color: var(--text-muted);">
-                                                (intervalo: {{ hour.break_start|time:"H:i" }} - {{ hour.break_end|time:"H:i" }})
-                                            </span>
+                                            <div class="break-line">
+                                                <i class="fas fa-pause"></i>
+                                                Intervalo: {{ hour.break_start|time:"H:i" }} - {{ hour.break_end|time:"H:i" }}
+                                            </div>
                                         {% endif %}
-                                    </span>
+                                    </div>
                                 </div>
                                 {% endfor %}
                             {% else %}
