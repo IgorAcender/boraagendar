@@ -393,7 +393,7 @@
         background: var(--bg-dark);
         border: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent);
         border-radius: 12px;
-        padding: 0.75rem;
+        padding: 1rem;
         text-align: center;
         transition: all 0.3s;
         cursor: pointer;
@@ -420,10 +420,10 @@
     }
 
     .professional-card-avatar {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
         margin: 0 auto 0.5rem;
-        border-radius: 50%;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -431,13 +431,15 @@
         font-weight: 700;
         color: var(--text-light);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        aspect-ratio: 1;
     }
 
     /* Ajustar avatar no mobile */
     @media (max-width: 480px) {
         .professional-card-avatar {
-            width: 50px;
-            height: 50px;
+            width: 70px;
+            height: 70px;
             font-size: 1.25rem;
         }
     }
@@ -446,12 +448,12 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 50%;
+        border-radius: 12px;
     }
 
     .professional-card-name {
         font-size: 0.7rem;
-        font-weight: 600;
+        font-weight: 500;
         color: var(--text-light);
         margin-top: 0.25rem;
         white-space: normal;
@@ -466,6 +468,7 @@
     @media (max-width: 480px) {
         .professional-card-name {
             font-size: 0.65rem;
+            font-weight: 500;
             line-height: 1.1;
         }
     }
