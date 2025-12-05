@@ -197,6 +197,43 @@
             display: none !important;
         }
 
+        /* CTA Button no Topo - Overlay */
+        .header-cta-button {
+            position: relative;
+            margin-top: -50px;
+            display: flex;
+            justify-content: center;
+            padding: 0 1rem;
+            z-index: 50;
+        }
+
+        .btn-schedule-header {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: var(--button-text);
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px color-mix(in srgb, var(--brand-primary) 40%, transparent);
+        }
+
+        .btn-schedule-header:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px color-mix(in srgb, var(--brand-primary) 60%, transparent);
+        }
+
+        .btn-schedule-header:active {
+            transform: translateY(-1px);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -704,36 +741,6 @@
             color: var(--brand-primary);
         }
 
-        /* CTA Button */
-        .cta-section {
-            text-align: center;
-            padding: 2rem 0;
-        }
-
-        .btn-schedule {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            color: var(--button-text);
-            padding: 1.2rem 3rem;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px color-mix(in srgb, var(--brand-primary) 35%, transparent);
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-schedule:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px color-mix(in srgb, var(--brand-primary) 45%, transparent);
-        }
-
-        .btn-schedule:active {
-            transform: translateY(-1px);
-        }
-
         /* Seção de Agendamento */
         .schedule-button-section {
             display: flex;
@@ -1038,6 +1045,14 @@
         <h1 class="company-name">{{ tenant.name }}</h1>
     </div>
 
+    <!-- CTA Button - Overlay no topo -->
+    <div class="header-cta-button" id="schedule">
+        <a href="{% url 'public:booking_start' tenant_slug=tenant.slug %}" class="btn-schedule-header">
+            <i class="fas fa-calendar-check" style="margin-right: 0.75rem;"></i>
+            Agendar Agora
+        </a>
+    </div>
+
     <!-- Barra de Navegação com Ícones -->
     <div class="navigation-bar">
         <a href="#schedule" class="nav-item">
@@ -1275,14 +1290,6 @@
                     </a>
                     {% endif %}
                 </div>
-            </div>
-
-            <!-- CTA Button -->
-            <div class="cta-section" id="schedule">
-                <a href="{% url 'public:booking_start' tenant_slug=tenant.slug %}" class="btn-schedule">
-                    <i class="fas fa-calendar-check" style="margin-right: 0.75rem;"></i>
-                    Agendar Agora
-                </a>
             </div>
         </div>
     </div>
