@@ -5,9 +5,9 @@
 
 {% block content %}
 <div class="container mt-5 mb-5">
-    <div class="row g-4 align-items-start">
+    <div class="branding-layout">
         <!-- Coluna de configurações -->
-        <div class="col-lg-7">
+        <div class="branding-form">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">
@@ -155,7 +155,7 @@
         </div>
 
         <!-- Coluna de preview -->
-        <div class="col-lg-5">
+        <div class="branding-preview">
             <div class="card shadow-sm preview-card">
                 <div class="card-header bg-light">
                     <h5 class="mb-0 d-flex align-items-center gap-2">
@@ -179,7 +179,7 @@
                     </div>
                     <div class="d-flex gap-2 flex-wrap mt-3">
                         <a class="btn btn-outline-primary" href="{{ tenant_landing_url }}" target="_blank" rel="noopener">
-                            <i class="fas fa-up-right-from-square me-2"></i>
+                            <i class="fas a-up-right-from-square me-2"></i>
                             Abrir mini site em nova aba
                         </a>
                         <button type="button" class="btn btn-outline-secondary" id="copy-preview-link" data-link="{{ tenant_landing_url }}">
@@ -314,6 +314,34 @@ updatePreview();
 .preview-card {
     position: sticky;
     top: 20px;
+}
+
+.branding-layout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.branding-form {
+    flex: 1 1 620px;
+    min-width: 320px;
+}
+
+.branding-preview {
+    flex: 0 0 420px;
+    max-width: 420px;
+}
+
+@media (max-width: 991px) {
+    .branding-preview {
+        position: static;
+        max-width: 100%;
+        flex: 1 1 100%;
+    }
+    .preview-card {
+        position: static;
+    }
 }
 </style>
 {% endblock %}
