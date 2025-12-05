@@ -136,7 +136,7 @@
                                         {% if tenant.avatar_base64 or tenant.avatar %}
                                         <div class="mt-2">
                                             <div class="small text-muted">Atual:</div>
-                                            <img src="{% if tenant.avatar_base64 %}{{ tenant.avatar_base64 }}{% else %}{{ tenant.avatar.url }}{% endif %}" alt="Capa atual" style="max-width: 100%; border-radius: 8px; border: 1px solid #dee2e6;">
+                                            <img src="{% if tenant.avatar_base64 %}{{ tenant.avatar_base64 }}{% else %}{{ tenant.avatar.url }}{% endif %}" alt="Capa atual" style="max-width: 140px; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
                                         </div>
                                         {% endif %}
                                     </div>
