@@ -424,26 +424,24 @@
         /* Equipe / Profissionais */
         .team-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr) !important;
-            column-gap: 0.75rem !important;
-            row-gap: 0.25rem !important;
+            grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+            column-gap: 0.75rem;
+            row-gap: 0.75rem;
         }
 
         @media (max-width: 768px) {
             .team-grid {
-                grid-template-columns: repeat(4, 1fr) !important;
-                column-gap: 0.5rem !important;
-                row-gap: 0.15rem !important;
-                background: transparent;
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                column-gap: 0.5rem;
+                row-gap: 0.5rem;
             }
         }
 
         @media (max-width: 480px) {
             .team-grid {
-                grid-template-columns: repeat(4, 1fr) !important;
-                column-gap: 0.5rem !important;
-                row-gap: 0.15rem !important;
-                background: transparent;
+                grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+                column-gap: 0.5rem;
+                row-gap: 0.45rem;
             }
         }
 
