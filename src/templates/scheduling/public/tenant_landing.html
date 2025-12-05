@@ -1349,7 +1349,7 @@
                         </div>
                     </div>
 
-                {% elif section_id == "social" and (tenant.instagram_url or tenant.facebook_url or tenant.whatsapp_number) %}
+                {% elif section_id == "social" and has_social_links %}
                     <div class="section">
                         <h2 class="section-title">
                             <i class="fas fa-share-alt"></i>

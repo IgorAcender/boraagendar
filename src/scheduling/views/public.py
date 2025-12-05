@@ -87,6 +87,7 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
 
     sections_config = get_sections_config(branding_settings)
     sections_order = get_sections_order(branding_settings)
+    has_social_links = bool(tenant.instagram_url or tenant.facebook_url or tenant.whatsapp_number)
     
     context = {
         "tenant": tenant,
@@ -97,6 +98,7 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         "branding": branding,
         "sections_config": sections_config,
         "sections_order": sections_order,
+        "has_social_links": has_social_links,
     }
     return render(request, "scheduling/public/tenant_landing.html", context)
 
