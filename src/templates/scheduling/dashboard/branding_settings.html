@@ -70,7 +70,7 @@
                             </h5>
 
                             <div class="row mb-3">
-                                <div class="col-md-6">
+                                <div class="col-md-6 mb-3">
                                     <div class="form-group">
                                         <label for="id_button_color_primary" class="form-label">
                                             {{ form.button_color_primary.label }}
@@ -85,7 +85,22 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        <label for="id_button_color_secondary" class="form-label">
+                                            {{ form.button_color_secondary.label }}
+                                        </label>
+                                        <div class="input-group">
+                                            {{ form.button_color_secondary }}
+                                            <span class="input-group-text" id="btn-secondary-preview" style="background-color: {{ branding.button_color_secondary|default:branding.button_color_primary }}; width: 50px; border-radius: 4px;"></span>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">
+                                            {{ form.button_color_secondary.help_text }}
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
                                     <div class="form-group">
                                         <label for="id_button_text_color" class="form-label">
                                             {{ form.button_text_color.label }}
@@ -96,6 +111,41 @@
                                         </div>
                                         <small class="text-muted d-block mt-1">
                                             {{ form.button_text_color.help_text }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-check form-switch mb-3">
+                                {{ form.use_gradient_buttons }}
+                                <label class="form-check-label" for="id_use_gradient_buttons">
+                                    {{ form.use_gradient_buttons.label }}
+                                </label>
+                                <small class="text-muted d-block">
+                                    {{ form.use_gradient_buttons.help_text }}
+                                </small>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Cor de Destaque -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-highlighter"></i> Cor de Destaque
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="id_highlight_color" class="form-label">
+                                            {{ form.highlight_color.label }}
+                                        </label>
+                                        <div class="input-group">
+                                            {{ form.highlight_color }}
+                                            <span class="input-group-text" id="highlight-preview" style="background-color: {{ branding.highlight_color }}; width: 50px; border-radius: 4px;"></span>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">
+                                            {{ form.highlight_color.help_text }}
                                         </small>
                                     </div>
                                 </div>
@@ -112,6 +162,9 @@
                             <div class="p-3" id="preview-box" style="background-color: {{ branding.background_color }}; border-radius: 8px; min-height: 200px;">
                                 <p style="color: {{ branding.text_color }};">
                                     <strong>Texto padrão:</strong> Este é um exemplo de como o texto padrão aparecerá no seu site.
+                                </p>
+                                <p class="highlight-preview-text" style="color: {{ branding.highlight_color }};">
+                                    <strong>Texto de destaque:</strong> Exemplo de como a cor de destaque aparecerá.
                                 </p>
                                 <button class="btn" id="preview-btn" style="background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); color: {{ branding.button_text_color }}; border: none; padding: 0.5rem 1rem; border-radius: 6px;">
                                     Botão com Gradiente
@@ -147,22 +200,8 @@
 </div>
 
 <script>
-// Função para calcular cor secundária (20% mais escura)
-function getDarkerColor(hexColor) {
-    const hex = hexColor.lstrip("#");
-    let r = parseInt(hex.substring(0, 2), 16);
-    let g = parseInt(hex.substring(2, 4), 16);
-    let b = parseInt(hex.substring(4, 6), 16);
-    
-    r = Math.max(0, Math.floor(r * 0.8));
-    g = Math.max(0, Math.floor(g * 0.8));
-    b = Math.max(0, Math.floor(b * 0.8));
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-}
-
 // Atualizar preview em tempo real
-document.querySelectorAll('input[type="color"]').forEach(input => {
+document.querySelectorAll('input[type="color"], input[type="checkbox"]').forEach(input => {
     input.addEventListener('change', updatePreview);
     input.addEventListener('input', updatePreview);
 });
@@ -171,10 +210,10 @@ function updatePreview() {
     const bgColor = document.getElementById('id_background_color').value;
     const textColor = document.getElementById('id_text_color').value;
     const btnPrimary = document.getElementById('id_button_color_primary').value;
+    const btnSecondary = document.getElementById('id_button_color_secondary').value || btnPrimary;
     const btnTextColor = document.getElementById('id_button_text_color').value;
-    
-    // Calcular cor secundária automaticamente (20% mais escura)
-    const btnSecondary = getDarkerColor(btnPrimary);
+    const useGradient = document.getElementById('id_use_gradient_buttons').checked;
+    const highlightColor = document.getElementById('id_highlight_color').value;
 
     // Atualizar box de preview
     const previewBox = document.getElementById('preview-box');
@@ -184,17 +223,27 @@ function updatePreview() {
     previewBox.querySelectorAll('p').forEach(p => {
         p.style.color = textColor;
     });
+    const highlightParagraph = document.querySelector('.highlight-preview-text');
+    if (highlightParagraph) {
+        highlightParagraph.style.color = highlightColor;
+    }
 
     // Atualizar botão com gradiente
     const previewBtn = document.getElementById('preview-btn');
-    previewBtn.style.background = `linear-gradient(135deg, ${btnPrimary}, ${btnSecondary})`;
+    if (useGradient) {
+        previewBtn.style.background = `linear-gradient(135deg, ${btnPrimary}, ${btnSecondary})`;
+    } else {
+        previewBtn.style.background = btnPrimary;
+    }
     previewBtn.style.color = btnTextColor;
 
     // Atualizar previews de cores
     document.getElementById('bg-preview').style.backgroundColor = bgColor;
     document.getElementById('text-preview').style.backgroundColor = textColor;
     document.getElementById('btn-primary-preview').style.backgroundColor = btnPrimary;
+    document.getElementById('btn-secondary-preview').style.backgroundColor = btnSecondary;
     document.getElementById('btn-text-preview').style.backgroundColor = btnTextColor;
+    document.getElementById('highlight-preview').style.backgroundColor = highlightColor;
 }
 
 // Chamar ao carregar
