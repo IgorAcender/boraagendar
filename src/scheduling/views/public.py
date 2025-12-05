@@ -62,7 +62,12 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             "button_color_primary": branding_settings.button_color_primary,
             "button_color_secondary": branding_settings.button_color_secondary,
             "use_gradient_buttons": branding_settings.use_gradient_buttons,
+            "button_text_color": getattr(branding_settings, "button_text_color", "#FFFFFF"),
+            "highlight_color": getattr(branding_settings, "highlight_color", "#FBBF24"),
             "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
+            "highlight_hover_color": branding_settings.get_hover_color(
+                getattr(branding_settings, "highlight_color", branding_settings.button_color_primary)
+            ),
         }
     except:
         # Se não houver BrandingSettings, usa cores padrão
@@ -72,7 +77,10 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             "button_color_primary": "#667EEA",
             "button_color_secondary": "#764BA2",
             "use_gradient_buttons": True,
+            "button_text_color": "#FFFFFF",
+            "highlight_color": "#FBBF24",
             "button_hover_color": "#8090F6",
+            "highlight_hover_color": "#FCC84B",
         }
     
     context = {
