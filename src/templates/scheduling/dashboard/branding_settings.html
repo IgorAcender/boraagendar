@@ -615,7 +615,7 @@
 
 <div class="page-layout">
     <div class="section-card form-wrapper">
-        <form method="post" enctype="multipart/form-data">
+        <form id="branding-form" method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
             <!-- SEÇÃO: Cores (Gerais + Botão combinadas) -->
@@ -833,7 +833,7 @@
 
             <!-- BOTÕES DE AÇÃO -->
             <div class="form-actions">
-                <button type="button" class="btn-submit" id="btn-save-branding" onclick="console.log('🖱️ onclick disparado'); updateSectionsState(); document.querySelector('form').submit(); return false;">
+                <button type="button" class="btn-submit" id="btn-save-branding" onclick="console.log('🖱️ onclick disparado'); updateSectionsState(); document.getElementById('branding-form').submit(); return false;">
                     <i class="fas fa-save"></i> Salvar Configurações
                 </button>
                 <a href="{% url 'dashboard:index' %}" class="btn-cancel">
@@ -1068,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ===== MÉTODO 2: Listener no formulário (backup) =====
-    const form = document.querySelector('form');
+    const form = document.getElementById('branding-form');
     if (form) {
         console.log('✅ Form encontrado, adicionando listener de submit');
         form.addEventListener('submit', function(e) {
