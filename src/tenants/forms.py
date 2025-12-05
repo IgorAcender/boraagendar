@@ -219,6 +219,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_text_color",
             "use_gradient_buttons",
             "highlight_color",
+            "sections_config",
             "hero_image",  # campo extra (não no modelo)
             "about_us",    # campo extra (não no modelo)
             "contact_info",  # campo extra (não no modelo)

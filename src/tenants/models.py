@@ -171,6 +171,14 @@ class BrandingSettings(models.Model):
         help_text="Cor do texto dentro dos botões"
     )
     
+    # Configuração de seções do site (visibilidade e ordem)
+    sections_config = models.JSONField(
+        "Configuração de Seções",
+        default=dict,
+        blank=True,
+        help_text="Controla a visibilidade e ordem das seções da página de landing"
+    )
+    
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
     updated_at = models.DateTimeField("Atualizado em", auto_now=True)
 
