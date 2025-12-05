@@ -1357,7 +1357,7 @@ def branding_settings(request: HttpRequest) -> HttpResponse:
 
     if request.method == "POST":
         try:
-            form = BrandingSettingsForm(request.POST, instance=branding)
+            form = BrandingSettingsForm(request.POST, request.FILES, instance=branding, tenant=tenant)
             if form.is_valid():
                 form.save()
                 messages.success(request, "Configurações de cores atualizadas com sucesso!")
@@ -1369,7 +1369,7 @@ def branding_settings(request: HttpRequest) -> HttpResponse:
             import traceback
             traceback.print_exc()
     else:
-        form = BrandingSettingsForm(instance=branding)
+        form = BrandingSettingsForm(instance=branding, tenant=tenant)
 
     # Construir URL do mini site de forma simples e segura
     tenant_landing_url = f"/{tenant.slug}/"

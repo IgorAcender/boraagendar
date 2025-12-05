@@ -164,6 +164,17 @@ class TeamMemberUpdateForm(forms.ModelForm):
 class BrandingSettingsForm(forms.ModelForm):
     """Formulário para personalização de cores do tenant"""
 
+    hero_image = forms.FileField(
+        label="Foto de capa / hero do mini site",
+        required=False,
+        widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
+        help_text="Imagem exibida no topo do mini site. Formatos: JPG/PNG."
+    )
+
+    def __init__(self, *args, tenant: Tenant, **kwargs):
+        self.tenant = tenant
+        super().__init__(*args, **kwargs)
+
     class Meta:
         model = BrandingSettings
         fields = [
@@ -173,6 +184,8 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_color_secondary",
             "button_text_color",
             "use_gradient_buttons",
+            "highlight_color",
+            "hero_image",  # campo extra (não no modelo)
         ]
         labels = {
             "background_color": "Cor de Fundo",
@@ -181,6 +194,8 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_color_secondary": "Cor Secundária do Botão",
             "button_text_color": "Cor de Texto dos Botões",
             "use_gradient_buttons": "Usar Gradiente nos Botões",
+            "highlight_color": "Cor de Destaque",
+            "hero_image": "Foto de capa / hero",
         }
         widgets = {
             "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
@@ -189,6 +204,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_color_secondary": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
             "button_text_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
             "use_gradient_buttons": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "highlight_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
         }
         help_texts = {
             "background_color": "Define o fundo de todas as páginas",
@@ -197,4 +213,20 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_color_secondary": "Cor secundária (usada em gradientes)",
             "button_text_color": "Cor do texto dentro dos botões",
             "use_gradient_buttons": "Se ativado, os botões terão gradiente com as duas cores",
+            "highlight_color": "Cor para destaque (textos especiais, ícones, contornos)",
+            "hero_image": "Selecione uma imagem para o topo do mini site",
         }
+
+    def save(self, commit=True):
+        branding = super().save(commit=commit)
+
+        hero = self.cleaned_data.get("hero_image")
+        if hero and isinstance(hero, UploadedFile):
+            hero_data = hero.read()
+            hero_b64 = base64.b64encode(hero_data).decode("utf-8")
+            content_type = hero.content_type or "image/jpeg"
+            self.tenant.avatar_base64 = f"data:{content_type};base64,{hero_b64}"
+            self.tenant.avatar = None  # evita salvar no disco
+            self.tenant.save(update_fields=["avatar", "avatar_base64", "updated_at"])
+
+        return branding

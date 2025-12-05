@@ -20,7 +20,7 @@
                         Personalize as cores do seu mini site. Essas configurações afetam como o site aparece para seus clientes.
                     </p>
 
-                    <form method="post" class="needs-validation" novalidate>
+                    <form method="post" class="needs-validation" novalidate enctype="multipart/form-data">
                         {% csrf_token %}
 
                         <!-- Cores Gerais -->
@@ -122,6 +122,23 @@
                                         <small class="text-muted d-block mt-1">
                                             {{ form.highlight_color.help_text }}
                                         </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="id_hero_image" class="form-label">
+                                            {{ form.hero_image.label }}
+                                        </label>
+                                        {{ form.hero_image }}
+                                        <small class="text-muted d-block mt-1">
+                                            {{ form.hero_image.help_text }}
+                                        </small>
+                                        {% if tenant.avatar_base64 or tenant.avatar %}
+                                        <div class="mt-2">
+                                            <div class="small text-muted">Atual:</div>
+                                            <img src="{% if tenant.avatar_base64 %}{{ tenant.avatar_base64 }}{% else %}{{ tenant.avatar.url }}{% endif %}" alt="Capa atual" style="max-width: 100%; border-radius: 8px; border: 1px solid #dee2e6;">
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
