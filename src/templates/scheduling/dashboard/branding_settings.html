@@ -163,6 +163,17 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    <div class="preview-toolbar mb-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="preview-back">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="preview-forward">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="preview-reload">
+                            <i class="fas fa-rotate-right"></i>
+                        </button>
+                    </div>
                     <div class="live-preview-wrapper">
                         <div class="live-preview-frame">
                             <iframe
@@ -260,6 +271,20 @@ if (copyBtn) {
     });
 }
 
+// Controles de navegação do iframe
+const iframe = document.getElementById('live-preview-iframe');
+const backBtn = document.getElementById('preview-back');
+const fwdBtn = document.getElementById('preview-forward');
+const reloadBtn = document.getElementById('preview-reload');
+
+function safeNav(fn) {
+    try { fn(); } catch (e) { /* ignora se navegador bloquear */ }
+}
+
+if (backBtn && iframe) backBtn.addEventListener('click', () => safeNav(() => iframe.contentWindow.history.back()));
+if (fwdBtn && iframe) fwdBtn.addEventListener('click', () => safeNav(() => iframe.contentWindow.history.forward()));
+if (reloadBtn && iframe) reloadBtn.addEventListener('click', () => safeNav(() => iframe.contentWindow.location.reload()));
+
 updatePreview();
 </script>
 
@@ -331,6 +356,12 @@ updatePreview();
 .branding-preview {
     flex: 0 0 420px;
     max-width: 420px;
+}
+
+.preview-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
 }
 
 @media (max-width: 991px) {
