@@ -831,7 +831,7 @@
 
             <!-- BOTÕES DE AÇÃO -->
             <div class="form-actions">
-                <button type="submit" class="btn-submit" id="btn-save-branding" onclick="console.log('🖱️ onclick disparado'); updateSectionsState(); console.log('✅ updateSectionsState() chamado no onclick');return true;">
+                <button type="button" class="btn-submit" id="btn-save-branding" onclick="console.log('🖱️ onclick disparado'); updateSectionsState(); document.querySelector('form').submit(); return false;">
                     <i class="fas fa-save"></i> Salvar Configurações
                 </button>
                 <a href="{% url 'dashboard:index' %}" class="btn-cancel">
