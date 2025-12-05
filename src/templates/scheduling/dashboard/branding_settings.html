@@ -104,12 +104,12 @@
 
                         <hr>
 
-                        <!-- Cor de Destaque -->
+                        <!-- Conteúdo e Destaque -->
                         <div class="mb-4">
                             <h5 class="mb-3">
-                                <i class="fas fa-highlighter"></i> Cor de Destaque
+                                <i class="fas fa-highlighter"></i> Conteúdo e Destaque
                             </h5>
-                            <div class="row">
+                            <div class="row gy-3">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="id_highlight_color" class="form-label">
@@ -139,6 +139,17 @@
                                             <img src="{% if tenant.avatar_base64 %}{{ tenant.avatar_base64 }}{% else %}{{ tenant.avatar.url }}{% endif %}" alt="Capa atual" style="max-width: 140px; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
                                         </div>
                                         {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="id_about_us" class="form-label">
+                                            {{ form.about_us.label }}
+                                        </label>
+                                        {{ form.about_us }}
+                                        <small class="text-muted d-block mt-1">
+                                            {{ form.about_us.help_text }}
+                                        </small>
                                     </div>
                                 </div>
                             </div>

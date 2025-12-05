@@ -171,10 +171,18 @@ class BrandingSettingsForm(forms.ModelForm):
         widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
         help_text="Imagem exibida no topo do mini site. Formatos: JPG/PNG."
     )
+    about_us = forms.CharField(
+        label="Sobre nós (mini site)",
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4, "placeholder": "Fale sobre seu negócio"}),
+        help_text="Texto que aparece na seção Sobre nós do mini site."
+    )
 
     def __init__(self, *args, tenant: Tenant, **kwargs):
         self.tenant = tenant
         super().__init__(*args, **kwargs)
+        # Preenche campo extra com valor do tenant
+        self.fields["about_us"].initial = tenant.about_us
 
     class Meta:
         model = BrandingSettings
@@ -187,6 +195,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "use_gradient_buttons",
             "highlight_color",
             "hero_image",  # campo extra (não no modelo)
+            "about_us",    # campo extra (não no modelo)
         ]
         labels = {
             "background_color": "Cor de Fundo",
@@ -197,6 +206,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "use_gradient_buttons": "Usar Gradiente nos Botões",
             "highlight_color": "Cor de Destaque",
             "hero_image": "Foto de capa / hero",
+            "about_us": "Sobre nós (mini site)",
         }
         widgets = {
             "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
@@ -216,6 +226,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "use_gradient_buttons": "Se ativado, os botões terão gradiente com as duas cores",
             "highlight_color": "Cor para destaque (textos especiais, ícones, contornos)",
             "hero_image": "Selecione uma imagem para o topo do mini site",
+            "about_us": "Texto exibido na seção Sobre nós do mini site",
         }
 
     def save(self, commit=True):
@@ -229,5 +240,10 @@ class BrandingSettingsForm(forms.ModelForm):
             self.tenant.avatar_base64 = f"data:{content_type};base64,{hero_b64}"
             self.tenant.avatar = None  # evita salvar no disco
             self.tenant.save(update_fields=["avatar", "avatar_base64", "updated_at"])
+
+        about_us = self.cleaned_data.get("about_us")
+        if about_us is not None:
+            self.tenant.about_us = about_us
+            self.tenant.save(update_fields=["about_us", "updated_at"])
 
         return branding
