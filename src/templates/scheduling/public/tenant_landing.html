@@ -812,8 +812,8 @@
             flex-direction: column;
             align-items: stretch;
             padding: 1.5rem 1rem;
-            background: color-mix(in srgb, var(--bg-dark) 95%, white);
-            border-bottom: 1px solid color-mix(in srgb, var(--brand-primary) 20%, transparent);
+            background: color-mix(in srgb, var(--bg-dark) 94%, white);
+            border-bottom: 1px solid color-mix(in srgb, var(--text-light) 10%, transparent);
             gap: 1rem;
         }
 
@@ -822,68 +822,57 @@
             flex-direction: row;
             align-items: center;
             justify-content: flex-start;
-            gap: 1.5rem;
+            gap: 1.25rem;
             text-decoration: none;
             color: var(--text-light);
             cursor: pointer;
-            transition: all 0.3s;
-            padding: 1.5rem;
+            transition: all 0.25s ease;
+            padding: 1.4rem 1.5rem;
             border-radius: 16px;
-            background: linear-gradient(135deg, color-mix(in srgb, var(--brand-primary) 15%, transparent), color-mix(in srgb, var(--brand-secondary) 10%, transparent));
-            border: 2px solid color-mix(in srgb, var(--brand-primary) 20%, transparent);
+            background: color-mix(in srgb, var(--bg-dark) 70%, white);
+            border: 1px solid color-mix(in srgb, var(--text-light) 12%, transparent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: linear-gradient(180deg, color-mix(in srgb, var(--brand-primary) 60%, transparent), color-mix(in srgb, var(--brand-primary) 20%, transparent));
+            border-radius: 6px;
+            opacity: 0.8;
         }
 
         .nav-item:hover {
-            background: linear-gradient(135deg, color-mix(in srgb, var(--brand-primary) 25%, transparent), color-mix(in srgb, var(--brand-secondary) 15%, transparent));
-            border-color: color-mix(in srgb, var(--brand-primary) 40%, transparent);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px color-mix(in srgb, var(--brand-primary) 20%, transparent);
-        }
-
-        /* Destaque para o primeiro item (Agendar) */
-        .nav-item:first-child {
-            background: linear-gradient(135deg, color-mix(in srgb, var(--highlight-color) 30%, transparent), color-mix(in srgb, var(--brand-primary) 20%, transparent));
-            border: 2px solid color-mix(in srgb, var(--highlight-color) 40%, transparent);
-            padding: 2rem 1.5rem;
-        }
-
-        .nav-item:first-child:hover {
-            background: linear-gradient(135deg, color-mix(in srgb, var(--highlight-color) 40%, transparent), color-mix(in srgb, var(--brand-primary) 30%, transparent));
-            border-color: color-mix(in srgb, var(--highlight-color) 60%, transparent);
-            box-shadow: 0 12px 30px color-mix(in srgb, var(--highlight-color) 30%, transparent);
+            border-color: color-mix(in srgb, var(--brand-primary) 30%, transparent);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+            background: color-mix(in srgb, var(--bg-dark) 65%, white);
         }
 
         .nav-icon {
-            width: 60px;
-            height: 60px;
-            background: color-mix(in srgb, var(--brand-primary) 20%, transparent);
-            border-radius: 12px;
+            width: 58px;
+            height: 58px;
+            background: color-mix(in srgb, var(--brand-primary) 15%, var(--bg-dark));
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            transition: all 0.3s;
-            color: var(--brand-primary);
+            font-size: 1.6rem;
+            transition: all 0.25s;
+            color: color-mix(in srgb, var(--brand-primary) 85%, white);
             flex-shrink: 0;
-        }
-
-        /* Ícone maior para o primeiro item */
-        .nav-item:first-child .nav-icon {
-            width: 75px;
-            height: 75px;
-            font-size: 2.2rem;
-            background: color-mix(in srgb, var(--highlight-color) 30%, transparent);
-            color: var(--highlight-color);
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand-primary) 25%, transparent);
         }
 
         .nav-item:hover .nav-icon {
-            background: color-mix(in srgb, var(--brand-primary) 35%, transparent);
-            transform: scale(1.1);
-        }
-
-        .nav-item:first-child:hover .nav-icon {
-            background: color-mix(in srgb, var(--highlight-color) 45%, transparent);
-            transform: scale(1.15);
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand-primary) 45%, transparent);
         }
 
         .nav-label {
@@ -892,17 +881,11 @@
             text-align: left;
             color: var(--text-light);
             max-width: none;
-        }
-
-        /* Label maior para o primeiro item */
-        .nav-item:first-child .nav-label {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--highlight-color);
+            letter-spacing: 0.1px;
         }
 
         .nav-item:hover .nav-label {
-            color: var(--brand-primary);
+            color: color-mix(in srgb, var(--text-light) 85%, var(--brand-primary) 15%);
         }
 
         @media (max-width: 767px) {
@@ -915,10 +898,7 @@
                 padding: 1.25rem;
                 gap: 1.2rem;
                 border-radius: 12px;
-            }
-
-            .nav-item:first-child {
-                padding: 1.5rem;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
             }
 
             .nav-icon {
@@ -935,10 +915,6 @@
 
             .nav-label {
                 font-size: 1rem;
-            }
-
-            .nav-item:first-child .nav-label {
-                font-size: 1.15rem;
             }
         }
 
