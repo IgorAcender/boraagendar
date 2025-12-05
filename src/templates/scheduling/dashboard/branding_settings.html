@@ -131,56 +131,20 @@
                         <!-- Preview -->
                         <div class="mb-4">
                             <h5 class="mb-3 d-flex align-items-center gap-2">
-                                <i class="fas fa-eye"></i> Preview (mini site mobile)
+                                <i class="fas fa-eye"></i> Preview do mini site (iframe ao vivo)
                             </h5>
-                            <div class="preview-grid">
-                                <div class="p-3 preview-box" id="preview-box" style="background-color: {{ branding.background_color }};">
-                                    <p class="preview-text" style="color: {{ branding.text_color }};">
-                                        <strong>Texto padrão:</strong> Este é um exemplo de como o texto padrão aparecerá no seu site.
-                                    </p>
-                                    <p class="highlight-preview-text" style="color: {{ branding.highlight_color|default:'#FBBF24' }};">
-                                        <strong>Texto de destaque:</strong> Exemplo de como a cor de destaque aparecerá.
-                                    </p>
-                                    <button class="btn" id="preview-btn" style="background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); color: {{ branding.button_text_color }}; border: none; padding: 0.5rem 1rem; border-radius: 6px;">
-                                        Botão com Gradiente
-                                    </button>
+                            <div class="live-preview-wrapper">
+                                <div class="live-preview-frame">
+                                    <iframe
+                                        id="live-preview-iframe"
+                                        src="{{ tenant_landing_url }}"
+                                        title="Preview do mini site"
+                                        loading="lazy"
+                                        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation-by-user-activation"
+                                    ></iframe>
                                 </div>
-
-                                <div class="mobile-preview">
-                                    <div class="phone-frame">
-                                        <div class="phone-notch"></div>
-                                        <div class="phone-screen" id="phone-preview">
-                                            <div class="phone-hero">
-                                                <div class="hero-overlay"></div>
-                                                <div class="hero-title">Igor &amp; Júnior</div>
-                                                <div class="hero-subtitle">Agende seu horário</div>
-                                            </div>
-                                            <div class="phone-content">
-                                                <div class="phone-card">
-                                                    <div class="phone-icon">
-                                                        <i class="fas fa-calendar-check"></i>
-                                                    </div>
-                                                    <div class="phone-text">
-                                                        <div class="label">Agendar</div>
-                                                        <div class="hint">Selecione serviço e horário</div>
-                                                    </div>
-                                                </div>
-                                                <div class="phone-card secondary">
-                                                    <div class="phone-icon">
-                                                        <i class="fas fa-list-check"></i>
-                                                    </div>
-                                                    <div class="phone-text">
-                                                        <div class="label">Meus agendamentos</div>
-                                                        <div class="hint">Consulte e gerencie</div>
-                                                    </div>
-                                                </div>
-                                                <button class="phone-cta" id="phone-cta">
-                                                    <i class="fas fa-bolt"></i>
-                                                    Agendar agora
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="live-preview-note text-muted mt-2">
+                                    Alterações de cor são aplicadas ao salvar; recarregue o preview após salvar para ver o mini site real.
                                 </div>
                             </div>
                         </div>
@@ -256,17 +220,6 @@ function updatePreview() {
     document.getElementById('btn-primary-preview').style.backgroundColor = btnPrimary;
     document.getElementById('btn-text-preview').style.backgroundColor = btnTextColor;
     document.getElementById('highlight-preview').style.backgroundColor = highlightColor;
-
-    // Mobile preview (aplica como variáveis inline)
-    const phone = document.getElementById('phone-preview');
-    if (phone) {
-        phone.style.setProperty('--bg', bgColor);
-        phone.style.setProperty('--text', textColor);
-        phone.style.setProperty('--primary', btnPrimary);
-        phone.style.setProperty('--primary-2', btnSecondary);
-        phone.style.setProperty('--primary-text', btnTextColor);
-        phone.style.setProperty('--highlight', highlightColor);
-    }
 }
 
 document.querySelectorAll('input[type="color"]').forEach(input => {
@@ -292,150 +245,35 @@ updatePreview();
     border: 2px solid #dee2e6;
 }
 
-.preview-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.25rem;
-    align-items: stretch;
+.live-preview-wrapper {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 0.75rem;
+    background: #f8fafc;
 }
 
-.preview-box {
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    min-height: 200px;
-}
-
-.mobile-preview {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.phone-frame {
-    width: 260px;
-    height: 500px;
-    background: linear-gradient(135deg, #0b1224, #0f172a);
-    border-radius: 24px;
-    padding: 12px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+.live-preview-frame {
     position: relative;
-}
-
-.phone-notch {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120px;
-    height: 18px;
-    background: #0b1224;
-    border-radius: 0 0 12px 12px;
-}
-
-.phone-screen {
     width: 100%;
-    height: 100%;
-    background: var(--bg, #0f172a);
-    border-radius: 18px;
+    padding-top: 200%;
+    border-radius: 10px;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    background: #0f172a;
 }
 
-.phone-hero {
-    position: relative;
-    height: 160px;
-    background: linear-gradient(135deg, var(--primary, #667eea), var(--primary-2, #5563c1));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 1.2rem;
-}
-
-.hero-overlay {
+.live-preview-frame iframe {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 100%);
-}
-
-.hero-title {
-    position: relative;
-    font-weight: 700;
-    color: var(--primary-text, #fff);
-    font-size: 1.1rem;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.35);
-}
-
-.hero-subtitle {
-    position: relative;
-    color: color-mix(in srgb, var(--primary-text, #fff) 85%, transparent);
-    font-size: 0.85rem;
-    margin-top: 0.2rem;
-}
-
-.phone-content {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    flex: 1;
-    background: var(--bg, #0f172a);
-}
-
-.phone-card {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    background: color-mix(in srgb, var(--bg, #0f172a) 85%, var(--primary, #667eea) 10%);
-    border: 1px solid color-mix(in srgb, var(--primary, #667eea) 25%, transparent);
-    border-radius: 14px;
-    padding: 0.9rem;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-}
-
-.phone-card.secondary {
-    background: color-mix(in srgb, var(--bg, #0f172a) 88%, var(--primary-2, #5563c1) 8%);
-    border: 1px solid color-mix(in srgb, var(--primary-2, #5563c1) 25%, transparent);
-}
-
-.phone-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: color-mix(in srgb, var(--primary, #667eea) 25%, transparent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary, #667eea);
-    font-size: 1.2rem;
-}
-
-.phone-text .label {
-    color: var(--text, #e2e8f0);
-    font-weight: 700;
-    font-size: 0.95rem;
-}
-
-.phone-text .hint {
-    color: color-mix(in srgb, var(--text, #e2e8f0) 70%, transparent);
-    font-size: 0.8rem;
-}
-
-.phone-cta {
-    margin-top: auto;
     width: 100%;
-    padding: 0.9rem 1rem;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--primary, #667eea), var(--primary-2, #5563c1));
-    color: var(--primary-text, #fff);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    height: 100%;
+    border: 0;
+    border-radius: 10px;
+    background: #0f172a;
+}
+
+.live-preview-note {
+    font-size: 0.85rem;
 }
 </style>
 {% endblock %}
