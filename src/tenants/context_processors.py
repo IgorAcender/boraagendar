@@ -21,9 +21,7 @@ def branding(request: HttpRequest) -> dict:
                 "button_color_secondary": branding_settings.button_color_secondary,
                 "button_text_color": branding_settings.button_text_color,
                 "use_gradient_buttons": branding_settings.use_gradient_buttons,
-                "highlight_color": branding_settings.highlight_color,
                 "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
-                "highlight_hover_color": branding_settings.get_hover_color(branding_settings.highlight_color),
             }
         except BrandingSettings.DoesNotExist:
             # Se não houver BrandingSettings, usa cores padrão
@@ -34,9 +32,7 @@ def branding(request: HttpRequest) -> dict:
                 "button_color_secondary": "#764BA2",
                 "button_text_color": "#FFFFFF",
                 "use_gradient_buttons": True,
-                "highlight_color": "#FBBF24",
                 "button_hover_color": "#8090F6",
-                "highlight_hover_color": "#FCC84B",
             }
     
     return context

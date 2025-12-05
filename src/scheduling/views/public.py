@@ -60,9 +60,7 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             "button_color_primary": branding_settings.button_color_primary,
             "button_color_secondary": branding_settings.button_color_secondary,
             "use_gradient_buttons": branding_settings.use_gradient_buttons,
-            "highlight_color": branding_settings.highlight_color,
             "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
-            "highlight_hover_color": branding_settings.get_hover_color(branding_settings.highlight_color),
         }
     except:
         # Se não houver BrandingSettings, usa cores padrão
@@ -72,9 +70,7 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             "button_color_primary": "#667EEA",
             "button_color_secondary": "#764BA2",
             "use_gradient_buttons": True,
-            "highlight_color": "#FBBF24",
             "button_hover_color": "#8090F6",
-            "highlight_hover_color": "#FCC84B",
         }
     
     context = {
@@ -166,9 +162,9 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             "button_color_primary": branding_settings.button_color_primary,
             "button_color_secondary": branding_settings.button_color_secondary,
             "use_gradient_buttons": branding_settings.use_gradient_buttons,
-            "highlight_color": branding_settings.highlight_color,
+            
             "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
-            "highlight_hover_color": branding_settings.get_hover_color(branding_settings.highlight_color),
+            
         }
     except:
         # Se não houver BrandingSettings, usa cores padrão
@@ -178,9 +174,7 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             "button_color_primary": "#667EEA",
             "button_color_secondary": "#764BA2",
             "use_gradient_buttons": True,
-            "highlight_color": "#FBBF24",
             "button_hover_color": "#8090F6",
-            "highlight_hover_color": "#FCC84B",
         }
 
     context = {
@@ -378,9 +372,9 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
                 "button_color_primary": branding_settings.button_color_primary,
                 "button_color_secondary": branding_settings.button_color_secondary,
                 "use_gradient_buttons": branding_settings.use_gradient_buttons,
-                "highlight_color": branding_settings.highlight_color,
+                
                 "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
-                "highlight_hover_color": branding_settings.get_hover_color(branding_settings.highlight_color),
+                
             }
         except:
             # Se não houver BrandingSettings, usa cores padrão
@@ -390,9 +384,7 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
                 "button_color_primary": "#667EEA",
                 "button_color_secondary": "#764BA2",
                 "use_gradient_buttons": True,
-                "highlight_color": "#FBBF24",
                 "button_hover_color": "#8090F6",
-                "highlight_hover_color": "#FCC84B",
             }
         
         return render(
@@ -432,9 +424,9 @@ def booking_success(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             "button_color_primary": branding_settings.button_color_primary,
             "button_color_secondary": branding_settings.button_color_secondary,
             "use_gradient_buttons": branding_settings.use_gradient_buttons,
-            "highlight_color": branding_settings.highlight_color,
+            
             "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
-            "highlight_hover_color": branding_settings.get_hover_color(branding_settings.highlight_color),
+            
         }
     except:
         # Se não houver BrandingSettings, usa cores padrão
@@ -444,9 +436,7 @@ def booking_success(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             "button_color_primary": "#667EEA",
             "button_color_secondary": "#764BA2",
             "use_gradient_buttons": True,
-            "highlight_color": "#FBBF24",
             "button_hover_color": "#8090F6",
-            "highlight_hover_color": "#FCC84B",
         }
     
     return render(

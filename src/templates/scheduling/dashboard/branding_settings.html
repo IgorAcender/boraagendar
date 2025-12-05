@@ -288,7 +288,6 @@ function updatePreview() {
     const btnTextColor = document.getElementById('id_button_text_color').value;
     // Sempre usar gradiente (valor enviado via hidden)
     const useGradient = true;
-    const highlightColor = document.getElementById('id_highlight_color').value;
 
     // Atualizar box de preview
     const previewBox = document.getElementById('preview-box');
@@ -298,10 +297,6 @@ function updatePreview() {
     previewBox.querySelectorAll('p').forEach(p => {
         p.style.color = textColor;
     });
-    const highlightParagraph = document.querySelector('.highlight-preview-text');
-    if (highlightParagraph) {
-        highlightParagraph.style.color = highlightColor;
-    }
 
     // Atualizar botão com gradiente
     const previewBtn = document.getElementById('preview-btn');
@@ -317,7 +312,6 @@ function updatePreview() {
     document.getElementById('text-preview').style.backgroundColor = textColor;
     document.getElementById('btn-primary-preview').style.backgroundColor = btnPrimary;
     document.getElementById('btn-text-preview').style.backgroundColor = btnTextColor;
-    document.getElementById('highlight-preview').style.backgroundColor = highlightColor;
 }
 
 // Chamar ao carregar

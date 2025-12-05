@@ -173,7 +173,6 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_color_secondary",
             "button_text_color",
             "use_gradient_buttons",
-            "highlight_color",
         ]
         labels = {
             "background_color": "Cor de Fundo",
@@ -182,7 +181,6 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_color_secondary": "Cor Secundária do Botão",
             "button_text_color": "Cor de Texto dos Botões",
             "use_gradient_buttons": "Usar Gradiente nos Botões",
-            "highlight_color": "Cor de Destaque",
         }
         widgets = {
             "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
@@ -191,7 +189,6 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_color_secondary": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
             "button_text_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
             "use_gradient_buttons": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "highlight_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
         }
         help_texts = {
             "background_color": "Define o fundo de todas as páginas",
@@ -200,5 +197,4 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_color_secondary": "Cor secundária (usada em gradientes)",
             "button_text_color": "Cor do texto dentro dos botões",
             "use_gradient_buttons": "Se ativado, os botões terão gradiente com as duas cores",
-            "highlight_color": "Cor para destaque (textos especiais, ícones, contornos)",
         }
