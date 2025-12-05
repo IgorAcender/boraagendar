@@ -1371,6 +1371,15 @@ def branding_settings(request: HttpRequest) -> HttpResponse:
     else:
         form = BrandingSettingsForm(instance=branding)
 
+    # Construir URL do mini site de forma segura
+    try:
+        # Tentar usar reverse para a view pública
+        from django.urls import reverse
+        tenant_landing_url = request.build_absolute_uri(reverse('public:tenant_landing', kwargs={'tenant_slug': tenant.slug}))
+    except:
+        # Fallback: construir manualmente
+        tenant_landing_url = request.build_absolute_uri(f"/{tenant.slug}/")
+
     return render(
         request,
         "scheduling/dashboard/branding_settings.html",
@@ -1378,6 +1387,6 @@ def branding_settings(request: HttpRequest) -> HttpResponse:
             "tenant": tenant,
             "form": form,
             "branding": branding,
-            "tenant_landing_url": request.build_absolute_uri(f"/{tenant.slug}/"),
+            "tenant_landing_url": tenant_landing_url,
         },
     )
