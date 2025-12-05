@@ -204,6 +204,10 @@ class BrandingSettingsForm(forms.ModelForm):
         self.fields["contact_info"].initial = tenant.contact_info
         self.fields["instagram_url"].initial = tenant.instagram_url
         self.fields["facebook_url"].initial = tenant.facebook_url
+        # Garante que destaque tem valor inicial e não bloqueia o submit
+        self.fields["highlight_color"].required = False
+        if not self.instance.highlight_color:
+            self.fields["highlight_color"].initial = BrandingSettings._meta.get_field("highlight_color").default
 
     class Meta:
         model = BrandingSettings
@@ -293,5 +297,10 @@ class BrandingSettingsForm(forms.ModelForm):
         if fields_to_update:
             fields_to_update.append("updated_at")
             self.tenant.save(update_fields=fields_to_update)
+
+        # Se destaque vier vazio, aplica default do modelo
+        if not branding.highlight_color:
+            branding.highlight_color = BrandingSettings._meta.get_field("highlight_color").default
+            branding.save(update_fields=["highlight_color"])
 
         return branding
