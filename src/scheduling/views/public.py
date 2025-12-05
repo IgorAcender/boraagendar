@@ -4,6 +4,7 @@ import json
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from tenants.models import Tenant
 from ..models import AvailabilityRule
@@ -14,6 +15,7 @@ from ..services.availability import AvailabilityService
 from ..services.notification_dispatcher import send_booking_confirmation
 
 
+@xframe_options_exempt
 def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     """Página de landing/mini-site do tenant."""
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
