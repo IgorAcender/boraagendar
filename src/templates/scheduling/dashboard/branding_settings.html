@@ -63,10 +63,10 @@
 
                         <hr>
 
-                        <!-- Cores de Botões -->
+                        <!-- Botão e Ícones -->
                         <div class="mb-4">
                             <h5 class="mb-3">
-                                <i class="fas fa-square"></i> Cores de Botões
+                                <i class="fas fa-square"></i> Botão e Ícones
                             </h5>
 
                             <div class="row mb-3">
@@ -103,31 +103,6 @@
                             <!-- Campos ocultos para manter compatibilidade com o modelo -->
                             <input type="hidden" name="{{ form.button_color_secondary.name }}" id="id_button_color_secondary" value="{{ branding.button_color_secondary|default:branding.button_color_primary }}">
                             <input type="hidden" name="{{ form.use_gradient_buttons.name }}" id="id_use_gradient_buttons" value="on">
-                        </div>
-
-                        <hr>
-
-                        <!-- Cor de Destaque -->
-                        <div class="mb-4">
-                            <h5 class="mb-3">
-                                <i class="fas fa-highlighter"></i> Cor de Destaque
-                            </h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="id_highlight_color" class="form-label">
-                                            {{ form.highlight_color.label }}
-                                        </label>
-                                        <div class="input-group">
-                                            {{ form.highlight_color }}
-                                            <span class="input-group-text" id="highlight-preview" style="background-color: {{ branding.highlight_color }}; width: 50px; border-radius: 4px;"></span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.highlight_color.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <hr>
@@ -171,7 +146,7 @@
 
                                         <!-- Section: Sobre Nós -->
                                         <div style="margin-bottom: 2rem;">
-                                            <h4 style="color: {{ branding.highlight_color }}; margin-bottom: 1rem; font-size: 1.2rem;">
+                                            <h4 style="color: {{ branding.button_color_primary }}; margin-bottom: 1rem; font-size: 1.2rem;">
                                                 <i class="fas fa-info-circle"></i> Sobre Nós
                                             </h4>
                                             <p style="color: {{ branding.text_color }}; font-size: 0.95rem; line-height: 1.6; margin: 0;">
@@ -181,7 +156,7 @@
 
                                         <!-- Section: Equipe -->
                                         <div style="margin-bottom: 2rem;">
-                                            <h4 style="color: {{ branding.highlight_color }}; margin-bottom: 1rem; font-size: 1.2rem;">
+                                            <h4 style="color: {{ branding.button_color_primary }}; margin-bottom: 1rem; font-size: 1.2rem;">
                                                 <i class="fas fa-users"></i> Equipe
                                             </h4>
                                             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
@@ -202,16 +177,16 @@
 
                                         <!-- Section: Horários -->
                                         <div>
-                                            <h4 style="color: {{ branding.highlight_color }}; margin-bottom: 1rem; font-size: 1.2rem;">
+                                            <h4 style="color: {{ branding.button_color_primary }}; margin-bottom: 1rem; font-size: 1.2rem;">
                                                 <i class="fas fa-clock"></i> Horários
                                             </h4>
                                             <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
                                                 <span>Segunda</span>
-                                                <span style="color: {{ branding.highlight_color }};">08:00 - 17:00</span>
+                                                <span style="color: {{ branding.button_color_primary }};">08:00 - 17:00</span>
                                             </div>
                                             <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
                                                 <span>Terça</span>
-                                                <span style="color: {{ branding.highlight_color }};">08:00 - 21:00</span>
+                                                <span style="color: {{ branding.button_color_primary }};">08:00 - 21:00</span>
                                             </div>
                                         </div>
                                     </div>
@@ -276,7 +251,6 @@ function updatePreview() {
     const buttonPrimary = document.getElementById('id_button_color_primary').value;
     const buttonSecondary = document.getElementById('id_button_color_secondary').value || buttonPrimary;
     const buttonText = document.getElementById('id_button_text_color').value;
-    const highlightColor = document.getElementById('id_highlight_color').value;
 
     // Atualizar preview
     const previewContent = document.getElementById('preview-content');
@@ -285,9 +259,6 @@ function updatePreview() {
         previewContent.style.color = textColor;
         
         // Atualizar todos os elementos com cores
-        const headers = previewContent.querySelectorAll('h4');
-        headers.forEach(h => h.style.color = highlightColor);
-        
         const buttons = previewContent.querySelectorAll('button');
         buttons.forEach(btn => {
             btn.style.background = `linear-gradient(135deg, ${buttonPrimary}, ${buttonSecondary})`;
@@ -299,10 +270,6 @@ function updatePreview() {
         avatars.forEach(avatar => {
             avatar.style.background = `linear-gradient(135deg, ${buttonPrimary}, ${buttonSecondary})`;
         });
-        
-        // Atualizar horários highlight
-        const timeSpans = previewContent.querySelectorAll('span[style*="highlight"]');
-        timeSpans.forEach(span => span.style.color = highlightColor);
     }
 }
 
