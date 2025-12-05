@@ -831,7 +831,7 @@
 
             <!-- BOTÕES DE AÇÃO -->
             <div class="form-actions">
-                <button type="submit" class="btn-submit" id="btn-save-branding">
+                <button type="submit" class="btn-submit" id="btn-save-branding" onclick="console.log('🖱️ onclick disparado'); updateSectionsState(); console.log('✅ updateSectionsState() chamado no onclick');return true;">
                     <i class="fas fa-save"></i> Salvar Configurações
                 </button>
                 <a href="{% url 'dashboard:index' %}" class="btn-cancel">
@@ -1032,19 +1032,31 @@ document.addEventListener('DOMContentLoaded', function() {
     updateButtonStates();
     updateSectionsState();
     
-    // ===== MÉTODO 1: Listener no botão Salvar =====
+    // ===== MÉTODO 1: Listener no botão Salvar (com captura) =====
     const saveBtn = document.getElementById('btn-save-branding');
     if (saveBtn) {
-        console.log('✅ Botão Salvar encontrado, adicionando listener');
+        console.log('✅ Botão Salvar encontrado, adicionando listeners');
+        
+        // Listener com captura (true = capture phase)
         saveBtn.addEventListener('click', function(e) {
-            console.log('🖱️ Clique no botão Salvar detectado');
-            // Atualizar sections_config ANTES de enviar
+            console.log('🖱️ addEventListener click disparado');
             updateSectionsState();
             const hiddenField = document.getElementById('id_sections_config');
             if (hiddenField) {
-                console.log('✅ CRÍTICO: sections_config preenchido antes do submit:', hiddenField.value.substring(0, 100));
+                console.log('✅ sections_config via addEventListener:', hiddenField.value.substring(0, 80));
             }
-        });
+        }, true);
+        
+        // Fallback com mousedown (antes de click)
+        saveBtn.addEventListener('mousedown', function(e) {
+            console.log('🖱️ addEventListener mousedown disparado');
+            updateSectionsState();
+        }, true);
+        
+        // Fallback com focus
+        saveBtn.addEventListener('focus', function(e) {
+            console.log('🖱️ addEventListener focus disparado');
+        }, true);
     } else {
         console.error('❌ Botão Salvar NÃO ENCONTRADO!');
     }
@@ -1057,12 +1069,18 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('📤 Form submit disparado');
             // Atualizar sections_config com ordem e visibilidade atuais
             updateSectionsState();
-            console.log('✅ updateSectionsState() executado antes do submit');
+            console.log('✅ updateSectionsState() executado no submit');
             const hiddenField = document.getElementById('id_sections_config');
             if (hiddenField) {
-                console.log('📝 sections_config value:', hiddenField.value);
+                console.log('📝 sections_config final:', hiddenField.value.substring(0, 100));
             }
-        });
+        }, true); // capture phase
+        
+        // Também captura no bubbling phase
+        form.addEventListener('submit', function(e) {
+            console.log('📤 Form submit (bubbling) disparado');
+            updateSectionsState();
+        }, false);
     } else {
         console.error('❌ Nenhum form encontrado no DOM!');
     }
