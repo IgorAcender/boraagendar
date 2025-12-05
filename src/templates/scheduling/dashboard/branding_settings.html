@@ -113,7 +113,7 @@
                                 <p style="color: {{ branding.text_color }};">
                                     <strong>Texto padrão:</strong> Este é um exemplo de como o texto padrão aparecerá no seu site.
                                 </p>
-                                <button class="btn" id="preview-btn" style="background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding|get_button_secondary_color }}); color: {{ branding.button_text_color }}; border: none; padding: 0.5rem 1rem; border-radius: 6px;">
+                                <button class="btn" id="preview-btn" style="background: linear-gradient(135deg, {{ branding.button_color_primary }}, {{ branding.button_color_secondary|default:branding.button_color_primary }}); color: {{ branding.button_text_color }}; border: none; padding: 0.5rem 1rem; border-radius: 6px;">
                                     Botão com Gradiente
                                 </button>
                             </div>
