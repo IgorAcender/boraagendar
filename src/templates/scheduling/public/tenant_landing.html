@@ -35,12 +35,38 @@
             box-sizing: border-box;
         }
 
+        /* Fixed Header Bar */
+        .fixed-header-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-dark);
+            border-bottom: 1px solid color-mix(in srgb, var(--brand-primary) 20%, transparent);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .fixed-header-bar .salon-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Adicionar espaço no topo do body para a barra fixa */
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--bg-dark);
             color: var(--text-light);
             min-height: 100vh;
             overflow-x: hidden;
+            padding-top: 60px;
         }
 
         .container {
@@ -164,6 +190,11 @@
             margin-bottom: 3rem;
             animation: fadeIn 0.5s ease-in;
             background: transparent;
+        }
+
+        /* Esconder nome da empresa do header - agora está na barra fixa */
+        .company-name {
+            display: none !important;
         }
 
         @keyframes fadeIn {
@@ -988,6 +1019,11 @@
     </script>
 </head>
 <body>
+    <!-- Fixed Header Bar -->
+    <div class="fixed-header-bar">
+        <h2 class="salon-name">{{ tenant.name }}</h2>
+    </div>
+
     <!-- Header -->
     <div class="header-section">
         <div class="logo-container">
