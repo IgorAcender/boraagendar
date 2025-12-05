@@ -780,6 +780,58 @@
             color: var(--button-text);
         }
 
+        /* Mapa Google Maps */
+        .map-container {
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .map-container iframe {
+            display: block;
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .map-container iframe {
+                height: 300px;
+            }
+        }
+
+        /* Botão Google Maps */
+        .btn-google-maps {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #4285F4, #34A853);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-google-maps:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66, 133, 244, 0.4);
+        }
+
+        .btn-google-maps:active {
+            transform: translateY(0);
+        }
+
+        .btn-google-maps i {
+            font-size: 1.1rem;
+        }
+
         /* Formas de Pagamento */
         .payment-grid {
             display: grid;
@@ -1323,9 +1375,24 @@
                             <i class="fas fa-map-marker-alt"></i>
                             Endereço
                         </h2>
+                        
+                        <!-- Mapa do Google Maps -->
+                        <div class="map-container">
+                            {% with address_full=tenant.address|add:", "|add:tenant.neighborhood|add:", "|add:tenant.city|add:" "|add:tenant.state %}
+                            <iframe 
+                                src="https://www.google.com/maps/embed/v1/search?key=AIzaSyA9dEpPpYIqU6yAqm9rvBLM6_wk_z0sQ8c&q={{ address_full|urlencode }}"
+                                style="width: 100%; height: 400px; border: none; border-radius: 10px;"
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                            {% endwith %}
+                        </div>
+                        
+                        <!-- Informações de Endereço -->
                         <div class="address-card">
                             <div class="address-line">
-                                {{ tenant.address }}{% if tenant.neighborhood %}, {{ tenant.neighborhood }}{% endif %}
+                                <strong>📍 {{ tenant.address }}{% if tenant.neighborhood %}, {{ tenant.neighborhood }}{% endif %}</strong>
                             </div>
                             {% if tenant.city or tenant.state or tenant.zip_code %}
                             <div class="address-line">
@@ -1333,6 +1400,15 @@
                                 {% if tenant.zip_code %}<br>CEP: {{ tenant.zip_code }}{% endif %}
                             </div>
                             {% endif %}
+                            
+                            <!-- Link para abrir no Google Maps -->
+                            <div class="address-line" style="margin-top: 1rem;">
+                                <a href="https://www.google.com/maps/search/{{ tenant.address|add:', '|add:tenant.city|urlencode }}" 
+                                   target="_blank" 
+                                   class="btn-google-maps">
+                                    <i class="fab fa-google"></i> Abrir no Google Maps
+                                </a>
+                            </div>
                         </div>
                     </div>
 
