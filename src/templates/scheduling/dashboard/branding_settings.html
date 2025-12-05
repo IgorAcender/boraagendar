@@ -322,6 +322,28 @@
         background: rgba(102, 126, 234, 0.05);
     }
 
+    /* Layout para colocar preview na direita */
+    .page-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .preview-section {
+        position: sticky;
+        top: 20px;
+    }
+
+    @media (max-width: 1100px) {
+        .page-layout {
+            grid-template-columns: 1fr;
+        }
+        .preview-section {
+            position: static;
+        }
+    }
+
     @media (max-width: 768px) {
         .hero-header {
             padding: 1.5rem;
@@ -369,6 +391,7 @@
 {% endfor %}
 {% endif %}
 
+<div class="page-layout">
 <div class="section-card form-wrapper">
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
