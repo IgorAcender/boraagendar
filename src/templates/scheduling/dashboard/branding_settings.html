@@ -722,7 +722,7 @@
                 <!-- 2. EQUIPE -->
                 <div class="form-field section-field" data-section-id="team">
                     <div class="section-field-header">
-                        <label for="id_show_team">EQUIPE</label>
+                        <label>EQUIPE</label>
                         <div class="order-controls">
                             <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" id="team_visible">
                             <button type="button" class="btn-section-up" title="Mover para cima">
@@ -737,7 +737,8 @@
                         <p><i class="fas fa-info-circle"></i> Exibe os membros da sua equipe no mini site.</p>
                         <p style="margin-top: 8px;">Para gerenciar a equipe, acesse a página de Membros.</p>
                     </div>
-                    <input type="hidden" name="show_team_dummy" id="id_show_team" value="0">
+                    <!-- Campo real do formulário para show_team -->
+                    {{ form.show_team }}
                     {% if form.show_team.help_text %}
                     <span class="field-help">{{ form.show_team.help_text|safe }}</span>
                     {% endif %}
@@ -746,7 +747,7 @@
                 <!-- 3. HORÁRIO DE FUNCIONAMENTO -->
                 <div class="form-field section-field" data-section-id="hours">
                     <div class="section-field-header">
-                        <label for="id_show_business_hours">HORÁRIO DE FUNCIONAMENTO</label>
+                        <label>HORÁRIO DE FUNCIONAMENTO</label>
                         <div class="order-controls">
                             <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" id="hours_visible">
                             <button type="button" class="btn-section-up" title="Mover para cima">
@@ -761,7 +762,8 @@
                         <p><i class="fas fa-info-circle"></i> Exibe os horários de funcionamento no mini site.</p>
                         <p style="margin-top: 8px;">Configure os horários na página de Horários de Funcionamento.</p>
                     </div>
-                    <input type="hidden" name="show_business_hours_dummy" id="id_show_business_hours" value="0">
+                    <!-- Campo real do formulário para show_business_hours -->
+                    {{ form.show_business_hours }}
                     {% if form.show_business_hours.help_text %}
                     <span class="field-help">{{ form.show_business_hours.help_text|safe }}</span>
                     {% endif %}
@@ -983,24 +985,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Sincronizar checkboxes dos campos dummy com a UI
+    // Sincronizar checkboxes dos campos TEAM e HOURS com os checkboxes da seção
     const teamVisible = document.getElementById('team_visible');
     const hoursVisible = document.getElementById('hours_visible');
     const showTeamField = document.querySelector('input[name="show_team"]');
     const showBusinessHoursField = document.querySelector('input[name="show_business_hours"]');
     
-    // Inicializar estado dos checkboxes dummy se houver campos reais
+    // Inicializar estado dos checkboxes
     if (teamVisible && showTeamField) {
         teamVisible.checked = showTeamField.checked;
+        // Quando o checkbox da seção muda, atualiza o campo real
         teamVisible.addEventListener('change', (e) => {
             showTeamField.checked = e.target.checked;
+            updateSectionsState();
         });
     }
     
     if (hoursVisible && showBusinessHoursField) {
         hoursVisible.checked = showBusinessHoursField.checked;
+        // Quando o checkbox da seção muda, atualiza o campo real
         hoursVisible.addEventListener('change', (e) => {
             showBusinessHoursField.checked = e.target.checked;
+            updateSectionsState();
         });
     }
     

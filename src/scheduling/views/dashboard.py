@@ -1357,28 +1357,27 @@ def branding_settings(request: HttpRequest) -> HttpResponse:
 
     if request.method == "POST":
         try:
-            # DEBUG: Ver o que está vindo no POST
-            print(f"📤 POST data recebido: {request.POST.keys()}")
-            if 'sections_config' in request.POST:
-                print(f"✅ sections_config recebido: {request.POST.get('sections_config')[:100]}")
-            else:
-                print(f"❌ sections_config NÃO está no POST!")
-            
             form = BrandingSettingsForm(request.POST, request.FILES, instance=branding, tenant=tenant)
             if form.is_valid():
-                print(f"✅ Formulário válido, salvando...")
-                form.save()
-                print(f"✅ Formulário salvo com sucesso!")
-                messages.success(request, "Configurações de cores atualizadas com sucesso!")
-                return redirect("dashboard:branding_settings")
+                try:
+                    form.save()
+                    messages.success(request, "Configurações de cores atualizadas com sucesso!")
+                    return redirect("dashboard:branding_settings")
+                except Exception as save_error:
+                    print(f"❌ Erro ao salvar o formulário: {save_error}")
+                    import traceback
+                    traceback.print_exc()
+                    messages.error(request, f"Erro ao salvar: {str(save_error)}")
             else:
-                print(f"❌ Erros no formulário: {form.errors}")
+                print(f"❌ Erros na validação do formulário:")
+                for field, errors in form.errors.items():
+                    print(f"   {field}: {errors}")
                 messages.error(request, f"Erros no formulário: {form.errors}")
         except Exception as e:
-            print(f"❌ Erro ao salvar: {str(e)}")
+            print(f"❌ Erro geral na view: {str(e)}")
             import traceback
             traceback.print_exc()
-            messages.error(request, f"Erro ao salvar: {str(e)}")
+            messages.error(request, f"Erro ao processar: {str(e)}")
     else:
         form = BrandingSettingsForm(instance=branding, tenant=tenant)
 
