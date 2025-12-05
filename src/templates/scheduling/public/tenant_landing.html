@@ -260,6 +260,37 @@
             transform: translateY(-1px);
         }
 
+        /* Secondary Button - Meus Agendamentos */
+        .header-secondary-button {
+            display: flex;
+            justify-content: center;
+            padding: 1rem 1rem 0 1rem;
+            z-index: 50;
+        }
+
+        .btn-my-bookings {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: transparent;
+            color: var(--text-muted);
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            border: 1px solid color-mix(in srgb, var(--text-light) 20%, transparent);
+            cursor: pointer;
+        }
+
+        .btn-my-bookings:hover {
+            background: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+            color: var(--text-light);
+            border-color: color-mix(in srgb, var(--brand-primary) 30%, transparent);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -860,13 +891,7 @@
 
         /* Barra de Navegação com Ícones */
         .navigation-bar {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            padding: 1.5rem 1rem;
-            background: var(--bg-dark);
-            border-bottom: 1px solid color-mix(in srgb, var(--text-light) 8%, transparent);
-            gap: 1rem;
+            display: none !important;
         }
 
         .nav-item {
@@ -1079,19 +1104,10 @@
         </a>
     </div>
 
-    <!-- Barra de Navegação com Ícones -->
-    <div class="navigation-bar">
-        <a href="#schedule" class="nav-item">
-            <div class="nav-icon">
-                <i class="fas fa-calendar"></i>
-            </div>
-            <div class="nav-label">Agendar</div>
-        </a>
-        <a href="#contact" class="nav-item">
-            <div class="nav-icon">
-                <i class="fas fa-list-check"></i>
-            </div>
-            <div class="nav-label">Meus Agendamentos</div>
+    <!-- Botão Discreto - Meus Agendamentos -->
+    <div class="header-secondary-button">
+        <a href="#contact" class="btn-my-bookings">
+            <i class="fas fa-calendar-alt"></i> Meus Agendamentos
         </a>
     </div>
 
