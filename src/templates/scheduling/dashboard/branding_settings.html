@@ -286,6 +286,7 @@
         border-radius: 6px;
         cursor: pointer;
         transition: all 0.2s;
+        font-size: 0.875rem;
     }
 
     .preview-toolbar button:hover {
@@ -295,27 +296,29 @@
 
     .preview-actions {
         display: flex;
-        gap: 1rem;
+        gap: 0.75rem;
         flex-wrap: wrap;
         margin-top: 1rem;
     }
 
     .btn-preview {
         flex: 1;
-        min-width: 200px;
-        padding: 0.75rem 1rem;
-        border-radius: 10px;
+        min-width: 100px;
+        padding: 0.6rem 0.75rem;
+        border-radius: 8px;
         border: 1px solid #e2e8f0;
         background: white;
         color: #667eea;
         font-weight: 600;
+        font-size: 0.875rem;
         cursor: pointer;
         transition: all 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
         text-decoration: none;
+        white-space: nowrap;
     }
 
     .btn-preview:hover {
@@ -326,23 +329,84 @@
     /* Layout para colocar preview na direita */
     .page-layout {
         display: grid;
-        grid-template-columns: minmax(0, 2fr) 380px;
-        gap: 1.5rem;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 2rem;
         align-items: start;
         width: 100%;
     }
 
-    .preview-section {
+    .page-layout .section-card.form-wrapper {
+        grid-column: 1;
+    }
+
+    .page-layout .section-card.preview-section {
+        grid-column: 2;
         position: sticky;
         top: 20px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+
+    .preview-section h2 {
+        margin-top: 0;
+        font-size: 1.25rem;
+    }
+
+    .live-preview-wrapper {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.75rem;
+        background: #f8fafc;
+        margin-bottom: 1rem;
+    }
+
+    .live-preview-frame {
+        position: relative;
+        width: 100%;
+        padding-top: 200%;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        background: #0f172a;
+    }
+
+    .live-preview-frame iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-radius: 10px;
+        background: #0f172a;
     }
 
     @media (max-width: 1100px) {
         .page-layout {
             grid-template-columns: 1fr;
         }
-        .preview-section {
+        
+        .page-layout .section-card.preview-section {
+            grid-column: 1;
             position: static;
+            max-height: none;
+        }
+
+        .preview-actions {
+            flex-direction: column;
+        }
+
+        .btn-preview {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-layout {
+            gap: 1rem;
+        }
+
+        .section-card.preview-section {
+            padding: 1rem;
         }
     }
 
@@ -394,169 +458,169 @@
 {% endif %}
 
 <div class="page-layout">
-<div class="section-card form-wrapper">
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
+    <div class="section-card form-wrapper">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        <!-- SEÇÃO: Cores Gerais -->
-        <div class="form-section">
-            <h3><i class="fas fa-fill-drip"></i> Cores Gerais</h3>
-            <p style="color: #64748b; margin-bottom: 1.5rem;">Defina as cores de fundo e texto do mini site.</p>
-            
-            <div class="color-row">
-                <div class="form-field">
-                    <label for="id_background_color">{{ form.background_color.label }}</label>
-                    {{ form.background_color }}
-                    {% if form.background_color.help_text %}
-                    <span class="field-help">{{ form.background_color.help_text|safe }}</span>
-                    {% endif %}
+            <!-- SEÇÃO: Cores Gerais -->
+            <div class="form-section">
+                <h3><i class="fas fa-fill-drip"></i> Cores Gerais</h3>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Defina as cores de fundo e texto do mini site.</p>
+                
+                <div class="color-row">
+                    <div class="form-field">
+                        <label for="id_background_color">{{ form.background_color.label }}</label>
+                        {{ form.background_color }}
+                        {% if form.background_color.help_text %}
+                        <span class="field-help">{{ form.background_color.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="id_text_color">{{ form.text_color.label }}</label>
+                        {{ form.text_color }}
+                        {% if form.text_color.help_text %}
+                        <span class="field-help">{{ form.text_color.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
                 </div>
+            </div>
+
+            <div class="form-divider"></div>
+
+            <!-- SEÇÃO: Botão -->
+            <div class="form-section">
+                <h3><i class="fas fa-square"></i> Botão</h3>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Personalize a cor dos botões principais.</p>
+                
+                <div class="color-row">
+                    <div class="form-field">
+                        <label for="id_button_color_primary">{{ form.button_color_primary.label }}</label>
+                        {{ form.button_color_primary }}
+                        {% if form.button_color_primary.help_text %}
+                        <span class="field-help">{{ form.button_color_primary.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="id_button_text_color">{{ form.button_text_color.label }}</label>
+                        {{ form.button_text_color }}
+                        {% if form.button_text_color.help_text %}
+                        <span class="field-help">{{ form.button_text_color.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Campos ocultos para compatibilidade -->
+                <input type="hidden" name="{{ form.button_color_secondary.name }}" id="id_button_color_secondary" value="{{ branding.button_color_secondary|default:branding.button_color_primary }}">
+                <input type="hidden" name="{{ form.use_gradient_buttons.name }}" id="id_use_gradient_buttons" value="on">
+            </div>
+
+            <div class="form-divider"></div>
+
+            <!-- SEÇÃO: Destaque -->
+            <div class="form-section">
+                <h3><i class="fas fa-highlighter"></i> Cor de Destaque</h3>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Cor usada para destacar elementos importantes.</p>
+                
+                <div class="color-row">
+                    <div class="form-field">
+                        <label for="id_highlight_color">{{ form.highlight_color.label }}</label>
+                        {{ form.highlight_color }}
+                        {% if form.highlight_color.help_text %}
+                        <span class="field-help">{{ form.highlight_color.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-divider"></div>
+
+            <!-- SEÇÃO: Imagem de Capa -->
+            <div class="form-section">
+                <h3><i class="fas fa-image"></i> Imagem de Capa</h3>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Faça upload da imagem principal do mini site.</p>
                 
                 <div class="form-field">
-                    <label for="id_text_color">{{ form.text_color.label }}</label>
-                    {{ form.text_color }}
-                    {% if form.text_color.help_text %}
-                    <span class="field-help">{{ form.text_color.help_text|safe }}</span>
+                    <label for="id_hero_image">{{ form.hero_image.label }}</label>
+                    {{ form.hero_image }}
+                    {% if form.hero_image.help_text %}
+                    <span class="field-help">{{ form.hero_image.help_text|safe }}</span>
+                    {% endif %}
+                    {% if branding.avatar_base64 or branding.hero_image %}
+                    <div class="image-preview-wrapper">
+                        <div class="image-preview-label">Imagem atual:</div>
+                        <img src="{% if branding.avatar_base64 %}{{ branding.avatar_base64 }}{% else %}{{ branding.hero_image.url }}{% endif %}" alt="Capa atual" class="image-preview-img">
+                    </div>
                     {% endif %}
                 </div>
             </div>
-        </div>
 
-        <div class="form-divider"></div>
+            <div class="form-divider"></div>
 
-        <!-- SEÇÃO: Botão -->
-        <div class="form-section">
-            <h3><i class="fas fa-square"></i> Botão</h3>
-            <p style="color: #64748b; margin-bottom: 1.5rem;">Personalize a cor dos botões principais.</p>
-            
-            <div class="color-row">
-                <div class="form-field">
-                    <label for="id_button_color_primary">{{ form.button_color_primary.label }}</label>
-                    {{ form.button_color_primary }}
-                    {% if form.button_color_primary.help_text %}
-                    <span class="field-help">{{ form.button_color_primary.help_text|safe }}</span>
-                    {% endif %}
-                </div>
+            <!-- SEÇÃO: Conteúdo -->
+            <div class="form-section">
+                <h3><i class="fas fa-align-left"></i> Conteúdo</h3>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Informações sobre sua empresa.</p>
                 
                 <div class="form-field">
-                    <label for="id_button_text_color">{{ form.button_text_color.label }}</label>
-                    {{ form.button_text_color }}
-                    {% if form.button_text_color.help_text %}
-                    <span class="field-help">{{ form.button_text_color.help_text|safe }}</span>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Campos ocultos para compatibilidade -->
-            <input type="hidden" name="{{ form.button_color_secondary.name }}" id="id_button_color_secondary" value="{{ branding.button_color_secondary|default:branding.button_color_primary }}">
-            <input type="hidden" name="{{ form.use_gradient_buttons.name }}" id="id_use_gradient_buttons" value="on">
-        </div>
-
-        <div class="form-divider"></div>
-
-        <!-- SEÇÃO: Destaque -->
-        <div class="form-section">
-            <h3><i class="fas fa-highlighter"></i> Cor de Destaque</h3>
-            <p style="color: #64748b; margin-bottom: 1.5rem;">Cor usada para destacar elementos importantes.</p>
-            
-            <div class="color-row">
-                <div class="form-field">
-                    <label for="id_highlight_color">{{ form.highlight_color.label }}</label>
-                    {{ form.highlight_color }}
-                    {% if form.highlight_color.help_text %}
-                    <span class="field-help">{{ form.highlight_color.help_text|safe }}</span>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="form-divider"></div>
-
-        <!-- SEÇÃO: Imagem de Capa -->
-        <div class="form-section">
-            <h3><i class="fas fa-image"></i> Imagem de Capa</h3>
-            <p style="color: #64748b; margin-bottom: 1.5rem;">Faça upload da imagem principal do mini site.</p>
-            
-            <div class="form-field">
-                <label for="id_hero_image">{{ form.hero_image.label }}</label>
-                {{ form.hero_image }}
-                {% if form.hero_image.help_text %}
-                <span class="field-help">{{ form.hero_image.help_text|safe }}</span>
-                {% endif %}
-                {% if branding.avatar_base64 or branding.hero_image %}
-                <div class="image-preview-wrapper">
-                    <div class="image-preview-label">Imagem atual:</div>
-                    <img src="{% if branding.avatar_base64 %}{{ branding.avatar_base64 }}{% else %}{{ branding.hero_image.url }}{% endif %}" alt="Capa atual" class="image-preview-img">
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="form-divider"></div>
-
-        <!-- SEÇÃO: Conteúdo -->
-        <div class="form-section">
-            <h3><i class="fas fa-align-left"></i> Conteúdo</h3>
-            <p style="color: #64748b; margin-bottom: 1.5rem;">Informações sobre sua empresa.</p>
-            
-            <div class="form-field">
-                <label for="id_about_us">{{ form.about_us.label }}</label>
-                {{ form.about_us }}
-                {% if form.about_us.help_text %}
-                <span class="field-help">{{ form.about_us.help_text|safe }}</span>
-                {% endif %}
-            </div>
-
-            <div class="form-field">
-                <label for="id_contact_info">{{ form.contact_info.label }}</label>
-                {{ form.contact_info }}
-                {% if form.contact_info.help_text %}
-                <span class="field-help">{{ form.contact_info.help_text|safe }}</span>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="form-divider"></div>
-
-        <!-- SEÇÃO: Redes Sociais -->
-        <div class="form-section">
-            <h3><i class="fas fa-share-nodes"></i> Redes Sociais</h3>
-            <p style="color: #64748b; margin-bottom: 1.5rem;">Links para seus perfis em redes sociais.</p>
-            
-            <div class="color-row">
-                <div class="form-field">
-                    <label for="id_instagram_url">{{ form.instagram_url.label }}</label>
-                    {{ form.instagram_url }}
-                    {% if form.instagram_url.help_text %}
-                    <span class="field-help">{{ form.instagram_url.help_text|safe }}</span>
+                    <label for="id_about_us">{{ form.about_us.label }}</label>
+                    {{ form.about_us }}
+                    {% if form.about_us.help_text %}
+                    <span class="field-help">{{ form.about_us.help_text|safe }}</span>
                     {% endif %}
                 </div>
 
                 <div class="form-field">
-                    <label for="id_facebook_url">{{ form.facebook_url.label }}</label>
-                    {{ form.facebook_url }}
-                    {% if form.facebook_url.help_text %}
-                    <span class="field-help">{{ form.facebook_url.help_text|safe }}</span>
+                    <label for="id_contact_info">{{ form.contact_info.label }}</label>
+                    {{ form.contact_info }}
+                    {% if form.contact_info.help_text %}
+                    <span class="field-help">{{ form.contact_info.help_text|safe }}</span>
                     {% endif %}
                 </div>
             </div>
-        </div>
 
-        <!-- BOTÕES DE AÇÃO -->
-        <div class="form-actions">
-            <button type="submit" class="btn-submit">
-                <i class="fas fa-save"></i> Salvar Configurações
-            </button>
-            <a href="{% url 'dashboard:index' %}" class="btn-cancel">
-                <i class="fas fa-times"></i> Cancelar
-            </a>
-        </div>
-    </form>
+            <div class="form-divider"></div>
 
-    <!-- SEÇÃO: PREVIEW -->
-    <div class="preview-section">
-        <h2><i class="fas fa-eye"></i> Preview do Mini Site</h2>
-        <p style="color: #64748b; margin-bottom: 1.5rem;">Veja como seu mini site se parece com as configurações atuais.</p>
+            <!-- SEÇÃO: Redes Sociais -->
+            <div class="form-section">
+                <h3><i class="fas fa-share-nodes"></i> Redes Sociais</h3>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Links para seus perfis em redes sociais.</p>
+                
+                <div class="color-row">
+                    <div class="form-field">
+                        <label for="id_instagram_url">{{ form.instagram_url.label }}</label>
+                        {{ form.instagram_url }}
+                        {% if form.instagram_url.help_text %}
+                        <span class="field-help">{{ form.instagram_url.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-field">
+                        <label for="id_facebook_url">{{ form.facebook_url.label }}</label>
+                        {{ form.facebook_url }}
+                        {% if form.facebook_url.help_text %}
+                        <span class="field-help">{{ form.facebook_url.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTÕES DE AÇÃO -->
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> Salvar Configurações
+                </button>
+                <a href="{% url 'dashboard:index' %}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- SEÇÃO: PREVIEW NO LADO DIREITO -->
+    <div class="section-card preview-section">
+        <h2><i class="fas fa-eye"></i> Preview</h2>
         
         <div class="preview-toolbar">
             <button type="button" id="preview-back" title="Voltar">
@@ -580,14 +644,15 @@
                     sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation-by-user-activation"
                 ></iframe>
             </div>
-            <div class="live-preview-note">
-                💡 Se o navegador bloquear o iframe, abra em uma nova aba ou habilite popups. Após salvar as cores, recarregue o preview.
-            </div>
+        </div>
+
+        <div class="live-preview-note" style="text-align: center;">
+            💡 Atualiza após salvar
         </div>
 
         <div class="preview-actions">
             <a href="{{ tenant_landing_url }}" target="_blank" rel="noopener" class="btn-preview">
-                <i class="fas fa-up-right-from-square"></i> Abrir em nova aba
+                <i class="fas fa-up-right-from-square"></i> Abrir
             </a>
             <button type="button" id="copy-preview-link" class="btn-preview" data-link="{{ tenant_landing_url }}">
                 <i class="fas fa-link"></i> Copiar link
