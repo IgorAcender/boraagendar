@@ -18,20 +18,24 @@ def get_sections_config(branding_settings) -> Dict[str, Dict]:
         ...
     }
     """
+    default_config = {
+        "about": {"visible": True, "order": 0},
+        "team": {"visible": True, "order": 1},
+        "hours": {"visible": True, "order": 2},
+        "contact": {"visible": True, "order": 3},
+        "location": {"visible": True, "order": 4},
+        "amenities": {"visible": True, "order": 5},
+        "payment_methods": {"visible": True, "order": 6},
+        "social": {"visible": True, "order": 7},
+    }
+
     if not branding_settings or not branding_settings.sections_config:
-        # Ordem padrão
-        return {
-            "about": {"visible": True, "order": 0},
-            "team": {"visible": True, "order": 1},
-            "hours": {"visible": True, "order": 2},
-            "contact": {"visible": True, "order": 3},
-            "location": {"visible": True, "order": 4},
-            "amenities": {"visible": True, "order": 5},
-            "payment_methods": {"visible": True, "order": 6},
-            "social": {"visible": True, "order": 7},
-        }
-    
-    return branding_settings.sections_config
+        return default_config
+
+    # Faz merge para garantir que novas seções ganhem defaults mesmo com config antiga
+    merged_config = default_config.copy()
+    merged_config.update(branding_settings.sections_config)
+    return merged_config
 
 
 def get_sections_order(branding_settings) -> List[str]:

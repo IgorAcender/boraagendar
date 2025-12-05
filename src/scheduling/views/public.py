@@ -6,13 +6,14 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.clickjacking import xframe_options_exempt
 
-from tenants.models import Tenant
+from tenants.models import Tenant, BrandingSettings
 from ..models import AvailabilityRule
 
 from ..forms import AvailabilitySearchForm, BookingForm
 from ..models import Booking, Professional, Service
 from ..services.availability import AvailabilityService
 from ..services.notification_dispatcher import send_booking_confirmation
+from .sections_helper import get_sections_config, get_sections_order
 
 
 @xframe_options_exempt
@@ -54,6 +55,7 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     
     # Obter configurações de branding
     branding = None
+    branding_settings = None
     try:
         branding_settings = tenant.branding_settings
         branding = {
@@ -69,7 +71,7 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
                 getattr(branding_settings, "highlight_color", branding_settings.button_color_primary)
             ),
         }
-    except:
+    except BrandingSettings.DoesNotExist:
         # Se não houver BrandingSettings, usa cores padrão
         branding = {
             "background_color": "#0F172A",
@@ -82,6 +84,9 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
             "button_hover_color": "#8090F6",
             "highlight_hover_color": "#FCC84B",
         }
+
+    sections_config = get_sections_config(branding_settings)
+    sections_order = get_sections_order(branding_settings)
     
     context = {
         "tenant": tenant,
@@ -90,6 +95,8 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         "amenities": amenities,
         "payment_methods": payment_methods,
         "branding": branding,
+        "sections_config": sections_config,
+        "sections_order": sections_order,
     }
     return render(request, "scheduling/public/tenant_landing.html", context)
 

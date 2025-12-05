@@ -1154,237 +1154,232 @@
     <!-- Content -->
     <div class="content">
         <div class="container">
-            <!-- Sobre Nós -->
-            <div class="section" id="about">
-                <h2 class="section-title">
-                    <i class="fas fa-info-circle"></i>
-                    Sobre Nós
-                </h2>
-                {% if tenant.about_us %}
-                    <p class="about-text">{{ tenant.about_us }}</p>
-                {% else %}
-                    <p class="about-text">Bem-vindo ao {{ tenant.name }}! Estamos aqui para oferecer os melhores serviços com qualidade e excelência.</p>
-                {% endif %}
-            </div>
-
-            <!-- Comodidades -->
-            {% if amenities %}
-            <div class="section">
-                <h2 class="section-title">
-                    <i class="fas fa-star"></i>
-                    Comodidades
-                </h2>
-                <div class="amenities-grid">
-                    {% for amenity in amenities %}
-                    <div class="amenity-badge">
-                        <div class="amenity-icon">
-                            {% if "WiFi" in amenity or "wifi" in amenity %}
-                                <i class="fas fa-wifi"></i>
-                            {% elif "Estacionamento" in amenity or "Parking" in amenity %}
-                                <i class="fas fa-parking"></i>
-                            {% elif "Acessibilidade" in amenity or "Accessibility" in amenity %}
-                                <i class="fas fa-wheelchair"></i>
-                            {% elif "Ar" in amenity or "AC" in amenity %}
-                                <i class="fas fa-fan"></i>
-                            {% elif "Café" in amenity or "Coffee" in amenity %}
-                                <i class="fas fa-mug-hot"></i>
-                            {% else %}
-                                <i class="fas fa-check-circle"></i>
-                            {% endif %}
-                        </div>
-                        <div class="amenity-name">{{ amenity }}</div>
+            {% for section_id in sections_order %}
+                {% if section_id == "about" %}
+                    <div class="section" id="about">
+                        <h2 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Sobre Nós
+                        </h2>
+                        {% if tenant.about_us %}
+                            <p class="about-text">{{ tenant.about_us }}</p>
+                        {% else %}
+                            <p class="about-text">Bem-vindo ao {{ tenant.name }}! Estamos aqui para oferecer os melhores serviços com qualidade e excelência.</p>
+                        {% endif %}
                     </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
 
-            <!-- Equipe -->
-            {% if professionals %}
-            <div class="section" id="team">
-                <h2 class="section-title">
-                    <i class="fas fa-users"></i>
-                    Equipe
-                </h2>
-                <div class="team-grid" style="row-gap: 2rem !important;">
-                    {% for professional in professionals %}
-                    <div class="team-member-card" 
-                         data-professional-name="{{ professional.display_name }}"
-                         data-professional-bio="{{ professional.bio|escapejs }}"
-                         data-professional-color="{{ professional.color }}"
-                         {% if professional.photo_base64 %}data-professional-photo="{{ professional.photo_base64 }}"{% elif professional.photo %}data-professional-photo="{{ professional.photo.url }}"{% endif %}>
-                        <div class="team-member-avatar" {% if professional.color %}style="background: {{ professional.color }};"{% endif %} onclick="openProfessionalModal(this)" title="Clique para ver mais informações">
-                            {% if professional.photo_base64 %}
-                                <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}">
-                            {% elif professional.photo %}
-                                <img src="{{ professional.photo.url }}" alt="{{ professional.display_name }}">
-                            {% else %}
-                                {{ professional.display_name|first|upper }}
-                            {% endif %}
-                        </div>
-                        <div class="team-member-info">
-                            <div class="team-member-name">{{ professional.display_name }}</div>
-                            {% if professional.bio %}
-                            <div class="team-member-bio">{{ professional.bio }}</div>
-                            {% endif %}
+                {% elif section_id == "amenities" and amenities %}
+                    <div class="section">
+                        <h2 class="section-title">
+                            <i class="fas fa-star"></i>
+                            Comodidades
+                        </h2>
+                        <div class="amenities-grid">
+                            {% for amenity in amenities %}
+                            <div class="amenity-badge">
+                                <div class="amenity-icon">
+                                    {% if "WiFi" in amenity or "wifi" in amenity %}
+                                        <i class="fas fa-wifi"></i>
+                                    {% elif "Estacionamento" in amenity or "Parking" in amenity %}
+                                        <i class="fas fa-parking"></i>
+                                    {% elif "Acessibilidade" in amenity or "Accessibility" in amenity %}
+                                        <i class="fas fa-wheelchair"></i>
+                                    {% elif "Ar" in amenity or "AC" in amenity %}
+                                        <i class="fas fa-fan"></i>
+                                    {% elif "Café" in amenity or "Coffee" in amenity %}
+                                        <i class="fas fa-mug-hot"></i>
+                                    {% else %}
+                                        <i class="fas fa-check-circle"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="amenity-name">{{ amenity }}</div>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
 
-            <!-- Horários -->
-            <div class="section">
-                <h2 class="section-title">
-                    <i class="fas fa-clock"></i>
-                    Horário de Funcionamento
-                </h2>
-                <div class="hours-container">
-                    {% if business_hours %}
-                        {% for hour in business_hours %}
-                        <div class="hour-item">
-                            <span class="day-name">{{ hour.day_name }}</span>
-                            <span class="hour-time">
-                                {{ hour.start_time|time:"H:i" }} - {{ hour.end_time|time:"H:i" }}
-                                {% if hour.break_start %}
-                                    <span style="font-size: 0.85rem; color: var(--text-muted);">
-                                        (intervalo: {{ hour.break_start|time:"H:i" }} - {{ hour.break_end|time:"H:i" }})
+                {% elif section_id == "team" and professionals %}
+                    <div class="section" id="team">
+                        <h2 class="section-title">
+                            <i class="fas fa-users"></i>
+                            Equipe
+                        </h2>
+                        <div class="team-grid" style="row-gap: 2rem !important;">
+                            {% for professional in professionals %}
+                            <div class="team-member-card" 
+                                 data-professional-name="{{ professional.display_name }}"
+                                 data-professional-bio="{{ professional.bio|escapejs }}"
+                                 data-professional-color="{{ professional.color }}"
+                                 {% if professional.photo_base64 %}data-professional-photo="{{ professional.photo_base64 }}"{% elif professional.photo %}data-professional-photo="{{ professional.photo.url }}"{% endif %}>
+                                <div class="team-member-avatar" {% if professional.color %}style="background: {{ professional.color }};"{% endif %} onclick="openProfessionalModal(this)" title="Clique para ver mais informações">
+                                    {% if professional.photo_base64 %}
+                                        <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}">
+                                    {% elif professional.photo %}
+                                        <img src="{{ professional.photo.url }}" alt="{{ professional.display_name }}">
+                                    {% else %}
+                                        {{ professional.display_name|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <div class="team-member-info">
+                                    <div class="team-member-name">{{ professional.display_name }}</div>
+                                    {% if professional.bio %}
+                                    <div class="team-member-bio">{{ professional.bio }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                {% elif section_id == "hours" %}
+                    <div class="section">
+                        <h2 class="section-title">
+                            <i class="fas fa-clock"></i>
+                            Horário de Funcionamento
+                        </h2>
+                        <div class="hours-container">
+                            {% if business_hours %}
+                                {% for hour in business_hours %}
+                                <div class="hour-item">
+                                    <span class="day-name">{{ hour.day_name }}</span>
+                                    <span class="hour-time">
+                                        {{ hour.start_time|time:"H:i" }} - {{ hour.end_time|time:"H:i" }}
+                                        {% if hour.break_start %}
+                                            <span style="font-size: 0.85rem; color: var(--text-muted);">
+                                                (intervalo: {{ hour.break_start|time:"H:i" }} - {{ hour.break_end|time:"H:i" }})
+                                            </span>
+                                        {% endif %}
                                     </span>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p style="color: var(--text-muted); text-align: center; padding: 1rem;">
+                                    Horários não configurados
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                {% elif section_id == "contact" %}
+                    <div class="section" id="contact">
+                        <h2 class="section-title">
+                            <i class="fas fa-phone"></i>
+                            Contato
+                        </h2>
+                        <div class="contact-grid">
+                            {% if tenant.contact_info %}
+                            <div class="contact-item" style="grid-column: span 2;">
+                                <div class="contact-icon">
+                                    <i class="fas fa-address-book"></i>
+                                </div>
+                                <div class="contact-label">Contatos</div>
+                                <div class="contact-value">
+                                    {{ tenant.contact_info|linebreaksbr }}
+                                </div>
+                            </div>
+                            {% else %}
+                                {% if tenant.phone_number %}
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <div class="contact-label">Telefone</div>
+                                    <div class="contact-value">
+                                        <a href="tel:{{ tenant.phone_number }}">{{ tenant.phone_number }}</a>
+                                    </div>
+                                </div>
                                 {% endif %}
-                            </span>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p style="color: var(--text-muted); text-align: center; padding: 1rem;">
-                            Horários não configurados
-                        </p>
-                    {% endif %}
-                </div>
-            </div>
 
-            <!-- Contato -->
-            <div class="section" id="contact">
-                <h2 class="section-title">
-                    <i class="fas fa-phone"></i>
-                    Contato
-                </h2>
-                <div class="contact-grid">
-                    {% if tenant.contact_info %}
-                    <div class="contact-item" style="grid-column: span 2;">
-                        <div class="contact-icon">
-                            <i class="fas fa-address-book"></i>
-                        </div>
-                        <div class="contact-label">Contatos</div>
-                        <div class="contact-value">
-                            {{ tenant.contact_info|linebreaksbr }}
+                                {% if tenant.whatsapp_number %}
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </div>
+                                    <div class="contact-label">WhatsApp</div>
+                                    <div class="contact-value">
+                                        <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank">{{ tenant.whatsapp_number }}</a>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {% if tenant.email %}
+                                <div class="contact-item">
+                                    <div class="contact-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="contact-label">E-mail</div>
+                                    <div class="contact-value">
+                                        <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endif %}
                         </div>
                     </div>
-                    {% else %}
-                        {% if tenant.phone_number %}
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-phone"></i>
-                            </div>
-                            <div class="contact-label">Telefone</div>
-                            <div class="contact-value">
-                                <a href="tel:{{ tenant.phone_number }}">{{ tenant.phone_number }}</a>
-                            </div>
-                        </div>
-                        {% endif %}
 
-                        {% if tenant.whatsapp_number %}
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fab fa-whatsapp"></i>
+                {% elif section_id == "location" and tenant.address %}
+                    <div class="section" id="location">
+                        <h2 class="section-title">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Endereço
+                        </h2>
+                        <div class="address-card">
+                            <div class="address-line">
+                                {{ tenant.address }}{% if tenant.neighborhood %}, {{ tenant.neighborhood }}{% endif %}
                             </div>
-                            <div class="contact-label">WhatsApp</div>
-                            <div class="contact-value">
-                                <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank">{{ tenant.whatsapp_number }}</a>
+                            {% if tenant.city or tenant.state or tenant.zip_code %}
+                            <div class="address-line">
+                                {% if tenant.city %}{{ tenant.city }}{% endif %}{% if tenant.state %} - {{ tenant.state }}{% endif %}
+                                {% if tenant.zip_code %}<br>CEP: {{ tenant.zip_code }}{% endif %}
                             </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
-
-                        {% if tenant.email %}
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="contact-label">E-mail</div>
-                            <div class="contact-value">
-                                <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a>
-                            </div>
-                        </div>
-                        {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Endereço -->
-            {% if tenant.address %}
-            <div class="section" id="location">
-                <h2 class="section-title">
-                    <i class="fas fa-map-marker-alt"></i>
-                    Endereço
-                </h2>
-                <div class="address-card">
-                    <div class="address-line">
-                        {{ tenant.address }}{% if tenant.neighborhood %}, {{ tenant.neighborhood }}{% endif %}
                     </div>
-                    {% if tenant.city or tenant.state or tenant.zip_code %}
-                    <div class="address-line">
-                        {% if tenant.city %}{{ tenant.city }}{% endif %}{% if tenant.state %} - {{ tenant.state }}{% endif %}
-                        {% if tenant.zip_code %}<br>CEP: {{ tenant.zip_code }}{% endif %}
+
+                {% elif section_id == "payment_methods" and payment_methods %}
+                    <div class="section">
+                        <h2 class="section-title">
+                            <i class="fas fa-credit-card"></i>
+                            Formas de Pagamento
+                        </h2>
+                        <div class="payment-grid">
+                            {% for method in payment_methods %}
+                            <div class="payment-badge">{{ method }}</div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
 
-            <!-- Formas de Pagamento -->
-            {% if payment_methods %}
-            <div class="section">
-                <h2 class="section-title">
-                    <i class="fas fa-credit-card"></i>
-                    Formas de Pagamento
-                </h2>
-                <div class="payment-grid">
-                    {% for method in payment_methods %}
-                    <div class="payment-badge">{{ method }}</div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
+                {% elif section_id == "social" and (tenant.instagram_url or tenant.facebook_url or tenant.whatsapp_number) %}
+                    <div class="section">
+                        <h2 class="section-title">
+                            <i class="fas fa-share-alt"></i>
+                            Redes Sociais
+                        </h2>
+                        <div class="social-links">
+                            {% if tenant.instagram_url %}
+                            <a href="{{ tenant.instagram_url }}" target="_blank" class="social-link">
+                                <i class="fab fa-instagram social-icon"></i>
+                                <span>Instagram</span>
+                            </a>
+                            {% endif %}
 
-            <!-- Redes Sociais -->
-            <div class="section">
-                <h2 class="section-title">
-                    <i class="fas fa-share-alt"></i>
-                    Redes Sociais
-                </h2>
-                <div class="social-links">
-                    {% if tenant.instagram_url %}
-                    <a href="{{ tenant.instagram_url }}" target="_blank" class="social-link">
-                        <i class="fab fa-instagram social-icon"></i>
-                        <span>Instagram</span>
-                    </a>
-                    {% endif %}
+                            {% if tenant.facebook_url %}
+                            <a href="{{ tenant.facebook_url }}" target="_blank" class="social-link">
+                                <i class="fab fa-facebook social-icon"></i>
+                                <span>Facebook</span>
+                            </a>
+                            {% endif %}
 
-                    {% if tenant.facebook_url %}
-                    <a href="{{ tenant.facebook_url }}" target="_blank" class="social-link">
-                        <i class="fab fa-facebook social-icon"></i>
-                        <span>Facebook</span>
-                    </a>
-                    {% endif %}
-
-                    {% if tenant.whatsapp_number %}
-                    <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank" class="social-link">
-                        <i class="fab fa-whatsapp social-icon"></i>
-                        <span>WhatsApp</span>
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
+                            {% if tenant.whatsapp_number %}
+                            <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank" class="social-link">
+                                <i class="fab fa-whatsapp social-icon"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 
