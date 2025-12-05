@@ -1374,5 +1374,10 @@ def branding_settings(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         "scheduling/dashboard/branding_settings.html",
-        {"tenant": tenant, "form": form, "branding": branding},
+        {
+            "tenant": tenant,
+            "form": form,
+            "branding": branding,
+            "tenant_landing_url": request.build_absolute_uri(f"/{tenant.slug}/"),
+        },
     )
