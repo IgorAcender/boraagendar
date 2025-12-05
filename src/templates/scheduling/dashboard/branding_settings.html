@@ -694,15 +694,15 @@
 
             <div class="form-divider"></div>
 
-            <!-- SEÇÃO: Conteúdo -->
+            <!-- SEÇÃO: Conteúdo - 5 Seções Reordináveis -->
             <div class="form-section">
-                <h3><i class="fas fa-align-left"></i> Conteúdo</h3>
-                <p style="color: #64748b; margin-bottom: 1.5rem;">Informações sobre sua empresa.</p>
+                <h3><i class="fas fa-align-left"></i> Conteúdo do Mini Site</h3>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Organize as seções que aparecerão no seu mini site. Use as setas para reordenar.</p>
                 
-                <!-- Campo do Sobre Nós com controles de ordem -->
+                <!-- 1. SOBRE NÓS -->
                 <div class="form-field section-field" data-section-id="about">
                     <div class="section-field-header">
-                        <label for="id_about_us">{{ form.about_us.label }}</label>
+                        <label for="id_about_us">SOBRE NÓS</label>
                         <div class="order-controls">
                             <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" checked>
                             <button type="button" class="btn-section-up" title="Mover para cima">
@@ -719,10 +719,58 @@
                     {% endif %}
                 </div>
 
-                <!-- Campo de Contatos com controles de ordem -->
+                <!-- 2. EQUIPE -->
+                <div class="form-field section-field" data-section-id="team">
+                    <div class="section-field-header">
+                        <label for="id_show_team">EQUIPE</label>
+                        <div class="order-controls">
+                            <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" id="team_visible">
+                            <button type="button" class="btn-section-up" title="Mover para cima">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button type="button" class="btn-section-down" title="Mover para baixo">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="padding: 12px 0; color: #94a3b8; font-size: 0.95rem;">
+                        <p><i class="fas fa-info-circle"></i> Exibe os membros da sua equipe no mini site.</p>
+                        <p style="margin-top: 8px;">Para gerenciar a equipe, acesse a página de Membros.</p>
+                    </div>
+                    <input type="hidden" name="show_team_dummy" id="id_show_team" value="0">
+                    {% if form.show_team.help_text %}
+                    <span class="field-help">{{ form.show_team.help_text|safe }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- 3. HORÁRIO DE FUNCIONAMENTO -->
+                <div class="form-field section-field" data-section-id="hours">
+                    <div class="section-field-header">
+                        <label for="id_show_business_hours">HORÁRIO DE FUNCIONAMENTO</label>
+                        <div class="order-controls">
+                            <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" id="hours_visible">
+                            <button type="button" class="btn-section-up" title="Mover para cima">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button type="button" class="btn-section-down" title="Mover para baixo">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="padding: 12px 0; color: #94a3b8; font-size: 0.95rem;">
+                        <p><i class="fas fa-info-circle"></i> Exibe os horários de funcionamento no mini site.</p>
+                        <p style="margin-top: 8px;">Configure os horários na página de Horários de Funcionamento.</p>
+                    </div>
+                    <input type="hidden" name="show_business_hours_dummy" id="id_show_business_hours" value="0">
+                    {% if form.show_business_hours.help_text %}
+                    <span class="field-help">{{ form.show_business_hours.help_text|safe }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- 4. CONTATO -->
                 <div class="form-field section-field" data-section-id="contact">
                     <div class="section-field-header">
-                        <label for="id_contact_info">{{ form.contact_info.label }}</label>
+                        <label for="id_contact_info">CONTATO</label>
                         <div class="order-controls">
                             <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" checked>
                             <button type="button" class="btn-section-up" title="Mover para cima">
@@ -738,19 +786,13 @@
                     <span class="field-help">{{ form.contact_info.help_text|safe }}</span>
                     {% endif %}
                 </div>
-            </div>
 
-            <div class="form-divider"></div>
-            <div class="form-section">
-                <h3><i class="fas fa-share-nodes"></i> Redes Sociais</h3>
-                <p style="color: #64748b; margin-bottom: 1.5rem;">Links para seus perfis em redes sociais.</p>
-                
-                <!-- Campo Instagram com controles de ordem -->
-                <div class="form-field section-field" data-section-id="social_instagram">
+                <!-- 5. REDES SOCIAIS -->
+                <div class="form-field section-field" data-section-id="social">
                     <div class="section-field-header">
-                        <label for="id_instagram_url">{{ form.instagram_url.label }}</label>
+                        <label>REDES SOCIAIS</label>
                         <div class="order-controls">
-                            <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" checked>
+                            <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" checked id="social_visible">
                             <button type="button" class="btn-section-up" title="Mover para cima">
                                 <i class="fas fa-arrow-up"></i>
                             </button>
@@ -759,30 +801,28 @@
                             </button>
                         </div>
                     </div>
-                    {{ form.instagram_url }}
-                    {% if form.instagram_url.help_text %}
-                    <span class="field-help">{{ form.instagram_url.help_text|safe }}</span>
-                    {% endif %}
-                </div>
-
-                <!-- Campo Facebook com controles de ordem -->
-                <div class="form-field section-field" data-section-id="social_facebook">
-                    <div class="section-field-header">
-                        <label for="id_facebook_url">{{ form.facebook_url.label }}</label>
-                        <div class="order-controls">
-                            <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" checked>
-                            <button type="button" class="btn-section-up" title="Mover para cima">
-                                <i class="fas fa-arrow-up"></i>
-                            </button>
-                            <button type="button" class="btn-section-down" title="Mover para baixo">
-                                <i class="fas fa-arrow-down"></i>
-                            </button>
-                        </div>
+                    
+                    <!-- Instagram -->
+                    <div style="margin-bottom: 1rem;">
+                        <label for="id_instagram_url" style="display: block; font-size: 0.95rem; color: #94a3b8; margin-bottom: 8px;">
+                            <i class="fab fa-instagram"></i> {{ form.instagram_url.label }}
+                        </label>
+                        {{ form.instagram_url }}
+                        {% if form.instagram_url.help_text %}
+                        <span class="field-help">{{ form.instagram_url.help_text|safe }}</span>
+                        {% endif %}
                     </div>
-                    {{ form.facebook_url }}
-                    {% if form.facebook_url.help_text %}
-                    <span class="field-help">{{ form.facebook_url.help_text|safe }}</span>
-                    {% endif %}
+
+                    <!-- Facebook -->
+                    <div>
+                        <label for="id_facebook_url" style="display: block; font-size: 0.95rem; color: #94a3b8; margin-bottom: 8px;">
+                            <i class="fab fa-facebook"></i> {{ form.facebook_url.label }}
+                        </label>
+                        {{ form.facebook_url }}
+                        {% if form.facebook_url.help_text %}
+                        <span class="field-help">{{ form.facebook_url.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
@@ -915,6 +955,27 @@ document.addEventListener('DOMContentLoaded', updateSecondaryColor);
 // Inicializa controles de seções
 document.addEventListener('DOMContentLoaded', function() {
     const sectionFields = document.querySelectorAll('.section-field');
+    
+    // Sincronizar checkboxes dos campos dummy com a UI
+    const teamVisible = document.getElementById('team_visible');
+    const hoursVisible = document.getElementById('hours_visible');
+    const showTeamField = document.querySelector('input[name="show_team"]');
+    const showBusinessHoursField = document.querySelector('input[name="show_business_hours"]');
+    
+    // Inicializar estado dos checkboxes dummy se houver campos reais
+    if (teamVisible && showTeamField) {
+        teamVisible.checked = showTeamField.checked;
+        teamVisible.addEventListener('change', (e) => {
+            showTeamField.checked = e.target.checked;
+        });
+    }
+    
+    if (hoursVisible && showBusinessHoursField) {
+        hoursVisible.checked = showBusinessHoursField.checked;
+        hoursVisible.addEventListener('change', (e) => {
+            showBusinessHoursField.checked = e.target.checked;
+        });
+    }
     
     sectionFields.forEach(field => {
         const upBtn = field.querySelector('.btn-section-up');

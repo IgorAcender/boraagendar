@@ -183,6 +183,18 @@ class BrandingSettingsForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 2, "placeholder": "Telefone, WhatsApp, e-mail..."}),
         help_text="Informações de contato exibidas no mini site."
     )
+    show_team = forms.BooleanField(
+        label="Equipe",
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        help_text="Mostrar membros da equipe no mini site."
+    )
+    show_business_hours = forms.BooleanField(
+        label="Horário de Funcionamento",
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        help_text="Mostrar horários de funcionamento no mini site."
+    )
     instagram_url = forms.URLField(
         label="Instagram (mini site)",
         required=False,
@@ -204,6 +216,13 @@ class BrandingSettingsForm(forms.ModelForm):
         self.fields["contact_info"].initial = tenant.contact_info
         self.fields["instagram_url"].initial = tenant.instagram_url
         self.fields["facebook_url"].initial = tenant.facebook_url
+        
+        # Inicializar campos booleanos para equipe e horários
+        # Estes são apenas campos dummy para controle na UI - não precisam estar no modelo
+        sections_config = self.instance.sections_config if hasattr(self.instance, 'sections_config') else {}
+        self.fields["show_team"].initial = sections_config.get("team", {}).get("visible", True)
+        self.fields["show_business_hours"].initial = sections_config.get("hours", {}).get("visible", True)
+        
         # Garante que destaque tem valor inicial e não bloqueia o submit
         self.fields["highlight_color"].required = False
         if not self.instance.highlight_color:
@@ -222,6 +241,8 @@ class BrandingSettingsForm(forms.ModelForm):
             "sections_config",
             "hero_image",  # campo extra (não no modelo)
             "about_us",    # campo extra (não no modelo)
+            "show_team",   # campo extra (não no modelo)
+            "show_business_hours",   # campo extra (não no modelo)
             "contact_info",  # campo extra (não no modelo)
             "instagram_url",
             "facebook_url",
@@ -236,6 +257,8 @@ class BrandingSettingsForm(forms.ModelForm):
             "highlight_color": "Cor de Destaque",
             "hero_image": "Foto de capa / hero",
             "about_us": "Sobre nós (mini site)",
+            "show_team": "Equipe (mini site)",
+            "show_business_hours": "Horário de Funcionamento (mini site)",
             "contact_info": "Contatos (mini site)",
             "instagram_url": "Instagram (mini site)",
             "facebook_url": "Facebook (mini site)",
@@ -260,6 +283,8 @@ class BrandingSettingsForm(forms.ModelForm):
             "highlight_color": "Cor para destaque (textos especiais, ícones, contornos)",
             "hero_image": "Selecione uma imagem para o topo do mini site",
             "about_us": "Texto exibido na seção Sobre nós do mini site",
+            "show_team": "Mostrar membros da equipe no mini site",
+            "show_business_hours": "Mostrar horários de funcionamento no mini site",
             "contact_info": "Telefone/WhatsApp/e-mail exibidos na seção de contato do mini site",
             "instagram_url": "Link para Instagram (opcional)",
             "facebook_url": "Link para Facebook (opcional)",
