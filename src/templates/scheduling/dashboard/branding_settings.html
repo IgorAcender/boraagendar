@@ -150,6 +150,37 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
+    /* Layout lado a lado para upload e miniatura */
+    .image-upload-row {
+        display: grid;
+        grid-template-columns: 1fr 250px;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .image-upload-field {
+        margin-bottom: 0;
+    }
+
+    .image-preview-box {
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+    .image-thumbnail {
+        width: 100%;
+        max-width: 200px;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
     .form-divider {
         height: 1px;
         background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
@@ -402,6 +433,10 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
+        .image-upload-row {
+            grid-template-columns: 1fr;
+        }
+
         .preview-actions {
             flex-direction: column;
         }
@@ -421,6 +456,10 @@
         }
 
         .color-row {
+            grid-template-columns: 1fr;
+        }
+
+        .image-upload-row {
             grid-template-columns: 1fr;
         }
     }
@@ -526,18 +565,21 @@
             <!-- SEÇÃO: Imagem de Capa (antes era Destaque, removido) -->
             <div class="form-section">
                 <h3><i class="fas fa-image"></i> Imagem de Capa</h3>
-                <p style="color: #64748b; margin-bottom: 1.5rem;">Faça upload da imagem principal do mini site.</p>
+                <p style="color: #64748b; margin-bottom: 1rem;">Faça upload da imagem principal do mini site.</p>
                 
-                <div class="form-field">
-                    <label for="id_hero_image">{{ form.hero_image.label }}</label>
-                    {{ form.hero_image }}
-                    {% if form.hero_image.help_text %}
-                    <span class="field-help">{{ form.hero_image.help_text|safe }}</span>
-                    {% endif %}
+                <div class="image-upload-row">
+                    <div class="form-field image-upload-field">
+                        <label for="id_hero_image">{{ form.hero_image.label }}</label>
+                        {{ form.hero_image }}
+                        {% if form.hero_image.help_text %}
+                        <span class="field-help">{{ form.hero_image.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
+
                     {% if branding.avatar_base64 or branding.hero_image %}
-                    <div class="image-preview-wrapper">
-                        <div class="image-preview-label">Imagem atual:</div>
-                        <img src="{% if branding.avatar_base64 %}{{ branding.avatar_base64 }}{% else %}{{ branding.hero_image.url }}{% endif %}" alt="Capa atual" class="image-preview-img">
+                    <div class="image-preview-box">
+                        <div class="image-preview-label">Miniatura atual:</div>
+                        <img src="{% if branding.avatar_base64 %}{{ branding.avatar_base64 }}{% else %}{{ branding.hero_image.url }}{% endif %}" alt="Capa atual" class="image-thumbnail">
                     </div>
                     {% endif %}
                 </div>
