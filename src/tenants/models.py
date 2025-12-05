@@ -153,6 +153,14 @@ class BrandingSettings(models.Model):
         default=True,
         help_text="Se ativado, botões usarão gradiente com as duas cores. Se desativado, usa apenas a cor primária."
     )
+
+    # Cor de destaque
+    highlight_color = models.CharField(
+        "Cor de Destaque",
+        max_length=7,
+        default="#FBBF24",
+        help_text="Cor para textos em destaque, ícones destacados, contornos especiais"
+    )
     
     # Cor de texto dos botões
     button_text_color = models.CharField(
