@@ -94,6 +94,7 @@ def tenant_landing(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     return render(request, "scheduling/public/tenant_landing.html", context)
 
 
+@xframe_options_exempt
 def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
     
@@ -205,6 +206,7 @@ def booking_start(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     return render(request, "scheduling/public/booking_start.html", context)
 
 
+@xframe_options_exempt
 def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
     
@@ -418,6 +420,7 @@ def booking_confirm(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         raise
 
 
+@xframe_options_exempt
 def booking_success(request: HttpRequest, tenant_slug: str) -> HttpResponse:
     tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
     
