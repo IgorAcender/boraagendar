@@ -46,6 +46,7 @@
             border-bottom: 1px solid color-mix(in srgb, var(--brand-primary) 20%, transparent);
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 0 1rem;
             z-index: 100;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
@@ -57,6 +58,28 @@
             color: var(--text-light);
             margin: 0;
             padding: 0;
+        }
+
+        .fixed-header-bar .menu-icon {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .fixed-header-bar .menu-icon:hover {
+            color: var(--brand-primary);
+            transform: scale(1.1);
+        }
+
+        .fixed-header-bar .menu-icon:active {
+            transform: scale(0.95);
         }
 
         /* Adicionar espaço no topo do body para a barra fixa */
@@ -1086,6 +1109,9 @@
     <!-- Fixed Header Bar -->
     <div class="fixed-header-bar">
         <h2 class="salon-name">{{ tenant.name }}</h2>
+        <button class="menu-icon" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
     </div>
 
     <!-- Header -->
