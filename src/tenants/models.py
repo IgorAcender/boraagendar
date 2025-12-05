@@ -1,4 +1,4 @@
-from django.conf import settings
+imagem 2from django.conf import settings
 from django.db import models
 
 

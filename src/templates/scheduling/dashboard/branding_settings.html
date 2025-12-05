@@ -3,270 +3,576 @@
 
 {% block title %}Configurações de Marca{% endblock %}
 
+{% block extra_head %}
+<style>
+    .hero-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .hero-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .hero-header p {
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .section-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(15px);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    }
+
+    .form-wrapper {
+        max-width: 900px;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section h3 {
+        margin: 0 0 1.5rem 0;
+        font-size: 1.25rem;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .form-section h3 i {
+        color: #667eea;
+    }
+
+    .color-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-field {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-field label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+        font-size: 0.9375rem;
+    }
+
+    .form-field input[type="color"] {
+        width: 100%;
+        height: 50px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+
+    .form-field input[type="color"]:hover {
+        border-color: #667eea;
+    }
+
+    .form-field input[type="text"],
+    .form-field input[type="url"],
+    .form-field textarea,
+    .form-field input[type="file"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-family: inherit;
+        transition: border-color 0.2s;
+        font-size: 0.9375rem;
+    }
+
+    .form-field input[type="text"]:focus,
+    .form-field input[type="url"]:focus,
+    .form-field textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-field textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .field-help {
+        display: block;
+        color: #64748b;
+        font-size: 0.8125rem;
+        margin-top: 0.5rem;
+    }
+
+    .image-preview-wrapper {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 10px;
+    }
+
+    .image-preview-label {
+        font-size: 0.8125rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    .image-preview-img {
+        max-width: 140px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .form-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+        margin: 2rem 0;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-cancel {
+        background: white;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-cancel:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .alert-message {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-message.success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
+    }
+
+    .alert-message.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+    }
+
+    .preview-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .preview-section h2 {
+        font-size: 1.5rem;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .preview-section h2 i {
+        color: #667eea;
+    }
+
+    .live-preview-wrapper {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.75rem;
+        background: #f8fafc;
+        max-width: 420px;
+        margin: 0 auto 1rem;
+    }
+
+    .live-preview-frame {
+        position: relative;
+        width: 100%;
+        padding-top: 200%;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        background: #0f172a;
+    }
+
+    .live-preview-frame iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-radius: 10px;
+        background: #0f172a;
+    }
+
+    .live-preview-note {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-top: 0.75rem;
+    }
+
+    .preview-toolbar {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .preview-toolbar button {
+        background: white;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .preview-toolbar button:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .preview-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .btn-preview {
+        flex: 1;
+        min-width: 200px;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: #667eea;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-preview:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    @media (max-width: 768px) {
+        .hero-header {
+            padding: 1.5rem;
+        }
+
+        .hero-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .section-card {
+            padding: 1.5rem;
+        }
+
+        .color-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-submit,
+        .btn-cancel {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5 mb-5">
-    <div class="branding-layout">
-        <!-- Coluna de configurações -->
-        <div class="branding-form">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">
-                        <i class="fas fa-palette"></i> Configurações de Marca
-                    </h3>
+<div class="hero-header">
+    <h1><i class="fas fa-palette"></i> Configurações de Marca</h1>
+    <p>Personalize as cores do seu mini site. Essas configurações afetam como o site aparece para seus clientes.</p>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="section-card">
+    <div class="alert-message {% if message.tags %}{{ message.tags }}{% else %}success{% endif %}">
+        {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>{% else %}<i class="fas fa-exclamation-triangle"></i>{% endif %}
+        <span>{{ message }}</span>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="section-card form-wrapper">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- SEÇÃO: Cores Gerais -->
+        <div class="form-section">
+            <h3><i class="fas fa-fill-drip"></i> Cores Gerais</h3>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Defina as cores de fundo e texto do mini site.</p>
+            
+            <div class="color-row">
+                <div class="form-field">
+                    <label for="id_background_color">{{ form.background_color.label }}</label>
+                    {{ form.background_color }}
+                    {% if form.background_color.help_text %}
+                    <span class="field-help">{{ form.background_color.help_text|safe }}</span>
+                    {% endif %}
                 </div>
-
-                <div class="card-body p-4">
-                    <p class="text-muted mb-4">
-                        Personalize as cores do seu mini site. Essas configurações afetam como o site aparece para seus clientes.
-                    </p>
-
-                    <form method="post" class="needs-validation" novalidate enctype="multipart/form-data">
-                        {% csrf_token %}
-
-                        <!-- Cores Gerais -->
-                        <div class="mb-4">
-                            <h5 class="mb-3">
-                                <i class="fas fa-fill-drip"></i> Cores Gerais
-                            </h5>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="id_background_color" class="form-label">
-                                            {{ form.background_color.label }}
-                                        </label>
-                                        <div class="input-group">
-                                            {{ form.background_color }}
-                                            <span class="input-group-text" id="bg-preview" style="background-color: {{ branding.background_color }}; width: 50px; border-radius: 4px;"></span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.background_color.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="id_text_color" class="form-label">
-                                            {{ form.text_color.label }}
-                                        </label>
-                                        <div class="input-group">
-                                            {{ form.text_color }}
-                                            <span class="input-group-text" id="text-preview" style="background-color: {{ branding.text_color }}; width: 50px; border-radius: 4px;"></span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.text_color.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <!-- Botão -->
-                        <div class="mb-4">
-                            <h5 class="mb-3">
-                                <i class="fas fa-square"></i> Botão
-                            </h5>
-                            <div class="row mb-3">
-                                <div class="col-md-6 mb-3">
-                                    <div class="form-group">
-                                        <label for="id_button_color_primary" class="form-label">
-                                            {{ form.button_color_primary.label }}
-                                        </label>
-                                        <div class="input-group">
-                                            {{ form.button_color_primary }}
-                                            <span class="input-group-text" id="btn-primary-preview" style="background-color: {{ branding.button_color_primary }}; width: 50px; border-radius: 4px;"></span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.button_color_primary.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="form-group">
-                                        <label for="id_button_text_color" class="form-label">
-                                            {{ form.button_text_color.label }}
-                                        </label>
-                                        <div class="input-group">
-                                            {{ form.button_text_color }}
-                                            <span class="input-group-text" id="btn-text-preview" style="background-color: {{ branding.button_text_color }}; width: 50px; border-radius: 4px;"></span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.button_text_color.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Campos ocultos para manter compatibilidade com o modelo -->
-                            <input type="hidden" name="{{ form.button_color_secondary.name }}" id="id_button_color_secondary" value="{{ branding.button_color_secondary|default:branding.button_color_primary }}">
-                            <input type="hidden" name="{{ form.use_gradient_buttons.name }}" id="id_use_gradient_buttons" value="on">
-                        </div>
-
-                        <hr>
-
-                        <!-- Conteúdo e Destaque -->
-                        <div class="mb-4">
-                            <h5 class="mb-3">
-                                <i class="fas fa-highlighter"></i> Conteúdo e Destaque
-                            </h5>
-                            <div class="row gy-3">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="id_highlight_color" class="form-label">
-                                            {{ form.highlight_color.label }}
-                                        </label>
-                                        <div class="input-group">
-                                            {{ form.highlight_color }}
-                                            <span class="input-group-text" id="highlight-preview" style="background-color: {{ branding.highlight_color|default:'#FBBF24' }}; width: 50px; border-radius: 4px;"></span>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.highlight_color.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="id_hero_image" class="form-label">
-                                            {{ form.hero_image.label }}
-                                        </label>
-                                        {{ form.hero_image }}
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.hero_image.help_text }}
-                                        </small>
-                                        {% if tenant.avatar_base64 or tenant.avatar %}
-                                        <div class="mt-2">
-                                            <div class="small text-muted">Atual:</div>
-                                            <img src="{% if tenant.avatar_base64 %}{{ tenant.avatar_base64 }}{% else %}{{ tenant.avatar.url }}{% endif %}" alt="Capa atual" style="max-width: 140px; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label for="id_about_us" class="form-label">
-                                            {{ form.about_us.label }}
-                                        </label>
-                                        {{ form.about_us }}
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.about_us.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label for="id_contact_info" class="form-label">
-                                            {{ form.contact_info.label }}
-                                        </label>
-                                        {{ form.contact_info }}
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.contact_info.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="id_instagram_url" class="form-label">
-                                            {{ form.instagram_url.label }}
-                                        </label>
-                                        {{ form.instagram_url }}
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.instagram_url.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="id_facebook_url" class="form-label">
-                                            {{ form.facebook_url.label }}
-                                        </label>
-                                        {{ form.facebook_url }}
-                                        <small class="text-muted d-block mt-1">
-                                            {{ form.facebook_url.help_text }}
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <!-- Botões -->
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Salvar Configurações
-                            </button>
-                            <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-times"></i> Cancelar
-                            </a>
-                        </div>
-                    </form>
+                
+                <div class="form-field">
+                    <label for="id_text_color">{{ form.text_color.label }}</label>
+                    {{ form.text_color }}
+                    {% if form.text_color.help_text %}
+                    <span class="field-help">{{ form.text_color.help_text|safe }}</span>
+                    {% endif %}
                 </div>
             </div>
-
-            {% if messages %}
-            <div class="mt-3">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
         </div>
 
-        <!-- Coluna de preview -->
-        <div class="branding-preview">
-            <div class="card shadow-sm preview-card">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0 d-flex align-items-center gap-2">
-                        <i class="fas fa-eye"></i> Preview do mini site
-                    </h5>
+        <div class="form-divider"></div>
+
+        <!-- SEÇÃO: Botão -->
+        <div class="form-section">
+            <h3><i class="fas fa-square"></i> Botão</h3>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Personalize a cor dos botões principais.</p>
+            
+            <div class="color-row">
+                <div class="form-field">
+                    <label for="id_button_color_primary">{{ form.button_color_primary.label }}</label>
+                    {{ form.button_color_primary }}
+                    {% if form.button_color_primary.help_text %}
+                    <span class="field-help">{{ form.button_color_primary.help_text|safe }}</span>
+                    {% endif %}
                 </div>
-                <div class="card-body">
-                    <div class="preview-toolbar mb-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="preview-back">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="preview-forward">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="preview-reload">
-                            <i class="fas fa-rotate-right"></i>
-                        </button>
-                    </div>
-                    <div class="live-preview-wrapper">
-                        <div class="live-preview-frame">
-                            <iframe
-                                id="live-preview-iframe"
-                                src="{{ tenant_landing_url }}"
-                                title="Preview do mini site"
-                                loading="lazy"
-                                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation-by-user-activation"
-                            ></iframe>
-                        </div>
-                        <div class="live-preview-note text-muted mt-2">
-                            Se o navegador bloquear, abra em nova aba ou habilite popups. Após salvar as cores, recarregue o iframe.
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 flex-wrap mt-3">
-                        <a class="btn btn-outline-primary" href="{{ tenant_landing_url }}" target="_blank" rel="noopener">
-                            <i class="fas a-up-right-from-square me-2"></i>
-                            Abrir mini site em nova aba
-                        </a>
-                        <button type="button" class="btn btn-outline-secondary" id="copy-preview-link" data-link="{{ tenant_landing_url }}">
-                            <i class="fas fa-link me-2"></i>
-                            Copiar link do mini site
-                        </button>
-                    </div>
+                
+                <div class="form-field">
+                    <label for="id_button_text_color">{{ form.button_text_color.label }}</label>
+                    {{ form.button_text_color }}
+                    {% if form.button_text_color.help_text %}
+                    <span class="field-help">{{ form.button_text_color.help_text|safe }}</span>
+                    {% endif %}
                 </div>
             </div>
+
+            <!-- Campos ocultos para compatibilidade -->
+            <input type="hidden" name="{{ form.button_color_secondary.name }}" id="id_button_color_secondary" value="{{ branding.button_color_secondary|default:branding.button_color_primary }}">
+            <input type="hidden" name="{{ form.use_gradient_buttons.name }}" id="id_use_gradient_buttons" value="on">
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- SEÇÃO: Destaque -->
+        <div class="form-section">
+            <h3><i class="fas fa-highlighter"></i> Cor de Destaque</h3>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Cor usada para destacar elementos importantes.</p>
+            
+            <div class="color-row">
+                <div class="form-field">
+                    <label for="id_highlight_color">{{ form.highlight_color.label }}</label>
+                    {{ form.highlight_color }}
+                    {% if form.highlight_color.help_text %}
+                    <span class="field-help">{{ form.highlight_color.help_text|safe }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- SEÇÃO: Imagem de Capa -->
+        <div class="form-section">
+            <h3><i class="fas fa-image"></i> Imagem de Capa</h3>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Faça upload da imagem principal do mini site.</p>
+            
+            <div class="form-field">
+                <label for="id_hero_image">{{ form.hero_image.label }}</label>
+                {{ form.hero_image }}
+                {% if form.hero_image.help_text %}
+                <span class="field-help">{{ form.hero_image.help_text|safe }}</span>
+                {% endif %}
+                {% if branding.avatar_base64 or branding.hero_image %}
+                <div class="image-preview-wrapper">
+                    <div class="image-preview-label">Imagem atual:</div>
+                    <img src="{% if branding.avatar_base64 %}{{ branding.avatar_base64 }}{% else %}{{ branding.hero_image.url }}{% endif %}" alt="Capa atual" class="image-preview-img">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- SEÇÃO: Conteúdo -->
+        <div class="form-section">
+            <h3><i class="fas fa-align-left"></i> Conteúdo</h3>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Informações sobre sua empresa.</p>
+            
+            <div class="form-field">
+                <label for="id_about_us">{{ form.about_us.label }}</label>
+                {{ form.about_us }}
+                {% if form.about_us.help_text %}
+                <span class="field-help">{{ form.about_us.help_text|safe }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-field">
+                <label for="id_contact_info">{{ form.contact_info.label }}</label>
+                {{ form.contact_info }}
+                {% if form.contact_info.help_text %}
+                <span class="field-help">{{ form.contact_info.help_text|safe }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- SEÇÃO: Redes Sociais -->
+        <div class="form-section">
+            <h3><i class="fas fa-share-nodes"></i> Redes Sociais</h3>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Links para seus perfis em redes sociais.</p>
+            
+            <div class="color-row">
+                <div class="form-field">
+                    <label for="id_instagram_url">{{ form.instagram_url.label }}</label>
+                    {{ form.instagram_url }}
+                    {% if form.instagram_url.help_text %}
+                    <span class="field-help">{{ form.instagram_url.help_text|safe }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="form-field">
+                    <label for="id_facebook_url">{{ form.facebook_url.label }}</label>
+                    {{ form.facebook_url }}
+                    {% if form.facebook_url.help_text %}
+                    <span class="field-help">{{ form.facebook_url.help_text|safe }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTÕES DE AÇÃO -->
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Salvar Configurações
+            </button>
+            <a href="{% url 'dashboard:index' %}" class="btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+
+    <!-- SEÇÃO: PREVIEW -->
+    <div class="preview-section">
+        <h2><i class="fas fa-eye"></i> Preview do Mini Site</h2>
+        <p style="color: #64748b; margin-bottom: 1.5rem;">Veja como seu mini site se parece com as configurações atuais.</p>
+        
+        <div class="preview-toolbar">
+            <button type="button" id="preview-back" title="Voltar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <button type="button" id="preview-forward" title="Avançar">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <button type="button" id="preview-reload" title="Recarregar">
+                <i class="fas fa-rotate-right"></i>
+            </button>
+        </div>
+
+        <div class="live-preview-wrapper">
+            <div class="live-preview-frame">
+                <iframe
+                    id="live-preview-iframe"
+                    src="{{ tenant_landing_url }}"
+                    title="Preview do mini site"
+                    loading="lazy"
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation-by-user-activation"
+                ></iframe>
+            </div>
+            <div class="live-preview-note">
+                💡 Se o navegador bloquear o iframe, abra em uma nova aba ou habilite popups. Após salvar as cores, recarregue o preview.
+            </div>
+        </div>
+
+        <div class="preview-actions">
+            <a href="{{ tenant_landing_url }}" target="_blank" rel="noopener" class="btn-preview">
+                <i class="fas fa-up-right-from-square"></i> Abrir em nova aba
+            </a>
+            <button type="button" id="copy-preview-link" class="btn-preview" data-link="{{ tenant_landing_url }}">
+                <i class="fas fa-link"></i> Copiar link
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-// Escurece 20% para gerar a cor secundária automática
+// Função para escurecer cor (gera cor secundária automática)
 function getDarkerColor(hexColor) {
     const hex = hexColor.replace('#', '');
     let r = parseInt(hex.substring(0, 2), 16);
@@ -278,43 +584,16 @@ function getDarkerColor(hexColor) {
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-function updatePreview() {
-    const bgColor = document.getElementById('id_background_color').value;
-    const textColor = document.getElementById('id_text_color').value;
+// Atualiza campo de cor secundária automática
+function updateSecondaryColor() {
     const btnPrimary = document.getElementById('id_button_color_primary').value;
     const btnSecondary = getDarkerColor(btnPrimary);
-    const btnTextColor = document.getElementById('id_button_text_color').value;
-    const highlightColor = document.getElementById('id_highlight_color').value;
-
-    // Atualiza campos ocultos
     const hiddenSecondary = document.getElementById('id_button_color_secondary');
     if (hiddenSecondary) hiddenSecondary.value = btnSecondary;
-
-    // Box e textos
-    const previewBox = document.getElementById('preview-box');
-    previewBox.style.backgroundColor = bgColor;
-
-    document.querySelectorAll('.preview-text').forEach(p => p.style.color = textColor);
-    const highlightParagraph = document.querySelector('.highlight-preview-text');
-    if (highlightParagraph) highlightParagraph.style.color = highlightColor;
-
-    // Botão
-    const previewBtn = document.getElementById('preview-btn');
-    previewBtn.style.background = `linear-gradient(135deg, ${btnPrimary}, ${btnSecondary})`;
-    previewBtn.style.color = btnTextColor;
-
-    // Previews
-    document.getElementById('bg-preview').style.backgroundColor = bgColor;
-    document.getElementById('text-preview').style.backgroundColor = textColor;
-    document.getElementById('btn-primary-preview').style.backgroundColor = btnPrimary;
-    document.getElementById('btn-text-preview').style.backgroundColor = btnTextColor;
-    document.getElementById('highlight-preview').style.backgroundColor = highlightColor;
 }
 
-document.querySelectorAll('input[type="color"]').forEach(input => {
-    input.addEventListener('input', updatePreview);
-    input.addEventListener('change', updatePreview);
-});
+document.getElementById('id_button_color_primary').addEventListener('input', updateSecondaryColor);
+document.getElementById('id_button_color_primary').addEventListener('change', updateSecondaryColor);
 
 // Copiar link do mini site
 const copyBtn = document.getElementById('copy-preview-link');
@@ -323,11 +602,16 @@ if (copyBtn) {
         const link = copyBtn.dataset.link;
         if (!link) return;
         navigator.clipboard.writeText(link).then(() => {
-            copyBtn.textContent = "Link copiado!";
-            setTimeout(() => copyBtn.textContent = "Copiar link do mini site", 2000);
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Link copiado!';
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
         }).catch(() => {
-            copyBtn.textContent = "Não foi possível copiar";
-            setTimeout(() => copyBtn.textContent = "Copiar link do mini site", 2000);
+            copyBtn.textContent = "Erro ao copiar";
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i class="fas fa-link"></i> Copiar link';
+            }, 2000);
         });
     });
 }
@@ -342,98 +626,17 @@ function safeNav(fn) {
     try { fn(); } catch (e) { /* ignora se navegador bloquear */ }
 }
 
-if (backBtn && iframe) backBtn.addEventListener('click', () => safeNav(() => iframe.contentWindow.history.back()));
-if (fwdBtn && iframe) fwdBtn.addEventListener('click', () => safeNav(() => iframe.contentWindow.history.forward()));
-if (reloadBtn && iframe) reloadBtn.addEventListener('click', () => safeNav(() => iframe.contentWindow.location.reload()));
+if (backBtn && iframe) {
+    backBtn.addEventListener('click', () => safeNav(() => iframe.contentWindow.history.back()));
+}
+if (fwdBtn && iframe) {
+    fwdBtn.addEventListener('click', () => safeNav(() => iframe.contentWindow.history.forward()));
+}
+if (reloadBtn && iframe) {
+    reloadBtn.addEventListener('click', () => safeNav(() => iframe.contentWindow.location.reload()));
+}
 
-updatePreview();
+// Inicializa cor secundária na carga
+document.addEventListener('DOMContentLoaded', updateSecondaryColor);
 </script>
-
-<style>
-.color-picker {
-    height: 45px;
-    padding: 3px;
-    cursor: pointer;
-}
-
-.input-group-text {
-    border: 1px solid #dee2e6;
-}
-
-#preview-box {
-    border: 2px solid #dee2e6;
-}
-
-.live-preview-wrapper {
-    border: 1px solid #dee2e6;
-    border-radius: 12px;
-    padding: 0.75rem;
-    background: #f8fafc;
-    max-width: 420px; /* largura típica de mobile */
-    margin: 0 auto;  /* centraliza */
-}
-
-.live-preview-frame {
-    position: relative;
-    width: 100%;
-    padding-top: 200%;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-    background: #0f172a;
-}
-
-.live-preview-frame iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    border-radius: 10px;
-    background: #0f172a;
-}
-
-.live-preview-note {
-    font-size: 0.85rem;
-}
-
-.preview-card {
-    position: sticky;
-    top: 20px;
-}
-
-.branding-layout {
-    display: flex;
-    gap: 1.5rem;
-    align-items: flex-start;
-    flex-wrap: wrap;
-}
-
-.branding-form {
-    flex: 1 1 620px;
-    min-width: 320px;
-}
-
-.branding-preview {
-    flex: 0 0 420px;
-    max-width: 420px;
-}
-
-.preview-toolbar {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-start;
-}
-
-@media (max-width: 991px) {
-    .branding-preview {
-        position: static;
-        max-width: 100%;
-        flex: 1 1 100%;
-    }
-    .preview-card {
-        position: static;
-    }
-}
-</style>
 {% endblock %}
