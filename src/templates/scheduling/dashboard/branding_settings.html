@@ -789,7 +789,76 @@
                     {% endif %}
                 </div>
 
-                <!-- 5. REDES SOCIAIS -->
+                <!-- 5. ENDEREÇO -->
+                <div class="form-field section-field" data-section-id="address">
+                    <div class="section-field-header">
+                        <label>ENDEREÇO</label>
+                        <div class="order-controls">
+                            <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" checked id="address_visible">
+                            <button type="button" class="btn-section-up" title="Mover para cima">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button type="button" class="btn-section-down" title="Mover para baixo">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Endereço - 2 colunas -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <label for="id_address" style="display: block; font-size: 0.95rem; color: #94a3b8; margin-bottom: 8px;">
+                                <i class="fas fa-map-pin"></i> {{ form.address.label }}
+                            </label>
+                            {{ form.address }}
+                            {% if form.address.help_text %}
+                            <span class="field-help">{{ form.address.help_text|safe }}</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="id_zip_code" style="display: block; font-size: 0.95rem; color: #94a3b8; margin-bottom: 8px;">
+                                <i class="fas fa-hashtag"></i> {{ form.zip_code.label }}
+                            </label>
+                            {{ form.zip_code }}
+                            {% if form.zip_code.help_text %}
+                            <span class="field-help">{{ form.zip_code.help_text|safe }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Bairro, Cidade, Estado - 3 colunas -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 100px; gap: 1rem;">
+                        <div>
+                            <label for="id_neighborhood" style="display: block; font-size: 0.95rem; color: #94a3b8; margin-bottom: 8px;">
+                                {{ form.neighborhood.label }}
+                            </label>
+                            {{ form.neighborhood }}
+                            {% if form.neighborhood.help_text %}
+                            <span class="field-help">{{ form.neighborhood.help_text|safe }}</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="id_city" style="display: block; font-size: 0.95rem; color: #94a3b8; margin-bottom: 8px;">
+                                {{ form.city.label }}
+                            </label>
+                            {{ form.city }}
+                            {% if form.city.help_text %}
+                            <span class="field-help">{{ form.city.help_text|safe }}</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label for="id_state" style="display: block; font-size: 0.95rem; color: #94a3b8; margin-bottom: 8px;">
+                                {{ form.state.label }}
+                            </label>
+                            {{ form.state }}
+                            {% if form.state.help_text %}
+                            <span class="field-help">{{ form.state.help_text|safe }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. REDES SOCIAIS -->
                 <div class="form-field section-field" data-section-id="social">
                     <div class="section-field-header">
                         <label>REDES SOCIAIS</label>

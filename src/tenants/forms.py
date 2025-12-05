@@ -195,6 +195,36 @@ class BrandingSettingsForm(forms.ModelForm):
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
         help_text="Mostrar horários de funcionamento no mini site."
     )
+    address = forms.CharField(
+        label="Endereço",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Rua, número e complemento"}),
+        help_text="Endereço completo da sua empresa."
+    )
+    neighborhood = forms.CharField(
+        label="Bairro",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Bairro"}),
+        help_text="Bairro onde fica sua empresa."
+    )
+    city = forms.CharField(
+        label="Cidade",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Cidade"}),
+        help_text="Cidade da empresa."
+    )
+    state = forms.CharField(
+        label="Estado",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "SP", "maxlength": "2"}),
+        help_text="Sigla do estado (ex: SP, RJ, MG)."
+    )
+    zip_code = forms.CharField(
+        label="CEP",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "00000-000"}),
+        help_text="CEP da empresa."
+    )
     instagram_url = forms.URLField(
         label="Instagram (mini site)",
         required=False,
@@ -214,6 +244,11 @@ class BrandingSettingsForm(forms.ModelForm):
         # Preenche campo extra com valor do tenant
         self.fields["about_us"].initial = tenant.about_us
         self.fields["contact_info"].initial = tenant.contact_info
+        self.fields["address"].initial = tenant.address
+        self.fields["neighborhood"].initial = tenant.neighborhood
+        self.fields["city"].initial = tenant.city
+        self.fields["state"].initial = tenant.state
+        self.fields["zip_code"].initial = tenant.zip_code
         self.fields["instagram_url"].initial = tenant.instagram_url
         self.fields["facebook_url"].initial = tenant.facebook_url
         
@@ -250,6 +285,11 @@ class BrandingSettingsForm(forms.ModelForm):
             "show_team",   # campo extra (não no modelo)
             "show_business_hours",   # campo extra (não no modelo)
             "contact_info",  # campo extra (não no modelo)
+            "address",  # campo extra (não no modelo)
+            "neighborhood",  # campo extra (não no modelo)
+            "city",  # campo extra (não no modelo)
+            "state",  # campo extra (não no modelo)
+            "zip_code",  # campo extra (não no modelo)
             "instagram_url",
             "facebook_url",
         ]
@@ -266,6 +306,11 @@ class BrandingSettingsForm(forms.ModelForm):
             "show_team": "Equipe (mini site)",
             "show_business_hours": "Horário de Funcionamento (mini site)",
             "contact_info": "Contatos (mini site)",
+            "address": "Endereço",
+            "neighborhood": "Bairro",
+            "city": "Cidade",
+            "state": "Estado",
+            "zip_code": "CEP",
             "instagram_url": "Instagram (mini site)",
             "facebook_url": "Facebook (mini site)",
         }
@@ -292,6 +337,11 @@ class BrandingSettingsForm(forms.ModelForm):
             "show_team": "Mostrar membros da equipe no mini site",
             "show_business_hours": "Mostrar horários de funcionamento no mini site",
             "contact_info": "Telefone/WhatsApp/e-mail exibidos na seção de contato do mini site",
+            "address": "Endereço completo exibido no mini site",
+            "neighborhood": "Bairro exibido no mini site",
+            "city": "Cidade exibida no mini site",
+            "state": "Estado exibido no mini site",
+            "zip_code": "CEP exibido no mini site",
             "instagram_url": "Link para Instagram (opcional)",
             "facebook_url": "Link para Facebook (opcional)",
         }
@@ -327,6 +377,37 @@ class BrandingSettingsForm(forms.ModelForm):
         if contact_info is not None:
             self.tenant.contact_info = contact_info
             self.tenant.save(update_fields=["contact_info", "updated_at"])
+
+        # Salvar campos de endereço
+        address_fields = {}
+        address = self.cleaned_data.get("address")
+        if address is not None:
+            self.tenant.address = address
+            address_fields["address"] = address
+        
+        neighborhood = self.cleaned_data.get("neighborhood")
+        if neighborhood is not None:
+            self.tenant.neighborhood = neighborhood
+            address_fields["neighborhood"] = neighborhood
+        
+        city = self.cleaned_data.get("city")
+        if city is not None:
+            self.tenant.city = city
+            address_fields["city"] = city
+        
+        state = self.cleaned_data.get("state")
+        if state is not None:
+            self.tenant.state = state
+            address_fields["state"] = state
+        
+        zip_code = self.cleaned_data.get("zip_code")
+        if zip_code is not None:
+            self.tenant.zip_code = zip_code
+            address_fields["zip_code"] = zip_code
+        
+        if address_fields:
+            address_fields["updated_at"] = None  # Será preenchido automaticamente
+            self.tenant.save(update_fields=list(address_fields.keys()) + ["updated_at"])
 
         instagram_url = self.cleaned_data.get("instagram_url")
         facebook_url = self.cleaned_data.get("facebook_url")

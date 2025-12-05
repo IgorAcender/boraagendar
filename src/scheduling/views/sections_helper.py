@@ -23,10 +23,8 @@ def get_sections_config(branding_settings) -> Dict[str, Dict]:
         "team": {"visible": True, "order": 1},
         "hours": {"visible": True, "order": 2},
         "contact": {"visible": True, "order": 3},
-        "location": {"visible": True, "order": 4},
-        "amenities": {"visible": True, "order": 5},
-        "payment_methods": {"visible": True, "order": 6},
-        "social": {"visible": True, "order": 7},
+        "address": {"visible": True, "order": 4},
+        "social": {"visible": True, "order": 5},
     }
 
     if not branding_settings or not branding_settings.sections_config:
