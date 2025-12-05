@@ -258,7 +258,6 @@
             transition: all 0.3s ease;
             position: relative;
             z-index: 2;
-            animation: continuousSlideOut 3s ease-in-out infinite;
         }
 
         .btn-schedule-header .btn-icon {
@@ -268,7 +267,6 @@
             transform: translateX(-10px) scale(0.8);
             position: relative;
             z-index: 2;
-            animation: continuousSlideIn 3s ease-in-out infinite;
         }
 
         /* Neon Border Lines */
@@ -369,41 +367,6 @@
                 transform: translateX(-10px) scale(0.8);
             }
             to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-
-        /* Animações Contínuas */
-        @keyframes continuousSlideOut {
-            0%, 100% {
-                opacity: 1;
-                transform: translateX(0);
-            }
-            40% {
-                opacity: 1;
-                transform: translateX(0);
-            }
-            50% {
-                opacity: 0;
-                transform: translateX(10px);
-            }
-            60% {
-                opacity: 0;
-                transform: translateX(10px);
-            }
-        }
-
-        @keyframes continuousSlideIn {
-            0%, 40% {
-                opacity: 0;
-                transform: translateX(-10px) scale(0.8);
-            }
-            50% {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-            60%, 100% {
                 opacity: 1;
                 transform: translateX(0) scale(1);
             }
@@ -1221,6 +1184,25 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeProfessionalModal();
+            }
+        });
+
+        // Animação do botão "Agendar Agora"
+        document.addEventListener('DOMContentLoaded', function() {
+            const scheduleBtn = document.querySelector('.btn-schedule-header');
+            if (scheduleBtn) {
+                scheduleBtn.addEventListener('click', function(e) {
+                    // Prevent navigation and add animation
+                    this.classList.add('clicked');
+                    
+                    // Delay navigation to show animation
+                    setTimeout(() => {
+                        window.location.href = this.href;
+                    }, 300);
+                    
+                    // Prevent default link behavior
+                    e.preventDefault();
+                });
             }
         });
     </script>
