@@ -248,6 +248,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_text_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
             "use_gradient_buttons": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "highlight_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+            "sections_config": forms.HiddenInput(),
         }
         help_texts = {
             "background_color": "Define o fundo de todas as páginas",
