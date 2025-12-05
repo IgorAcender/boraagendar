@@ -5,8 +5,9 @@
 
 {% block content %}
 <div class="container mt-5 mb-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
+    <div class="row g-4 align-items-start">
+        <!-- Coluna de configurações -->
+        <div class="col-lg-7">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">
@@ -128,37 +129,6 @@
 
                         <hr>
 
-                        <!-- Preview -->
-                        <div class="mb-4">
-                            <h5 class="mb-3 d-flex align-items-center gap-2">
-                                <i class="fas fa-eye"></i> Preview do mini site
-                            </h5>
-                            <div class="live-preview-wrapper">
-                                <div class="live-preview-frame">
-                                    <iframe
-                                        id="live-preview-iframe"
-                                        src="{{ tenant_landing_url }}"
-                                        title="Preview do mini site"
-                                        loading="lazy"
-                                        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation-by-user-activation"
-                                    ></iframe>
-                                </div>
-                                <div class="live-preview-note text-muted mt-2">
-                                    Se o navegador bloquear, abra em nova aba ou habilite popups. Após salvar as cores, recarregue o iframe.
-                                </div>
-                            </div>
-                            <div class="d-flex gap-2 flex-wrap mt-2">
-                                <a class="btn btn-outline-primary" href="{{ tenant_landing_url }}" target="_blank" rel="noopener">
-                                    <i class="fas fa-up-right-from-square me-2"></i>
-                                    Abrir mini site em nova aba
-                                </a>
-                                <button type="button" class="btn btn-outline-secondary" id="copy-preview-link" data-link="{{ tenant_landing_url }}">
-                                    <i class="fas fa-link me-2"></i>
-                                    Copiar link do mini site
-                                </button>
-                            </div>
-                        </div>
-
                         <!-- Botões -->
                         <div class="d-flex gap-2 mt-4">
                             <button type="submit" class="btn btn-primary">
@@ -182,6 +152,43 @@
                 {% endfor %}
             </div>
             {% endif %}
+        </div>
+
+        <!-- Coluna de preview -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm preview-card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 d-flex align-items-center gap-2">
+                        <i class="fas fa-eye"></i> Preview do mini site
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="live-preview-wrapper">
+                        <div class="live-preview-frame">
+                            <iframe
+                                id="live-preview-iframe"
+                                src="{{ tenant_landing_url }}"
+                                title="Preview do mini site"
+                                loading="lazy"
+                                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation-by-user-activation"
+                            ></iframe>
+                        </div>
+                        <div class="live-preview-note text-muted mt-2">
+                            Se o navegador bloquear, abra em nova aba ou habilite popups. Após salvar as cores, recarregue o iframe.
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap mt-3">
+                        <a class="btn btn-outline-primary" href="{{ tenant_landing_url }}" target="_blank" rel="noopener">
+                            <i class="fas fa-up-right-from-square me-2"></i>
+                            Abrir mini site em nova aba
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary" id="copy-preview-link" data-link="{{ tenant_landing_url }}">
+                            <i class="fas fa-link me-2"></i>
+                            Copiar link do mini site
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -302,6 +309,11 @@ updatePreview();
 
 .live-preview-note {
     font-size: 0.85rem;
+}
+
+.preview-card {
+    position: sticky;
+    top: 20px;
 }
 </style>
 {% endblock %}
