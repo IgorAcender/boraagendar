@@ -177,12 +177,19 @@ class BrandingSettingsForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 4, "placeholder": "Fale sobre seu negócio"}),
         help_text="Texto que aparece na seção Sobre nós do mini site."
     )
+    contact_info = forms.CharField(
+        label="Contatos (mini site)",
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 2, "placeholder": "Telefone, WhatsApp, e-mail..."}),
+        help_text="Informações de contato exibidas no mini site."
+    )
 
     def __init__(self, *args, tenant: Tenant, **kwargs):
         self.tenant = tenant
         super().__init__(*args, **kwargs)
         # Preenche campo extra com valor do tenant
         self.fields["about_us"].initial = tenant.about_us
+        self.fields["contact_info"].initial = tenant.contact_info
 
     class Meta:
         model = BrandingSettings
@@ -196,6 +203,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "highlight_color",
             "hero_image",  # campo extra (não no modelo)
             "about_us",    # campo extra (não no modelo)
+            "contact_info",  # campo extra (não no modelo)
         ]
         labels = {
             "background_color": "Cor de Fundo",
@@ -207,6 +215,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "highlight_color": "Cor de Destaque",
             "hero_image": "Foto de capa / hero",
             "about_us": "Sobre nós (mini site)",
+            "contact_info": "Contatos (mini site)",
         }
         widgets = {
             "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
@@ -227,6 +236,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "highlight_color": "Cor para destaque (textos especiais, ícones, contornos)",
             "hero_image": "Selecione uma imagem para o topo do mini site",
             "about_us": "Texto exibido na seção Sobre nós do mini site",
+            "contact_info": "Telefone/WhatsApp/e-mail exibidos na seção de contato do mini site",
         }
 
     def save(self, commit=True):
@@ -245,5 +255,10 @@ class BrandingSettingsForm(forms.ModelForm):
         if about_us is not None:
             self.tenant.about_us = about_us
             self.tenant.save(update_fields=["about_us", "updated_at"])
+
+        contact_info = self.cleaned_data.get("contact_info")
+        if contact_info is not None:
+            self.tenant.contact_info = contact_info
+            self.tenant.save(update_fields=["contact_info", "updated_at"])
 
         return branding

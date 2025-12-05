@@ -1270,40 +1270,52 @@
                     Contato
                 </h2>
                 <div class="contact-grid">
-                    {% if tenant.phone_number %}
-                    <div class="contact-item">
+                    {% if tenant.contact_info %}
+                    <div class="contact-item" style="grid-column: span 2;">
                         <div class="contact-icon">
-                            <i class="fas fa-phone"></i>
+                            <i class="fas fa-address-book"></i>
                         </div>
-                        <div class="contact-label">Telefone</div>
+                        <div class="contact-label">Contatos</div>
                         <div class="contact-value">
-                            <a href="tel:{{ tenant.phone_number }}">{{ tenant.phone_number }}</a>
+                            {{ tenant.contact_info|linebreaksbr }}
                         </div>
                     </div>
-                    {% endif %}
+                    {% else %}
+                        {% if tenant.phone_number %}
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-label">Telefone</div>
+                            <div class="contact-value">
+                                <a href="tel:{{ tenant.phone_number }}">{{ tenant.phone_number }}</a>
+                            </div>
+                        </div>
+                        {% endif %}
 
-                    {% if tenant.whatsapp_number %}
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fab fa-whatsapp"></i>
+                        {% if tenant.whatsapp_number %}
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="contact-label">WhatsApp</div>
+                            <div class="contact-value">
+                                <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank">{{ tenant.whatsapp_number }}</a>
+                            </div>
                         </div>
-                        <div class="contact-label">WhatsApp</div>
-                        <div class="contact-value">
-                            <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank">{{ tenant.whatsapp_number }}</a>
-                        </div>
-                    </div>
-                    {% endif %}
+                        {% endif %}
 
-                    {% if tenant.email %}
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fas fa-envelope"></i>
+                        {% if tenant.email %}
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-label">E-mail</div>
+                            <div class="contact-value">
+                                <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a>
+                            </div>
                         </div>
-                        <div class="contact-label">E-mail</div>
-                        <div class="contact-value">
-                            <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a>
-                        </div>
-                    </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

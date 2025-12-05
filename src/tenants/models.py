@@ -35,6 +35,7 @@ class Tenant(models.Model):
     zip_code = models.CharField("CEP", max_length=10, blank=True)
     instagram_url = models.URLField("URL Instagram", blank=True)
     facebook_url = models.URLField("URL Facebook", blank=True)
+    contact_info = models.TextField("Contatos do mini site", blank=True, help_text="Telefone/WhatsApp/e-mail exibidos no mini site")
     payment_methods = models.TextField("Formas de pagamento", blank=True, help_text="Separadas por vírgula: Ex: Dinheiro, Cartão de Crédito, Cartão de Débito, PIX")
     amenities = models.TextField("Comodidades", blank=True, help_text="Separadas por vírgula: Ex: WiFi, Estacionamento, Acessibilidade")
     is_active = models.BooleanField("Ativo", default=True)
