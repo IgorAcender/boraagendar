@@ -249,10 +249,44 @@
         background: white;
     }
 
+    /* Toggle Switch Style */
     .section-visible-toggle {
-        width: 20px;
-        height: 20px;
+        appearance: none;
+        -webkit-appearance: none;
+        width: 50px;
+        height: 28px;
+        background: #cbd5e1;
+        border: none;
+        border-radius: 34px;
         cursor: pointer;
+        position: relative;
+        transition: background 0.3s ease;
+        outline: none;
+    }
+
+    .section-visible-toggle::before {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: white;
+        top: 2px;
+        left: 2px;
+        transition: left 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-visible-toggle:checked {
+        background: #52cc80;
+    }
+
+    .section-visible-toggle:checked::before {
+        left: 24px;
+    }
+
+    .section-visible-toggle:hover {
+        opacity: 0.8;
     }
 
     .btn-section-up,
