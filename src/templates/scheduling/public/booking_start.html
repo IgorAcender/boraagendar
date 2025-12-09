@@ -287,6 +287,20 @@
         background: transparent;
         border: 1px solid var(--text-muted);
         opacity: 0.5;
+        position: relative;
+    }
+
+    .calendar-day.disabled::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            linear-gradient(135deg, transparent calc(50% - 1px), var(--text-muted) calc(50% - 1px), var(--text-muted) calc(50% + 1px), transparent calc(50% + 1px)),
+            linear-gradient(45deg, transparent calc(50% - 1px), var(--text-muted) calc(50% - 1px), var(--text-muted) calc(50% + 1px), transparent calc(50% + 1px));
+        pointer-events: none;
     }
 
     .calendar-day.disabled:hover {
