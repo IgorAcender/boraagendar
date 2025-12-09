@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tenant',
             name='contact_info',
-            field=models.TextField(blank=True, help_text='Telefone/WhatsApp/e-mail exibidos no mini site', verbose_name='Contatos do mini site'),
+            field=models.TextField(blank=True, help_text='Telefone/WhatsApp/e-mail exibidos no site', verbose_name='Contatos do site'),
         ),
     ]

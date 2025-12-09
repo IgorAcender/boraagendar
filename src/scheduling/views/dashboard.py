@@ -1381,7 +1381,7 @@ def branding_settings(request: HttpRequest) -> HttpResponse:
     else:
         form = BrandingSettingsForm(instance=branding, tenant=tenant)
 
-    # Construir URL do mini site de forma simples e segura
+    # Construir URL do site de forma simples e segura
     tenant_landing_url = f"/{tenant.slug}/"
 
     return render(

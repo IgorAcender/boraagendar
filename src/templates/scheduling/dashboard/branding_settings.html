@@ -708,7 +708,7 @@
 {% block content %}
 <div class="hero-header">
     <h1><i class="fas fa-palette"></i> Configurações de Marca</h1>
-    <p>Personalize as cores do seu mini site. Essas configurações afetam como o site aparece para seus clientes.</p>
+    <p>Personalize as cores do seu site. Essas configurações afetam como o site aparece para seus clientes.</p>
 </div>
 
 {% if messages %}
@@ -730,7 +730,7 @@
             <!-- SEÇÃO: Modelo de Tema (Novo) -->
             <div class="form-section">
                 <h3><i class="fas fa-palette"></i> Modelo de Tema</h3>
-                <p style="color: #64748b; margin-bottom: 1.5rem;">Escolha um tema pré-configurado ou personalize as cores do seu mini site.</p>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Escolha um tema pré-configurado ou personalize as cores do seu site.</p>
                 
                 <!-- Template Selection -->
                 <div style="margin-bottom: 2rem;">
@@ -822,7 +822,7 @@
                     <div style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px; border: 2px dashed #cbd5e1;">
                         <p style="margin: 0 0 1rem 0; color: #64748b; font-size: 0.9rem;">Prévia:</p>
                         <div id="theme-preview" style="border-radius: 6px; padding: 1rem; text-align: center;">
-                            <p style="margin: 0.5rem 0; font-weight: 600;">Seu Mini Site</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;">Seu Site</p>
                             <button style="margin-top: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;" id="preview-button">Agendar Agora</button>
                         </div>
                     </div>
@@ -831,7 +831,7 @@
 
             <div class="form-section">
                 <h3><i class="fas fa-image"></i> Imagem de Capa</h3>
-                <p style="color: #64748b; margin-bottom: 1rem;">Faça upload da imagem principal do mini site.</p>
+                <p style="color: #64748b; margin-bottom: 1rem;">Faça upload da imagem principal do site.</p>
                 
                 <div class="image-upload-row">
                     <div class="form-field image-upload-field">
@@ -860,8 +860,8 @@
 
             <!-- SEÇÃO: Conteúdo - 5 Seções Reordináveis -->
             <div class="form-section">
-                <h3><i class="fas fa-align-left"></i> Conteúdo do Mini Site</h3>
-                <p style="color: #64748b; margin-bottom: 1.5rem;">Organize as seções que aparecerão no seu mini site. Use as setas para reordenar.</p>
+                <h3><i class="fas fa-align-left"></i> Conteúdo do Site</h3>
+                <p style="color: #64748b; margin-bottom: 1.5rem;">Organize as seções que aparecerão no seu site. Use as setas para reordenar.</p>
                 
                 <!-- 1. SOBRE NÓS -->
                 <div class="form-field section-field" data-section-id="about">
@@ -898,7 +898,7 @@
                         </div>
                     </div>
                     <div style="padding: 12px 0; color: #94a3b8; font-size: 0.95rem;">
-                        <p><i class="fas fa-info-circle"></i> Exibe os membros da sua equipe no mini site.</p>
+                        <p><i class="fas fa-info-circle"></i> Exibe os membros da sua equipe no site.</p>
                         <a href="{% url 'dashboard:professional_list' %}" class="btn-link-small" style="display: inline-block; margin-top: 8px;">
                             <i class="fas fa-pen"></i> Gerenciar {{ tenant.label_profissional_plural }}
                         </a>
@@ -920,7 +920,7 @@
                         </div>
                     </div>
                     <div style="padding: 12px 0; color: #94a3b8; font-size: 0.95rem;">
-                        <p><i class="fas fa-info-circle"></i> Exibe os horários de funcionamento no mini site.</p>
+                        <p><i class="fas fa-info-circle"></i> Exibe os horários de funcionamento no site.</p>
                         <a href="{% url 'dashboard:default_availability' %}" class="btn-link-small" style="display: inline-block; margin-top: 8px;">
                             <i class="fas fa-pen"></i> Configurar Horários
                         </a>
@@ -1126,7 +1126,7 @@
                 <iframe
                     id="live-preview-iframe"
                     src="{{ tenant_landing_url }}"
-                    title="Preview do mini site"
+                    title="Preview do site"
                     loading="lazy"
                     sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation-by-user-activation"
                 ></iframe>
@@ -1172,7 +1172,7 @@ function updateSecondaryColor() {
 document.getElementById('id_button_color_primary').addEventListener('input', updateSecondaryColor);
 document.getElementById('id_button_color_primary').addEventListener('change', updateSecondaryColor);
 
-// Copiar link do mini site
+// Copiar link do site
 const copyBtn = document.getElementById('copy-preview-link');
 if (copyBtn) {
     copyBtn.addEventListener('click', () => {

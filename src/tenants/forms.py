@@ -169,34 +169,34 @@ class BrandingSettingsForm(forms.ModelForm):
     """Formulário para personalização de cores do tenant"""
 
     hero_image = forms.FileField(
-        label="Foto de capa / hero do mini site",
+        label="Foto de capa / hero do site",
         required=False,
         widget=forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
-        help_text="Imagem exibida no topo do mini site. Formatos: JPG/PNG."
+        help_text="Imagem exibida no topo do site. Formatos: JPG/PNG."
     )
     about_us = forms.CharField(
-        label="Sobre nós (mini site)",
+        label="Sobre nós (site)",
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 4, "placeholder": "Fale sobre seu negócio"}),
-        help_text="Texto que aparece na seção Sobre nós do mini site."
+        help_text="Texto que aparece na seção Sobre nós do site."
     )
     contact_info = forms.CharField(
-        label="Contatos (mini site)",
+        label="Contatos (site)",
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 2, "placeholder": "Telefone, WhatsApp, e-mail..."}),
-        help_text="Informações de contato exibidas no mini site."
+        help_text="Informações de contato exibidas no site."
     )
     show_team = forms.BooleanField(
         label="Equipe",
         required=False,
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
-        help_text="Mostrar membros da equipe no mini site."
+        help_text="Mostrar membros da equipe no site."
     )
     show_business_hours = forms.BooleanField(
         label="Horário de Funcionamento",
         required=False,
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
-        help_text="Mostrar horários de funcionamento no mini site."
+        help_text="Mostrar horários de funcionamento no site."
     )
     address = forms.CharField(
         label="Endereço",
@@ -229,25 +229,25 @@ class BrandingSettingsForm(forms.ModelForm):
         help_text="CEP da empresa."
     )
     instagram_url = forms.URLField(
-        label="Instagram (mini site)",
+        label="Instagram (site)",
         required=False,
         widget=forms.URLInput(attrs={"class": "form-control", "placeholder": "https://instagram.com/seu_perfil"}),
         help_text="Link exibido na seção de redes sociais."
     )
     facebook_url = forms.URLField(
-        label="Facebook (mini site)",
+        label="Facebook (site)",
         required=False,
         widget=forms.URLInput(attrs={"class": "form-control", "placeholder": "https://facebook.com/seu_perfil"}),
         help_text="Link exibido na seção de redes sociais."
     )
     whatsapp_number = forms.CharField(
-        label="WhatsApp (mini site)",
+        label="WhatsApp (site)",
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "(00) 00000-0000"}),
         help_text="Número do WhatsApp para botão de contato."
     )
     payment_methods = forms.CharField(
-        label="Formas de Pagamento (mini site)",
+        label="Formas de Pagamento (site)",
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 3, "placeholder": "Dinheiro, Cartão de Crédito, Cartão de Débito, PIX"}),
         help_text="Formas de pagamento aceitas. Separe por vírgula ou uma por linha."
@@ -320,19 +320,19 @@ class BrandingSettingsForm(forms.ModelForm):
             "use_gradient_buttons": "Usar Gradiente nos Botões",
             "highlight_color": "Cor de Destaque",
             "hero_image": "Foto de capa / hero",
-            "about_us": "Sobre nós (mini site)",
-            "show_team": "Equipe (mini site)",
-            "show_business_hours": "Horário de Funcionamento (mini site)",
-            "contact_info": "Contatos (mini site)",
+            "about_us": "Sobre nós (site)",
+            "show_team": "Equipe (site)",
+            "show_business_hours": "Horário de Funcionamento (site)",
+            "contact_info": "Contatos (site)",
             "address": "Endereço",
             "neighborhood": "Bairro",
             "city": "Cidade",
             "state": "Estado",
             "zip_code": "CEP",
-            "instagram_url": "Instagram (mini site)",
-            "facebook_url": "Facebook (mini site)",
-            "whatsapp_number": "WhatsApp (mini site)",
-            "payment_methods": "Formas de Pagamento (mini site)",
+            "instagram_url": "Instagram (site)",
+            "facebook_url": "Facebook (site)",
+            "whatsapp_number": "WhatsApp (site)",
+            "payment_methods": "Formas de Pagamento (site)",
             "theme_template": "Modelo de Tema",
         }
         widgets = {
@@ -352,19 +352,19 @@ class BrandingSettingsForm(forms.ModelForm):
             "button_text_color": "Cor do texto dentro dos botões",
             "use_gradient_buttons": "Se ativado, os botões terão gradiente com as duas cores",
             "highlight_color": "Cor para destaque (textos especiais, ícones, contornos)",
-            "hero_image": "Selecione uma imagem para o topo do mini site",
-            "about_us": "Texto exibido na seção Sobre nós do mini site",
-            "show_team": "Mostrar membros da equipe no mini site",
-            "show_business_hours": "Mostrar horários de funcionamento no mini site",
-            "contact_info": "Telefone/WhatsApp/e-mail exibidos na seção de contato do mini site",
-            "address": "Endereço completo exibido no mini site",
-            "neighborhood": "Bairro exibido no mini site",
-            "city": "Cidade exibida no mini site",
-            "state": "Estado exibido no mini site",
-            "zip_code": "CEP exibido no mini site",
+            "hero_image": "Selecione uma imagem para o topo do site",
+            "about_us": "Texto exibido na seção Sobre nós do site",
+            "show_team": "Mostrar membros da equipe no site",
+            "show_business_hours": "Mostrar horários de funcionamento no site",
+            "contact_info": "Telefone/WhatsApp/e-mail exibidos na seção de contato do site",
+            "address": "Endereço completo exibido no site",
+            "neighborhood": "Bairro exibido no site",
+            "city": "Cidade exibida no site",
+            "state": "Estado exibido no site",
+            "zip_code": "CEP exibido no site",
             "instagram_url": "Link para Instagram (opcional)",
             "facebook_url": "Link para Facebook (opcional)",
-            "whatsapp_number": "Número para botão de WhatsApp no mini site",
+            "whatsapp_number": "Número para botão de WhatsApp no site",
             "payment_methods": "Formas de pagamento aceitas. Separe por vírgula ou uma por linha.",
             "theme_template": "Escolha um modelo pré-configurado ou personalize as cores",
         }
