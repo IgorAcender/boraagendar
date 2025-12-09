@@ -288,6 +288,28 @@
         opacity: 0.8;
     }
 
+    /* Botão de link pequeno */
+    .btn-link-small {
+        color: #0284c7;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.4rem 0.8rem;
+        border: 1px solid #0284c7;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-link-small:hover {
+        background: #dbeafe;
+        color: #0284c7;
+        text-decoration: none;
+    }
+
+    .btn-link-small i {
+        margin-right: 0.4rem;
+    }
+
     .btn-section-up,
     .btn-section-down {
         padding: 0.5rem 0.8rem;
@@ -785,7 +807,9 @@
                     </div>
                     <div style="padding: 12px 0; color: #94a3b8; font-size: 0.95rem;">
                         <p><i class="fas fa-info-circle"></i> Exibe os membros da sua equipe no mini site.</p>
-                        <p style="margin-top: 8px;">Para gerenciar a equipe, acesse a página de Membros.</p>
+                        <a href="{% url 'dashboard:team_list' %}" class="btn-link-small" style="display: inline-block; margin-top: 8px;">
+                            <i class="fas fa-pen"></i> Gerenciar Equipe
+                        </a>
                     </div>
                 </div>
 
@@ -805,7 +829,9 @@
                     </div>
                     <div style="padding: 12px 0; color: #94a3b8; font-size: 0.95rem;">
                         <p><i class="fas fa-info-circle"></i> Exibe os horários de funcionamento no mini site.</p>
-                        <p style="margin-top: 8px;">Configure os horários na página de Horários de Funcionamento.</p>
+                        <a href="{% url 'dashboard:default_availability' %}" class="btn-link-small" style="display: inline-block; margin-top: 8px;">
+                            <i class="fas fa-pen"></i> Configurar Horários
+                        </a>
                     </div>
                 </div>
 
