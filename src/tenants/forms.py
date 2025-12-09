@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import base64
 import secrets
-from typing import Tuple
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
+
+if TYPE_CHECKING:
+    from typing import Tuple as TupleType
 
 from .models import Tenant, TenantMembership, BrandingSettings
 
@@ -128,7 +131,7 @@ class TeamMemberCreateForm(forms.Form):
                 self.add_error("full_name", "Informe o nome do usuário.")
         return data
 
-    def save(self) -> Tuple[User, TenantMembership]:
+    def save(self):
         data = self.cleaned_data
         email = data["email"].lower()
         role = data["role"]
