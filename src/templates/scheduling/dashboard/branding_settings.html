@@ -727,53 +727,7 @@
         <form id="branding-form" method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <!-- SEÇÃO: Cores (Gerais + Botão combinadas) -->
-            <div class="form-section">
-                <h3><i class="fas fa-palette"></i> Cores e Botões</h3>
-                <p style="color: #64748b; margin-bottom: 1rem;">Personalize as cores do seu site.</p>
-                
-                <div class="color-row">
-                    <div class="form-field">
-                        <label for="id_background_color">{{ form.background_color.label }}</label>
-                        {{ form.background_color }}
-                        {% if form.background_color.help_text %}
-                        <span class="field-help">{{ form.background_color.help_text|safe }}</span>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="form-field">
-                        <label for="id_text_color">{{ form.text_color.label }}</label>
-                        {{ form.text_color }}
-                        {% if form.text_color.help_text %}
-                        <span class="field-help">{{ form.text_color.help_text|safe }}</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-field">
-                        <label for="id_button_color_primary">{{ form.button_color_primary.label }}</label>
-                        {{ form.button_color_primary }}
-                        {% if form.button_color_primary.help_text %}
-                        <span class="field-help">{{ form.button_color_primary.help_text|safe }}</span>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="form-field">
-                        <label for="id_button_text_color">{{ form.button_text_color.label }}</label>
-                        {{ form.button_text_color }}
-                        {% if form.button_text_color.help_text %}
-                        <span class="field-help">{{ form.button_text_color.help_text|safe }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Campos ocultos para compatibilidade -->
-                <input type="hidden" name="{{ form.button_color_secondary.name }}" id="id_button_color_secondary" value="{{ branding.button_color_secondary|default:branding.button_color_primary }}">
-                <input type="hidden" name="{{ form.use_gradient_buttons.name }}" id="id_use_gradient_buttons" value="on">
-            </div>
-
-            <div class="form-divider"></div>
-
-            <!-- SEÇÃO: Imagem de Capa (antes era Destaque, removido) -->
+            <!-- SEÇÃO: Modelo de Tema (Novo) -->
             <div class="form-section">
                 <h3><i class="fas fa-palette"></i> Modelo de Tema</h3>
                 <p style="color: #64748b; margin-bottom: 1.5rem;">Escolha um tema pré-configurado ou personalize as cores do seu mini site.</p>
@@ -1475,6 +1429,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnColorInput = document.getElementById('id_button_color_theme');
     const btnTextColorInput = document.getElementById('id_button_text_color_theme');
     
+    console.log('🎨 Inicializando Theme Template Switching');
+    console.log('Campos encontrados:', {bgColorInput, textColorInput, btnColorInput, btnTextColorInput});
+    
     const templates = {
         'dark': {
             background: '#000000',
@@ -1491,10 +1448,10 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     function updateThemePreview() {
-        const bgColor = bgColorInput.value;
-        const textColor = textColorInput.value;
-        const btnColor = btnColorInput.value;
-        const btnTextColor = btnTextColorInput.value;
+        const bgColor = bgColorInput ? bgColorInput.value : '#000000';
+        const textColor = textColorInput ? textColorInput.value : '#FFFFFF';
+        const btnColor = btnColorInput ? btnColorInput.value : '#22c55e';
+        const btnTextColor = btnTextColorInput ? btnTextColorInput.value : '#FFFFFF';
         
         const preview = document.getElementById('theme-preview');
         const previewBtn = document.getElementById('preview-button');
@@ -1510,32 +1467,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Atualizar previews coloridos
-        document.getElementById('bg-color-preview').style.background = bgColor;
-        document.getElementById('text-color-preview').style.background = textColor;
-        document.getElementById('btn-color-preview').style.background = btnColor;
-        document.getElementById('btn-text-color-preview').style.background = btnTextColor;
+        const bgPreview = document.getElementById('bg-color-preview');
+        const textPreview = document.getElementById('text-color-preview');
+        const btnPreview = document.getElementById('btn-color-preview');
+        const btnTextPreview = document.getElementById('btn-text-color-preview');
+        
+        if (bgPreview) bgPreview.style.background = bgColor;
+        if (textPreview) textPreview.style.background = textColor;
+        if (btnPreview) btnPreview.style.background = btnColor;
+        if (btnTextPreview) btnTextPreview.style.background = btnTextColor;
+        
+        console.log('🎨 Preview atualizado:', {bgColor, textColor, btnColor, btnTextColor});
     }
     
     function handleThemeChange(e) {
         const selectedTemplate = e.target.value;
+        console.log('📋 Tema selecionado:', selectedTemplate);
         
         if (selectedTemplate !== 'custom' && templates[selectedTemplate]) {
             const template = templates[selectedTemplate];
-            bgColorInput.value = template.background;
-            textColorInput.value = template.text;
-            btnColorInput.value = template.button;
-            btnTextColorInput.value = template.buttonText;
+            if (bgColorInput) bgColorInput.value = template.background;
+            if (textColorInput) textColorInput.value = template.text;
+            if (btnColorInput) btnColorInput.value = template.button;
+            if (btnTextColorInput) btnTextColorInput.value = template.buttonText;
             
-            customColorsSection.style.display = 'none';
+            console.log('✅ Cores aplicadas:', template);
+            
+            if (customColorsSection) customColorsSection.style.display = 'none';
         } else {
-            customColorsSection.style.display = 'block';
+            if (customColorsSection) customColorsSection.style.display = 'block';
+            console.log('✏️  Modo personalizado ativado');
         }
         
         updateThemePreview();
     }
     
-    // Inicializar
-    themeRadios.forEach(radio => {
+    // Inicializar listeners
+    themeRadios.forEach((radio, index) => {
+        console.log(`Radio ${index}: value=${radio.value}, checked=${radio.checked}`);
         radio.addEventListener('change', handleThemeChange);
     });
     
@@ -1548,10 +1517,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar state
     const checkedRadio = document.querySelector('input[name="theme_template"]:checked');
     if (checkedRadio) {
+        console.log('🎯 Radio selecionado no carregamento:', checkedRadio.value);
         if (checkedRadio.value === 'custom') {
-            customColorsSection.style.display = 'block';
+            if (customColorsSection) customColorsSection.style.display = 'block';
         } else {
-            customColorsSection.style.display = 'none';
+            if (customColorsSection) customColorsSection.style.display = 'none';
         }
     }
     updateThemePreview();
