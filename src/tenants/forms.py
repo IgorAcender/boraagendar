@@ -292,7 +292,6 @@ class BrandingSettingsForm(forms.ModelForm):
             "background_color",
             "text_color",
             "button_color_primary",
-            "button_color_secondary",
             "button_text_color",
             "use_gradient_buttons",
             "highlight_color",
@@ -317,7 +316,6 @@ class BrandingSettingsForm(forms.ModelForm):
             "background_color": "Cor de Fundo",
             "text_color": "Cor de Texto",
             "button_color_primary": "Cor Primária do Botão",
-            "button_color_secondary": "Cor Secundária do Botão",
             "button_text_color": "Cor de Texto dos Botões",
             "use_gradient_buttons": "Usar Gradiente nos Botões",
             "highlight_color": "Cor de Destaque",
@@ -341,7 +339,6 @@ class BrandingSettingsForm(forms.ModelForm):
             "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
             "text_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
             "button_color_primary": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
-            "button_color_secondary": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
             "button_text_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
             "use_gradient_buttons": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "highlight_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
@@ -352,7 +349,6 @@ class BrandingSettingsForm(forms.ModelForm):
             "background_color": "Define o fundo de todas as páginas",
             "text_color": "Cor padrão do texto em todas as páginas",
             "button_color_primary": "Cor principal dos botões",
-            "button_color_secondary": "Cor secundária (usada em gradientes)",
             "button_text_color": "Cor do texto dentro dos botões",
             "use_gradient_buttons": "Se ativado, os botões terão gradiente com as duas cores",
             "highlight_color": "Cor para destaque (textos especiais, ícones, contornos)",
@@ -400,6 +396,10 @@ class BrandingSettingsForm(forms.ModelForm):
             self.instance.text_color = template["text_color"]
             self.instance.button_color_primary = template["button_color_primary"]
             self.instance.button_text_color = template["button_text_color"]
+        
+        # Garantir que button_color_secondary tem valor (necessário para compatibilidade)
+        if not self.instance.button_color_secondary:
+            self.instance.button_color_secondary = self.instance.button_color_primary
         
         # Processar sections_config se vier como string JSON
         sections_config = self.cleaned_data.get("sections_config")
