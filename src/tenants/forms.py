@@ -246,6 +246,12 @@ class BrandingSettingsForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "(00) 00000-0000"}),
         help_text="Número do WhatsApp para botão de contato."
     )
+    payment_methods = forms.CharField(
+        label="Formas de Pagamento (mini site)",
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 3, "placeholder": "Dinheiro, Cartão de Crédito, Cartão de Débito, PIX"}),
+        help_text="Formas de pagamento aceitas. Separe por vírgula ou uma por linha."
+    )
 
     def __init__(self, *args, tenant: Tenant, **kwargs):
         self.tenant = tenant
@@ -261,6 +267,7 @@ class BrandingSettingsForm(forms.ModelForm):
         self.fields["instagram_url"].initial = tenant.instagram_url
         self.fields["facebook_url"].initial = tenant.facebook_url
         self.fields["whatsapp_number"].initial = tenant.whatsapp_number
+        self.fields["payment_methods"].initial = tenant.payment_methods
         
         # Inicializar campos booleanos para equipe e horários
         # Estes são apenas campos dummy para controle na UI - não precisam estar no modelo
@@ -303,6 +310,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "instagram_url",
             "facebook_url",
             "whatsapp_number",
+            "payment_methods",
         ]
         labels = {
             "background_color": "Cor de Fundo",
@@ -325,6 +333,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "instagram_url": "Instagram (mini site)",
             "facebook_url": "Facebook (mini site)",
             "whatsapp_number": "WhatsApp (mini site)",
+            "payment_methods": "Formas de Pagamento (mini site)",
         }
         widgets = {
             "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
@@ -357,6 +366,7 @@ class BrandingSettingsForm(forms.ModelForm):
             "instagram_url": "Link para Instagram (opcional)",
             "facebook_url": "Link para Facebook (opcional)",
             "whatsapp_number": "Número para botão de WhatsApp no mini site",
+            "payment_methods": "Formas de pagamento aceitas. Separe por vírgula ou uma por linha.",
         }
 
     def save(self, commit=True):
@@ -425,6 +435,7 @@ class BrandingSettingsForm(forms.ModelForm):
         instagram_url = self.cleaned_data.get("instagram_url")
         facebook_url = self.cleaned_data.get("facebook_url")
         whatsapp_number = self.cleaned_data.get("whatsapp_number")
+        payment_methods = self.cleaned_data.get("payment_methods")
         fields_to_update = []
         if instagram_url is not None:
             self.tenant.instagram_url = instagram_url
@@ -435,6 +446,9 @@ class BrandingSettingsForm(forms.ModelForm):
         if whatsapp_number is not None:
             self.tenant.whatsapp_number = whatsapp_number
             fields_to_update.append("whatsapp_number")
+        if payment_methods is not None:
+            self.tenant.payment_methods = payment_methods
+            fields_to_update.append("payment_methods")
         if fields_to_update:
             fields_to_update.append("updated_at")
             self.tenant.save(update_fields=fields_to_update)

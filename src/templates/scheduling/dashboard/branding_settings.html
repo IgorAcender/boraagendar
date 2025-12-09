@@ -906,6 +906,30 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <!-- 6. FORMAS DE PAGAMENTO -->
+                <div class="form-field section-field" data-section-id="payment_methods">
+                    <div class="section-field-header">
+                        <label>FORMAS DE PAGAMENTO</label>
+                        <div class="order-controls">
+                            <input type="checkbox" class="section-visible-toggle" title="Mostrar/ocultar seção" checked id="payment_methods_visible">
+                            <button type="button" class="btn-section-up" title="Mover para cima">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button type="button" class="btn-section-down" title="Mover para baixo">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <label for="id_payment_methods" style="display: block; font-size: 0.95rem; color: #94a3b8; margin-bottom: 8px;">
+                        <i class="fas fa-credit-card"></i> {{ form.payment_methods.label }}
+                    </label>
+                    {{ form.payment_methods }}
+                    {% if form.payment_methods.help_text %}
+                    <span class="field-help">{{ form.payment_methods.help_text|safe }}</span>
+                    {% endif %}
+                </div>
             </div>
 
             <!-- Campo oculto para salvar configurações de seções -->
