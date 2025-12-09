@@ -922,6 +922,31 @@
             color: var(--brand-primary);
         }
 
+        /* Botão WhatsApp compacto nos contatos */
+        .whatsapp-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            background: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+            border: 1px solid color-mix(in srgb, var(--brand-primary) 30%, transparent);
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .whatsapp-button:hover {
+            background: color-mix(in srgb, var(--brand-primary) 20%, transparent);
+            transform: translateY(-2px);
+        }
+
+        .whatsapp-button i {
+            font-size: 1.3rem;
+            color: var(--brand-primary);
+        }
+
         /* Seção de Agendamento */
         .schedule-button-section {
             display: flex;
@@ -1417,8 +1442,8 @@
                         <!-- Botão WhatsApp Destacado -->
                         {% if tenant.whatsapp_number %}
                         <div style="margin-top: 1.5rem; text-align: center;">
-                            <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank" class="social-link">
-                                <i class="fab fa-whatsapp social-icon"></i>
+                            <a href="https://wa.me/{{ tenant.whatsapp_number }}" target="_blank" class="whatsapp-button">
+                                <i class="fab fa-whatsapp"></i>
                                 WhatsApp
                             </a>
                         </div>
