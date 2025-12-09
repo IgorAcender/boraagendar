@@ -377,15 +377,15 @@ class BrandingSettingsForm(forms.ModelForm):
             "dark": {
                 "background_color": "#000000",
                 "text_color": "#FFFFFF",
-                "button_color_primary": "#22c55e",
-                "button_color_secondary": "#22c55e",
+                "button_color_primary": "#09913b",
+                "button_color_secondary": "#09913b",
                 "button_text_color": "#FFFFFF",
             },
             "light": {
                 "background_color": "#FFFFFF",
                 "text_color": "#000000",
-                "button_color_primary": "#22c55e",
-                "button_color_secondary": "#22c55e",
+                "button_color_primary": "#09913b",
+                "button_color_secondary": "#09913b",
                 "button_text_color": "#FFFFFF",
             },
         }
