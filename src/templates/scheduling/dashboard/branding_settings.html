@@ -787,6 +787,17 @@
                     {% if form.contact_info.help_text %}
                     <span class="field-help">{{ form.contact_info.help_text|safe }}</span>
                     {% endif %}
+                    
+                    <!-- WhatsApp Field -->
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+                        <label for="id_whatsapp_number" style="display: block; font-size: 0.95rem; color: #94a3b8; margin-bottom: 8px;">
+                            <i class="fab fa-whatsapp" style="color: #25D366; margin-right: 6px;"></i> WhatsApp
+                        </label>
+                        {{ form.whatsapp_number }}
+                        {% if form.whatsapp_number.help_text %}
+                        <span class="field-help">{{ form.whatsapp_number.help_text|safe }}</span>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- 5. ENDEREÇO -->
