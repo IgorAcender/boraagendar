@@ -378,12 +378,14 @@ class BrandingSettingsForm(forms.ModelForm):
                 "background_color": "#000000",
                 "text_color": "#FFFFFF",
                 "button_color_primary": "#22c55e",
+                "button_color_secondary": "#22c55e",
                 "button_text_color": "#FFFFFF",
             },
             "light": {
                 "background_color": "#FFFFFF",
                 "text_color": "#000000",
                 "button_color_primary": "#22c55e",
+                "button_color_secondary": "#22c55e",
                 "button_text_color": "#FFFFFF",
             },
         }
@@ -395,6 +397,7 @@ class BrandingSettingsForm(forms.ModelForm):
             self.instance.background_color = template["background_color"]
             self.instance.text_color = template["text_color"]
             self.instance.button_color_primary = template["button_color_primary"]
+            self.instance.button_color_secondary = template["button_color_secondary"]
             self.instance.button_text_color = template["button_text_color"]
         
         # Garantir que button_color_secondary tem valor (necessário para compatibilidade)
