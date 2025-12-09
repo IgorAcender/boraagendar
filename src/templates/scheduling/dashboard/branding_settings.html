@@ -771,49 +771,49 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
                         <!-- Cor de Fundo -->
                         <div class="form-field">
-                            <label for="id_background_color_theme">{{ form.background_color_theme.label }}</label>
+                            <label for="id_background_color">{{ form.background_color.label }}</label>
                             <div style="display: flex; gap: 0.75rem; align-items: center;">
-                                {{ form.background_color_theme }}
+                                {{ form.background_color }}
                                 <span id="bg-color-preview" style="display: inline-block; width: 40px; height: 40px; border: 1px solid #ccc; border-radius: 4px; background: #000000;"></span>
                             </div>
-                            {% if form.background_color_theme.help_text %}
-                            <span class="field-help">{{ form.background_color_theme.help_text|safe }}</span>
+                            {% if form.background_color.help_text %}
+                            <span class="field-help">{{ form.background_color.help_text|safe }}</span>
                             {% endif %}
                         </div>
                         
                         <!-- Cor do Texto -->
                         <div class="form-field">
-                            <label for="id_text_color_theme">{{ form.text_color_theme.label }}</label>
+                            <label for="id_text_color">{{ form.text_color.label }}</label>
                             <div style="display: flex; gap: 0.75rem; align-items: center;">
-                                {{ form.text_color_theme }}
+                                {{ form.text_color }}
                                 <span id="text-color-preview" style="display: inline-block; width: 40px; height: 40px; border: 1px solid #ccc; border-radius: 4px; background: #FFFFFF;"></span>
                             </div>
-                            {% if form.text_color_theme.help_text %}
-                            <span class="field-help">{{ form.text_color_theme.help_text|safe }}</span>
+                            {% if form.text_color.help_text %}
+                            <span class="field-help">{{ form.text_color.help_text|safe }}</span>
                             {% endif %}
                         </div>
                         
                         <!-- Cor do Botão -->
                         <div class="form-field">
-                            <label for="id_button_color_theme">{{ form.button_color_theme.label }}</label>
+                            <label for="id_button_color_primary">{{ form.button_color_primary.label }}</label>
                             <div style="display: flex; gap: 0.75rem; align-items: center;">
-                                {{ form.button_color_theme }}
+                                {{ form.button_color_primary }}
                                 <span id="btn-color-preview" style="display: inline-block; width: 40px; height: 40px; border: 1px solid #ccc; border-radius: 4px; background: #22c55e;"></span>
                             </div>
-                            {% if form.button_color_theme.help_text %}
-                            <span class="field-help">{{ form.button_color_theme.help_text|safe }}</span>
+                            {% if form.button_color_primary.help_text %}
+                            <span class="field-help">{{ form.button_color_primary.help_text|safe }}</span>
                             {% endif %}
                         </div>
                         
                         <!-- Cor do Texto do Botão -->
                         <div class="form-field">
-                            <label for="id_button_text_color_theme">{{ form.button_text_color_theme.label }}</label>
+                            <label for="id_button_text_color">{{ form.button_text_color.label }}</label>
                             <div style="display: flex; gap: 0.75rem; align-items: center;">
-                                {{ form.button_text_color_theme }}
+                                {{ form.button_text_color }}
                                 <span id="btn-text-color-preview" style="display: inline-block; width: 40px; height: 40px; border: 1px solid #ccc; border-radius: 4px; background: #FFFFFF;"></span>
                             </div>
-                            {% if form.button_text_color_theme.help_text %}
-                            <span class="field-help">{{ form.button_text_color_theme.help_text|safe }}</span>
+                            {% if form.button_text_color.help_text %}
+                            <span class="field-help">{{ form.button_text_color.help_text|safe }}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -1424,10 +1424,10 @@ function updateSectionsState() {
 document.addEventListener('DOMContentLoaded', function() {
     const themeRadios = document.querySelectorAll('input[name="theme_template"]');
     const customColorsSection = document.getElementById('custom-colors-section');
-    const bgColorInput = document.getElementById('id_background_color_theme');
-    const textColorInput = document.getElementById('id_text_color_theme');
-    const btnColorInput = document.getElementById('id_button_color_theme');
-    const btnTextColorInput = document.getElementById('id_button_text_color_theme');
+    const bgColorInput = document.getElementById('id_background_color');
+    const textColorInput = document.getElementById('id_text_color');
+    const btnColorInput = document.getElementById('id_button_color_primary');
+    const btnTextColorInput = document.getElementById('id_button_text_color');
     
     console.log('🎨 Inicializando Theme Template Switching');
     console.log('Campos encontrados:', {bgColorInput, textColorInput, btnColorInput, btnTextColorInput});
