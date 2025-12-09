@@ -787,11 +787,6 @@
                         <p><i class="fas fa-info-circle"></i> Exibe os membros da sua equipe no mini site.</p>
                         <p style="margin-top: 8px;">Para gerenciar a equipe, acesse a página de Membros.</p>
                     </div>
-                    <!-- Campo real do formulário para show_team -->
-                    {{ form.show_team }}
-                    {% if form.show_team.help_text %}
-                    <span class="field-help">{{ form.show_team.help_text|safe }}</span>
-                    {% endif %}
                 </div>
 
                 <!-- 3. HORÁRIO DE FUNCIONAMENTO -->
@@ -812,11 +807,6 @@
                         <p><i class="fas fa-info-circle"></i> Exibe os horários de funcionamento no mini site.</p>
                         <p style="margin-top: 8px;">Configure os horários na página de Horários de Funcionamento.</p>
                     </div>
-                    <!-- Campo real do formulário para show_business_hours -->
-                    {{ form.show_business_hours }}
-                    {% if form.show_business_hours.help_text %}
-                    <span class="field-help">{{ form.show_business_hours.help_text|safe }}</span>
-                    {% endif %}
                 </div>
 
                 <!-- 4. CONTATO -->
