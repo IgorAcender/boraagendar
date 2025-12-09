@@ -38,6 +38,24 @@ class Tenant(models.Model):
     contact_info = models.TextField("Contatos do mini site", blank=True, help_text="Telefone/WhatsApp/e-mail exibidos no mini site")
     payment_methods = models.TextField("Formas de pagamento", blank=True, help_text="Separadas por vírgula: Ex: Dinheiro, Cartão de Crédito, Cartão de Débito, PIX")
     amenities = models.TextField("Comodidades", blank=True, help_text="Separadas por vírgula: Ex: WiFi, Estacionamento, Acessibilidade")
+    
+    # Campos de tema e personalização
+    theme_template = models.CharField(
+        "Modelo de Tema",
+        max_length=20,
+        choices=[
+            ("custom", "Personalizado"),
+            ("dark", "Preto e Branco (Tema Escuro)"),
+            ("light", "Branco e Preto (Tema Claro)"),
+        ],
+        default="custom",
+        help_text="Escolha um modelo pré-configurado ou personalize as cores"
+    )
+    background_color = models.CharField("Cor de Fundo", max_length=7, default="#000000")
+    text_color = models.CharField("Cor do Texto", max_length=7, default="#FFFFFF")
+    button_color = models.CharField("Cor do Botão", max_length=7, default="#22c55e")
+    button_text_color = models.CharField("Cor do Texto do Botão", max_length=7, default="#FFFFFF")
+    
     is_active = models.BooleanField("Ativo", default=True)
     created_at = models.DateTimeField("Criado em", auto_now_add=True)
     updated_at = models.DateTimeField("Atualizado em", auto_now=True)

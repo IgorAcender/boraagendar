@@ -252,6 +252,46 @@ class BrandingSettingsForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 3, "placeholder": "Dinheiro, Cartão de Crédito, Cartão de Débito, PIX"}),
         help_text="Formas de pagamento aceitas. Separe por vírgula ou uma por linha."
     )
+    
+    theme_template = forms.ChoiceField(
+        label="Modelo de Tema",
+        required=False,
+        choices=[
+            ("custom", "Personalizado (Suas cores)"),
+            ("dark", "🌙 Preto e Branco (Tema Escuro)"),
+            ("light", "☀️ Branco e Preto (Tema Claro)"),
+        ],
+        widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+        help_text="Escolha um modelo pré-configurado ou personalize as cores abaixo"
+    )
+    
+    background_color_theme = forms.CharField(
+        label="Cor de Fundo",
+        required=False,
+        widget=forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+        help_text="Cor de fundo da página"
+    )
+    
+    text_color_theme = forms.CharField(
+        label="Cor do Texto",
+        required=False,
+        widget=forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+        help_text="Cor padrão do texto"
+    )
+    
+    button_color_theme = forms.CharField(
+        label="Cor do Botão",
+        required=False,
+        widget=forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+        help_text="Cor dos botões de ação"
+    )
+    
+    button_text_color_theme = forms.CharField(
+        label="Cor do Texto do Botão",
+        required=False,
+        widget=forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
+        help_text="Cor do texto dentro dos botões"
+    )
 
     def __init__(self, *args, tenant: Tenant, **kwargs):
         self.tenant = tenant
@@ -268,6 +308,13 @@ class BrandingSettingsForm(forms.ModelForm):
         self.fields["facebook_url"].initial = tenant.facebook_url
         self.fields["whatsapp_number"].initial = tenant.whatsapp_number
         self.fields["payment_methods"].initial = tenant.payment_methods
+        
+        # Inicializar campos de tema
+        self.fields["theme_template"].initial = tenant.theme_template
+        self.fields["background_color_theme"].initial = tenant.background_color
+        self.fields["text_color_theme"].initial = tenant.text_color
+        self.fields["button_color_theme"].initial = tenant.button_color
+        self.fields["button_text_color_theme"].initial = tenant.button_text_color
         
         # Inicializar campos booleanos para equipe e horários
         # Estes são apenas campos dummy para controle na UI - não precisam estar no modelo
@@ -311,6 +358,11 @@ class BrandingSettingsForm(forms.ModelForm):
             "facebook_url",
             "whatsapp_number",
             "payment_methods",
+            "theme_template",
+            "background_color_theme",
+            "text_color_theme",
+            "button_color_theme",
+            "button_text_color_theme",
         ]
         labels = {
             "background_color": "Cor de Fundo",
@@ -334,6 +386,11 @@ class BrandingSettingsForm(forms.ModelForm):
             "facebook_url": "Facebook (mini site)",
             "whatsapp_number": "WhatsApp (mini site)",
             "payment_methods": "Formas de Pagamento (mini site)",
+            "theme_template": "Modelo de Tema",
+            "background_color_theme": "Cor de Fundo",
+            "text_color_theme": "Cor do Texto",
+            "button_color_theme": "Cor do Botão",
+            "button_text_color_theme": "Cor do Texto do Botão",
         }
         widgets = {
             "background_color": forms.TextInput(attrs={"type": "color", "class": "form-control color-picker"}),
@@ -371,6 +428,41 @@ class BrandingSettingsForm(forms.ModelForm):
 
     def save(self, commit=True):
         import json
+        
+        # TEMPLATES DE TEMA PRÉ-CONFIGURADOS
+        theme_templates = {
+            "dark": {
+                "background_color": "#000000",
+                "text_color": "#FFFFFF",
+                "button_color": "#22c55e",
+                "button_text_color": "#FFFFFF",
+            },
+            "light": {
+                "background_color": "#FFFFFF",
+                "text_color": "#000000",
+                "button_color": "#22c55e",
+                "button_text_color": "#FFFFFF",
+            },
+        }
+        
+        # Aplicar template se selecionado
+        theme_selected = self.cleaned_data.get("theme_template")
+        if theme_selected and theme_selected in theme_templates:
+            template = theme_templates[theme_selected]
+            self.tenant.theme_template = theme_selected
+            self.tenant.background_color = template["background_color"]
+            self.tenant.text_color = template["text_color"]
+            self.tenant.button_color = template["button_color"]
+            self.tenant.button_text_color = template["button_text_color"]
+        else:
+            # Se for personalizado, usar cores do formulário
+            self.tenant.theme_template = self.cleaned_data.get("theme_template", "custom")
+            self.tenant.background_color = self.cleaned_data.get("background_color_theme") or self.tenant.background_color
+            self.tenant.text_color = self.cleaned_data.get("text_color_theme") or self.tenant.text_color
+            self.tenant.button_color = self.cleaned_data.get("button_color_theme") or self.tenant.button_color
+            self.tenant.button_text_color = self.cleaned_data.get("button_text_color_theme") or self.tenant.button_text_color
+        
+        self.tenant.save(update_fields=["theme_template", "background_color", "text_color", "button_color", "button_text_color", "updated_at"])
         
         # Processar sections_config se vier como string JSON
         sections_config = self.cleaned_data.get("sections_config")
