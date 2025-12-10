@@ -890,7 +890,7 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
         Booking,
         id=booking_id,
         tenant=tenant,
-        customer__phone=customer_phone
+        customer_phone=customer_phone
     )
     
     # Obter política de reagendamento
