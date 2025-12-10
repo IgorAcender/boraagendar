@@ -669,6 +669,134 @@
         visibility: hidden !important;
         opacity: 0 !important;
     }
+
+    /* Modal Styles */
+    .confirmation-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .confirmation-modal.active {
+        display: flex;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-content {
+        background: var(--bg-dark);
+        border: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent);
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .modal-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid color-mix(in srgb, var(--text-light) 20%, transparent);
+    }
+
+    .modal-header h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    .modal-body {
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-item {
+        padding: 1rem;
+        background: color-mix(in srgb, var(--text-light) 5%, var(--bg-dark));
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--brand-primary);
+    }
+
+    .modal-item-label {
+        font-size: 0.85rem;
+        color: rgba(var(--text-light), 0.6);
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .modal-item-value {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        font-weight: 600;
+    }
+
+    .modal-footer {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .modal-btn {
+        flex: 1;
+        padding: 0.875rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .modal-btn-confirm {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: var(--button-text);
+    }
+
+    .modal-btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .modal-btn-cancel {
+        background: color-mix(in srgb, var(--text-light) 15%, var(--bg-dark));
+        color: var(--text-light);
+    }
+
+    .modal-btn-cancel:hover {
+        background: color-mix(in srgb, var(--text-light) 25%, var(--bg-dark));
+    }
+
 </style>
 {% endblock %}
 
@@ -878,10 +1006,15 @@
 
         <div class="slots-grid">
             {% for slot in available_slots %}
-            <a class="slot-card btn-book"
-               href="{% url 'public:booking_confirm' tenant_slug=tenant.slug %}?service={{ selected_service.id }}&professional={% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %}&start={{ slot.start|date:'c' }}">
+            <div class="slot-card btn-book"
+                 data-slot-time="{{ slot.start|time:'H:i' }}"
+                 data-slot-date="{{ selected_date|date:'d/m/Y' }}"
+                 data-slot-start="{{ slot.start|date:'c' }}"
+                 data-service-name="{{ selected_service.name }}"
+                 data-professional-id="{% if selected_professional %}{{ selected_professional.id }}{% else %}any{% endif %}"
+                 data-professional-name="{% if selected_professional %}{{ selected_professional.display_name }}{% else %}Sem Preferência{% endif %}">
                 <div class="slot-time">{{ slot.start|time:"H:i" }}</div>
-            </a>
+            </div>
             {% endfor %}
         </div>
         {% elif selected_date %}
@@ -904,6 +1037,37 @@
     </div>
 </div>
 {% endif %}
+
+<!-- Confirmation Modal -->
+<div class="confirmation-modal" id="confirmationModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirmar Agendamento</h3>
+        </div>
+        <div class="modal-body">
+            <div class="modal-item">
+                <div class="modal-item-label">{{ tenant.label_servico }}</div>
+                <div class="modal-item-value" id="modalService"></div>
+            </div>
+            <div class="modal-item">
+                <div class="modal-item-label">Data</div>
+                <div class="modal-item-value" id="modalDate"></div>
+            </div>
+            <div class="modal-item">
+                <div class="modal-item-label">Horário</div>
+                <div class="modal-item-value" id="modalTime"></div>
+            </div>
+            <div class="modal-item" id="modalProfessionalItem" style="display: none;">
+                <div class="modal-item-label">{{ tenant.label_profissional }}</div>
+                <div class="modal-item-value" id="modalProfessional"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-cancel" id="cancelBtn">Voltar</button>
+            <button type="button" class="modal-btn modal-btn-confirm" id="confirmBtn">Confirmar</button>
+        </div>
+    </div>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1363,6 +1527,68 @@
             slotsContainer.innerHTML = slotsHTML;
             console.log('Slots rendered successfully');
         }
+
+        // Modal functionality
+        const modal = document.getElementById('confirmationModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+        let selectedSlotData = null;
+
+        // Open modal when clicking a slot
+        document.addEventListener('click', function(e) {
+            const slotCard = e.target.closest('.slot-card');
+            if (slotCard) {
+                e.preventDefault();
+                selectedSlotData = {
+                    time: slotCard.dataset.slotTime,
+                    date: slotCard.dataset.slotDate,
+                    start: slotCard.dataset.slotStart,
+                    serviceName: slotCard.dataset.serviceName,
+                    professionalId: slotCard.dataset.professionalId,
+                    professionalName: slotCard.dataset.professionalName,
+                    serviceId: '{{ selected_service.id }}'
+                };
+
+                // Update modal content
+                document.getElementById('modalService').textContent = selectedSlotData.serviceName;
+                document.getElementById('modalDate').textContent = selectedSlotData.date;
+                document.getElementById('modalTime').textContent = selectedSlotData.time;
+                
+                const professionalItem = document.getElementById('modalProfessionalItem');
+                if (selectedSlotData.professionalName && selectedSlotData.professionalName !== 'Sem Preferência') {
+                    document.getElementById('modalProfessional').textContent = selectedSlotData.professionalName;
+                    professionalItem.style.display = 'block';
+                } else {
+                    professionalItem.style.display = 'none';
+                }
+
+                // Show modal
+                modal.classList.add('active');
+            }
+        });
+
+        // Close modal
+        cancelBtn.addEventListener('click', function() {
+            modal.classList.remove('active');
+            selectedSlotData = null;
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                selectedSlotData = null;
+            }
+        });
+
+        // Confirm booking
+        confirmBtn.addEventListener('click', function() {
+            if (selectedSlotData) {
+                // Redirect to booking_confirm with parameters
+                const confirmUrl = `{% url 'public:booking_confirm' tenant_slug=tenant.slug %}?service=${selectedSlotData.serviceId}&professional=${selectedSlotData.professionalId}&start=${encodeURIComponent(selectedSlotData.start)}`;
+                window.location.href = confirmUrl;
+            }
+        });
     });
 </script>
 {% endblock %}
