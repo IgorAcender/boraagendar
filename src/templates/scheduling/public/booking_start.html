@@ -674,10 +674,10 @@
     .confirmation-modal {
         display: none !important;
         position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
+        inset: 0 !important;
         width: 100% !important;
         height: 100vh !important;
+        padding: 1.5rem !important;
         background: rgba(0, 0, 0, 0.7) !important;
         z-index: 1000 !important;
         align-items: center !important;
@@ -688,6 +688,8 @@
 
     .confirmation-modal.active {
         display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
     body.modal-open {
