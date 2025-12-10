@@ -348,15 +348,16 @@
                 {% endif %}
 
                 <div class="booking-actions">
+                    {% if booking.status == 'confirmed' or booking.status == 'pending' %}
+                    <button class="btn-action btn-reschedule" onclick="rescheduleBooking({{ booking.id }})">
+                        <i class="fas fa-calendar-alt"></i>
+                        Reagendar
+                    </button>
                     <button class="btn-action btn-cancel" onclick="cancelBooking({{ booking.id }}, '{{ booking.service.name }}', '{{ booking.scheduled_for|date:"d/m/Y" }}', '{{ booking.scheduled_for|time:"H:i" }}')">
                         <i class="fas fa-times-circle"></i>
                         Cancelar
                     </button>
-                    <!-- Futura implementação de remarcar -->
-                    <!-- <button class="btn-action btn-reschedule">
-                        <i class="fas fa-calendar-alt"></i>
-                        Remarcar
-                    </button> -->
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -426,13 +427,63 @@
 </div>
 
 <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     function cancelBooking(bookingId, serviceName, date, time) {
         const message = `Deseja realmente cancelar o agendamento?\n\n${serviceName}\n${date} às ${time}`;
         
-        if (confirm(message)) {
-            // TODO: Implementar cancelamento via AJAX
-            alert('Funcionalidade de cancelamento será implementada em breve!');
+        if (!confirm(message)) {
+            return;
         }
+        
+        // Pedir motivo do cancelamento
+        const reason = prompt('Por favor, informe o motivo do cancelamento (opcional):');
+        
+        // Fazer requisição AJAX para cancelar
+        const csrftoken = getCookie('csrftoken');
+        const formData = new FormData();
+        if (reason) {
+            formData.append('reason', reason);
+        }
+        
+        fetch(`{% url 'public:cancel_booking' tenant_slug=tenant.slug booking_id=0 %}`.replace('/0/', `/${bookingId}/`), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message || 'Agendamento cancelado com sucesso!');
+                location.reload();
+            } else {
+                alert(data.error || 'Erro ao cancelar agendamento.');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao processar cancelamento. Tente novamente.');
+        });
+    }
+    
+    function rescheduleBooking(bookingId) {
+        // Redirecionar para página de reagendamento
+        window.location.href = `{% url 'public:reschedule_booking' tenant_slug=tenant.slug booking_id=0 %}`.replace('/0/', `/${bookingId}/`);
     }
 </script>
 {% endblock %}

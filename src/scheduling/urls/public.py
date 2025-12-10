@@ -47,4 +47,14 @@ urlpatterns = [
         public_views.logout_bookings,
         name="logout_bookings",
     ),
+    path(
+        "<slug:tenant_slug>/meus-agendamentos/<int:booking_id>/cancelar/",
+        public_views.cancel_booking,
+        name="cancel_booking",
+    ),
+    path(
+        "<slug:tenant_slug>/meus-agendamentos/<int:booking_id>/reagendar/",
+        public_views.reschedule_booking,
+        name="reschedule_booking",
+    ),
 ]

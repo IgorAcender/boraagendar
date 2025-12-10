@@ -5,6 +5,8 @@ import json
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.http import require_http_methods
+from django.contrib import messages
 
 from tenants.models import Tenant, BrandingSettings
 from ..models import AvailabilityRule
@@ -752,3 +754,239 @@ def logout_bookings(request: HttpRequest, tenant_slug: str) -> HttpResponse:
         del request.session['tenant_slug']
     
     return redirect('public:tenant_landing', tenant_slug=tenant_slug)
+
+
+@require_http_methods(["POST"])
+def cancel_booking(request: HttpRequest, tenant_slug: str, booking_id: int) -> HttpResponse:
+    """
+    Cancelar um agendamento
+    """
+    from django.utils import timezone
+    from datetime import timedelta
+    from scheduling.models import BookingPolicy
+    import json
+    
+    # Verificar se o cliente está logado
+    customer_phone = request.session.get('customer_phone')
+    if not customer_phone:
+        return JsonResponse({'success': False, 'error': 'Não autenticado'}, status=401)
+    
+    try:
+        tenant = get_object_or_404(Tenant, slug=tenant_slug)
+        booking = get_object_or_404(
+            Booking,
+            id=booking_id,
+            tenant=tenant,
+            customer__phone=customer_phone
+        )
+        
+        # Obter política de cancelamento
+        policy = BookingPolicy.get_or_create_for_tenant(tenant)
+        
+        # Verificar se cancelamento está permitido
+        if not policy.allow_cancellation:
+            return JsonResponse({
+                'success': False,
+                'error': 'Cancelamento não permitido pela política do estabelecimento.'
+            }, status=403)
+        
+        # Verificar se o agendamento já foi cancelado
+        if booking.status == 'cancelled':
+            return JsonResponse({
+                'success': False,
+                'error': 'Este agendamento já foi cancelado.'
+            }, status=400)
+        
+        # Verificar se o agendamento já passou
+        if booking.scheduled_for < timezone.now():
+            return JsonResponse({
+                'success': False,
+                'error': 'Não é possível cancelar um agendamento que já passou.'
+            }, status=400)
+        
+        # Verificar antecedência mínima
+        if policy.min_cancellation_hours > 0:
+            min_time = timezone.now() + timedelta(hours=policy.min_cancellation_hours)
+            if booking.scheduled_for < min_time:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Cancelamento deve ser feito com pelo menos {policy.min_cancellation_hours} horas de antecedência.'
+                }, status=400)
+        
+        # Verificar limite de cancelamentos
+        if policy.max_cancellations > 0 and policy.cancellation_period_days > 0:
+            period_start = timezone.now() - timedelta(days=policy.cancellation_period_days)
+            recent_cancellations = Booking.objects.filter(
+                tenant=tenant,
+                customer_phone=customer_phone,
+                status='cancelled',
+                updated_at__gte=period_start
+            ).count()
+            
+            if recent_cancellations >= policy.max_cancellations:
+                # TODO: Implementar bloqueio de cliente (criar modelo Customer)
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Você atingiu o limite de {policy.max_cancellations} cancelamentos em {policy.cancellation_period_days} dias.'
+                }, status=403)
+        
+        # Obter motivo do cancelamento se exigido
+        reason = request.POST.get('reason', '').strip()
+        if policy.require_cancellation_reason and not reason:
+            return JsonResponse({
+                'success': False,
+                'error': 'Por favor, informe o motivo do cancelamento.'
+            }, status=400)
+        
+        # Cancelar o agendamento
+        booking.status = 'cancelled'
+        if reason:
+            booking.notes = f"{booking.notes}\n\nMotivo do cancelamento: {reason}" if booking.notes else f"Motivo do cancelamento: {reason}"
+        booking.save()
+        
+        # Notificar gerente se configurado
+        if policy.notify_manager_on_abuse:
+            if policy.max_cancellations > 0 and policy.cancellation_period_days > 0:
+                period_start = timezone.now() - timedelta(days=policy.cancellation_period_days)
+                recent_cancellations = Booking.objects.filter(
+                    tenant=tenant,
+                    customer_phone=customer_phone,
+                    status='cancelled',
+                    updated_at__gte=period_start
+                ).count()
+                
+                if recent_cancellations >= policy.max_cancellations - 1:
+                    # TODO: Enviar notificação para o gerente
+                    pass
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Agendamento cancelado com sucesso.'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@require_http_methods(["GET", "POST"])
+def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) -> HttpResponse:
+    """
+    Reagendar um agendamento
+    """
+    from django.utils import timezone
+    from datetime import timedelta, datetime
+    from scheduling.models import BookingPolicy
+    
+    # Verificar se o cliente está logado
+    customer_phone = request.session.get('customer_phone')
+    if not customer_phone:
+        return redirect('public:my_bookings_login', tenant_slug=tenant_slug)
+    
+    tenant = get_object_or_404(Tenant, slug=tenant_slug)
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id,
+        tenant=tenant,
+        customer__phone=customer_phone
+    )
+    
+    # Obter política de reagendamento
+    policy = BookingPolicy.get_or_create_for_tenant(tenant)
+    
+    # Verificar se reagendamento está permitido
+    if not policy.allow_rescheduling:
+        messages.error(request, 'Reagendamento não permitido pela política do estabelecimento.')
+        return redirect('public:my_bookings', tenant_slug=tenant_slug)
+    
+    # Verificar se o agendamento já foi cancelado
+    if booking.status == 'cancelled':
+        messages.error(request, 'Não é possível reagendar um agendamento cancelado.')
+        return redirect('public:my_bookings', tenant_slug=tenant_slug)
+    
+    # Verificar se o agendamento já passou
+    if booking.scheduled_for < timezone.now():
+        messages.error(request, 'Não é possível reagendar um agendamento que já passou.')
+        return redirect('public:my_bookings', tenant_slug=tenant_slug)
+    
+    # Verificar antecedência mínima
+    if policy.min_reschedule_hours > 0:
+        min_time = timezone.now() + timedelta(hours=policy.min_reschedule_hours)
+        if booking.scheduled_for < min_time:
+            messages.error(request, f'Reagendamento deve ser feito com pelo menos {policy.min_reschedule_hours} horas de antecedência.')
+            return redirect('public:my_bookings', tenant_slug=tenant_slug)
+    
+    # Verificar limite de reagendamentos por agendamento
+    if policy.max_reschedules_per_booking > 0:
+        # Contar reagendamentos deste booking (usando histórico se disponível)
+        # Por enquanto, vamos usar um campo metadata
+        reschedule_count = booking.metadata.get('reschedule_count', 0) if hasattr(booking, 'metadata') and booking.metadata else 0
+        
+        if reschedule_count >= policy.max_reschedules_per_booking:
+            messages.error(request, f'Este agendamento já foi reagendado {policy.max_reschedules_per_booking} vez(es). Limite atingido.')
+            return redirect('public:my_bookings', tenant_slug=tenant_slug)
+    
+    if request.method == 'POST':
+        # Processar reagendamento
+        new_datetime_str = request.POST.get('new_datetime')
+        
+        if not new_datetime_str:
+            messages.error(request, 'Por favor, selecione uma nova data e horário.')
+            return redirect('public:reschedule_booking', tenant_slug=tenant_slug, booking_id=booking_id)
+        
+        try:
+            # Parse datetime
+            new_datetime = datetime.fromisoformat(new_datetime_str.replace('Z', '+00:00'))
+            
+            # Converter para timezone aware se necessário
+            if timezone.is_naive(new_datetime):
+                new_datetime = timezone.make_aware(new_datetime)
+            
+            # Verificar janela de reagendamento
+            if policy.reschedule_window_days > 0:
+                max_date = timezone.now() + timedelta(days=policy.reschedule_window_days)
+                if new_datetime > max_date:
+                    messages.error(request, f'O reagendamento deve ser feito dentro de {policy.reschedule_window_days} dias.')
+                    return redirect('public:reschedule_booking', tenant_slug=tenant_slug, booking_id=booking_id)
+            
+            # Verificar se o novo horário está disponível
+            # TODO: Implementar verificação de disponibilidade
+            
+            # Atualizar agendamento
+            old_datetime = booking.scheduled_for
+            booking.scheduled_for = new_datetime
+            
+            # Incrementar contador de reagendamentos
+            if hasattr(booking, 'metadata') and booking.metadata:
+                booking.metadata['reschedule_count'] = booking.metadata.get('reschedule_count', 0) + 1
+            else:
+                booking.metadata = {'reschedule_count': 1}
+            
+            # Adicionar nota sobre reagendamento
+            reschedule_note = f"\n\nReagendado de {old_datetime.strftime('%d/%m/%Y %H:%M')} para {new_datetime.strftime('%d/%m/%Y %H:%M')}"
+            booking.notes = f"{booking.notes}{reschedule_note}" if booking.notes else reschedule_note.strip()
+            
+            booking.save()
+            
+            messages.success(request, 'Agendamento reagendado com sucesso!')
+            return redirect('public:my_bookings', tenant_slug=tenant_slug)
+            
+        except ValueError as e:
+            messages.error(request, 'Data e horário inválidos.')
+            return redirect('public:reschedule_booking', tenant_slug=tenant_slug, booking_id=booking_id)
+        except Exception as e:
+            messages.error(request, f'Erro ao reagendar: {str(e)}')
+            return redirect('public:reschedule_booking', tenant_slug=tenant_slug, booking_id=booking_id)
+    
+    # GET - mostrar formulário de reagendamento
+    branding = tenant.branding if hasattr(tenant, 'branding') else None
+    
+    return render(request, 'scheduling/public/reschedule_booking.html', {
+        'tenant': tenant,
+        'booking': booking,
+        'policy': policy,
+        'branding': branding,
+    })
+
