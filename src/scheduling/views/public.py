@@ -575,3 +575,37 @@ def get_available_slots(request: HttpRequest, tenant_slug: str) -> JsonResponse:
     except (Service.DoesNotExist, Professional.DoesNotExist) as e:
         print(f"DEBUG - Erro: {e}")
         return JsonResponse({'slots': [], 'error': str(e)})
+
+
+def check_phone(request: HttpRequest, tenant_slug: str) -> JsonResponse:
+    """
+    API para verificar se um telefone já está cadastrado
+    Retorna o nome do cliente se encontrado
+    """
+    tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
+    
+    phone = request.GET.get('phone', '').strip()
+    
+    if not phone:
+        return JsonResponse({'exists': False, 'error': 'Telefone não fornecido'})
+    
+    # Normalizar telefone (remover caracteres especiais)
+    import re
+    phone_normalized = re.sub(r'[^\d]', '', phone)
+    
+    # Buscar agendamento mais recente com esse telefone
+    from django.db.models import Q
+    
+    booking = Booking.objects.filter(
+        tenant=tenant,
+        customer_phone__icontains=phone_normalized[-8:]  # Últimos 8 dígitos
+    ).order_by('-created_at').first()
+    
+    if booking:
+        return JsonResponse({
+            'exists': True,
+            'customer_name': booking.customer_name,
+            'customer_phone': booking.customer_phone
+        })
+    else:
+        return JsonResponse({'exists': False})

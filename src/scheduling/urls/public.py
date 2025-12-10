@@ -27,4 +27,9 @@ urlpatterns = [
         public_views.get_available_slots,
         name="get_available_slots",
     ),
+    path(
+        "agendar/<slug:tenant_slug>/api/verificar-telefone/",
+        public_views.check_phone,
+        name="check_phone",
+    ),
 ]
