@@ -1,65 +1,114 @@
 {% extends 'base_dashboard.html' %}
 {% load static %}
 
-{% block page_title %}Políticas de Agendamento{% endblock %}
+{% block title %}Políticas de Agendamento{% endblock %}
 
-{% block extra_css %}
+{% block extra_head %}
 <style>
-    .policy-card {
+    .settings-card {
         background: white;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
     }
-    
-    .policy-card h3 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #1a202c;
-        margin-bottom: 8px;
+
+    .settings-header {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #f1f5f9;
     }
-    
-    .policy-card h3 i {
-        color: var(--primary-color, #4f46e5);
+
+    .settings-header-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
     }
-    
-    .policy-card .subtitle {
+
+    .settings-header h1 {
+        margin: 0;
+        font-size: 1.75rem;
+        color: #1e293b;
+    }
+
+    .settings-subtitle {
         color: #64748b;
+        font-size: 0.9375rem;
+        margin-top: 0.5rem;
+    }
+    .settings-subtitle {
+        color: #64748b;
+        font-size: 0.9375rem;
+        margin-top: 0.5rem;
+    }
+
+    .form-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .form-section-title {
         font-size: 0.875rem;
-        margin-bottom: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-section-title i {
+        color: var(--brand-primary);
+        font-size: 1rem;
     }
     
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 1.5rem;
     }
     
     .form-group label {
         display: block;
-        font-weight: 500;
-        color: #334155;
-        margin-bottom: 8px;
-        font-size: 0.9375rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
     }
     
-    .form-group .help-text {
+    .help-text {
         display: block;
-        color: #94a3b8;
+        color: #64748b;
         font-size: 0.8125rem;
-        margin-top: 4px;
+        margin-top: 0.5rem;
+        line-height: 1.5;
     }
     
     .toggle-wrapper {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 16px;
-        padding: 12px;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
         background: #f8fafc;
-        border-radius: 8px;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+
+    .toggle-wrapper:hover {
+        border-color: #cbd5e1;
+        background: white;
     }
     
     .toggle-switch {
@@ -108,112 +157,141 @@
     }
     
     .toggle-label {
-        font-weight: 500;
-        color: #334155;
+        font-weight: 600;
+        color: #475569;
         font-size: 0.9375rem;
+        flex: 1;
     }
     
     .input-group {
-        display: flex;
-        gap: 12px;
-        align-items: flex-start;
-    }
-    
-    .input-group > div {
-        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
     }
     
     .form-control {
         width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 0.9375rem;
-        transition: all 0.2s;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s;
+        background: #fafbfc;
+        font-family: inherit;
+    }
+    
+    .form-control:hover {
+        border-color: #cbd5e1;
+        background: white;
     }
     
     .form-control:focus {
         outline: none;
-        border-color: var(--primary-color, #4f46e5);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        border-color: var(--brand-primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.08);
+        transform: translateY(-1px);
     }
     
     .form-control:disabled {
         background-color: #f1f5f9;
         color: #94a3b8;
         cursor: not-allowed;
+        opacity: 0.6;
     }
     
     .conditional-fields {
         margin-left: 20px;
         padding-left: 20px;
         border-left: 3px solid #e2e8f0;
-        margin-top: 16px;
+        margin-top: 1rem;
     }
     
     .conditional-fields.hidden {
         display: none;
     }
     
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #f1f5f9;
+        margin-top: 2rem;
+    }
+    
     .btn-primary {
-        background-color: var(--primary-color, #4f46e5);
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
         color: white;
-        padding: 12px 32px;
         border: none;
-        border-radius: 8px;
+        border-radius: 12px;
         font-weight: 600;
         font-size: 1rem;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
     }
     
     .btn-primary:hover {
-        background-color: var(--primary-color-dark, #4338ca);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-    }
-    
-    .save-section {
-        position: sticky;
-        bottom: 0;
-        background: white;
-        padding: 20px 0;
-        border-top: 1px solid #e2e8f0;
-        margin-top: 24px;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
     }
     
     .alert {
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
         font-size: 0.9375rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
     }
     
     .alert-success {
         background-color: #ecfdf5;
         color: #047857;
-        border: 1px solid #86efac;
+        border: 2px solid #86efac;
     }
     
     .alert-info {
         background-color: #eff6ff;
         color: #1e40af;
-        border: 1px solid #93c5fd;
+        border: 2px solid #93c5fd;
+    }
+
+    @media (max-width: 768px) {
+        .input-group {
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        .settings-card {
+            padding: 1.5rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <div>
-        <h1>Políticas de Agendamento</h1>
-        <p class="subtitle">Configure as regras de cancelamento e reagendamento para seus clientes</p>
+<div class="settings-card">
+    <div class="settings-header">
+        <div class="settings-header-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <div>
+            <h1>Políticas de Agendamento</h1>
+            <p class="settings-subtitle">Configure as regras de cancelamento e reagendamento para seus clientes</p>
+        </div>
     </div>
-</div>
 
 {% if messages %}
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
+            <i class="fas fa-check-circle"></i>
             {{ message }}
         </div>
     {% endfor %}
@@ -223,12 +301,11 @@
     {% csrf_token %}
     
     <!-- Cancelamento -->
-    <div class="policy-card">
-        <h3>
+    <div class="form-section">
+        <h3 class="form-section-title">
             <i class="fas fa-ban"></i>
             Cancelamento de Agendamentos
         </h3>
-        <p class="subtitle">Defina as regras para cancelamento de agendamentos pelos clientes</p>
         
         <div class="toggle-wrapper">
             <label class="toggle-switch">
@@ -241,7 +318,7 @@
             </label>
         </div>
         
-        <div id="cancellationFields" class="conditional-fields">
+        <div class="conditional-fields" id="cancellationFields">
             <div class="form-group">
                 <label for="minCancellationHours">
                     Antecedência mínima para cancelamento (em horas)
@@ -306,12 +383,11 @@
     </div>
     
     <!-- Reagendamento -->
-    <div class="policy-card">
-        <h3>
+    <div class="form-section">
+        <h3 class="form-section-title">
             <i class="fas fa-calendar-alt"></i>
             Reagendamento
         </h3>
-        <p class="subtitle">Configure as opções de reagendamento disponíveis para os clientes</p>
         
         <div class="toggle-wrapper">
             <label class="toggle-switch">
@@ -324,7 +400,7 @@
             </label>
         </div>
         
-        <div id="reschedulingFields" class="conditional-fields">
+        <div class="conditional-fields" id="reschedulingFields">
             <div class="form-group">
                 <label for="minRescheduleHours">
                     Antecedência mínima para reagendamento (em horas)
@@ -378,12 +454,11 @@
     </div>
     
     <!-- Penalidades -->
-    <div class="policy-card">
-        <h3>
+    <div class="form-section">
+        <h3 class="form-section-title">
             <i class="fas fa-exclamation-triangle"></i>
             Penalidades e Notificações
         </h3>
-        <p class="subtitle">Configure ações automáticas para casos de abuso das políticas</p>
         
         <div class="toggle-wrapper">
             <label class="toggle-switch">
@@ -396,7 +471,7 @@
             </label>
         </div>
         
-        <div id="blockFields" class="conditional-fields">
+        <div class="conditional-fields" id="blockFields">
             <div class="form-group">
                 <label for="blockDurationDays">
                     Duração do bloqueio (em dias)
@@ -426,12 +501,13 @@
         </div>
     </div>
     
-    <div class="save-section">
+    <div class="form-actions">
         <button type="submit" class="btn-primary">
             <i class="fas fa-save"></i> Salvar Configurações
         </button>
     </div>
 </form>
+</div>
 {% endblock %}
 
 {% block extra_js %}
