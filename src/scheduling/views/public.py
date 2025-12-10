@@ -1001,7 +1001,7 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
             tenant=tenant,
             is_active=True
         ).filter(
-            Q(services=booking.service) | Q(auto_assign=True)
+            Q(services=booking.service) | Q(allow_auto_assign=True)
         ).distinct().order_by('display_name')
     except Exception as e:
         # Fallback: buscar todos profissionais ativos
@@ -1011,7 +1011,7 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
         ).order_by('display_name')
     
     # Verificar se há profissionais com auto_assign
-    has_auto_assign = available_professionals.filter(auto_assign=True).exists()
+    has_auto_assign = available_professionals.filter(allow_auto_assign=True).exists()
     
     branding = tenant.branding if hasattr(tenant, 'branding') else None
     
