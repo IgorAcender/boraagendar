@@ -1013,7 +1013,36 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
     # Verificar se há profissionais com auto_assign
     has_auto_assign = available_professionals.filter(allow_auto_assign=True).exists()
     
-    branding = tenant.branding if hasattr(tenant, 'branding') else None
+    # Obter configurações de branding
+    branding = None
+    try:
+        branding_settings = tenant.branding_settings
+        branding = {
+            "background_color": branding_settings.background_color,
+            "text_color": branding_settings.text_color,
+            "button_color_primary": branding_settings.button_color_primary,
+            "button_color_secondary": branding_settings.button_color_secondary,
+            "use_gradient_buttons": branding_settings.use_gradient_buttons,
+            "button_text_color": getattr(branding_settings, "button_text_color", "#FFFFFF"),
+            "highlight_color": getattr(branding_settings, "highlight_color", "#FBBF24"),
+            "button_hover_color": branding_settings.get_hover_color(branding_settings.button_color_primary),
+            "highlight_hover_color": branding_settings.get_hover_color(
+                getattr(branding_settings, "highlight_color", branding_settings.button_color_primary)
+            ),
+        }
+    except BrandingSettings.DoesNotExist:
+        # Se não houver BrandingSettings, usa cores padrão
+        branding = {
+            "background_color": "#0F172A",
+            "text_color": "#E2E8F0",
+            "button_color_primary": "#667EEA",
+            "button_color_secondary": "#764BA2",
+            "use_gradient_buttons": True,
+            "button_text_color": "#FFFFFF",
+            "highlight_color": "#FBBF24",
+            "button_hover_color": "#8090F6",
+            "highlight_hover_color": "#FCC84B",
+        }
     
     # Data atual para o calendário
     today = timezone.now().date()
