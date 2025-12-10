@@ -30,16 +30,78 @@ def index(request: HttpRequest) -> HttpResponse:
     if redirect_response:
         return redirect_response
     tenant = membership.tenant
-    bookings = Booking.objects.filter(tenant=tenant).order_by("-scheduled_for")[:10]
+    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    
+    # Obter filtro de período
+    period_filter = request.GET.get('period', 'all')
+    start_date, end_date = _get_date_range(period_filter, tz)
+    
+    # Obter abas de filtro
+    event_type = request.GET.get('type', 'all')
+    
+    # Query base
+    bookings_query = Booking.objects.filter(tenant=tenant)
+    
+    # Aplicar filtro de data
+    if start_date and end_date:
+        bookings_query = bookings_query.filter(
+            scheduled_for__range=(start_date, end_date)
+        ) | bookings_query.filter(
+            updated_at__range=(start_date, end_date)
+        )
+    
+    # Aplicar filtro de tipo de evento
+    if event_type == 'confirmed':
+        bookings_query = bookings_query.filter(status='confirmed')
+    elif event_type == 'pending':
+        bookings_query = bookings_query.filter(status='pending')
+    elif event_type == 'cancelled':
+        bookings_query = bookings_query.filter(status='cancelled')
+    
+    # Ordenar por data de atualização (para histórico completo)
+    bookings_history = bookings_query.select_related(
+        'service', 'professional'
+    ).order_by('-updated_at')[:50]
+    
+    # Para exibição, precisamos identificar reagendamentos
+    bookings_with_events = []
+    for booking in bookings_history:
+        event_type_display = 'Agendamento'
+        if booking.notes and 'Reagendado de' in booking.notes:
+            event_type_display = 'Reagendamento'
+        elif booking.status == 'cancelled':
+            event_type_display = 'Cancelamento'
+        
+        bookings_with_events.append({
+            'booking': booking,
+            'event_type': event_type_display,
+            'timestamp': booking.updated_at or booking.created_at,
+        })
+    
+    # Últimos 10 agendamentos (para a primeira seção)
+    recent_bookings = Booking.objects.filter(tenant=tenant).order_by("-scheduled_for")[:10]
+    
     totals = {
         "bookings": Booking.objects.filter(tenant=tenant).count(),
         "services": Service.objects.filter(tenant=tenant).count(),
         "professionals": Professional.objects.filter(tenant=tenant).count(),
     }
+    
+    context = {
+        "tenant": tenant,
+        "bookings": recent_bookings,
+        "bookings_history": bookings_with_events,
+        "totals": totals,
+        "period_filter": period_filter,
+        "event_filter": event_type,
+        "start_date": start_date,
+        "end_date": end_date,
+    }
+    
     return render(
         request,
         "scheduling/dashboard/index.html",
-        {"tenant": tenant, "bookings": bookings, "totals": totals},
+        context,
     )
 
 
@@ -1444,3 +1506,46 @@ def booking_policies(request: HttpRequest) -> HttpResponse:
             "policy": policy,
         },
     )
+
+
+def _get_date_range(period: str, tz: ZoneInfo) -> tuple:
+    """
+    Obtém o intervalo de datas baseado no período selecionado.
+    Retorna (start_date, end_date) como datetime aware.
+    """
+    from django.utils import timezone as django_tz
+    
+    now = django_tz.now().astimezone(tz)
+    today = now.date()
+    
+    if period == 'today':
+        # Hoje
+        start = django_tz.make_aware(datetime.combine(today, time.min), tz)
+        end = django_tz.make_aware(datetime.combine(today, time.max), tz)
+    elif period == 'week':
+        # Esta semana (segunda a domingo)
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=6)
+        start = django_tz.make_aware(datetime.combine(start_date, time.min), tz)
+        end = django_tz.make_aware(datetime.combine(end_date, time.max), tz)
+    elif period == 'month':
+        # Este mês
+        start_date = today.replace(day=1)
+        if today.month == 12:
+            end_date = start_date.replace(year=today.year + 1, month=1, day=1) - timedelta(days=1)
+        else:
+            end_date = start_date.replace(month=today.month + 1, day=1) - timedelta(days=1)
+        start = django_tz.make_aware(datetime.combine(start_date, time.min), tz)
+        end = django_tz.make_aware(datetime.combine(end_date, time.max), tz)
+    elif period == 'year':
+        # Este ano
+        start_date = today.replace(month=1, day=1)
+        end_date = today.replace(month=12, day=31)
+        start = django_tz.make_aware(datetime.combine(start_date, time.min), tz)
+        end = django_tz.make_aware(datetime.combine(end_date, time.max), tz)
+    else:
+        # 'all' - sem filtro de data
+        return (None, None)
+    
+    return (start, end)
+
