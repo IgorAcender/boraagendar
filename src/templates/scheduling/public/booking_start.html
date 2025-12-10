@@ -1532,6 +1532,11 @@
                 return;
             }
 
+            // Buscar informações adicionais
+            const serviceName = '{{ selected_service.name }}';
+            const professionalName = getProfessionalName(professionalId);
+            const formattedDate = formatDate(selectedDate);
+
             console.log('Building slots HTML...');
             let slotsHTML = `
                 <h2 class="section-title">
@@ -1546,9 +1551,15 @@
             slots.forEach((slot, index) => {
                 console.log(`Slot ${index}:`, slot);
                 slotsHTML += `
-                    <a class="slot-card btn-book" href="/agendar/${tenantSlug}/confirmar/?service=${serviceId}&professional=${professionalId}&start=${slot.start}">
+                    <div class="slot-card btn-book"
+                         data-slot-time="${slot.time}"
+                         data-slot-date="${formattedDate}"
+                         data-slot-start="${slot.start}"
+                         data-service-name="${serviceName}"
+                         data-professional-id="${professionalId}"
+                         data-professional-name="${professionalName}">
                         <div class="slot-time">${slot.time}</div>
-                    </a>
+                    </div>
                 `;
             });
 
@@ -1556,6 +1567,29 @@
             console.log('Setting innerHTML, HTML length:', slotsHTML.length);
             slotsContainer.innerHTML = slotsHTML;
             console.log('Slots rendered successfully');
+        }
+
+        // Função auxiliar para obter o nome do profissional
+        function getProfessionalName(professionalId) {
+            if (professionalId === 'any') {
+                return 'Sem Preferência';
+            }
+            const professionalCard = document.querySelector(`[data-professional-id="${professionalId}"]`);
+            if (professionalCard) {
+                const nameElement = professionalCard.querySelector('.professional-card-name');
+                return nameElement ? nameElement.textContent.trim() : 'Profissional';
+            }
+            return 'Profissional';
+        }
+
+        // Função auxiliar para formatar data
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString + 'T00:00:00');
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
         }
 
         // Modal functionality
