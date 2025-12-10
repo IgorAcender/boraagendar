@@ -268,6 +268,14 @@ class BookingForm(TenantAwareForm):
             for name in ("service", "professional", "date", "time"):
                 self.fields[name].widget = forms.HiddenInput()
 
+    def clean_customer_phone(self):
+        """Normalizar o número de telefone removendo formatação."""
+        import re
+        phone = self.cleaned_data.get('customer_phone', '')
+        # Remover tudo que não for dígito
+        phone_clean = re.sub(r'[^\d]', '', phone)
+        return phone_clean
+
     def clean(self):
         from zoneinfo import ZoneInfo
 
