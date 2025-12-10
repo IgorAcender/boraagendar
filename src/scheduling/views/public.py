@@ -878,7 +878,7 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
     """
     from django.utils import timezone
     from datetime import timedelta, datetime
-    from scheduling.models import BookingPolicy
+    from scheduling.models import BookingPolicy, Professional
     
     # Verificar se o cliente está logado
     customer_phone = request.session.get('customer_phone')
@@ -962,7 +962,6 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
             
             # Atualizar profissional se foi alterado
             if new_professional_id and new_professional_id != 'any':
-                from scheduling.models import Professional
                 try:
                     new_professional = Professional.objects.get(id=new_professional_id, tenant=tenant)
                     booking.professional = new_professional
@@ -994,7 +993,6 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
             return redirect('public:reschedule_booking', tenant_slug=tenant_slug, booking_id=booking_id)
     
     # GET - mostrar formulário de reagendamento
-    from scheduling.models import Professional
     
     # Buscar profissionais disponíveis para o serviço
     available_professionals = Professional.objects.filter(
