@@ -678,20 +678,36 @@
         left: 0 !important;
         right: 0 !important;
         bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
         background: rgba(0, 0, 0, 0.7);
-        z-index: 99999;
+        z-index: 99999 !important;
         align-items: center;
         justify-content: center;
         margin: 0 !important;
         padding: 0 !important;
+        transform: none !important;
+        
+        /* Adicionar essas propriedades críticas para ignorar o container pai */
+        inset: 0 !important;
     }
 
     .confirmation-modal.active {
         display: flex !important;
+        animation: fadeIn 0.3s ease-out;
     }
 
     body.modal-open {
         overflow: hidden;
+    }
+    
+    /* Garantir que containers pais não afetem o modal */
+    body.modal-open * {
+        transform: none !important;
+    }
+    
+    body.modal-open .confirmation-modal {
+        transform: none !important;
     }
 
     @keyframes fadeIn {
@@ -724,6 +740,9 @@
         max-height: 90vh;
         overflow-y: auto;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+        margin: auto;
+        animation: slideUp 0.3s ease-out;
     }
 
     .modal-header {
@@ -1075,6 +1094,13 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Mover o modal para o body para garantir que ele fique fora de qualquer container
+        const confirmModal = document.getElementById('confirmationModal');
+        if (confirmModal && !confirmModal.dataset.moved) {
+            document.body.appendChild(confirmModal);
+            confirmModal.dataset.moved = 'true';
+        }
+        
         const serviceSelect = document.getElementById('id_service');
         const dateInput = document.getElementById('date_input');
         const tenantSlug = '{{ tenant.slug }}';
@@ -1568,12 +1594,23 @@
 
                 // Show modal
                 modal.classList.add('active');
+                document.body.classList.add('modal-open');
+                
+                // Garantir que o modal fique centralizado na viewport
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.right = '0';
+                modal.style.bottom = '0';
+                modal.style.width = '100vw';
+                modal.style.height = '100vh';
             }
         });
 
         // Close modal
         cancelBtn.addEventListener('click', function() {
             modal.classList.remove('active');
+            document.body.classList.remove('modal-open');
             selectedSlotData = null;
         });
 
@@ -1581,6 +1618,7 @@
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 modal.classList.remove('active');
+                document.body.classList.remove('modal-open');
                 selectedSlotData = null;
             }
         });
