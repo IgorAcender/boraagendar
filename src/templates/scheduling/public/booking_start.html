@@ -1075,12 +1075,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Move modal to body to avoid container positioning issues
-        const modal = document.getElementById('confirmationModal');
-        if (modal && modal.parentElement !== document.body) {
-            document.body.appendChild(modal);
-        }
-        
         const serviceSelect = document.getElementById('id_service');
         const dateInput = document.getElementById('date_input');
         const tenantSlug = '{{ tenant.slug }}';
