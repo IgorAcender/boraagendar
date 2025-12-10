@@ -1015,6 +1015,9 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
     
     branding = tenant.branding if hasattr(tenant, 'branding') else None
     
+    # Data atual para o calendário
+    today = timezone.now().date()
+    
     return render(request, 'scheduling/public/reschedule_booking.html', {
         'tenant': tenant,
         'booking': booking,
@@ -1022,5 +1025,6 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
         'branding': branding,
         'available_professionals': available_professionals,
         'has_auto_assign_professionals': has_auto_assign,
+        'today': today,
     })
 
