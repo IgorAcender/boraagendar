@@ -931,6 +931,7 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
     if request.method == 'POST':
         # Processar reagendamento
         new_datetime_str = request.POST.get('new_datetime')
+        new_professional_id = request.POST.get('new_professional_id')
         
         if not new_datetime_str:
             messages.error(request, 'Por favor, selecione uma nova data e horário.')
@@ -956,7 +957,17 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
             
             # Atualizar agendamento
             old_datetime = booking.scheduled_for
+            old_professional = booking.professional
             booking.scheduled_for = new_datetime
+            
+            # Atualizar profissional se foi alterado
+            if new_professional_id and new_professional_id != 'any':
+                from scheduling.models import Professional
+                try:
+                    new_professional = Professional.objects.get(id=new_professional_id, tenant=tenant)
+                    booking.professional = new_professional
+                except Professional.DoesNotExist:
+                    pass
             
             # Incrementar contador de reagendamentos
             if hasattr(booking, 'metadata') and booking.metadata:
@@ -966,6 +977,8 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
             
             # Adicionar nota sobre reagendamento
             reschedule_note = f"\n\nReagendado de {old_datetime.strftime('%d/%m/%Y %H:%M')} para {new_datetime.strftime('%d/%m/%Y %H:%M')}"
+            if old_professional and booking.professional and old_professional.id != booking.professional.id:
+                reschedule_note += f" | Profissional alterado de {old_professional.display_name} para {booking.professional.display_name}"
             booking.notes = f"{booking.notes}{reschedule_note}" if booking.notes else reschedule_note.strip()
             
             booking.save()
@@ -981,6 +994,18 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
             return redirect('public:reschedule_booking', tenant_slug=tenant_slug, booking_id=booking_id)
     
     # GET - mostrar formulário de reagendamento
+    from scheduling.models import Professional
+    
+    # Buscar profissionais disponíveis para o serviço
+    available_professionals = Professional.objects.filter(
+        tenant=tenant,
+        is_active=True,
+        services=booking.service
+    ).order_by('display_name')
+    
+    # Verificar se há profissionais com auto_assign
+    has_auto_assign = available_professionals.filter(auto_assign=True).exists()
+    
     branding = tenant.branding if hasattr(tenant, 'branding') else None
     
     return render(request, 'scheduling/public/reschedule_booking.html', {
@@ -988,5 +1013,7 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
         'booking': booking,
         'policy': policy,
         'branding': branding,
+        'available_professionals': available_professionals,
+        'has_auto_assign_professionals': has_auto_assign,
     })
 

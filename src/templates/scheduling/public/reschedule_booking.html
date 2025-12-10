@@ -243,6 +243,104 @@
         border-color: var(--brand-primary);
     }
 
+    /* Professionals Grid */
+    .professionals-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+        row-gap: 1.5rem;
+        padding: 1rem 0;
+        margin-top: 1rem;
+    }
+
+    @media (max-width: 480px) {
+        .professionals-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            row-gap: 1.5rem;
+        }
+    }
+
+    .professional-card {
+        background: transparent;
+        border: none;
+        border-radius: 12px;
+        padding: 0;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .professional-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .professional-card.selected {
+        transform: scale(1.05);
+    }
+
+    .professional-card.selected .professional-card-avatar {
+        border: 3px solid var(--brand-primary);
+        box-shadow: 0 0 15px var(--brand-primary), 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .professional-card-avatar {
+        width: 100%;
+        aspect-ratio: 1;
+        margin: 0 auto 0.5rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-light);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        overflow: hidden;
+    }
+
+    @media (max-width: 480px) {
+        .professional-card-avatar {
+            font-size: 1.25rem;
+        }
+    }
+
+    .professional-card-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+
+    .professional-card-name {
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: var(--text-light);
+        margin-top: 0.35rem;
+        white-space: normal;
+        word-wrap: break-word;
+        line-height: 1.2;
+        height: auto;
+        width: 100%;
+        text-align: center;
+    }
+
+    @media (max-width: 480px) {
+        .professional-card-name {
+            font-size: 0.65rem;
+            font-weight: 500;
+            line-height: 1.1;
+        }
+    }
+
     .form-actions {
         display: flex;
         gap: 1rem;
@@ -367,6 +465,47 @@
     <form method="post" id="rescheduleForm">
         {% csrf_token %}
         <input type="hidden" name="new_datetime" id="newDatetimeInput">
+        <input type="hidden" name="new_professional_id" id="newProfessionalInput">
+        
+        <!-- Professional Selection -->
+        {% if available_professionals %}
+        <div class="form-group">
+            <h3 class="section-title">
+                <i class="fas fa-users"></i>
+                {{ tenant.label_profissional }}
+            </h3>
+            
+            <div class="professionals-grid">
+                {% if has_auto_assign_professionals %}
+                <!-- Opção: Qualquer Profissional -->
+                <div class="professional-card professional-card-any"
+                     data-professional-id="any">
+                    <div class="professional-card-avatar" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
+                        <i class="fas fa-users" style="font-size: 1.5rem; color: var(--text-light);"></i>
+                    </div>
+                    <div class="professional-card-name" style="color: var(--brand-primary); font-weight: 700;">
+                        Sem<br>Preferência
+                    </div>
+                </div>
+                {% endif %}
+                {% for professional in available_professionals %}
+                <div class="professional-card {% if booking.professional and booking.professional.id == professional.id %}selected{% endif %}"
+                     data-professional-id="{{ professional.id }}">
+                    <div class="professional-card-avatar" style="background: {{ professional.color }};">
+                        {% if professional.photo_base64 %}
+                            <img src="{{ professional.photo_base64 }}" alt="{{ professional.display_name }}">
+                        {% elif professional.photo %}
+                            <img src="{{ professional.photo.url }}" alt="{{ professional.display_name }}">
+                        {% else %}
+                            {{ professional.display_name|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="professional-card-name">{{ professional.display_name }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
         
         <div class="form-group">
             <h3 class="section-title">
@@ -411,11 +550,41 @@
 <script>
     const tenantSlug = '{{ tenant.slug }}';
     const serviceId = {{ booking.service.id }};
-    const professionalId = {% if booking.professional %}'{{ booking.professional.id }}'{% else %}'any'{% endif %};
+    let professionalId = {% if booking.professional %}'{{ booking.professional.id }}'{% else %}'any'{% endif %};
     const rescheduleWindowDays = {{ policy.reschedule_window_days|default:0 }};
     
     let selectedDate = null;
     let selectedSlot = null;
+
+    // Professional Selection
+    const professionalCards = document.querySelectorAll('.professional-card');
+    const newProfessionalInput = document.getElementById('newProfessionalInput');
+    
+    // Set initial professional value
+    if (newProfessionalInput) {
+        newProfessionalInput.value = professionalId;
+    }
+    
+    professionalCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove selection from all cards
+            professionalCards.forEach(c => c.classList.remove('selected'));
+            
+            // Add selection to clicked card
+            this.classList.add('selected');
+            
+            // Update professional ID
+            professionalId = this.dataset.professionalId;
+            if (newProfessionalInput) {
+                newProfessionalInput.value = professionalId;
+            }
+            
+            // Reload slots if date is selected
+            if (selectedDate) {
+                loadAvailableSlots(selectedDate);
+            }
+        });
+    });
 
     // Calendar implementation
     class RescheduleCalendar {
