@@ -682,9 +682,9 @@
         height: 100%;
         background: rgba(0, 0, 0, 0.7);
         z-index: 9999;
-        align-items: center;
+        align-items: flex-end;
         justify-content: center;
-        padding: 20px;
+        padding: 0;
     }
 
     .confirmation-modal.active {
@@ -718,13 +718,13 @@
     .modal-content {
         background: var(--bg-dark);
         border: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent);
-        border-radius: 16px;
+        border-radius: 16px 16px 0 0;
         padding: 2rem;
-        max-width: 500px;
-        width: min(500px, 90vw);
-        max-height: calc(100dvh - 3rem);
+        max-width: 600px;
+        width: 100%;
+        max-height: 80vh;
         overflow-y: auto;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
         animation: slideUp 0.3s ease-out;
     }
 
