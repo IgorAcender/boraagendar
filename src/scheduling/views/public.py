@@ -609,3 +609,146 @@ def check_phone(request: HttpRequest, tenant_slug: str) -> JsonResponse:
         })
     else:
         return JsonResponse({'exists': False})
+
+
+def my_bookings_login(request: HttpRequest, tenant_slug: str) -> HttpResponse:
+    """
+    Página de login para acessar meus agendamentos
+    """
+    tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
+    request.tenant = tenant
+    
+    error_message = None
+    
+    if request.method == 'POST':
+        phone = request.POST.get('phone', '').strip()
+        
+        if not phone:
+            error_message = 'Por favor, informe seu telefone'
+        else:
+            # Normalizar telefone
+            import re
+            phone_normalized = re.sub(r'[^\d]', '', phone)
+            
+            # Buscar agendamentos com esse telefone
+            bookings = Booking.objects.filter(
+                tenant=tenant,
+                customer_phone__icontains=phone_normalized[-8:]
+            ).exists()
+            
+            if bookings:
+                # Salvar telefone na sessão
+                request.session['customer_phone'] = phone_normalized
+                request.session['tenant_slug'] = tenant_slug
+                return redirect('public:my_bookings', tenant_slug=tenant.slug)
+            else:
+                error_message = 'Nenhum agendamento encontrado com este telefone'
+    
+    # Obter branding
+    branding = None
+    try:
+        branding_settings = tenant.branding_settings
+        branding = {
+            "background_color": branding_settings.background_color,
+            "text_color": branding_settings.text_color,
+            "button_color_primary": branding_settings.button_color_primary,
+            "button_color_secondary": branding_settings.button_color_secondary,
+            "button_text_color": branding_settings.button_text_color,
+        }
+    except:
+        branding = {
+            "background_color": "#0F172A",
+            "text_color": "#E2E8F0",
+            "button_color_primary": "#667EEA",
+            "button_color_secondary": "#764BA2",
+            "button_text_color": "#FFFFFF",
+        }
+    
+    return render(request, 'scheduling/public/my_bookings_login.html', {
+        'tenant': tenant,
+        'branding': branding,
+        'error_message': error_message,
+    })
+
+
+def my_bookings(request: HttpRequest, tenant_slug: str) -> HttpResponse:
+    """
+    Página de listagem dos agendamentos do cliente
+    """
+    tenant = get_object_or_404(Tenant, slug=tenant_slug, is_active=True)
+    request.tenant = tenant
+    
+    # Verificar se está autenticado
+    customer_phone = request.session.get('customer_phone')
+    if not customer_phone or request.session.get('tenant_slug') != tenant_slug:
+        return redirect('public:my_bookings_login', tenant_slug=tenant.slug)
+    
+    # Buscar agendamentos do cliente
+    from django.utils.timezone import now
+    current_time = now()
+    
+    # Agendamentos futuros
+    upcoming_bookings = Booking.objects.filter(
+        tenant=tenant,
+        customer_phone__icontains=customer_phone[-8:],
+        scheduled_for__gte=current_time,
+        status__in=['pending', 'confirmed']
+    ).select_related('service', 'professional').order_by('scheduled_for')
+    
+    # Histórico (agendamentos passados ou cancelados)
+    past_bookings = Booking.objects.filter(
+        tenant=tenant,
+        customer_phone__icontains=customer_phone[-8:]
+    ).exclude(
+        scheduled_for__gte=current_time,
+        status__in=['pending', 'confirmed']
+    ).select_related('service', 'professional').order_by('-scheduled_for')[:10]
+    
+    # Obter nome do cliente do primeiro agendamento
+    customer_name = ''
+    first_booking = Booking.objects.filter(
+        tenant=tenant,
+        customer_phone__icontains=customer_phone[-8:]
+    ).first()
+    if first_booking:
+        customer_name = first_booking.customer_name
+    
+    # Obter branding
+    branding = None
+    try:
+        branding_settings = tenant.branding_settings
+        branding = {
+            "background_color": branding_settings.background_color,
+            "text_color": branding_settings.text_color,
+            "button_color_primary": branding_settings.button_color_primary,
+            "button_color_secondary": branding_settings.button_color_secondary,
+            "button_text_color": branding_settings.button_text_color,
+        }
+    except:
+        branding = {
+            "background_color": "#0F172A",
+            "text_color": "#E2E8F0",
+            "button_color_primary": "#667EEA",
+            "button_color_secondary": "#764BA2",
+            "button_text_color": "#FFFFFF",
+        }
+    
+    return render(request, 'scheduling/public/my_bookings.html', {
+        'tenant': tenant,
+        'branding': branding,
+        'customer_name': customer_name,
+        'upcoming_bookings': upcoming_bookings,
+        'past_bookings': past_bookings,
+    })
+
+
+def logout_bookings(request: HttpRequest, tenant_slug: str) -> HttpResponse:
+    """
+    Logout da área de meus agendamentos
+    """
+    if 'customer_phone' in request.session:
+        del request.session['customer_phone']
+    if 'tenant_slug' in request.session:
+        del request.session['tenant_slug']
+    
+    return redirect('public:tenant_landing', tenant_slug=tenant_slug)

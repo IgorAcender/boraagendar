@@ -1258,7 +1258,7 @@
 
     <!-- Botão Discreto - Meus Agendamentos -->
     <div class="header-secondary-button">
-        <a href="#contact" class="btn-my-bookings">
+        <a href="{% url 'public:my_bookings_login' tenant_slug=tenant.slug %}" class="btn-my-bookings">
             <i class="fas fa-calendar-alt"></i> Meus Agendamentos
         </a>
     </div>

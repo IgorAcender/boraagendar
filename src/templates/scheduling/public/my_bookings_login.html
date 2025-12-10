@@ -1,0 +1,233 @@
+{% extends "scheduling/public/base_public.html" %}
+{% block title %}Meus Agendamentos{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --brand-primary: {{ branding.button_color_primary|default:"#667eea" }};
+        --brand-secondary: {{ branding.button_color_secondary|default:"#764ba2" }};
+        --bg-dark: {{ branding.background_color|default:"#0f172a" }};
+        --text-light: {{ branding.text_color|default:"#e2e8f0" }};
+        --button-text: {{ branding.button_text_color|default:"#FFFFFF" }};
+    }
+
+    .login-container {
+        max-width: 500px;
+        margin: 3rem auto;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .login-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+        color: rgba(var(--text-light), 0.7);
+        font-size: 1rem;
+    }
+
+    .login-card {
+        background: var(--bg-dark);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+        border: 1px solid color-mix(in srgb, var(--text-light) 20%, transparent);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-light);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid color-mix(in srgb, var(--text-light) 20%, transparent);
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.2s;
+        background: var(--bg-dark);
+        color: var(--text-light);
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .error-message {
+        background: color-mix(in srgb, #ef4444 10%, transparent);
+        border: 1px solid #ef4444;
+        color: #fca5a5;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        color: var(--button-text);
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-login:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .back-link {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .back-link a {
+        color: var(--brand-primary);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .back-link a:hover {
+        gap: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-header">
+        <h2>Meus Agendamentos</h2>
+        <p>Digite seu telefone para acessar seus agendamentos</p>
+    </div>
+
+    <div class="login-card">
+        {% if error_message %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ error_message }}</span>
+        </div>
+        {% endif %}
+
+        <form method="post" id="loginForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="phone">Telefone/WhatsApp</label>
+                <input 
+                    type="tel" 
+                    id="phone" 
+                    name="phone" 
+                    placeholder="(00) 00000-0000"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <button type="submit" class="btn-login" id="submitBtn" disabled>
+                <i class="fas fa-sign-in-alt"></i>
+                Acessar meus agendamentos
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="{% url 'public:tenant_landing' tenant_slug=tenant.slug %}">
+                <i class="fas fa-arrow-left"></i>
+                Voltar para o início
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.getElementById('phone');
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('loginForm');
+        
+        // Formatar telefone enquanto digita
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Limitar a 11 dígitos
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            
+            // Formatar (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
+            if (value.length >= 11) {
+                e.target.value = `(${value.substring(0, 2)}) ${value.substring(2, 7)}-${value.substring(7, 11)}`;
+            } else if (value.length >= 7) {
+                e.target.value = `(${value.substring(0, 2)}) ${value.substring(2, 6)}-${value.substring(6)}`;
+            } else if (value.length >= 3) {
+                e.target.value = `(${value.substring(0, 2)}) ${value.substring(2)}`;
+            } else if (value.length >= 1) {
+                e.target.value = `(${value}`;
+            }
+            
+            // Habilitar botão se tiver pelo menos 10 dígitos
+            const cleanPhone = value;
+            if (cleanPhone.length >= 10) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+            }
+        });
+        
+        // Validação antes de enviar
+        form.addEventListener('submit', function(e) {
+            const phone = phoneInput.value.replace(/\D/g, '');
+            
+            if (phone.length < 10) {
+                e.preventDefault();
+                alert('Por favor, informe um telefone válido');
+                phoneInput.focus();
+                return false;
+            }
+            
+            return true;
+        });
+    });
+</script>
+{% endblock %}

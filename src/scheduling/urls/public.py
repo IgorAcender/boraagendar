@@ -32,4 +32,19 @@ urlpatterns = [
         public_views.check_phone,
         name="check_phone",
     ),
+    path(
+        "<slug:tenant_slug>/meus-agendamentos/login/",
+        public_views.my_bookings_login,
+        name="my_bookings_login",
+    ),
+    path(
+        "<slug:tenant_slug>/meus-agendamentos/",
+        public_views.my_bookings,
+        name="my_bookings",
+    ),
+    path(
+        "<slug:tenant_slug>/meus-agendamentos/sair/",
+        public_views.logout_bookings,
+        name="logout_bookings",
+    ),
 ]
