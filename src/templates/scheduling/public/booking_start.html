@@ -1566,14 +1566,12 @@
 
                 // Show modal
                 modal.classList.add('active');
-                document.body.classList.add('modal-open');
             }
         });
 
         // Close modal
         cancelBtn.addEventListener('click', function() {
             modal.classList.remove('active');
-            document.body.classList.remove('modal-open');
             selectedSlotData = null;
         });
 
@@ -1581,7 +1579,6 @@
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 modal.classList.remove('active');
-                document.body.classList.remove('modal-open');
                 selectedSlotData = null;
             }
         });
