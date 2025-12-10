@@ -1042,8 +1042,45 @@
 </div>
 {% endif %}
 
+<!-- Confirmation Modal -->
+<div class="confirmation-modal" id="confirmationModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirmar Agendamento</h3>
+        </div>
+        <div class="modal-body">
+            <div class="modal-item">
+                <div class="modal-item-label">{{ tenant.label_servico }}</div>
+                <div class="modal-item-value" id="modalService"></div>
+            </div>
+            <div class="modal-item">
+                <div class="modal-item-label">Data</div>
+                <div class="modal-item-value" id="modalDate"></div>
+            </div>
+            <div class="modal-item">
+                <div class="modal-item-label">Horário</div>
+                <div class="modal-item-value" id="modalTime"></div>
+            </div>
+            <div class="modal-item" id="modalProfessionalItem" style="display: none;">
+                <div class="modal-item-label">{{ tenant.label_profissional }}</div>
+                <div class="modal-item-value" id="modalProfessional"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-cancel" id="cancelBtn">Voltar</button>
+            <button type="button" class="modal-btn modal-btn-confirm" id="confirmBtn">Confirmar</button>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Move modal to body to avoid container positioning issues
+        const modal = document.getElementById('confirmationModal');
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+        
         const serviceSelect = document.getElementById('id_service');
         const dateInput = document.getElementById('date_input');
         const tenantSlug = '{{ tenant.slug }}';
@@ -1565,34 +1602,3 @@
     });
 </script>
 {% endblock %}
-
-<!-- Confirmation Modal -->
-<div class="confirmation-modal" id="confirmationModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Confirmar Agendamento</h3>
-        </div>
-        <div class="modal-body">
-            <div class="modal-item">
-                <div class="modal-item-label">{{ tenant.label_servico }}</div>
-                <div class="modal-item-value" id="modalService"></div>
-            </div>
-            <div class="modal-item">
-                <div class="modal-item-label">Data</div>
-                <div class="modal-item-value" id="modalDate"></div>
-            </div>
-            <div class="modal-item">
-                <div class="modal-item-label">Horário</div>
-                <div class="modal-item-value" id="modalTime"></div>
-            </div>
-            <div class="modal-item" id="modalProfessionalItem" style="display: none;">
-                <div class="modal-item-label">{{ tenant.label_profissional }}</div>
-                <div class="modal-item-value" id="modalProfessional"></div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="modal-btn modal-btn-cancel" id="cancelBtn">Voltar</button>
-            <button type="button" class="modal-btn modal-btn-confirm" id="confirmBtn">Confirmar</button>
-        </div>
-    </div>
-</div>
