@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
+from django.db.models import Q
 
 from tenants.models import Tenant, BrandingSettings
 from ..models import AvailabilityRule
@@ -995,11 +996,19 @@ def reschedule_booking(request: HttpRequest, tenant_slug: str, booking_id: int) 
     # GET - mostrar formulário de reagendamento
     
     # Buscar profissionais disponíveis para o serviço
-    available_professionals = Professional.objects.filter(
-        tenant=tenant,
-        is_active=True,
-        services=booking.service
-    ).order_by('display_name')
+    try:
+        available_professionals = Professional.objects.filter(
+            tenant=tenant,
+            is_active=True
+        ).filter(
+            Q(services=booking.service) | Q(auto_assign=True)
+        ).distinct().order_by('display_name')
+    except Exception as e:
+        # Fallback: buscar todos profissionais ativos
+        available_professionals = Professional.objects.filter(
+            tenant=tenant,
+            is_active=True
+        ).order_by('display_name')
     
     # Verificar se há profissionais com auto_assign
     has_auto_assign = available_professionals.filter(auto_assign=True).exists()
