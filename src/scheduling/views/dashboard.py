@@ -1394,3 +1394,53 @@ def branding_settings(request: HttpRequest) -> HttpResponse:
             "tenant_landing_url": tenant_landing_url,
         },
     )
+
+
+@login_required
+def booking_policies(request: HttpRequest) -> HttpResponse:
+    """Configuração de políticas de cancelamento e reagendamento"""
+    membership, redirect_response = _membership_or_redirect(request, allowed_roles=["owner", "manager"])
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+
+    # Importar aqui para evitar import circular
+    from ..models import BookingPolicy
+
+    # Obter ou criar política
+    policy = BookingPolicy.get_or_create_for_tenant(tenant)
+
+    if request.method == "POST":
+        try:
+            # Atualizar campos de cancelamento
+            policy.allow_cancellation = request.POST.get('allow_cancellation') == 'on'
+            policy.min_cancellation_hours = int(request.POST.get('min_cancellation_hours', 4))
+            policy.max_cancellations = int(request.POST.get('max_cancellations', 3))
+            policy.cancellation_period_days = int(request.POST.get('cancellation_period_days', 30))
+            policy.require_cancellation_reason = request.POST.get('require_cancellation_reason') == 'on'
+            
+            # Atualizar campos de reagendamento
+            policy.allow_rescheduling = request.POST.get('allow_rescheduling') == 'on'
+            policy.min_reschedule_hours = int(request.POST.get('min_reschedule_hours', 2))
+            policy.max_reschedules_per_booking = int(request.POST.get('max_reschedules_per_booking', 2))
+            policy.reschedule_window_days = int(request.POST.get('reschedule_window_days', 60))
+            
+            # Atualizar campos de penalidades
+            policy.block_on_limit_reached = request.POST.get('block_on_limit_reached') == 'on'
+            policy.block_duration_days = int(request.POST.get('block_duration_days', 15))
+            policy.notify_manager_on_abuse = request.POST.get('notify_manager_on_abuse') == 'on'
+            
+            policy.save()
+            messages.success(request, "Políticas de agendamento atualizadas com sucesso!")
+            return redirect("dashboard:booking_policies")
+        except Exception as e:
+            messages.error(request, f"Erro ao salvar políticas: {str(e)}")
+
+    return render(
+        request,
+        "scheduling/dashboard/booking_policies.html",
+        {
+            "tenant": tenant,
+            "policy": policy,
+        },
+    )

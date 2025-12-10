@@ -175,3 +175,95 @@ class Booking(models.Model):
 
     def __str__(self) -> str:
         return f"{self.customer_name} - {self.service.name} ({self.scheduled_for:%d/%m %H:%M})"
+
+
+class BookingPolicy(models.Model):
+    """Políticas de cancelamento e reagendamento por tenant"""
+    tenant = models.OneToOneField(
+        Tenant, 
+        on_delete=models.CASCADE, 
+        related_name='booking_policy',
+        verbose_name="Tenant"
+    )
+    
+    # CANCELAMENTO
+    allow_cancellation = models.BooleanField(
+        default=True,
+        verbose_name="Permitir cancelamento",
+        help_text="Permite que clientes cancelem agendamentos"
+    )
+    min_cancellation_hours = models.PositiveIntegerField(
+        default=4,
+        verbose_name="Prazo mínimo para cancelar (horas)",
+        help_text="Horas de antecedência necessárias para cancelar"
+    )
+    max_cancellations = models.PositiveIntegerField(
+        default=3,
+        verbose_name="Máximo de cancelamentos permitidos",
+        help_text="Quantidade máxima de cancelamentos no período especificado"
+    )
+    cancellation_period_days = models.PositiveIntegerField(
+        default=30,
+        verbose_name="Período de contagem (dias)",
+        help_text="Período em dias para contar os cancelamentos"
+    )
+    require_cancellation_reason = models.BooleanField(
+        default=False,
+        verbose_name="Exigir motivo ao cancelar",
+        help_text="Cliente deve informar motivo do cancelamento"
+    )
+    
+    # REAGENDAMENTO
+    allow_rescheduling = models.BooleanField(
+        default=True,
+        verbose_name="Permitir reagendamento",
+        help_text="Permite que clientes reagendem agendamentos"
+    )
+    min_reschedule_hours = models.PositiveIntegerField(
+        default=2,
+        verbose_name="Prazo mínimo para reagendar (horas)",
+        help_text="Horas de antecedência necessárias para reagendar"
+    )
+    max_reschedules_per_booking = models.PositiveIntegerField(
+        default=2,
+        verbose_name="Máximo de reagendamentos por agendamento",
+        help_text="Quantas vezes o mesmo agendamento pode ser reagendado"
+    )
+    reschedule_window_days = models.PositiveIntegerField(
+        default=60,
+        verbose_name="Janela para reagendar (dias)",
+        help_text="Até quantos dias no futuro pode reagendar"
+    )
+    
+    # PENALIDADES
+    block_on_limit_reached = models.BooleanField(
+        default=False,
+        verbose_name="Bloquear ao atingir limite",
+        help_text="Bloqueia novos agendamentos ao atingir limite de cancelamentos"
+    )
+    block_duration_days = models.PositiveIntegerField(
+        default=15,
+        verbose_name="Duração do bloqueio (dias)",
+        help_text="Por quantos dias o cliente fica bloqueado"
+    )
+    notify_manager_on_abuse = models.BooleanField(
+        default=True,
+        verbose_name="Notificar gerente sobre abusos",
+        help_text="Envia notificação quando cliente atinge limite"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Política de Agendamento"
+        verbose_name_plural = "Políticas de Agendamento"
+    
+    def __str__(self) -> str:
+        return f"Política - {self.tenant.name}"
+    
+    @classmethod
+    def get_or_create_for_tenant(cls, tenant):
+        """Retorna a política do tenant, criando uma com valores padrão se não existir"""
+        policy, created = cls.objects.get_or_create(tenant=tenant)
+        return policy

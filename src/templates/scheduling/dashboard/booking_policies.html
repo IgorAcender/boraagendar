@@ -1,0 +1,545 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block page_title %}Políticas de Agendamento{% endblock %}
+
+{% block extra_css %}
+<style>
+    .policy-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .policy-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .policy-card h3 i {
+        color: var(--primary-color, #4f46e5);
+    }
+    
+    .policy-card .subtitle {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 500;
+        color: #334155;
+        margin-bottom: 8px;
+        font-size: 0.9375rem;
+    }
+    
+    .form-group .help-text {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.8125rem;
+        margin-top: 4px;
+    }
+    
+    .toggle-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+    
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 26px;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e1;
+        transition: 0.3s;
+        border-radius: 26px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+        background-color: var(--primary-color, #4f46e5);
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(22px);
+    }
+    
+    .toggle-label {
+        font-weight: 500;
+        color: #334155;
+        font-size: 0.9375rem;
+    }
+    
+    .input-group {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .input-group > div {
+        flex: 1;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        transition: all 0.2s;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color, #4f46e5);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    
+    .form-control:disabled {
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        cursor: not-allowed;
+    }
+    
+    .conditional-fields {
+        margin-left: 20px;
+        padding-left: 20px;
+        border-left: 3px solid #e2e8f0;
+        margin-top: 16px;
+    }
+    
+    .conditional-fields.hidden {
+        display: none;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color, #4f46e5);
+        color: white;
+        padding: 12px 32px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-color-dark, #4338ca);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+    
+    .save-section {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 20px 0;
+        border-top: 1px solid #e2e8f0;
+        margin-top: 24px;
+    }
+    
+    .alert {
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 0.9375rem;
+    }
+    
+    .alert-success {
+        background-color: #ecfdf5;
+        color: #047857;
+        border: 1px solid #86efac;
+    }
+    
+    .alert-info {
+        background-color: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #93c5fd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1>Políticas de Agendamento</h1>
+        <p class="subtitle">Configure as regras de cancelamento e reagendamento para seus clientes</p>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="post" id="policiesForm">
+    {% csrf_token %}
+    
+    <!-- Cancelamento -->
+    <div class="policy-card">
+        <h3>
+            <i class="fas fa-ban"></i>
+            Cancelamento de Agendamentos
+        </h3>
+        <p class="subtitle">Defina as regras para cancelamento de agendamentos pelos clientes</p>
+        
+        <div class="toggle-wrapper">
+            <label class="toggle-switch">
+                <input type="checkbox" name="allow_cancellation" id="allowCancellation" 
+                       {% if policy.allow_cancellation %}checked{% endif %}>
+                <span class="toggle-slider"></span>
+            </label>
+            <label for="allowCancellation" class="toggle-label">
+                Permitir que clientes cancelem agendamentos
+            </label>
+        </div>
+        
+        <div id="cancellationFields" class="conditional-fields">
+            <div class="form-group">
+                <label for="minCancellationHours">
+                    Antecedência mínima para cancelamento (em horas)
+                </label>
+                <input type="number" 
+                       class="form-control" 
+                       id="minCancellationHours"
+                       name="min_cancellation_hours" 
+                       value="{{ policy.min_cancellation_hours }}"
+                       min="0"
+                       step="1">
+                <span class="help-text">
+                    Cliente deve cancelar com pelo menos X horas de antecedência. Digite 0 para permitir cancelamento até o horário do agendamento.
+                </span>
+            </div>
+            
+            <div class="input-group">
+                <div class="form-group">
+                    <label for="maxCancellations">
+                        Limite de cancelamentos
+                    </label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="maxCancellations"
+                           name="max_cancellations" 
+                           value="{{ policy.max_cancellations }}"
+                           min="0"
+                           step="1">
+                    <span class="help-text">
+                        Número máximo de cancelamentos permitidos. Digite 0 para ilimitado.
+                    </span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cancellationPeriodDays">
+                        Período de contagem (em dias)
+                    </label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="cancellationPeriodDays"
+                           name="cancellation_period_days" 
+                           value="{{ policy.cancellation_period_days }}"
+                           min="1"
+                           step="1">
+                    <span class="help-text">
+                        Período para contar os cancelamentos (ex: 30 dias).
+                    </span>
+                </div>
+            </div>
+            
+            <div class="toggle-wrapper">
+                <label class="toggle-switch">
+                    <input type="checkbox" name="require_cancellation_reason" id="requireReason"
+                           {% if policy.require_cancellation_reason %}checked{% endif %}>
+                    <span class="toggle-slider"></span>
+                </label>
+                <label for="requireReason" class="toggle-label">
+                    Exigir motivo do cancelamento
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reagendamento -->
+    <div class="policy-card">
+        <h3>
+            <i class="fas fa-calendar-alt"></i>
+            Reagendamento
+        </h3>
+        <p class="subtitle">Configure as opções de reagendamento disponíveis para os clientes</p>
+        
+        <div class="toggle-wrapper">
+            <label class="toggle-switch">
+                <input type="checkbox" name="allow_rescheduling" id="allowRescheduling"
+                       {% if policy.allow_rescheduling %}checked{% endif %}>
+                <span class="toggle-slider"></span>
+            </label>
+            <label for="allowRescheduling" class="toggle-label">
+                Permitir que clientes reagendem seus agendamentos
+            </label>
+        </div>
+        
+        <div id="reschedulingFields" class="conditional-fields">
+            <div class="form-group">
+                <label for="minRescheduleHours">
+                    Antecedência mínima para reagendamento (em horas)
+                </label>
+                <input type="number" 
+                       class="form-control" 
+                       id="minRescheduleHours"
+                       name="min_reschedule_hours" 
+                       value="{{ policy.min_reschedule_hours }}"
+                       min="0"
+                       step="1">
+                <span class="help-text">
+                    Cliente deve reagendar com pelo menos X horas de antecedência.
+                </span>
+            </div>
+            
+            <div class="input-group">
+                <div class="form-group">
+                    <label for="maxReschedulesPerBooking">
+                        Limite de reagendamentos por agendamento
+                    </label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="maxReschedulesPerBooking"
+                           name="max_reschedules_per_booking" 
+                           value="{{ policy.max_reschedules_per_booking }}"
+                           min="0"
+                           step="1">
+                    <span class="help-text">
+                        Quantas vezes o mesmo agendamento pode ser reagendado. Digite 0 para ilimitado.
+                    </span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="rescheduleWindowDays">
+                        Janela de reagendamento (em dias)
+                    </label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="rescheduleWindowDays"
+                           name="reschedule_window_days" 
+                           value="{{ policy.reschedule_window_days }}"
+                           min="0"
+                           step="1">
+                    <span class="help-text">
+                        Número máximo de dias no futuro que o cliente pode reagendar. Digite 0 para sem limite.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Penalidades -->
+    <div class="policy-card">
+        <h3>
+            <i class="fas fa-exclamation-triangle"></i>
+            Penalidades e Notificações
+        </h3>
+        <p class="subtitle">Configure ações automáticas para casos de abuso das políticas</p>
+        
+        <div class="toggle-wrapper">
+            <label class="toggle-switch">
+                <input type="checkbox" name="block_on_limit_reached" id="blockOnLimit"
+                       {% if policy.block_on_limit_reached %}checked{% endif %}>
+                <span class="toggle-slider"></span>
+            </label>
+            <label for="blockOnLimit" class="toggle-label">
+                Bloquear cliente ao atingir limite de cancelamentos
+            </label>
+        </div>
+        
+        <div id="blockFields" class="conditional-fields">
+            <div class="form-group">
+                <label for="blockDurationDays">
+                    Duração do bloqueio (em dias)
+                </label>
+                <input type="number" 
+                       class="form-control" 
+                       id="blockDurationDays"
+                       name="block_duration_days" 
+                       value="{{ policy.block_duration_days }}"
+                       min="1"
+                       step="1">
+                <span class="help-text">
+                    Por quantos dias o cliente ficará impossibilitado de fazer novos agendamentos.
+                </span>
+            </div>
+        </div>
+        
+        <div class="toggle-wrapper">
+            <label class="toggle-switch">
+                <input type="checkbox" name="notify_manager_on_abuse" id="notifyManager"
+                       {% if policy.notify_manager_on_abuse %}checked{% endif %}>
+                <span class="toggle-slider"></span>
+            </label>
+            <label for="notifyManager" class="toggle-label">
+                Notificar gerente sobre cancelamentos excessivos
+            </label>
+        </div>
+    </div>
+    
+    <div class="save-section">
+        <button type="submit" class="btn-primary">
+            <i class="fas fa-save"></i> Salvar Configurações
+        </button>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const allowCancellation = document.getElementById('allowCancellation');
+    const cancellationFields = document.getElementById('cancellationFields');
+    const allowRescheduling = document.getElementById('allowRescheduling');
+    const reschedulingFields = document.getElementById('reschedulingFields');
+    const blockOnLimit = document.getElementById('blockOnLimit');
+    const blockFields = document.getElementById('blockFields');
+    
+    // Toggle cancellation fields
+    function toggleCancellationFields() {
+        if (allowCancellation.checked) {
+            cancellationFields.classList.remove('hidden');
+            // Enable all inputs inside
+            cancellationFields.querySelectorAll('input').forEach(input => {
+                input.disabled = false;
+            });
+        } else {
+            cancellationFields.classList.add('hidden');
+            // Disable all inputs inside
+            cancellationFields.querySelectorAll('input').forEach(input => {
+                input.disabled = true;
+            });
+        }
+    }
+    
+    // Toggle rescheduling fields
+    function toggleReschedulingFields() {
+        if (allowRescheduling.checked) {
+            reschedulingFields.classList.remove('hidden');
+            reschedulingFields.querySelectorAll('input').forEach(input => {
+                input.disabled = false;
+            });
+        } else {
+            reschedulingFields.classList.add('hidden');
+            reschedulingFields.querySelectorAll('input').forEach(input => {
+                input.disabled = true;
+            });
+        }
+    }
+    
+    // Toggle block duration field
+    function toggleBlockFields() {
+        if (blockOnLimit.checked) {
+            blockFields.classList.remove('hidden');
+            blockFields.querySelectorAll('input').forEach(input => {
+                input.disabled = false;
+            });
+        } else {
+            blockFields.classList.add('hidden');
+            blockFields.querySelectorAll('input').forEach(input => {
+                input.disabled = true;
+            });
+        }
+    }
+    
+    // Initial state
+    toggleCancellationFields();
+    toggleReschedulingFields();
+    toggleBlockFields();
+    
+    // Event listeners
+    allowCancellation.addEventListener('change', toggleCancellationFields);
+    allowRescheduling.addEventListener('change', toggleReschedulingFields);
+    blockOnLimit.addEventListener('change', toggleBlockFields);
+    
+    // Form validation
+    document.getElementById('policiesForm').addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Validate cancellation fields if enabled
+        if (allowCancellation.checked) {
+            const maxCancellations = parseInt(document.getElementById('maxCancellations').value);
+            const periodDays = parseInt(document.getElementById('cancellationPeriodDays').value);
+            
+            if (maxCancellations > 0 && periodDays <= 0) {
+                alert('Se você definir um limite de cancelamentos, precisa definir o período de contagem.');
+                isValid = false;
+            }
+        }
+        
+        // Validate rescheduling fields if enabled
+        if (allowRescheduling.checked) {
+            const maxReschedules = parseInt(document.getElementById('maxReschedulesPerBooking').value);
+            
+            if (maxReschedules < 0) {
+                alert('O limite de reagendamentos não pode ser negativo.');
+                isValid = false;
+            }
+        }
+        
+        // Validate block duration if enabled
+        if (blockOnLimit.checked) {
+            const blockDuration = parseInt(document.getElementById('blockDurationDays').value);
+            
+            if (blockDuration <= 0) {
+                alert('A duração do bloqueio deve ser maior que zero.');
+                isValid = false;
+            }
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}
