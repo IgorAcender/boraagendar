@@ -124,6 +124,12 @@ def index(request: HttpRequest) -> HttpResponse:
         # Sem filtro customizado, usar padrão
         financial_data = financial_service.get_dashboard_summary(days=30)
     
+    # Obter comparação de períodos
+    from ..services.period_comparison import PeriodComparison
+    period_comparison = PeriodComparison(tenant)
+    month_comparison = period_comparison.get_month_comparison()
+    week_comparison = period_comparison.get_week_comparison()
+    
     # Converter dados dos gráficos para JSON
     financial_data['revenue_last_7_days'] = json.dumps(financial_data['revenue_last_7_days'])
     financial_data['revenue_last_12_months'] = json.dumps(financial_data['revenue_last_12_months'])
@@ -142,6 +148,9 @@ def index(request: HttpRequest) -> HttpResponse:
         "subscription": tenant.subscription if hasattr(tenant, 'subscription') else None,
         # Dados financeiros
         "financial": financial_data,
+        # Comparação de períodos
+        "month_comparison": month_comparison,
+        "week_comparison": week_comparison,
     }
     
     return render(
