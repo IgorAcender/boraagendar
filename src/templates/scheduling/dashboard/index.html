@@ -658,16 +658,37 @@
 <div style="margin-top: 40px;">
     <!-- Abas Navegação -->
     <div style="display: flex; gap: 0; border-bottom: 2px solid #e5e7eb; background: white; border-radius: 12px 12px 0 0; overflow: hidden; box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);">
-        <button id="btn-operational" class="dashboard-tab-button active" onclick="switchTab(this, 'operational')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+        <button id="btn-operational" class="dashboard-tab-button active" onclick="switchTab(this, 'operational')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; position: relative;">
             <i class="fas fa-chart-pie"></i> Módulo Operacional
         </button>
-        <button id="btn-financial" class="dashboard-tab-button" onclick="switchTab(this, 'financial')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+        <button id="btn-financial" class="dashboard-tab-button" onclick="switchTab(this, 'financial')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; position: relative;">
             <i class="fas fa-dollar-sign"></i> Módulo Financeiro
         </button>
-        <button id="btn-history" class="dashboard-tab-button" onclick="switchTab(this, 'history')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+        <button id="btn-history" class="dashboard-tab-button" onclick="switchTab(this, 'history')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; position: relative;">
             <i class="fas fa-history"></i> Histórico Completo
         </button>
     </div>
+
+    <style>
+        .dashboard-tab-button {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-tab-button:hover {
+            background-color: #f8f9fa;
+            color: #667eea !important;
+        }
+        
+        .dashboard-tab-button:active {
+            background-color: #f0f4ff;
+        }
+        
+        .dashboard-tab-button.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+    </style>
 
     <!-- Aba 1: Módulo Operacional -->
     <div id="operational" class="dashboard-tab-content" style="display: block; background: white; padding: 40px; border-radius: 0 0 12px 12px;">
