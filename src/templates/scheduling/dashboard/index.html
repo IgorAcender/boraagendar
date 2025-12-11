@@ -739,9 +739,11 @@
         const rows = document.querySelectorAll('.history-row');
         
         rows.forEach(row => {
+            const rowType = row.getAttribute('data-event-type').trim();
+            
             if (eventType === 'all') {
                 row.style.display = '';
-            } else if (row.getAttribute('data-event-type') === eventType) {
+            } else if (rowType === eventType) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
