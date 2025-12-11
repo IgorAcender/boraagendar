@@ -573,45 +573,6 @@
     </div>
 </div>
 
-<!-- Cards de Estatísticas -->
-<div class="stats-grid animate-slide-up">
-    <div class="stat-card primary">
-        <div class="stat-content">
-            <div class="stat-info">
-                <div class="stat-label">Total Agendamentos</div>
-                <div class="stat-value">{{ totals.bookings }}</div>
-            </div>
-            <div class="stat-icon">
-                <i class="fas fa-calendar-check"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="stat-card success">
-        <div class="stat-content">
-            <div class="stat-info">
-                <div class="stat-label">Serviços Ativos</div>
-                <div class="stat-value">{{ totals.services }}</div>
-            </div>
-            <div class="stat-icon">
-                <i class="fas fa-concierge-bell"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="stat-card warning">
-        <div class="stat-content">
-            <div class="stat-info">
-                <div class="stat-label">Profissionais</div>
-                <div class="stat-value">{{ totals.professionals }}</div>
-            </div>
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Histórico Completo com Abas -->
 <div class="tabs-container animate-slide-up">
     <div class="tabs-header">
@@ -894,9 +855,12 @@
         
         <!-- Horários de Pico -->
         <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <h3 style="font-size: 16px; color: #1F2937; margin: 0 0 20px 0; display: flex; align-items: center; gap: 8px; font-weight: 700;">
-                🕐 Horários de Pico
-            </h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 16px; color: #1F2937; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: 700;">
+                    🕐 Horários de Pico
+                </h3>
+                <span style="background: #f0f4ff; color: #667eea; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">Últimos 30 dias</span>
+            </div>
             {% if operational.peak_hours %}
             <div style="display: grid; gap: 10px;">
                 {% for hour in operational.peak_hours %}
@@ -918,9 +882,12 @@
 
         <!-- Dias de Pico -->
         <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <h3 style="font-size: 16px; color: #1F2937; margin: 0 0 20px 0; display: flex; align-items: center; gap: 8px; font-weight: 700;">
-                📅 Dias de Pico
-            </h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 16px; color: #1F2937; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: 700;">
+                    📅 Dias de Pico
+                </h3>
+                <span style="background: #f0fdf4; color: #10b981; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">Últimos 30 dias</span>
+            </div>
             {% if operational.peak_days %}
             <div style="display: grid; gap: 10px;">
                 {% for day in operational.peak_days %}

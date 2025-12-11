@@ -179,8 +179,8 @@ class OperationalAnalytics:
         
         return round(total_bookings / professionals_count, 2)
     
-    def get_peak_hours(self, days=7):
-        """Horas de pico (mais agendamentos)"""
+    def get_peak_hours(self, days=30):
+        """Horas de pico (mais agendamentos) - últimos X dias"""
         start_date = timezone.now() - timedelta(days=days)
         
         bookings = Booking.objects.filter(
@@ -318,7 +318,7 @@ class OperationalAnalytics:
             'average_bookings_per_professional': self.get_average_bookings_per_professional(days),
             
             # Picos
-            'peak_hours': self.get_peak_hours(7),
+            'peak_hours': self.get_peak_hours(days),
             'peak_days': self.get_peak_days(days),
             
             # Gráficos
