@@ -660,8 +660,20 @@ function openBookingModal(bookingId) {
         .then(html => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const content = doc.querySelector('.booking-details, .card, main, .content') || doc.body;
+            const content = doc.querySelector('.booking-card, .booking-details, .card, main, .content') || doc.body;
             modalBody.innerHTML = content.innerHTML;
+
+            // Reexecutar scripts marcados para o modal (ex.: updateBookingStatus)
+            const modalScripts = doc.querySelectorAll('script[data-modal-script]');
+            modalScripts.forEach(script => {
+                const newScript = document.createElement('script');
+                if (script.src) {
+                    newScript.src = script.src;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                modalBody.appendChild(newScript);
+            });
         })
         .catch(error => {
             modalBody.innerHTML = '<p style="padding: 2rem; text-align: center; color: #ef4444;">Erro ao carregar agendamento.</p>';

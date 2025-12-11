@@ -311,7 +311,7 @@
     </div>
 </div>
 
-<script>
+<script data-modal-script="booking-detail">
 function updateBookingStatus() {
     const statusSelect = document.getElementById('statusSelect');
     const updateBtn = document.getElementById('updateStatusBtn');
@@ -325,41 +325,80 @@ function updateBookingStatus() {
     updateBtn.disabled = true;
     updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
     
+    // Obter CSRF token - tenta várias fontes
+    let csrfToken = null;
+    
+    // 1. Tenta do form no modal (se existir)
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) {
+        csrfToken = csrfInput.value;
+    }
+    
+    // 2. Tenta do cookie
+    if (!csrfToken) {
+        csrfToken = getCookie('csrftoken');
+    }
+    
+    // 3. Tenta do meta tag (se existir no parent)
+    if (!csrfToken && window.parent.document) {
+        const metaTag = window.parent.document.querySelector('[name="csrf-token"]');
+        if (metaTag) {
+            csrfToken = metaTag.getAttribute('content');
+        }
+    }
+    
+    // Se ainda não tiver, tenta pegar de um form no parent
+    if (!csrfToken && window.parent.document) {
+        const parentCsrfInput = window.parent.document.querySelector('[name=csrfmiddlewaretoken]');
+        if (parentCsrfInput) {
+            csrfToken = parentCsrfInput.value;
+        }
+    }
+    
+    console.log('DEBUG: CSRF Token encontrado:', !!csrfToken);
+    
     // Fazer requisição AJAX
     fetch(`/dashboard/agendamentos/${bookingId}/status/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken'),
+            'X-CSRFToken': csrfToken || '',
         },
-        body: `status=${encodeURIComponent(newStatus)}`
+        body: `status=${encodeURIComponent(newStatus)}`,
+        credentials: 'same-origin'
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('DEBUG: Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('DEBUG: Response data:', data);
+        
         if (data.success) {
             // Mostrar mensagem de sucesso
             successText.textContent = data.message || 'Status atualizado com sucesso!';
             successMessage.classList.add('show');
             
-            // Esconder mensagem após 3 segundos
+            // Recarregar o modal após 1.5 segundos
             setTimeout(() => {
                 successMessage.classList.remove('show');
-            }, 3000);
-            
-            // Se houver um modal aberto, recarregar o conteúdo
-            if (window.parent && window.parent.openBookingModal) {
-                // Aguardar um pouco para o usuário ver a mensagem
-                setTimeout(() => {
-                    window.parent.location.reload();
-                }, 1000);
-            }
+                // Fechar e reabrir o modal para recarregar os dados
+                if (window.parent.closeBookingModal && window.parent.openBookingModal) {
+                    console.log('DEBUG: Recarregando modal...');
+                    window.parent.closeBookingModal();
+                    setTimeout(() => {
+                        window.parent.openBookingModal(bookingId);
+                    }, 300);
+                }
+            }, 1500);
         } else {
+            console.error('DEBUG: Erro na resposta:', data.error);
             alert('Erro: ' + (data.error || 'Não foi possível atualizar o status'));
             statusSelect.value = '{{ booking.status }}';
         }
     })
     .catch(error => {
-        console.error('Erro:', error);
+        console.error('DEBUG: Erro ao fazer fetch:', error);
         alert('Erro ao atualizar status. Tente novamente.');
         statusSelect.value = '{{ booking.status }}';
     })

@@ -750,12 +750,39 @@ function openBookingModal(bookingId) {
     fetch(`/dashboard/agendamentos/${bookingId}/`)
         .then(response => response.text())
         .then(html => {
-            // Extrair apenas o conteúdo relevante (sem o layout completo)
+            // Extrair o conteúdo completo do booking-card
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const content = doc.querySelector('.booking-details, .card, main, .content') || doc.body;
+            
+            // Procurar por .booking-card primeiro (novo), depois fallback para .card (compatibilidade)
+            let content = doc.querySelector('.booking-card');
+            if (!content) {
+                content = doc.querySelector('.card');
+            }
+            if (!content) {
+                content = doc.querySelector('.booking-details');
+            }
+            if (!content) {
+                content = doc.querySelector('main');
+            }
+            if (!content) {
+                content = doc.body;
+            }
 
+            // Usar o innerHTML do elemento encontrado
             modalBody.innerHTML = content.innerHTML;
+            
+            // Re-executar apenas scripts marcados para o modal (ex.: updateBookingStatus)
+            const modalScripts = doc.querySelectorAll('script[data-modal-script]');
+            modalScripts.forEach(script => {
+                const newScript = document.createElement('script');
+                if (script.src) {
+                    newScript.src = script.src;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                modalBody.appendChild(newScript);
+            });
         })
         .catch(error => {
             modalBody.innerHTML = `
