@@ -19,6 +19,7 @@ from tenants.models import TenantMembership, BrandingSettings
 from ..forms import BookingForm, ProfessionalForm, ProfessionalUpdateForm, ServiceForm
 from ..models import Booking, Professional, Service
 from ..services.notification_dispatcher import send_booking_confirmation
+from ..services.financial import FinancialAnalytics
 
 
 @login_required
@@ -87,6 +88,10 @@ def index(request: HttpRequest) -> HttpResponse:
         "professionals": Professional.objects.filter(tenant=tenant).count(),
     }
     
+    # Obter análise financeira
+    financial_service = FinancialAnalytics(tenant)
+    financial_data = financial_service.get_dashboard_summary(days=30)
+    
     context = {
         "tenant": tenant,
         "bookings": recent_bookings,
@@ -97,6 +102,8 @@ def index(request: HttpRequest) -> HttpResponse:
         "start_date": start_date,
         "end_date": end_date,
         "subscription": tenant.subscription if hasattr(tenant, 'subscription') else None,
+        # Dados financeiros
+        "financial": financial_data,
     }
     
     return render(

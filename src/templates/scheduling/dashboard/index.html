@@ -763,34 +763,169 @@
     }
 </script>
 
-<!-- SEÇÃO: MÓDULO FINANCEIRO (TEMPORARIAMENTE LIBERADO PARA DESENVOLVIMENTO) -->
-<section class="dashboard-section financial-module-section" style="margin-top: 40px;">
-    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <h2 style="font-size: 24px; color: #1F2937; margin: 0;">💰 Módulo Financeiro</h2>
-        <span style="background: #10B981; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase;">🔓 Liberado</span>
-    </div>
-
-    <!-- CONTEÚDO LIBERADO PARA DESENVOLVIMENTO -->
-    <div class="financial-content-development" style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
-        <div style="background: #DBEAFE; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 4px; margin-bottom: 25px;">
-            <p style="color: #1E40AF; margin: 0; font-weight: 600;">
-                ℹ️ Modo de Desenvolvimento: Todas as features estão liberadas temporariamente
-            </p>
-            <p style="color: #1E40AF; margin: 5px 0 0 0; font-size: 13px;">
-                Você pode criar o dashboard completo agora. Depois vamos bloquear apenas as features que você decidir.
-            </p>
-        </div>
-
-        <p style="color: #6B7280; margin-bottom: 20px;">
-            📊 <strong>Comece a criar aqui:</strong> Adicione as seções que quiser (receita, gráficos, tabelas, etc)
-        </p>
-
-        <!-- Espaço para desenvolvimento -->
-        <div style="border: 2px dashed #E5E7EB; border-radius: 8px; padding: 40px; text-align: center; color: #9CA3AF;">
-            <p style="font-size: 18px; margin: 0;">📝 Seu conteúdo financeiro vai aqui</p>
-            <p style="font-size: 13px; margin: 10px 0 0 0;">Implemente as seções que você imagina para o financeiro</p>
+<!-- SEÇÃO: MÓDULO FINANCEIRO -->
+<section class="dashboard-section financial-module-section" style="margin-top: 60px;">
+    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
+        <h2 style="font-size: 28px; color: #1F2937; margin: 0; display: flex; align-items: center; gap: 12px;">
+            💰 Módulo Financeiro
+        </h2>
+        <div style="display: flex; gap: 10px;">
+            <span style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">🔓 Liberado</span>
         </div>
     </div>
+
+    <!-- =============== SEÇÃO 1: KPIs PRINCIPAIS =============== -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
+        
+        <!-- Receita Total -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15); transition: all 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div>
+                    <p style="font-size: 12px; margin: 0; opacity: 0.9; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Receita Total</p>
+                    <p style="font-size: 28px; font-weight: 700; margin: 8px 0 0 0;">R$ {{ financial.total_revenue|floatformat:2 }}</p>
+                </div>
+                <span style="font-size: 32px;">📊</span>
+            </div>
+            <p style="font-size: 12px; margin: 0; opacity: 0.8;">Últimos 30 dias</p>
+        </div>
+
+        <!-- Receita Hoje -->
+        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15); transition: all 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div>
+                    <p style="font-size: 12px; margin: 0; opacity: 0.9; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Receita Hoje</p>
+                    <p style="font-size: 28px; font-weight: 700; margin: 8px 0 0 0;">R$ {{ financial.revenue_today|floatformat:2 }}</p>
+                </div>
+                <span style="font-size: 32px;">📈</span>
+            </div>
+            <p style="font-size: 12px; margin: 0; opacity: 0.8;">Últimas 24 horas</p>
+        </div>
+
+        <!-- Receita Mês -->
+        <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 8px 25px rgba(245, 158, 11, 0.15); transition: all 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div>
+                    <p style="font-size: 12px; margin: 0; opacity: 0.9; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Receita Mês</p>
+                    <p style="font-size: 28px; font-weight: 700; margin: 8px 0 0 0;">R$ {{ financial.revenue_this_month|floatformat:2 }}</p>
+                </div>
+                <span style="font-size: 32px;">💵</span>
+            </div>
+            <p style="font-size: 12px; margin: 0; opacity: 0.8;">Mês atual</p>
+        </div>
+
+        <!-- Ticket Médio -->
+        <div style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 8px 25px rgba(236, 72, 153, 0.15); transition: all 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div>
+                    <p style="font-size: 12px; margin: 0; opacity: 0.9; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Ticket Médio</p>
+                    <p style="font-size: 28px; font-weight: 700; margin: 8px 0 0 0;">R$ {{ financial.average_ticket|floatformat:2 }}</p>
+                </div>
+                <span style="font-size: 32px;">🎯</span>
+            </div>
+            <p style="font-size: 12px; margin: 0; opacity: 0.8;">Por agendamento</p>
+        </div>
+
+    </div>
+
+    <!-- =============== SEÇÃO 2: MÉTRICAS DE CONVERSÃO =============== -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
+        
+        <!-- Taxa de Conversão -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <p style="font-size: 12px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Taxa de Conversão</p>
+            <p style="font-size: 32px; font-weight: 700; margin: 0; color: #1f2937;">{{ financial.conversion_rate|floatformat:1 }}%</p>
+            <p style="font-size: 12px; margin: 8px 0 0 0; color: #94a3b8;">Agendamentos confirmados</p>
+        </div>
+
+        <!-- Agendamentos Confirmados -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <p style="font-size: 12px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">✅ Confirmados</p>
+            <p style="font-size: 32px; font-weight: 700; margin: 0; color: #10b981;">{{ financial.confirmed_bookings }}</p>
+            <p style="font-size: 12px; margin: 8px 0 0 0; color: #94a3b8;">Total de agendamentos</p>
+        </div>
+
+        <!-- Agendamentos Pendentes -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <p style="font-size: 12px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">⏳ Pendentes</p>
+            <p style="font-size: 32px; font-weight: 700; margin: 0; color: #f59e0b;">{{ financial.pending_bookings }}</p>
+            <p style="font-size: 12px; margin: 8px 0 0 0; color: #94a3b8;">Aguardando confirmação</p>
+        </div>
+
+        <!-- Agendamentos Cancelados -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <p style="font-size: 12px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">❌ Cancelados</p>
+            <p style="font-size: 32px; font-weight: 700; margin: 0; color: #ef4444;">{{ financial.cancelled_bookings }}</p>
+            <p style="font-size: 12px; margin: 8px 0 0 0; color: #94a3b8;">Cancelamentos totais</p>
+        </div>
+
+    </div>
+
+    <!-- =============== SEÇÃO 3: TOP PROFISSIONAIS =============== -->
+    <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+        <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
+            👥 Top Profissionais (por receita)
+        </h3>
+        
+        {% if financial.top_professionals %}
+        <div style="display: grid; gap: 12px;">
+            {% for prof in financial.top_professionals %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
+                        {{ prof.professional__display_name|first|upper }}
+                    </div>
+                    <div>
+                        <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ prof.professional__display_name }}</p>
+                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ prof.booking_count }} agendamentos</p>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <p style="margin: 0; font-weight: 700; color: #667eea; font-size: 16px;">R$ {{ prof.total_revenue|floatformat:2 }}</p>
+                    <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Ticket: R$ {{ prof.avg_ticket|floatformat:2 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="padding: 30px; text-align: center; color: #94a3b8;">
+            <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- =============== SEÇÃO 4: TOP SERVIÇOS =============== -->
+    <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+        <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
+            🛍️ Top Serviços (por receita)
+        </h3>
+        
+        {% if financial.top_services %}
+        <div style="display: grid; gap: 12px;">
+            {% for service in financial.top_services %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
+                        ✓
+                    </div>
+                    <div>
+                        <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ service.service__name }}</p>
+                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ service.booking_count }} agendamentos</p>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <p style="margin: 0; font-weight: 700; color: #10b981; font-size: 16px;">R$ {{ service.total_revenue|floatformat:2 }}</p>
+                    <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Ticket: R$ {{ service.avg_ticket|floatformat:2 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="padding: 30px; text-align: center; color: #94a3b8;">
+            <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
+        </div>
+        {% endif %}
+    </div>
+
 </section>
 
 <style>
