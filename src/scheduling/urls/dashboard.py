@@ -10,6 +10,7 @@ urlpatterns = [
     path("agenda/dia/", dashboard_views.calendar_day_view, name="calendar_day"),
     path("agendamentos/<int:pk>/", dashboard_views.booking_detail, name="booking_detail"),
     path("agendamentos/<int:pk>/status/", dashboard_views.booking_update_status, name="booking_update_status"),
+    path("agendamentos/passados/", dashboard_views.booking_past_list, name="booking_past_list"),
     path("agendamentos/novo/", dashboard_views.booking_create, name="booking_create"),
     path("agendamentos/dados-profissionais/", dashboard_views.get_professionals_data, name="get_professionals_data"),
     path("agendamentos/profissionais-por-servico/", dashboard_views.get_professionals_by_service, name="get_professionals_by_service"),

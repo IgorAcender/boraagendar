@@ -418,6 +418,54 @@ def booking_detail(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
+def booking_past_list(request: HttpRequest) -> HttpResponse:
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff"],
+    )
+    if redirect_response:
+        return redirect_response
+
+    tenant = membership.tenant
+    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    current_time = now().astimezone(tz)
+
+    past_bookings = (
+        Booking.objects.filter(tenant=tenant, scheduled_for__lt=current_time)
+        .select_related("service", "professional")
+        .order_by("-scheduled_for")
+    )
+
+    bookings_by_status: dict[str, list[Booking]] = defaultdict(list)
+    for booking in past_bookings:
+        bookings_by_status[booking.status].append(booking)
+
+    statuses_payload: list[dict[str, object]] = []
+    for status_value, status_label in Booking.Status.choices:
+        status_bookings = bookings_by_status.get(status_value, [])
+        statuses_payload.append(
+            {
+                "value": status_value,
+                "label": status_label,
+                "bookings": status_bookings,
+                "count": len(status_bookings),
+            }
+        )
+
+    total_past = sum(item["count"] for item in statuses_payload)
+
+    return render(
+        request,
+        "scheduling/dashboard/past_bookings.html",
+        {
+            "tenant": tenant,
+            "statuses": statuses_payload,
+            "total_past": total_past,
+        },
+    )
+
+
+@login_required
 @require_POST
 def booking_update_status(request: HttpRequest, pk: int) -> HttpResponse:
     """Atualiza o status de um agendamento via AJAX"""
@@ -1618,4 +1666,3 @@ def _get_date_range(period: str, tz: ZoneInfo) -> tuple:
         return (None, None)
     
     return (start, end)
-
