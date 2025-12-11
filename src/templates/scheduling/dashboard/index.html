@@ -726,6 +726,9 @@
 <script>
     function filterByType(event, eventType) {
         event.preventDefault();
+        event.stopPropagation();
+        
+        console.log('filterByType chamado com:', eventType);
         
         // Remover active class de todos os botões
         document.querySelectorAll('.tab-button').forEach(btn => {
@@ -733,20 +736,29 @@
         });
         
         // Adicionar active class ao botão clicado
-        event.target.closest('.tab-button').classList.add('active');
+        const button = event.target.closest('.tab-button');
+        if (button) {
+            button.classList.add('active');
+            console.log('Botão ativado');
+        }
         
         // Filtrar linhas da tabela
         const rows = document.querySelectorAll('.history-row');
+        console.log('Total de linhas encontradas:', rows.length);
         
         rows.forEach(row => {
-            const rowType = row.getAttribute('data-event-type').trim();
+            const rowType = row.getAttribute('data-event-type');
+            console.log('Verificando linha com tipo:', rowType);
             
             if (eventType === 'all') {
                 row.style.display = '';
-            } else if (rowType === eventType) {
+                console.log('Mostrando linha (all)');
+            } else if (rowType && rowType.trim() === eventType) {
                 row.style.display = '';
+                console.log('Mostrando linha (match)');
             } else {
                 row.style.display = 'none';
+                console.log('Ocultando linha');
             }
         });
     }
