@@ -557,6 +557,93 @@
 {% endblock %}
 
 {% block content %}
+
+<script type="text/javascript">
+    // Função para trocar abas - Definida no início
+    function switchTab(event, tabName) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        console.log('Alternando para aba:', tabName);
+        
+        // Esconder todos os conteúdos
+        const contents = document.querySelectorAll('.dashboard-tab-content');
+        contents.forEach(content => {
+            content.style.display = 'none';
+        });
+        
+        // Remover active de todos os botões
+        const buttons = document.querySelectorAll('.dashboard-tab-button');
+        buttons.forEach(button => {
+            button.style.color = '#64748b';
+            button.style.borderBottom = 'none';
+            button.style.marginBottom = '-2px';
+        });
+        
+        // Mostrar o conteúdo selecionado
+        const targetContent = document.getElementById(tabName);
+        if (targetContent) {
+            targetContent.style.display = 'block';
+            console.log('✓ Aba exibida:', tabName);
+        } else {
+            console.error('✗ Aba não encontrada:', tabName);
+        }
+        
+        // Adicionar active ao botão clicado
+        if (event && event.target) {
+            const button = event.target.closest('button');
+            if (button) {
+                button.style.color = '#667eea';
+                button.style.borderBottom = '3px solid #667eea';
+                button.style.marginBottom = '-2px';
+                console.log('✓ Botão ativado');
+            }
+        }
+    }
+
+    // Função para filtrar histórico por tipo
+    function filterByType(event, eventType) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        // Remover active class de todos os botões
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Adicionar active class ao botão clicado
+        if (event && event.target) {
+            const button = event.target.closest('.tab-button');
+            if (button) {
+                button.classList.add('active');
+            }
+        }
+        
+        // Filtrar linhas da tabela
+        const rows = document.querySelectorAll('.history-row');
+        
+        rows.forEach(row => {
+            const rowType = row.getAttribute('data-event-type');
+            
+            if (eventType === 'all') {
+                // Mostrar todas as linhas
+                row.style.display = '';
+            } else if (rowType && rowType.trim() === eventType) {
+                // Mostrar apenas as linhas que correspondem
+                row.style.display = '';
+            } else {
+                // Ocultar as outras
+                row.style.display = 'none';
+            }
+        });
+    }
+</script>
+
 <!-- Hero Header -->
 <div class="hero-header animate-fade-in">
     <div class="hero-content">
@@ -1333,41 +1420,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <script type="text/javascript">
-    // Função para trocar abas
-    function switchTab(event, tabName) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        // Esconder todos os conteúdos
-        const contents = document.querySelectorAll('.dashboard-tab-content');
-        contents.forEach(content => {
-            content.style.display = 'none';
-        });
-        
-        // Remover active de todos os botões
-        const buttons = document.querySelectorAll('.dashboard-tab-button');
-        buttons.forEach(button => {
-            button.style.color = '#64748b';
-            button.style.borderBottom = 'none';
-            button.style.marginBottom = '-2px';
-        });
-        
-        // Mostrar o conteúdo selecionado
-        const targetContent = document.getElementById(tabName);
-        if (targetContent) {
-            targetContent.style.display = 'block';
-        }
-        
-        // Adicionar active ao botão clicado
-        const clickedButton = event.target.closest('button') || event.target;
-        if (clickedButton) {
-            clickedButton.style.color = '#667eea';
-            clickedButton.style.borderBottom = '3px solid #667eea';
-            clickedButton.style.marginBottom = '-2px';
-        }
-    }
-    }
-
     // Passar dados dos gráficos para o JavaScript
     try {
         window.chart7DaysData = {{ financial.revenue_last_7_days|safe }};
