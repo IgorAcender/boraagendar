@@ -1365,70 +1365,73 @@
 
     </div>
 
-    <!-- =============== SEÇÃO 3: TOP PROFISSIONAIS =============== -->
-    <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-        <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
-            👥 Top Profissionais (por receita)
-        </h3>
-        
-        {% if financial.top_professionals %}
-        <div style="display: grid; gap: 12px;">
-            {% for prof in financial.top_professionals %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
-                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
-                        {{ prof.professional__display_name|first|upper }}
+    <!-- =============== SEÇÃO 3 E 4: TOP PROFISSIONAIS E SERVIÇOS (2 COLUNAS) =============== -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+        <!-- TOP PROFISSIONAIS -->
+        <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
+                👥 Top Profissionais (por receita)
+            </h3>
+            
+            {% if financial.top_professionals %}
+            <div style="display: grid; gap: 12px;">
+                {% for prof in financial.top_professionals %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
+                            {{ prof.professional__display_name|first|upper }}
+                        </div>
+                        <div>
+                            <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ prof.professional__display_name }}</p>
+                            <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ prof.booking_count }} agendamentos</p>
+                        </div>
                     </div>
-                    <div>
-                        <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ prof.professional__display_name }}</p>
-                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ prof.booking_count }} agendamentos</p>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-weight: 700; color: #667eea; font-size: 16px;">R$ {{ prof.total_revenue|floatformat:2 }}</p>
+                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Ticket: R$ {{ prof.avg_ticket|floatformat:2 }}</p>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <p style="margin: 0; font-weight: 700; color: #667eea; font-size: 16px;">R$ {{ prof.total_revenue|floatformat:2 }}</p>
-                    <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Ticket: R$ {{ prof.avg_ticket|floatformat:2 }}</p>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% else %}
+            <div style="padding: 30px; text-align: center; color: #94a3b8;">
+                <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <div style="padding: 30px; text-align: center; color: #94a3b8;">
-            <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
-        </div>
-        {% endif %}
-    </div>
 
-    <!-- =============== SEÇÃO 4: TOP SERVIÇOS =============== -->
-    <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-        <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
-            🛍️ Top Serviços (por receita)
-        </h3>
-        
-        {% if financial.top_services %}
-        <div style="display: grid; gap: 12px;">
-            {% for service in financial.top_services %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
-                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
-                        ✓
+        <!-- TOP SERVIÇOS -->
+        <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
+                🛍️ Top Serviços (por receita)
+            </h3>
+            
+            {% if financial.top_services %}
+            <div style="display: grid; gap: 12px;">
+                {% for service in financial.top_services %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
+                            ✓
+                        </div>
+                        <div>
+                            <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ service.service__name }}</p>
+                            <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ service.booking_count }} agendamentos</p>
+                        </div>
                     </div>
-                    <div>
-                        <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ service.service__name }}</p>
-                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ service.booking_count }} agendamentos</p>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-weight: 700; color: #10b981; font-size: 16px;">R$ {{ service.total_revenue|floatformat:2 }}</p>
+                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Ticket: R$ {{ service.avg_ticket|floatformat:2 }}</p>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <p style="margin: 0; font-weight: 700; color: #10b981; font-size: 16px;">R$ {{ service.total_revenue|floatformat:2 }}</p>
-                    <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Ticket: R$ {{ service.avg_ticket|floatformat:2 }}</p>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% else %}
+            <div style="padding: 30px; text-align: center; color: #94a3b8;">
+                <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <div style="padding: 30px; text-align: center; color: #94a3b8;">
-            <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
-        </div>
-        {% endif %}
     </div>
 
     <!-- =============== SEÇÃO 5: GRÁFICOS =============== -->
