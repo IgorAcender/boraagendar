@@ -265,6 +265,64 @@ class FinancialAnalytics:
         
         return data
     
+    # ==================== FILTRO CUSTOMIZADO ====================
+    
+    def get_revenue_by_date_range(self, start_date, end_date):
+        """Receita em um período customizado"""
+        revenue = Booking.objects.filter(
+            tenant=self.tenant,
+            status='confirmed',
+            scheduled_for__range=(start_date, end_date)
+        ).aggregate(Sum('price'))['price__sum'] or Decimal('0.00')
+        
+        return float(revenue)
+    
+    def get_bookings_count_by_date_range(self, start_date, end_date):
+        """Contagem de agendamentos em um período"""
+        return Booking.objects.filter(
+            tenant=self.tenant,
+            status='confirmed',
+            scheduled_for__range=(start_date, end_date)
+        ).count()
+    
+    def get_summary_by_date_range(self, start_date, end_date):
+        """Resumo completo para um período customizado"""
+        bookings = Booking.objects.filter(
+            tenant=self.tenant,
+            status='confirmed',
+            scheduled_for__range=(start_date, end_date)
+        )
+        
+        total_revenue = bookings.aggregate(Sum('price'))['price__sum'] or Decimal('0.00')
+        booking_count = bookings.count()
+        avg_ticket = bookings.aggregate(Avg('price'))['price__avg'] or Decimal('0.00')
+        
+        # Top profissionais no período
+        top_professionals = bookings.values(
+            'professional__display_name', 'professional_id'
+        ).annotate(
+            total_revenue=Sum('price'),
+            booking_count=Count('id'),
+            avg_ticket=Avg('price')
+        ).order_by('-total_revenue')[:5]
+        
+        # Top serviços no período
+        top_services = bookings.values(
+            'service__name', 'service_id'
+        ).annotate(
+            total_revenue=Sum('price'),
+            booking_count=Count('id'),
+            avg_ticket=Avg('price')
+        ).order_by('-total_revenue')[:5]
+        
+        return {
+            'total_revenue': float(total_revenue),
+            'booking_count': booking_count,
+            'average_ticket': float(avg_ticket),
+            'top_professionals': list(top_professionals),
+            'top_services': list(top_services),
+        }
+    
     # ==================== RESUMO COMPLETO ====================
     
     def get_dashboard_summary(self, days=30):

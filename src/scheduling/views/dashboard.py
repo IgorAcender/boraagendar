@@ -90,7 +90,26 @@ def index(request: HttpRequest) -> HttpResponse:
     
     # Obter análise financeira
     financial_service = FinancialAnalytics(tenant)
-    financial_data = financial_service.get_dashboard_summary(days=30)
+    
+    # Verificar se há filtro de data customizada
+    filter_start_date = request.GET.get('start_date')
+    filter_end_date = request.GET.get('end_date')
+    
+    if filter_start_date and filter_end_date:
+        try:
+            from datetime import datetime
+            # Parsear as datas do formulário
+            custom_start = datetime.strptime(filter_start_date, '%Y-%m-%d').replace(tzinfo=tz)
+            custom_end = datetime.strptime(filter_end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999, tzinfo=tz)
+            
+            # Usar filtro customizado
+            financial_data = financial_service.get_summary_by_date_range(custom_start, custom_end)
+        except (ValueError, AttributeError):
+            # Se erro ao parsear datas, usar padrão
+            financial_data = financial_service.get_dashboard_summary(days=30)
+    else:
+        # Sem filtro customizado, usar padrão
+        financial_data = financial_service.get_dashboard_summary(days=30)
     
     # Converter dados dos gráficos para JSON
     financial_data['revenue_last_7_days'] = json.dumps(financial_data['revenue_last_7_days'])
@@ -105,6 +124,8 @@ def index(request: HttpRequest) -> HttpResponse:
         "event_filter": event_type,
         "start_date": start_date,
         "end_date": end_date,
+        "filter_start_date": filter_start_date,
+        "filter_end_date": filter_end_date,
         "subscription": tenant.subscription if hasattr(tenant, 'subscription') else None,
         # Dados financeiros
         "financial": financial_data,
