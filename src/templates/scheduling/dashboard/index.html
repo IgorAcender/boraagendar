@@ -825,6 +825,23 @@
             <p style="font-size: 12px; margin: 0; opacity: 0.8;">Por agendamento</p>
         </div>
 
+        <!-- ESTIMATIVA DO MÊS (DESTACADO) -->
+        <div style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 12px 30px rgba(139, 92, 246, 0.25); transition: all 0.3s ease; border: 2px solid rgba(255, 255, 255, 0.2); position: relative;">
+            <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">⭐ Estimativa</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-top: 15px;">
+                <div>
+                    <p style="font-size: 12px; margin: 0; opacity: 0.9; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Estimativa do Mês</p>
+                    <p style="font-size: 32px; font-weight: 700; margin: 12px 0 0 0;">R$ {{ financial.estimated_revenue_this_month|floatformat:2 }}</p>
+                    <p style="font-size: 13px; margin: 8px 0 0 0; opacity: 0.9;">
+                        <strong>{{ financial.confirmed_bookings }}</strong> confirmados + 
+                        <strong>{{ financial.pending_bookings }}</strong> pendentes
+                    </p>
+                </div>
+                <span style="font-size: 40px;">📈</span>
+            </div>
+            <p style="font-size: 12px; margin: 0; opacity: 0.8;">Soma confirmados + agendados para o mês</p>
+        </div>
+
     </div>
 
     <!-- =============== SEÇÃO 2: MÉTRICAS DE CONVERSÃO =============== -->

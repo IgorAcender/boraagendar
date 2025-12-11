@@ -63,6 +63,25 @@ class FinancialAnalytics:
         
         return float(revenue)
     
+    def get_estimated_revenue_this_month(self):
+        """Receita estimada do mês (confirmados + pendentes futuros)"""
+        now = timezone.now()
+        month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        
+        if now.month == 12:
+            month_end = month_start.replace(year=now.year + 1, month=1)
+        else:
+            month_end = month_start.replace(month=now.month + 1)
+        
+        # Somar confirmados e pendentes do mês
+        estimated = Booking.objects.filter(
+            tenant=self.tenant,
+            status__in=['confirmed', 'pending'],  # Confirmados + Pendentes
+            scheduled_for__range=(month_start, month_end)
+        ).aggregate(Sum('price'))['price__sum'] or Decimal('0.00')
+        
+        return float(estimated)
+    
     def get_revenue_this_week(self):
         """Receita da semana atual"""
         now = timezone.now()
@@ -242,6 +261,7 @@ class FinancialAnalytics:
             'revenue_today': self.get_revenue_today(),
             'revenue_this_week': self.get_revenue_this_week(),
             'revenue_this_month': self.get_revenue_this_month(),
+            'estimated_revenue_this_month': self.get_estimated_revenue_this_month(),
             'average_ticket': self.get_average_ticket(days),
             
             # Agendamentos
