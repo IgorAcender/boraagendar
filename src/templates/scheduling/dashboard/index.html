@@ -573,170 +573,24 @@
     </div>
 </div>
 
-<!-- Histórico Completo com Abas -->
-<div class="tabs-container animate-slide-up">
-    <div class="tabs-header">
-        <h2>
-            <i class="fas fa-history"></i>
-            Histórico Completo
-        </h2>
-        <div class="filter-section">
-            <div class="filter-group">
-                <label for="periodFilter">Período:</label>
-                <form method="get" style="display: flex; gap: 0.5rem;">
-                    <select name="period" id="periodFilter" onchange="this.form.submit()">
-                        <option value="all" {% if period_filter == 'all' %}selected{% endif %}>Todos</option>
-                        <option value="today" {% if period_filter == 'today' %}selected{% endif %}>Hoje</option>
-                        <option value="week" {% if period_filter == 'week' %}selected{% endif %}>Esta Semana</option>
-                        <option value="month" {% if period_filter == 'month' %}selected{% endif %}>Este Mês</option>
-                        <option value="year" {% if period_filter == 'year' %}selected{% endif %}>Este Ano</option>
-                    </select>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="tabs-nav">
-        <button class="tab-button active" onclick="filterByType(event, 'all')">
-            <i class="fas fa-list"></i> Tudo
+<!-- Sistema de Abas Principal -->
+<div style="margin-top: 40px;">
+    <!-- Abas Navegação -->
+    <div style="display: flex; gap: 0; border-bottom: 2px solid #e5e7eb; background: white; border-radius: 12px 12px 0 0; overflow: hidden; box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);">
+        <button class="dashboard-tab-button active" onclick="switchTab(event, 'operational')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-chart-pie"></i> Módulo Operacional
         </button>
-        <button class="tab-button" onclick="filterByType(event, 'Agendamento')">
-            <i class="fas fa-calendar-plus"></i> Agendamentos
+        <button class="dashboard-tab-button" onclick="switchTab(event, 'financial')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-dollar-sign"></i> Módulo Financeiro
         </button>
-        <button class="tab-button" onclick="filterByType(event, 'Reagendamento')">
-            <i class="fas fa-sync"></i> Reagendamentos
-        </button>
-        <button class="tab-button" onclick="filterByType(event, 'Cancelamento')">
-            <i class="fas fa-times-circle"></i> Cancelamentos
+        <button class="dashboard-tab-button" onclick="switchTab(event, 'history')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-history"></i> Histórico Completo
         </button>
     </div>
 
-    <div id="history-table-container" class="tab-content active">
-        {% if bookings_history %}
-        <table class="modern-table">
-            <thead>
-                <tr>
-                    <th>Data/Hora</th>
-                    <th>Cliente</th>
-                    <th>Serviço</th>
-                    <th>Tipo de Evento</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="history-tbody">
-                {% for item in bookings_history %}
-                <tr data-event-type="{{ item.event_type }}" class="history-row">
-                    <td>
-                        <div>
-                            <div style="font-weight: 600;">{{ item.timestamp|date:"d/m/Y" }}</div>
-                            <div style="font-size: 0.875rem; color: #64748b;">{{ item.timestamp|time:"H:i:s" }}</div>
-                        </div>
-                    </td>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem;">
-                                {{ item.booking.customer_name|first|upper }}
-                            </div>
-                            <span style="font-weight: 500;">{{ item.booking.customer_name }}</span>
-                        </div>
-                    </td>
-                    <td>{{ item.booking.service.name }}</td>
-                    <td>
-                        <span class="event-type-badge event-{{ item.event_type|lower }}">
-                            {{ item.event_type }}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="status-badge status-{{ item.booking.status }}">
-                            {% if item.booking.status == 'pending' %}
-                                PENDENTE
-                            {% elif item.booking.status == 'confirmed' %}
-                                CONFIRMADO
-                            {% else %}
-                                CANCELADO
-                            {% endif %}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{% url 'dashboard:booking_detail' item.booking.pk %}" class="btn-action">
-                            <i class="fas fa-eye"></i> Ver
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-state-icon">
-                <i class="fas fa-inbox"></i>
-            </div>
-            <h3>Nenhum evento encontrado</h3>
-            <p>Não há eventos neste período.</p>
-        </div>
-        {% endif %}
-    </div>
-</div>
+    <!-- Aba 1: Módulo Operacional -->
+    <div id="operational" class="dashboard-tab-content" style="display: block; background: white; padding: 40px; border-radius: 0 0 12px 12px;">
 
-<!-- Floating Action Button -->
-<button onclick="openNewBookingModal()" class="fab" title="Novo Agendamento">
-    <i class="fas fa-plus"></i>
-</button>
-
-<script>
-    function filterByType(event, eventType) {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        
-        // Remover active class de todos os botões
-        const buttons = document.querySelectorAll('.tab-button');
-        buttons.forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        // Adicionar active class ao botão clicado
-        if (event && event.target) {
-            const button = event.target.closest('.tab-button');
-            if (button) {
-                button.classList.add('active');
-            }
-        }
-        
-        // Filtrar linhas da tabela
-        const rows = document.querySelectorAll('.history-row');
-        
-        rows.forEach(row => {
-            const rowType = row.getAttribute('data-event-type');
-            
-            if (eventType === 'all') {
-                // Mostrar todas as linhas
-                row.style.display = '';
-            } else if (rowType && rowType.trim() === eventType) {
-                // Mostrar apenas as linhas que correspondem
-                row.style.display = '';
-            } else {
-                // Ocultar as outras
-                row.style.display = 'none';
-            }
-        });
-    }
-</script>
-
-<!-- SEÇÃO: MÓDULO OPERACIONAL -->
-<section class="dashboard-section operational-module-section" style="margin-top: 60px;">
-    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
-        <div>
-            <h2 style="font-size: 28px; color: #1F2937; margin: 0; display: flex; align-items: center; gap: 12px;">
-                📊 Módulo Operacional
-            </h2>
-        </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <span style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">🔓 Liberado</span>
-        </div>
-    </div>
 
     <!-- =============== SEÇÃO 1: KPIs OPERACIONAIS =============== -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
@@ -977,12 +831,17 @@
 
 </section>
 
+    </div> <!-- Fim da aba Operacional -->
+
+    <!-- Aba 2: Módulo Financeiro -->
+    <div id="financial" class="dashboard-tab-content" style="display: none; background: white; padding: 40px; border-radius: 0 0 12px 12px;">
+
 <!-- SEÇÃO: MÓDULO FINANCEIRO -->
-<section class="dashboard-section financial-module-section" style="margin-top: 60px;">
+<section class="dashboard-section financial-module-section">
     <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
         <div>
-            <h2 style="font-size: 28px; color: #1F2937; margin: 0; display: flex; align-items: center; gap: 12px;">
-                💰 Módulo Financeiro
+            <h2 style="font-size: 24px; color: #1F2937; margin: 0; display: flex; align-items: center; gap: 12px;">
+                💰 Análise Financeira
             </h2>
             {% if filter_start_date and filter_end_date %}
             <p style="font-size: 13px; color: #64748b; margin: 8px 0 0 0; display: flex; align-items: center; gap: 6px;">
@@ -1321,10 +1180,152 @@
 
 </section>
 
+    </div> <!-- Fim da aba Financeira -->
+
+    <!-- Aba 3: Histórico Completo -->
+    <div id="history" class="dashboard-tab-content" style="display: none; background: white; padding: 40px; border-radius: 0 0 12px 12px;">
+
+<!-- Histórico Completo com Abas Internas -->
+<div class="tabs-container">
+    <div class="tabs-header">
+        <h2>
+            <i class="fas fa-history"></i>
+            Histórico Completo
+        </h2>
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="periodFilter">Período:</label>
+                <form method="get" style="display: flex; gap: 0.5rem;">
+                    <select name="period" id="periodFilter" onchange="this.form.submit()">
+                        <option value="all" {% if period_filter == 'all' %}selected{% endif %}>Todos</option>
+                        <option value="today" {% if period_filter == 'today' %}selected{% endif %}>Hoje</option>
+                        <option value="week" {% if period_filter == 'week' %}selected{% endif %}>Esta Semana</option>
+                        <option value="month" {% if period_filter == 'month' %}selected{% endif %}>Este Mês</option>
+                        <option value="year" {% if period_filter == 'year' %}selected{% endif %}>Este Ano</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs-nav">
+        <button class="tab-button active" onclick="filterByType(event, 'all')">
+            <i class="fas fa-list"></i> Tudo
+        </button>
+        <button class="tab-button" onclick="filterByType(event, 'Agendamento')">
+            <i class="fas fa-calendar-plus"></i> Agendamentos
+        </button>
+        <button class="tab-button" onclick="filterByType(event, 'Reagendamento')">
+            <i class="fas fa-sync"></i> Reagendamentos
+        </button>
+        <button class="tab-button" onclick="filterByType(event, 'Cancelamento')">
+            <i class="fas fa-times-circle"></i> Cancelamentos
+        </button>
+    </div>
+
+    <div id="history-table-container" class="tab-content active">
+        {% if bookings_history %}
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Cliente</th>
+                    <th>Serviço</th>
+                    <th>Tipo de Evento</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="history-tbody">
+                {% for item in bookings_history %}
+                <tr data-event-type="{{ item.event_type }}" class="history-row">
+                    <td>
+                        <div>
+                            <div style="font-weight: 600;">{{ item.timestamp|date:"d/m/Y" }}</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">{{ item.timestamp|time:"H:i:s" }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem;">
+                                {{ item.booking.customer_name|first|upper }}
+                            </div>
+                            <span style="font-weight: 500;">{{ item.booking.customer_name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ item.booking.service.name }}</td>
+                    <td>
+                        <span class="event-type-badge event-{{ item.event_type|lower }}">
+                            {{ item.event_type }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ item.booking.status }}">
+                            {% if item.booking.status == 'pending' %}
+                                PENDENTE
+                            {% elif item.booking.status == 'confirmed' %}
+                                CONFIRMADO
+                            {% else %}
+                                CANCELADO
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'dashboard:booking_detail' item.booking.pk %}" class="btn-action">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3>Nenhum evento encontrado</h3>
+            <p>Não há eventos neste período.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+    </div> <!-- Fim da aba Histórico -->
+
+</div> <!-- Fim do Sistema de Abas -->
+
+<!-- Floating Action Button -->
+<button onclick="openNewBookingModal()" class="fab" title="Novo Agendamento">
+    <i class="fas fa-plus"></i>
+</button>
+
 <style>
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
+}
+
+/* Estilos das Abas */
+.dashboard-tab-button {
+    transition: all 0.3s ease;
+}
+
+.dashboard-tab-button:hover {
+    color: #667eea !important;
+}
+
+.dashboard-tab-content {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 </style>
 
@@ -1332,6 +1333,33 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <script type="text/javascript">
+    // Função para trocar abas
+    function switchTab(event, tabName) {
+        event.preventDefault();
+        
+        // Esconder todos os conteúdos
+        const contents = document.querySelectorAll('.dashboard-tab-content');
+        contents.forEach(content => {
+            content.style.display = 'none';
+        });
+        
+        // Remover active de todos os botões
+        const buttons = document.querySelectorAll('.dashboard-tab-button');
+        buttons.forEach(button => {
+            button.style.color = '#64748b';
+            button.style.borderBottom = 'none';
+            button.style.marginBottom = '-2px';
+        });
+        
+        // Mostrar o conteúdo selecionado
+        document.getElementById(tabName).style.display = 'block';
+        
+        // Adicionar active ao botão clicado
+        event.target.closest('.dashboard-tab-button').style.color = '#667eea';
+        event.target.closest('.dashboard-tab-button').style.borderBottom = '3px solid #667eea';
+        event.target.closest('.dashboard-tab-button').style.marginBottom = '-2px';
+    }
+
     // Passar dados dos gráficos para o JavaScript
     try {
         window.chart7DaysData = {{ financial.revenue_last_7_days|safe }};
