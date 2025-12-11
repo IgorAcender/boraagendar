@@ -101,9 +101,10 @@ def index(request: HttpRequest) -> HttpResponse:
     
     # ====== FIM PROCESSAMENTO DO FILTRO DE TEMPO ======
     
-    # Obter filtro de período
+    # Obter filtro de período (mantido para compatibilidade, mas não é mais usado)
     period_filter = request.GET.get('period', 'all')
-    start_date, end_date = _get_date_range(period_filter, tz)
+    # Não chamar _get_date_range pois usamos custom_start_date e custom_end_date agora
+    start_date, end_date = custom_start_date, custom_end_date
     
     # Obter abas de filtro
     event_type = request.GET.get('type', 'all')
