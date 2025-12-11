@@ -906,7 +906,10 @@
         });
         
         // Add active class to selected tab and button
-        document.getElementById(tabId).classList.add('active');
-        event.target.closest('.tab-button').classList.add('active');
+        const selectedTab = document.getElementById(tabId);
+        if (selectedTab) {
+            selectedTab.classList.add('active');
+            event.target.closest('.tab-button').classList.add('active');
+        }
     }
 </script>
