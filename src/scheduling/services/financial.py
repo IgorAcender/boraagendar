@@ -37,7 +37,7 @@ class FinancialAnalytics:
         return self.get_total_revenue(days=365)
     
     def get_revenue_today(self):
-        """Receita das últimas 24 horas"""
+        """Receita do dia de hoje (00:00 até 23:59 do dia atual)"""
         today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
         today_end = today_start + timedelta(days=1)
         
