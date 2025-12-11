@@ -222,6 +222,29 @@ class OperationalAnalytics:
             for b in bookings
         ]
     
+    def get_peak_hours_by_range(self, start_date, end_date):
+        """Horas de pico (mais agendamentos) - período customizado"""
+        bookings = Booking.objects.filter(
+            tenant=self.tenant,
+            scheduled_for__range=(start_date, end_date)
+        ).values('scheduled_for__hour').annotate(
+            count=Count('id')
+        ).order_by('-count')[:5]
+        
+        total_bookings = Booking.objects.filter(
+            tenant=self.tenant,
+            scheduled_for__range=(start_date, end_date)
+        ).count()
+        
+        return [
+            {
+                'hour': f"{b['scheduled_for__hour']:02d}:00",
+                'count': b['count'],
+                'percentage': (b['count'] / total_bookings * 100) if total_bookings > 0 else 0
+            }
+            for b in bookings
+        ]
+    
     def get_peak_days(self, days=30):
         """Dias da semana com mais agendamentos"""
         start_date = timezone.now() - timedelta(days=days)
@@ -236,6 +259,31 @@ class OperationalAnalytics:
         ).order_by('scheduled_for__week_day')
         
         total_bookings = self.get_total_bookings(days=days)
+        
+        return [
+            {
+                'day': WEEKDAY_NAMES[b['scheduled_for__week_day'] - 1] if b['scheduled_for__week_day'] <= 7 else 'Dom',
+                'count': b['count'],
+                'percentage': (b['count'] / total_bookings * 100) if total_bookings > 0 else 0
+            }
+            for b in bookings
+        ]
+    
+    def get_peak_days_by_range(self, start_date, end_date):
+        """Dias da semana com mais agendamentos - período customizado"""
+        WEEKDAY_NAMES = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom']
+        
+        bookings = Booking.objects.filter(
+            tenant=self.tenant,
+            scheduled_for__range=(start_date, end_date)
+        ).values('scheduled_for__week_day').annotate(
+            count=Count('id')
+        ).order_by('scheduled_for__week_day')
+        
+        total_bookings = Booking.objects.filter(
+            tenant=self.tenant,
+            scheduled_for__range=(start_date, end_date)
+        ).count()
         
         return [
             {
@@ -394,8 +442,8 @@ class OperationalAnalytics:
             'average_bookings_per_day': average_per_day,
             'average_bookings_per_professional': self.get_average_bookings_per_professional(30),
             
-            'peak_hours': self.get_peak_hours(7),
-            'peak_days': self.get_peak_days(30),
+            'peak_hours': self.get_peak_hours_by_range(start_date, end_date),
+            'peak_days': self.get_peak_days_by_range(start_date, end_date),
             'bookings_by_status_last_7_days': self.get_bookings_by_status_last_7_days(),
             'top_professionals': self.get_bookings_by_professional(30, 5),
             'top_services': self.get_bookings_by_service(30, 5),

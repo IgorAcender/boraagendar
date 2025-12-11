@@ -698,6 +698,17 @@
             periodLabel.textContent = `${monthName} ${year}`;
         }
         
+        // Atualizar o label do período nos gráficos de pico
+        const peakHoursLabel = document.getElementById('period-label-peak-hours');
+        if (peakHoursLabel) {
+            peakHoursLabel.textContent = `${monthName} ${year}`;
+        }
+        
+        const peakDaysLabel = document.getElementById('period-label-peak-days');
+        if (peakDaysLabel) {
+            peakDaysLabel.textContent = `${monthName} ${year}`;
+        }
+        
         console.log(`📅 Mês selecionado: ${monthName} ${year}`);
     }
 
@@ -1071,7 +1082,7 @@
                 <h3 style="font-size: 16px; color: #1F2937; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: 700;">
                     🕐 Horários de Pico
                 </h3>
-                <span style="background: #f0f4ff; color: #667eea; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">Últimos 30 dias</span>
+                <span style="background: #f0f4ff; color: #667eea; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;" id="period-label-peak-hours">Últimos 30 dias</span>
             </div>
             {% if operational.peak_hours %}
             <div style="display: grid; gap: 10px;">
@@ -1098,7 +1109,7 @@
                 <h3 style="font-size: 16px; color: #1F2937; margin: 0; display: flex; align-items: center; gap: 8px; font-weight: 700;">
                     📅 Dias de Pico
                 </h3>
-                <span style="background: #f0fdf4; color: #10b981; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">Últimos 30 dias</span>
+                <span style="background: #f0fdf4; color: #10b981; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;" id="period-label-peak-days">Últimos 30 dias</span>
             </div>
             {% if operational.peak_days %}
             <div style="display: grid; gap: 10px;">
