@@ -600,6 +600,23 @@
     // ====== FILTRO DE MÊS GLOBAL ======
     let currentDate = new Date();
 
+    // Restaurar currentDate a partir dos parâmetros de query
+    function restoreCurrentDateFromQuery() {
+        const params = new URLSearchParams(window.location.search);
+        const timeFilter = params.get('time_filter');
+        
+        if (timeFilter && timeFilter.startsWith('custom:')) {
+            const parts = timeFilter.split(':');
+            if (parts.length === 3) {
+                const startDate = parts[1];
+                // Extrair o mês e ano do startDate (YYYY-MM-DD)
+                const [year, month, day] = startDate.split('-');
+                currentDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+                console.log(`📅 Restaurado do filtro: ${startDate}`);
+            }
+        }
+    }
+
     // Inicializar exibição do mês
     function updateMonthDisplay() {
         const monthNames = [
@@ -1545,6 +1562,7 @@
     // Inicializar exibição do mês quando a página carregar
     document.addEventListener('DOMContentLoaded', function() {
         console.log('📋 Inicializando dashboard...');
+        restoreCurrentDateFromQuery();
         updateMonthDisplay();
     });
 </script>
