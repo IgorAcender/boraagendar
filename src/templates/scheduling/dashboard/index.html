@@ -891,6 +891,8 @@
     <i class="fas fa-plus"></i>
 </button>
 
+{% endblock %}
+
 <script>
     function switchTab(event, tabId) {
         event.preventDefault();
@@ -908,65 +910,3 @@
         event.target.closest('.tab-button').classList.add('active');
     }
 </script>
-
-<!-- Hero Header -->
-<div class="hero-header animate-fade-in">
-    <div class="hero-content">
-        <div class="hero-text">
-            <h1>Bem-vindo ao Dashboard</h1>
-            <p>Visão geral do seu sistema de agendamentos</p>
-        </div>
-        <div class="hero-actions">
-            <button onclick="openNewBookingModal()" class="btn-hero">
-                <i class="fas fa-plus"></i>
-                Novo Agendamento
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- Cards de Estatísticas -->
-<div class="stats-grid animate-slide-up">
-    <div class="stat-card primary">
-        <div class="stat-content">
-            <div class="stat-info">
-                <div class="stat-label">Total Agendamentos</div>
-                <div class="stat-value">{{ totals.bookings }}</div>
-            </div>
-            <div class="stat-icon">
-                <i class="fas fa-calendar-check"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="stat-card success">
-        <div class="stat-content">
-            <div class="stat-info">
-                <div class="stat-label">Serviços Ativos</div>
-                <div class="stat-value">{{ totals.services }}</div>
-            </div>
-            <div class="stat-icon">
-                <i class="fas fa-concierge-bell"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="stat-card warning">
-        <div class="stat-content">
-            <div class="stat-info">
-                <div class="stat-label">Profissionais</div>
-                <div class="stat-value">{{ totals.professionals }}</div>
-            </div>
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Floating Action Button -->
-<button onclick="openNewBookingModal()" class="fab" title="Novo Agendamento">
-    <i class="fas fa-plus"></i>
-</button>
-
-{% endblock %}
