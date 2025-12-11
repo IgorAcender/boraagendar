@@ -357,7 +357,7 @@ class OperationalAnalytics:
             
             'cancellation_rate': (cancelled / total * 100) if total > 0 else 0.0,
             'no_show_rate': (bookings.filter(status='no_show').count() / total * 100) if total > 0 else 0.0,
-            'average_bookings_per_day': total / max((end_date - start_date).days, 1),
+            'average_bookings_per_day': round(total / max((end_date - start_date).days, 1), 2),
             'average_bookings_per_professional': self.get_average_bookings_per_professional(30),
             
             'peak_hours': self.get_peak_hours(7),

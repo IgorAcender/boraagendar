@@ -992,14 +992,14 @@
         <!-- Média por Dia -->
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);">
             <p style="font-size: 12px; margin: 0 0 10px 0; opacity: 0.9; text-transform: uppercase; font-weight: 600;">Média por Dia</p>
-            <p style="font-size: 28px; font-weight: 700; margin: 0;">{{ operational.average_bookings_per_day }}</p>
+            <p style="font-size: 28px; font-weight: 700; margin: 0;">{{ operational.average_bookings_per_day|floatformat:1 }}</p>
             <p style="font-size: 12px; margin: 8px 0 0 0; opacity: 0.8;">Agendamentos diários</p>
         </div>
 
         <!-- Média por Profissional -->
         <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);">
             <p style="font-size: 12px; margin: 0 0 10px 0; opacity: 0.9; text-transform: uppercase; font-weight: 600;">Média por Profissional</p>
-            <p style="font-size: 28px; font-weight: 700; margin: 0;">{{ operational.average_bookings_per_professional }}</p>
+            <p style="font-size: 28px; font-weight: 700; margin: 0;">{{ operational.average_bookings_per_professional|floatformat:1 }}</p>
             <p style="font-size: 12px; margin: 8px 0 0 0; opacity: 0.8;">Por profissional</p>
         </div>
 
