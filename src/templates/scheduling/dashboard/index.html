@@ -634,21 +634,21 @@
     </div>
 
     <div class="tabs-nav">
-        <button class="tab-button active" onclick="switchTab(event, 'all-tab')">
+        <button class="tab-button active" onclick="filterByType(event, 'all')">
             <i class="fas fa-list"></i> Tudo
         </button>
-        <button class="tab-button" onclick="switchTab(event, 'agendamentos-tab')">
+        <button class="tab-button" onclick="filterByType(event, 'Agendamento')">
             <i class="fas fa-calendar-plus"></i> Agendamentos
         </button>
-        <button class="tab-button" onclick="switchTab(event, 'reagendamentos-tab')">
+        <button class="tab-button" onclick="filterByType(event, 'Reagendamento')">
             <i class="fas fa-sync"></i> Reagendamentos
         </button>
-        <button class="tab-button" onclick="switchTab(event, 'cancelamentos-tab')">
+        <button class="tab-button" onclick="filterByType(event, 'Cancelamento')">
             <i class="fas fa-times-circle"></i> Cancelamentos
         </button>
     </div>
 
-    <div id="all-tab" class="tab-content active">
+    <div id="history-table-container" class="tab-content active">
         {% if bookings_history %}
         <table class="modern-table">
             <thead>
@@ -661,9 +661,9 @@
                     <th>Ações</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="history-tbody">
                 {% for item in bookings_history %}
-                <tr>
+                <tr data-event-type="{{ item.event_type }}" class="history-row">
                     <td>
                         <div>
                             <div style="font-weight: 600;">{{ item.timestamp|date:"d/m/Y" }}</div>
@@ -714,176 +714,6 @@
         </div>
         {% endif %}
     </div>
-
-    <div id="agendamentos-tab" class="tab-content">
-        {% with filtered_agendamentos=bookings_history|dictsort:"event_type" %}
-            {% if filtered_agendamentos %}
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Cliente</th>
-                        <th>Serviço</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in bookings_history %}
-                        {% if item.event_type == 'Agendamento' %}
-                        <tr>
-                            <td>
-                                <div>
-                                    <div style="font-weight: 600;">{{ item.timestamp|date:"d/m/Y" }}</div>
-                                    <div style="font-size: 0.875rem; color: #64748b;">{{ item.timestamp|time:"H:i:s" }}</div>
-                                </div>
-                            </td>
-                            <td>{{ item.booking.customer_name }}</td>
-                            <td>{{ item.booking.service.name }}</td>
-                            <td>
-                                <span class="status-badge status-{{ item.booking.status }}">
-                                    {% if item.booking.status == 'pending' %}
-                                        PENDENTE
-                                    {% elif item.booking.status == 'confirmed' %}
-                                        CONFIRMADO
-                                    {% else %}
-                                        CANCELADO
-                                    {% endif %}
-                                </span>
-                            </td>
-                            <td>
-                                <a href="{% url 'dashboard:booking_detail' item.booking.pk %}" class="btn-action">
-                                    <i class="fas fa-eye"></i> Ver
-                                </a>
-                            </td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <h3>Nenhum agendamento encontrado</h3>
-                <p>Não há agendamentos neste período.</p>
-            </div>
-            {% endif %}
-        {% endwith %}
-    </div>
-
-    <div id="reagendamentos-tab" class="tab-content">
-        {% if bookings_history %}
-        <table class="modern-table">
-            <thead>
-                <tr>
-                    <th>Data/Hora</th>
-                    <th>Cliente</th>
-                    <th>Serviço</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in bookings_history %}
-                    {% if item.event_type == 'Reagendamento' %}
-                    <tr>
-                        <td>
-                            <div>
-                                <div style="font-weight: 600;">{{ item.timestamp|date:"d/m/Y" }}</div>
-                                <div style="font-size: 0.875rem; color: #64748b;">{{ item.timestamp|time:"H:i:s" }}</div>
-                            </div>
-                        </td>
-                        <td>{{ item.booking.customer_name }}</td>
-                        <td>{{ item.booking.service.name }}</td>
-                        <td>
-                            <span class="status-badge status-{{ item.booking.status }}">
-                                {% if item.booking.status == 'pending' %}
-                                    PENDENTE
-                                {% elif item.booking.status == 'confirmed' %}
-                                    CONFIRMADO
-                                {% else %}
-                                    CANCELADO
-                                {% endif %}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="{% url 'dashboard:booking_detail' item.booking.pk %}" class="btn-action">
-                                <i class="fas fa-eye"></i> Ver
-                            </a>
-                        </td>
-                    </tr>
-                    {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-state-icon">
-                <i class="fas fa-sync"></i>
-            </div>
-            <h3>Nenhum reagendamento encontrado</h3>
-            <p>Não há reagendamentos neste período.</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <div id="cancelamentos-tab" class="tab-content">
-        {% if bookings_history %}
-        <table class="modern-table">
-            <thead>
-                <tr>
-                    <th>Data/Hora</th>
-                    <th>Cliente</th>
-                    <th>Serviço</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in bookings_history %}
-                    {% if item.event_type == 'Cancelamento' %}
-                    <tr>
-                        <td>
-                            <div>
-                                <div style="font-weight: 600;">{{ item.timestamp|date:"d/m/Y" }}</div>
-                                <div style="font-size: 0.875rem; color: #64748b;">{{ item.timestamp|time:"H:i:s" }}</div>
-                            </div>
-                        </td>
-                        <td>{{ item.booking.customer_name }}</td>
-                        <td>{{ item.booking.service.name }}</td>
-                        <td>
-                            <span class="status-badge status-{{ item.booking.status }}">
-                                {% if item.booking.status == 'pending' %}
-                                    PENDENTE
-                                {% elif item.booking.status == 'confirmed' %}
-                                    CONFIRMADO
-                                {% else %}
-                                    CANCELADO
-                                {% endif %}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="{% url 'dashboard:booking_detail' item.booking.pk %}" class="btn-action">
-                                <i class="fas fa-eye"></i> Ver
-                            </a>
-                        </td>
-                    </tr>
-                    {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-state-icon">
-                <i class="fas fa-times-circle"></i>
-            </div>
-            <h3>Nenhum cancelamento encontrado</h3>
-            <p>Não há cancelamentos neste período.</p>
-        </div>
-        {% endif %}
-    </div>
 </div>
 
 <!-- Floating Action Button -->
@@ -894,22 +724,28 @@
 {% endblock %}
 
 <script>
-    function switchTab(event, tabId) {
+    function filterByType(event, eventType) {
         event.preventDefault();
         
-        // Remove active class from all tabs and buttons
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
+        // Remover active class de todos os botões
         document.querySelectorAll('.tab-button').forEach(btn => {
             btn.classList.remove('active');
         });
         
-        // Add active class to selected tab and button
-        const selectedTab = document.getElementById(tabId);
-        if (selectedTab) {
-            selectedTab.classList.add('active');
-            event.target.closest('.tab-button').classList.add('active');
-        }
+        // Adicionar active class ao botão clicado
+        event.target.closest('.tab-button').classList.add('active');
+        
+        // Filtrar linhas da tabela
+        const rows = document.querySelectorAll('.history-row');
+        
+        rows.forEach(row => {
+            if (eventType === 'all') {
+                row.style.display = '';
+            } else if (row.getAttribute('data-event-type') === eventType) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
     }
 </script>
