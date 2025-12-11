@@ -635,7 +635,6 @@
         }
     }
 
-    // Inicializar exibição do mês
     function updateMonthDisplay() {
         const monthNames = [
             'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -647,6 +646,12 @@
         const monthName = monthNames[month];
         
         document.getElementById('month-display').textContent = `${monthName} ${year}`;
+        
+        // Atualizar o label do período nos cards
+        const periodLabel = document.getElementById('period-label-operational');
+        if (periodLabel) {
+            periodLabel.textContent = `${monthName} ${year}`;
+        }
         
         console.log(`📅 Mês selecionado: ${monthName} ${year}`);
     }
@@ -700,6 +705,7 @@
         })
         .then(html => {
             console.log('✅ Dados carregados com sucesso');
+            console.log('📄 HTML recebido (primeiros 500 chars):', html.substring(0, 500));
             
             // Atualizar a URL sem recarregar
             window.history.pushState(
@@ -721,8 +727,14 @@
             const oldFinancial = document.getElementById('financial');
             const oldHistory = document.getElementById('history');
             
+            console.log('🔍 Elementos encontrados - newOperational:', !!newOperational, 'oldOperational:', !!oldOperational);
+            
             if (newOperational && oldOperational) {
-                oldOperational.innerHTML = newOperational.innerHTML;
+                const oldHTML = oldOperational.innerHTML;
+                const newHTML = newOperational.innerHTML;
+                console.log('📊 Conteúdo antigo:', oldHTML.substring(0, 200));
+                console.log('📊 Conteúdo novo:', newHTML.substring(0, 200));
+                oldOperational.innerHTML = newHTML;
                 console.log('✅ Aba operacional atualizada');
             }
             if (newFinancial && oldFinancial) {
@@ -893,7 +905,7 @@
                 </div>
                 <span style="font-size: 32px;">📅</span>
             </div>
-            <p style="font-size: 12px; margin: 0; opacity: 0.8;">Últimos 30 dias</p>
+            <p style="font-size: 12px; margin: 0; opacity: 0.8;" id="period-label-operational">Últimos 30 dias</p>
         </div>
 
         <!-- Confirmados -->
