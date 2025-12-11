@@ -668,6 +668,16 @@
     }
 
     function loadMonthData() {
+        // Salvar a aba ativa atual no localStorage
+        const activeButton = document.querySelector('.dashboard-tab-button[style*="border-bottom: 3px solid"]');
+        if (activeButton) {
+            const activeTabId = activeButton.id;
+            // Extrai o nome da aba do ID (btn-operational -> operational)
+            const tabName = activeTabId.replace('btn-', '');
+            localStorage.setItem('activeTab', tabName);
+            console.log(`💾 Aba ativa salva: ${tabName}`);
+        }
+        
         // Calcular primeiro e último dia do mês
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -1592,6 +1602,19 @@
         console.log('📋 Inicializando dashboard...');
         restoreCurrentDateFromQuery();
         updateMonthDisplay();
+        
+        // Restaurar a aba ativa anterior
+        const savedTab = localStorage.getItem('activeTab');
+        if (savedTab) {
+            console.log(`🔄 Restaurando aba salva: ${savedTab}`);
+            const tabButton = document.getElementById(`btn-${savedTab}`);
+            if (tabButton) {
+                switchTab(tabButton, savedTab);
+                console.log(`✅ Aba restaurada: ${savedTab}`);
+            } else {
+                console.warn(`⚠️ Botão da aba não encontrado: btn-${savedTab}`);
+            }
+        }
         
         // Adicionar event listeners aos botões de navegação de mês
         const btnPrevMonth = document.getElementById('btn-prev-month');
