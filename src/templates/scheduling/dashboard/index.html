@@ -1,4 +1,5 @@
 ﻿{% extends "base_dashboard.html" %}
+{% load subscription_tags %}
 {% block title %}Dashboard{% endblock %}
 {% block extra_head %}
 <style>
@@ -761,5 +762,119 @@
         });
     }
 </script>
+
+<!-- SEÇÃO: MÓDULO FINANCEIRO (PAYWALL) -->
+<section class="dashboard-section financial-module-section" style="margin-top: 40px;">
+    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2 style="font-size: 24px; color: #1F2937; margin: 0;">💰 Módulo Financeiro</h2>
+        <div style="background: linear-gradient(135deg, #D97706 0%, #B45309 100%); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase;">Premium</div>
+    </div>
+
+    {% if user|has_feature_access:"has_financial_module" %}
+        <!-- CONTEÚDO DESBLOQUEADO -->
+        <div class="financial-content-unlocked" style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+            <p style="color: #6B7280;">📊 Conteúdo do módulo financeiro será implementado em breve...</p>
+        </div>
+    {% else %}
+        <!-- CONTEÚDO BLOQUEADO - PAYWALL -->
+        <div class="financial-content-locked" style="background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%); border: 2px dashed #d1d5db; border-radius: 12px; padding: 40px 20px;">
+            <div class="locked-card" style="max-width: 700px; margin: 0 auto; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); text-align: center;">
+                
+                <div class="locked-header" style="margin-bottom: 30px;">
+                    <div style="font-size: 64px; margin-bottom: 15px; display: block; animation: bounce 2s infinite;">🔒</div>
+                    
+                    <h3 style="font-size: 24px; color: #1F2937; margin: 15px 0;">
+                        Módulo Financeiro - Recurso Premium
+                    </h3>
+                    
+                    <span style="display: inline-block; background: linear-gradient(135deg, #D97706 0%, #B45309 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-left: 10px;">Premium</span>
+                </div>
+
+                <div class="locked-body" style="text-align: left;">
+                    <p style="color: #6B7280; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                        Desbloqueie análises completas de receita com relatórios detalhados, gráficos em tempo real e muito mais.
+                    </p>
+
+                    <div style="background: #f3f4f6; border-radius: 8px; padding: 25px; margin-bottom: 30px; text-align: left;">
+                        <h4 style="color: #1F2937; margin-top: 0; margin-bottom: 15px;">O que você vai ganhar:</h4>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="display: flex; align-items: center; padding: 10px 0; color: #4B5563; border-bottom: 1px solid #e5e7eb;">
+                                <span style="font-size: 18px; margin-right: 12px; min-width: 25px;">📊</span>
+                                <span>Relatórios detalhados de receita</span>
+                            </li>
+                            <li style="display: flex; align-items: center; padding: 10px 0; color: #4B5563; border-bottom: 1px solid #e5e7eb;">
+                                <span style="font-size: 18px; margin-right: 12px; min-width: 25px;">📈</span>
+                                <span>Gráficos de receita por período</span>
+                            </li>
+                            <li style="display: flex; align-items: center; padding: 10px 0; color: #4B5563; border-bottom: 1px solid #e5e7eb;">
+                                <span style="font-size: 18px; margin-right: 12px; min-width: 25px;">👤</span>
+                                <span>Análise de receita por profissional</span>
+                            </li>
+                            <li style="display: flex; align-items: center; padding: 10px 0; color: #4B5563; border-bottom: 1px solid #e5e7eb;">
+                                <span style="font-size: 18px; margin-right: 12px; min-width: 25px;">🛍️</span>
+                                <span>Análise de receita por serviço</span>
+                            </li>
+                            <li style="display: flex; align-items: center; padding: 10px 0; color: #4B5563; border-bottom: 1px solid #e5e7eb;">
+                                <span style="font-size: 18px; margin-right: 12px; min-width: 25px;">📥</span>
+                                <span>Exportar relatórios em PDF/CSV</span>
+                            </li>
+                            <li style="display: flex; align-items: center; padding: 10px 0; color: #4B5563;">
+                                <span style="font-size: 18px; margin-right: 12px; min-width: 25px;">📊</span>
+                                <span>Comparação período vs período</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #e5e7eb;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="text-align: left;">
+                                <p style="font-size: 12px; color: #9CA3AF; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 600;">Seu plano atual:</p>
+                                <p style="font-size: 18px; color: #1F2937; font-weight: 700; margin: 0;">
+                                    {% get_user_plan user as user_plan %}
+                                    {{ user_plan.name }}
+                                </p>
+                            </div>
+
+                            <div style="text-align: left;">
+                                <p style="font-size: 12px; color: #9CA3AF; margin: 0 0 5px 0; text-transform: uppercase; font-weight: 600;">Faça upgrade para:</p>
+                                <p style="font-size: 16px; color: #D97706; font-weight: 700; margin: 0 0 5px 0;">Profissional ou Premium</p>
+                                <p style="font-size: 14px; color: #6B7280; margin: 0;">a partir de <strong>R$ 99/mês</strong></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <a href="#" style="background: linear-gradient(135deg, #D97706 0%, #B45309 100%); color: white; padding: 14px 40px; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer; text-decoration: none; display: inline-block; margin-bottom: 15px; transition: all 0.3s ease;" onmouseover="this.style.boxShadow='0 8px 20px rgba(217, 119, 6, 0.3)'" onmouseout="this.style.boxShadow=''">
+                            🚀 Fazer Upgrade Agora
+                        </a>
+
+                        <p style="color: #9CA3AF; font-size: 13px; margin: 10px 0;">
+                            Professional: R$ 99/mês com todas as features
+                        </p>
+
+                        {% get_subscription user as subscription %}
+                        {% if subscription.is_trial %}
+                        <div style="margin-top: 20px; padding: 15px; background: #FEF3C7; border-radius: 8px; color: #92400E; font-size: 14px;">
+                            <p style="margin: 0;">
+                                ⏱️ Seu período de teste expira em 
+                                <strong>{{ subscription.trial_days_remaining }} dias</strong>
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    {% endif %}
+</section>
+
+<style>
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+</style>
 
 {% endblock %}

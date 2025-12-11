@@ -96,6 +96,7 @@ def index(request: HttpRequest) -> HttpResponse:
         "event_filter": event_type,
         "start_date": start_date,
         "end_date": end_date,
+        "subscription": tenant.subscription if hasattr(tenant, 'subscription') else None,
     }
     
     return render(
