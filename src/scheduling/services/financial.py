@@ -315,12 +315,30 @@ class FinancialAnalytics:
             avg_ticket=Avg('price')
         ).order_by('-total_revenue')[:5]
         
+        # Adicionar dados de gráficos para compatibilidade com o template
+        # Usar os mesmos dados do período customizado para os gráficos
+        revenue_by_date = {}
+        for booking in bookings.order_by('scheduled_for'):
+            date_key = booking.scheduled_for.strftime('%Y-%m-%d')
+            if date_key not in revenue_by_date:
+                revenue_by_date[date_key] = 0
+            revenue_by_date[date_key] += float(booking.price or 0)
+        
+        # Formatar para Chart.js
+        revenue_last_7_days = {
+            'labels': list(revenue_by_date.keys()),
+            'data': list(revenue_by_date.values())
+        }
+        
         return {
             'total_revenue': float(total_revenue),
             'booking_count': booking_count,
             'average_ticket': float(avg_ticket),
             'top_professionals': list(top_professionals),
             'top_services': list(top_services),
+            # Adicionar chaves esperadas pelo template
+            'revenue_last_7_days': revenue_last_7_days,
+            'revenue_last_12_months': revenue_last_7_days,  # Usar mesmos dados para período customizado
         }
     
     # ==================== RESUMO COMPLETO ====================
