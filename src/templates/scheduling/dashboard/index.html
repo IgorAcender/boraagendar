@@ -560,22 +560,19 @@
 
 <script type="text/javascript">
     // Função para trocar abas - Definida no início
-    function switchTab(event, tabName) {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        
-        console.log('Alternando para aba:', tabName);
+    function switchTab(buttonElement, tabName) {
+        console.log('🔄 Tentando alternar para aba:', tabName);
         
         // Esconder todos os conteúdos
         const contents = document.querySelectorAll('.dashboard-tab-content');
+        console.log('📦 Encontrados', contents.length, 'conteúdos');
         contents.forEach(content => {
             content.style.display = 'none';
         });
         
         // Remover active de todos os botões
         const buttons = document.querySelectorAll('.dashboard-tab-button');
+        console.log('🔘 Encontrados', buttons.length, 'botões');
         buttons.forEach(button => {
             button.style.color = '#64748b';
             button.style.borderBottom = 'none';
@@ -586,20 +583,17 @@
         const targetContent = document.getElementById(tabName);
         if (targetContent) {
             targetContent.style.display = 'block';
-            console.log('✓ Aba exibida:', tabName);
+            console.log('✅ Aba exibida:', tabName);
         } else {
-            console.error('✗ Aba não encontrada:', tabName);
+            console.error('❌ Aba não encontrada:', tabName);
         }
         
         // Adicionar active ao botão clicado
-        if (event && event.target) {
-            const button = event.target.closest('button');
-            if (button) {
-                button.style.color = '#667eea';
-                button.style.borderBottom = '3px solid #667eea';
-                button.style.marginBottom = '-2px';
-                console.log('✓ Botão ativado');
-            }
+        if (buttonElement) {
+            buttonElement.style.color = '#667eea';
+            buttonElement.style.borderBottom = '3px solid #667eea';
+            buttonElement.style.marginBottom = '-2px';
+            console.log('✅ Botão ativado');
         }
     }
 
@@ -664,13 +658,13 @@
 <div style="margin-top: 40px;">
     <!-- Abas Navegação -->
     <div style="display: flex; gap: 0; border-bottom: 2px solid #e5e7eb; background: white; border-radius: 12px 12px 0 0; overflow: hidden; box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);">
-        <button class="dashboard-tab-button active" onclick="switchTab(event, 'operational')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+        <button id="btn-operational" class="dashboard-tab-button active" onclick="switchTab(this, 'operational')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-chart-pie"></i> Módulo Operacional
         </button>
-        <button class="dashboard-tab-button" onclick="switchTab(event, 'financial')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+        <button id="btn-financial" class="dashboard-tab-button" onclick="switchTab(this, 'financial')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-dollar-sign"></i> Módulo Financeiro
         </button>
-        <button class="dashboard-tab-button" onclick="switchTab(event, 'history')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+        <button id="btn-history" class="dashboard-tab-button" onclick="switchTab(this, 'history')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #64748b; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-history"></i> Histórico Completo
         </button>
     </div>
