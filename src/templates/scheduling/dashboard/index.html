@@ -571,6 +571,51 @@
     #btn-next-month:active {
         transform: scale(0.98);
     }
+
+    /* Tooltip para explicar métricas */
+    .metric-tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: help;
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.5);
+    }
+
+    .metric-tooltip .tooltip-text {
+        visibility: hidden;
+        width: 280px;
+        background-color: rgba(0, 0, 0, 0.9);
+        color: #fff;
+        text-align: left;
+        border-radius: 8px;
+        padding: 12px;
+        position: absolute;
+        z-index: 1000;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -140px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 13px;
+        line-height: 1.4;
+        font-weight: 400;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .metric-tooltip .tooltip-text::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+    }
+
+    .metric-tooltip:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
 </style>
 {% endblock %}
 
@@ -991,14 +1036,26 @@
         
         <!-- Média por Dia -->
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);">
-            <p style="font-size: 12px; margin: 0 0 10px 0; opacity: 0.9; text-transform: uppercase; font-weight: 600;">Média por Dia</p>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <p style="font-size: 12px; margin: 0; opacity: 0.9; text-transform: uppercase; font-weight: 600;">Média por Dia</p>
+                <div class="metric-tooltip" style="font-size: 16px; opacity: 0.7;">
+                    ℹ️
+                    <span class="tooltip-text">Calculado dividindo o total de agendamentos pelo número de dias que tiveram pelo menos um agendamento (não pelos 31 dias do mês).</span>
+                </div>
+            </div>
             <p style="font-size: 28px; font-weight: 700; margin: 0;">{{ operational.average_bookings_per_day|floatformat:1 }}</p>
             <p style="font-size: 12px; margin: 8px 0 0 0; opacity: 0.8;">Agendamentos diários</p>
         </div>
 
         <!-- Média por Profissional -->
         <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);">
-            <p style="font-size: 12px; margin: 0 0 10px 0; opacity: 0.9; text-transform: uppercase; font-weight: 600;">Média por Profissional</p>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <p style="font-size: 12px; margin: 0; opacity: 0.9; text-transform: uppercase; font-weight: 600;">Média por Profissional</p>
+                <div class="metric-tooltip" style="font-size: 16px; opacity: 0.7;">
+                    ℹ️
+                    <span class="tooltip-text">Número médio de agendamentos por profissional ativo no período. Útil para entender a distribuição de carga entre a equipe.</span>
+                </div>
+            </div>
             <p style="font-size: 28px; font-weight: 700; margin: 0;">{{ operational.average_bookings_per_professional|floatformat:1 }}</p>
             <p style="font-size: 12px; margin: 8px 0 0 0; opacity: 0.8;">Por profissional</p>
         </div>
