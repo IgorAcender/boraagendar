@@ -1136,70 +1136,73 @@
 
     </div>
 
-    <!-- =============== SEÇÃO 5: TOP PROFISSIONAIS OPERACIONAL =============== -->
-    <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-        <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
-            👥 Top Profissionais (por Agendamentos)
-        </h3>
-        
-        {% if operational.top_professionals %}
-        <div style="display: grid; gap: 12px;">
-            {% for prof in operational.top_professionals %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
-                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
-                        {{ prof.professional__display_name|first|upper }}
+    <!-- =============== SEÇÃO 5 E 6: TOP SERVIÇOS E PROFISSIONAIS (2 COLUNAS) =============== -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+        <!-- TOP SERVIÇOS -->
+        <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
+                🎯 Top Serviços (por Agendamentos)
+            </h3>
+            
+            {% if operational.top_services %}
+            <div style="display: grid; gap: 12px;">
+                {% for svc in operational.top_services %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
+                            {{ svc.service__name|first|upper }}
+                        </div>
+                        <div>
+                            <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ svc.service__name }}</p>
+                            <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ svc.total }} total • {{ svc.confirmed }} confirmados • {{ svc.cancelled }} cancelados</p>
+                        </div>
                     </div>
-                    <div>
-                        <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ prof.professional__display_name }}</p>
-                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ prof.total }} total • {{ prof.confirmed }} confirmados • {{ prof.cancelled }} cancelados</p>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-weight: 700; color: #f59e0b; font-size: 16px;">{{ svc.total }}</p>
+                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Agendamentos</p>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <p style="margin: 0; font-weight: 700; color: #667eea; font-size: 16px;">{{ prof.total }}</p>
-                    <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Agendamentos</p>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% else %}
+            <div style="padding: 30px; text-align: center; color: #94a3b8;">
+                <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <div style="padding: 30px; text-align: center; color: #94a3b8;">
-            <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
-        </div>
-        {% endif %}
-    </div>
 
-    <!-- =============== SEÇÃO 6: TOP SERVIÇOS OPERACIONAL =============== -->
-    <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-        <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
-            🎯 Top Serviços (por Agendamentos)
-        </h3>
-        
-        {% if operational.top_services %}
-        <div style="display: grid; gap: 12px;">
-            {% for svc in operational.top_services %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
-                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
-                        {{ svc.service__name|first|upper }}
+        <!-- TOP PROFISSIONAIS -->
+        <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
+                👥 Top Profissionais (por Agendamentos)
+            </h3>
+            
+            {% if operational.top_professionals %}
+            <div style="display: grid; gap: 12px;">
+                {% for prof in operational.top_professionals %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
+                            {{ prof.professional__display_name|first|upper }}
+                        </div>
+                        <div>
+                            <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ prof.professional__display_name }}</p>
+                            <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ prof.total }} total • {{ prof.confirmed }} confirmados • {{ prof.cancelled }} cancelados</p>
+                        </div>
                     </div>
-                    <div>
-                        <p style="margin: 0; font-weight: 600; color: #1F2937;">{{ svc.service__name }}</p>
-                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #64748b;">{{ svc.total }} total • {{ svc.confirmed }} confirmados • {{ svc.cancelled }} cancelados</p>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-weight: 700; color: #667eea; font-size: 16px;">{{ prof.total }}</p>
+                        <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Agendamentos</p>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <p style="margin: 0; font-weight: 700; color: #f59e0b; font-size: 16px;">{{ svc.total }}</p>
-                    <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Agendamentos</p>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% else %}
+            <div style="padding: 30px; text-align: center; color: #94a3b8;">
+                <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <div style="padding: 30px; text-align: center; color: #94a3b8;">
-            <p style="margin: 0;">📊 Nenhum dado disponível ainda</p>
-        </div>
-        {% endif %}
     </div>
 
 </section>
