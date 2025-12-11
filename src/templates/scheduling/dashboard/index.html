@@ -598,7 +598,7 @@
     }
 
     // ====== FILTRO DE TEMPO GLOBAL ======
-    let currentTimeFilter = 'diario';
+    let currentTimeFilter = 'mensal';
 
     function setTimeFilter(filterType) {
         console.log('⏱️ Alterando filtro de tempo para:', filterType);
@@ -735,13 +735,13 @@
         
         <!-- Botões de período rápido -->
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button onclick="setTimeFilter('diario')" class="filter-btn active" style="padding: 8px 16px; border: 2px solid #667eea; background: #667eea; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease;">
+            <button onclick="setTimeFilter('diario')" class="filter-btn" style="padding: 8px 16px; border: 2px solid #e5e7eb; background: white; color: #64748b; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease;">
                 📆 Diário
             </button>
             <button onclick="setTimeFilter('semanal')" class="filter-btn" style="padding: 8px 16px; border: 2px solid #e5e7eb; background: white; color: #64748b; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease;">
                 📊 Semanal
             </button>
-            <button onclick="setTimeFilter('mensal')" class="filter-btn" style="padding: 8px 16px; border: 2px solid #e5e7eb; background: white; color: #64748b; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease;">
+            <button onclick="setTimeFilter('mensal')" class="filter-btn active" style="padding: 8px 16px; border: 2px solid #667eea; background: #667eea; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease;">
                 📈 Mensal
             </button>
             <button onclick="setTimeFilter('anual')" class="filter-btn" style="padding: 8px 16px; border: 2px solid #e5e7eb; background: white; color: #64748b; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease;">

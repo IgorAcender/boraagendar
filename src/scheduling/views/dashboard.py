@@ -47,7 +47,7 @@ def index(request: HttpRequest) -> HttpResponse:
     tz = _get_tenant_timezone(tenant)
     
     # ====== PROCESSAMENTO DO FILTRO DE TEMPO GLOBAL ======
-    time_filter = request.GET.get('time_filter', 'diario')
+    time_filter = request.GET.get('time_filter', 'mensal')
     custom_start_date = None
     custom_end_date = None
     
