@@ -92,6 +92,10 @@ def index(request: HttpRequest) -> HttpResponse:
     financial_service = FinancialAnalytics(tenant)
     financial_data = financial_service.get_dashboard_summary(days=30)
     
+    # Converter dados dos gráficos para JSON
+    financial_data['revenue_last_7_days'] = json.dumps(financial_data['revenue_last_7_days'])
+    financial_data['revenue_last_12_months'] = json.dumps(financial_data['revenue_last_12_months'])
+    
     context = {
         "tenant": tenant,
         "bookings": recent_bookings,

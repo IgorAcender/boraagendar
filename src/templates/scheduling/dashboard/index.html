@@ -1,5 +1,6 @@
 ﻿{% extends "base_dashboard.html" %}
 {% load subscription_tags %}
+{% load static %}
 {% block title %}Dashboard{% endblock %}
 {% block extra_head %}
 <style>
@@ -943,6 +944,27 @@
         {% endif %}
     </div>
 
+    <!-- =============== SEÇÃO 5: GRÁFICOS =============== -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-bottom: 40px;">
+        
+        <!-- Gráfico 7 Dias -->
+        <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
+                📊 Receita - Últimos 7 Dias
+            </h3>
+            <canvas id="chart-7days" height="80"></canvas>
+        </div>
+
+        <!-- Gráfico 12 Meses -->
+        <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <h3 style="font-size: 18px; color: #1F2937; margin: 0 0 25px 0; display: flex; align-items: center; gap: 8px;">
+                📈 Receita - Últimos 12 Meses
+            </h3>
+            <canvas id="chart-12months" height="80"></canvas>
+        </div>
+
+    </div>
+
 </section>
 
 <style>
@@ -951,5 +973,16 @@
     50% { transform: translateY(-10px); }
 }
 </style>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script type="text/javascript">
+    // Passar dados dos gráficos para o JavaScript
+    window.chart7DaysData = JSON.parse('{{ financial.revenue_last_7_days|safe|escapejs }}');
+    window.chart12MonthsData = JSON.parse('{{ financial.revenue_last_12_months|safe|escapejs }}');
+</script>
+
+<script src="{% static 'js/dashboard-charts.js' %}"></script>
 
 {% endblock %}
