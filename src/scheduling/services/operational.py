@@ -200,6 +200,20 @@ class OperationalAnalytics:
         
         return round(total_bookings / professionals_count, 2)
     
+    def get_average_bookings_per_professional_by_range(self, start_date, end_date):
+        """Média de agendamentos por profissional - período customizado"""
+        professionals_count = Professional.objects.filter(tenant=self.tenant, is_active=True).count()
+        
+        if professionals_count == 0:
+            return 0.0
+        
+        total_bookings = Booking.objects.filter(
+            tenant=self.tenant,
+            scheduled_for__range=(start_date, end_date)
+        ).count()
+        
+        return round(total_bookings / professionals_count, 2)
+    
     def get_peak_hours(self, days=30):
         """Horas de pico (mais agendamentos) - últimos X dias"""
         start_date = timezone.now() - timedelta(days=days)
@@ -440,7 +454,7 @@ class OperationalAnalytics:
             'cancellation_rate': (cancelled / total * 100) if total > 0 else 0.0,
             'no_show_rate': (bookings.filter(status='no_show').count() / total * 100) if total > 0 else 0.0,
             'average_bookings_per_day': average_per_day,
-            'average_bookings_per_professional': self.get_average_bookings_per_professional(30),
+            'average_bookings_per_professional': self.get_average_bookings_per_professional_by_range(start_date, end_date),
             
             'peak_hours': self.get_peak_hours_by_range(start_date, end_date),
             'peak_days': self.get_peak_days_by_range(start_date, end_date),
