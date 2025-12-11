@@ -668,16 +668,6 @@
     }
 
     function loadMonthData() {
-        // Salvar a aba ativa atual no localStorage
-        const activeButton = document.querySelector('.dashboard-tab-button[style*="border-bottom: 3px solid"]');
-        if (activeButton) {
-            const activeTabId = activeButton.id;
-            // Extrai o nome da aba do ID (btn-operational -> operational)
-            const tabName = activeTabId.replace('btn-', '');
-            localStorage.setItem('activeTab', tabName);
-            console.log(`💾 Aba ativa salva: ${tabName}`);
-        }
-        
         // Calcular primeiro e último dia do mês
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -695,10 +685,75 @@
         const url = new URL(window.location.href);
         url.searchParams.set('time_filter', `custom:${startDate}:${endDate}`);
         
-        console.log(`📍 Navegando para: ${url.toString()}`);
+        console.log(`📍 Fazendo requisição AJAX para: ${url.toString()}`);
         
-        // Redirecionar com a nova URL
-        window.location.href = url.toString();
+        // Fazer requisição AJAX ao invés de recarregar
+        fetch(url.toString(), {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Erro na requisição');
+            return response.text();
+        })
+        .then(html => {
+            console.log('✅ Dados carregados com sucesso');
+            
+            // Atualizar a URL sem recarregar
+            window.history.pushState(
+                { time_filter: `custom:${startDate}:${endDate}` },
+                '',
+                url.toString()
+            );
+            
+            // Extrair apenas o conteúdo relevante do HTML e atualizar a página
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, 'text/html');
+            
+            // Atualizar os cards das abas (você pode customizar quais elementos atualizar)
+            const newOperational = newDoc.getElementById('operational');
+            const newFinancial = newDoc.getElementById('financial');
+            const newHistory = newDoc.getElementById('history');
+            
+            const oldOperational = document.getElementById('operational');
+            const oldFinancial = document.getElementById('financial');
+            const oldHistory = document.getElementById('history');
+            
+            if (newOperational && oldOperational) {
+                oldOperational.innerHTML = newOperational.innerHTML;
+                console.log('✅ Aba operacional atualizada');
+            }
+            if (newFinancial && oldFinancial) {
+                oldFinancial.innerHTML = newFinancial.innerHTML;
+                console.log('✅ Aba financeira atualizada');
+            }
+            if (newHistory && oldHistory) {
+                oldHistory.innerHTML = newHistory.innerHTML;
+                console.log('✅ Aba histórico atualizada');
+            }
+            
+            // Re-executar scripts que possam estar na página (gráficos, etc)
+            const scripts = newDoc.querySelectorAll('script');
+            scripts.forEach(script => {
+                if (script.src) {
+                    // Scripts externos já foram carregados
+                    return;
+                }
+                // Executar scripts inline
+                try {
+                    eval(script.textContent);
+                } catch(e) {
+                    console.warn('⚠️ Erro ao executar script:', e);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('❌ Erro ao carregar dados:', error);
+            // Fallback: recarregar a página se AJAX falhar
+            window.location.href = url.toString();
+        });
     }
 
     // ====== FIM FILTRO DE MÊS GLOBAL ======
@@ -1602,19 +1657,6 @@
         console.log('📋 Inicializando dashboard...');
         restoreCurrentDateFromQuery();
         updateMonthDisplay();
-        
-        // Restaurar a aba ativa anterior
-        const savedTab = localStorage.getItem('activeTab');
-        if (savedTab) {
-            console.log(`🔄 Restaurando aba salva: ${savedTab}`);
-            const tabButton = document.getElementById(`btn-${savedTab}`);
-            if (tabButton) {
-                switchTab(tabButton, savedTab);
-                console.log(`✅ Aba restaurada: ${savedTab}`);
-            } else {
-                console.warn(`⚠️ Botão da aba não encontrado: btn-${savedTab}`);
-            }
-        }
         
         // Adicionar event listeners aos botões de navegação de mês
         const btnPrevMonth = document.getElementById('btn-prev-month');
