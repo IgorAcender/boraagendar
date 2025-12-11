@@ -413,46 +413,88 @@ class OperationalAnalytics:
         }
     
     def get_occupation_rate_by_range(self, start_date, end_date):
-        """Taxa de ocupação (%) - percentual do tempo disponível ocupado"""
-        # Buscar agendamentos no período
+        """Taxa de ocupação (%) - percentual do tempo disponível ocupado baseado em horários reais dos profissionais"""
+        from django.db.models.functions import TruncDate
+        from datetime import date, time
+        from ..models import AvailabilityRule
+        
+        # Buscar agendamentos confirmados no período
         bookings = Booking.objects.filter(
             tenant=self.tenant,
+            status='confirmed',
             scheduled_for__range=(start_date, end_date)
         )
         
         if not bookings.exists():
             return 0.0
         
-        # Somar duração total de todos os agendamentos
-        total_duration = bookings.aggregate(Sum('duration_minutes'))['duration_minutes__sum'] or 0
+        # Somar duração total de todos os agendamentos confirmados
+        total_duration_minutes = bookings.aggregate(Sum('duration_minutes'))['duration_minutes__sum'] or 0
         
-        # Calcular total de minutos disponíveis
-        # Assumindo: 8 horas por dia, 6 dias por semana (segunda a sábado)
-        from django.db.models.functions import TruncDate
+        # Buscar todos os profissionais com agendamentos no período
+        professionals_with_bookings = bookings.values_list('professional', flat=True).distinct()
         
-        # Contar dias únicos no período (de segunda a sábado)
-        distinct_dates = bookings.annotate(
-            booking_date=TruncDate('scheduled_for')
-        ).values('booking_date').distinct()
+        # Calcular total de minutos disponíveis por profissional
+        total_available_minutes = 0
         
-        # Verificar quais dias da semana (0=segunda, 6=domingo)
-        working_days = 0
-        for date_entry in distinct_dates:
-            date = date_entry['booking_date']
-            # Se o dia não é domingo (6), conta como dia de trabalho
-            if date.weekday() < 6:  # 0-5 = seg-sab, 6 = dom
-                working_days += 1
-        
-        if working_days == 0:
-            working_days = 1
-        
-        # Total de minutos disponíveis: 8 horas/dia × 60 min/hora × dias de trabalho
-        total_available_minutes = working_days * 8 * 60
+        # Iterar por cada dia do período
+        current_date = start_date
+        while current_date <= end_date:
+            weekday = current_date.weekday()  # 0=segunda, 6=domingo
+            
+            # Apenas contar dias úteis (segunda a sábado)
+            if weekday < 6:
+                # Para cada profissional com agendamentos
+                for professional_id in professionals_with_bookings:
+                    try:
+                        professional = Professional.objects.get(id=professional_id, tenant=self.tenant)
+                    except Professional.DoesNotExist:
+                        continue
+                    
+                    # Buscar regra de disponibilidade para este dia e profissional
+                    availability = AvailabilityRule.objects.filter(
+                        tenant=self.tenant,
+                        professional=professional,
+                        weekday=weekday,
+                        is_active=True
+                    ).first()
+                    
+                    if not availability:
+                        # Se não houver regra específica, buscar padrão da empresa
+                        availability = AvailabilityRule.objects.filter(
+                            tenant=self.tenant,
+                            professional__isnull=True,
+                            weekday=weekday,
+                            is_active=True
+                        ).first()
+                    
+                    if availability:
+                        # Calcular minutos disponíveis (hora fim - hora início - pausas)
+                        start = availability.start_time
+                        end = availability.end_time
+                        
+                        # Converter para minutos
+                        start_minutes = start.hour * 60 + start.minute
+                        end_minutes = end.hour * 60 + end.minute
+                        
+                        day_available = end_minutes - start_minutes
+                        
+                        # Subtrair pausas se houver
+                        if availability.break_start and availability.break_end:
+                            break_start_minutes = availability.break_start.hour * 60 + availability.break_start.minute
+                            break_end_minutes = availability.break_end.hour * 60 + availability.break_end.minute
+                            day_available -= (break_end_minutes - break_start_minutes)
+                        
+                        total_available_minutes += day_available
+            
+            current_date += timedelta(days=1)
         
         # Calcular percentual
-        occupation_rate = (total_duration / total_available_minutes * 100) if total_available_minutes > 0 else 0.0
+        if total_available_minutes > 0:
+            occupation_rate = (total_duration_minutes / total_available_minutes) * 100
+            return round(min(occupation_rate, 100), 1)
         
-        return round(min(occupation_rate, 100), 1)  # Máximo 100%
+        return 0.0
     
     def get_summary_by_date_range(self, start_date, end_date):
         """Resumo para período customizado"""
