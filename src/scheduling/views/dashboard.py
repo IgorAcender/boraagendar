@@ -46,6 +46,61 @@ def index(request: HttpRequest) -> HttpResponse:
     tenant = membership.tenant
     tz = _get_tenant_timezone(tenant)
     
+    # ====== PROCESSAMENTO DO FILTRO DE TEMPO GLOBAL ======
+    time_filter = request.GET.get('time_filter', 'diario')
+    custom_start_date = None
+    custom_end_date = None
+    
+    # Calcular datas baseado no filtro de tempo
+    now_tz = django_timezone.now().astimezone(tz)
+    
+    if time_filter == 'diario':
+        # Últimas 24 horas
+        custom_start_date = now_tz.replace(hour=0, minute=0, second=0, microsecond=0)
+        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
+    elif time_filter == 'semanal':
+        # Últimos 7 dias
+        custom_start_date = now_tz - timedelta(days=7)
+        custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
+    elif time_filter == 'mensal':
+        # Últimos 30 dias
+        custom_start_date = now_tz - timedelta(days=30)
+        custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
+    elif time_filter == 'anual':
+        # Últimos 365 dias
+        custom_start_date = now_tz - timedelta(days=365)
+        custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
+    elif time_filter.startswith('custom:'):
+        # Filtro personalizado: custom:YYYY-MM-DD:YYYY-MM-DD
+        try:
+            parts = time_filter.split(':')
+            if len(parts) == 3:
+                start_str = parts[1]
+                end_str = parts[2]
+                custom_start_date = django_timezone.make_aware(
+                    datetime.strptime(f"{start_str} 00:00:00", "%Y-%m-%d %H:%M:%S"),
+                    timezone=tz
+                )
+                custom_end_date = django_timezone.make_aware(
+                    datetime.strptime(f"{end_str} 23:59:59", "%Y-%m-%d %H:%M:%S"),
+                    timezone=tz
+                )
+        except (ValueError, IndexError):
+            # Se erro, usar padrão de últimos 30 dias
+            custom_start_date = now_tz - timedelta(days=30)
+            custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
+    else:
+        # Default: últimos 30 dias
+        custom_start_date = now_tz - timedelta(days=30)
+        custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
+    
+    # ====== FIM PROCESSAMENTO DO FILTRO DE TEMPO ======
+    
     # Obter filtro de período
     period_filter = request.GET.get('period', 'all')
     start_date, end_date = _get_date_range(period_filter, tz)
@@ -108,26 +163,13 @@ def index(request: HttpRequest) -> HttpResponse:
     from ..services.operational import OperationalAnalytics
     operational_service = OperationalAnalytics(tenant)
     
-    # Verificar se há filtro de data customizada
-    filter_start_date = request.GET.get('start_date')
-    filter_end_date = request.GET.get('end_date')
-    
-    if filter_start_date and filter_end_date:
-        try:
-            from datetime import datetime
-            # Parsear as datas do formulário
-            custom_start = datetime.strptime(filter_start_date, '%Y-%m-%d').replace(tzinfo=tz)
-            custom_end = datetime.strptime(filter_end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999, tzinfo=tz)
-            
-            # Usar filtro customizado
-            financial_data = financial_service.get_summary_by_date_range(custom_start, custom_end)
-            operational_data = operational_service.get_summary_by_date_range(custom_start, custom_end)
-        except (ValueError, AttributeError):
-            # Se erro ao parsear datas, usar padrão
-            financial_data = financial_service.get_dashboard_summary(days=30)
-            operational_data = operational_service.get_dashboard_summary(days=30)
+    # Usar o novo filtro de tempo global para obter os dados
+    # Se houver datas customizadas do filtro de tempo, usar elas
+    if custom_start_date and custom_end_date:
+        financial_data = financial_service.get_summary_by_date_range(custom_start_date, custom_end_date)
+        operational_data = operational_service.get_summary_by_date_range(custom_start_date, custom_end_date)
     else:
-        # Sem filtro customizado, usar padrão
+        # Fallback para padrão de 30 dias
         financial_data = financial_service.get_dashboard_summary(days=30)
         operational_data = operational_service.get_dashboard_summary(days=30)
     
@@ -155,8 +197,6 @@ def index(request: HttpRequest) -> HttpResponse:
         "event_filter": event_type,
         "start_date": start_date,
         "end_date": end_date,
-        "filter_start_date": filter_start_date,
-        "filter_end_date": filter_end_date,
         "subscription": tenant.subscription if hasattr(tenant, 'subscription') else None,
         # Dados operacionais
         "operational": operational_data,
@@ -165,6 +205,8 @@ def index(request: HttpRequest) -> HttpResponse:
         # Comparação de períodos
         "month_comparison": month_comparison,
         "week_comparison": week_comparison,
+        # Filtro de tempo global
+        "current_time_filter": time_filter,
     }
     
     return render(
