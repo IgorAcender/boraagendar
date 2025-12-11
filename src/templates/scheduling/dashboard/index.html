@@ -650,7 +650,7 @@
         console.log('🔄 Recarregando todas as abas com filtro:', currentTimeFilter);
         
         // Aqui vamos fazer uma requisição AJAX para carregar os dados com o novo filtro
-        fetch(`/dashboard/?time_filter=${encodeURIComponent(currentTimeFilter)}`, {
+        fetch(`/scheduling/dashboard/?time_filter=${encodeURIComponent(currentTimeFilter)}`, {
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
