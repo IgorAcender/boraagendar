@@ -646,11 +646,6 @@
         window.location.href = `/scheduling/dashboard/?time_filter=custom:${startDate}:${endDate}`;
     }
 
-    // Inicializar na primeira carga
-    document.addEventListener('DOMContentLoaded', function() {
-        updateMonthDisplay();
-    });
-
     // ====== FIM FILTRO DE MÊS GLOBAL ======
 
     // Função para filtrar histórico por tipo
@@ -1545,5 +1540,13 @@
 </script>
 
 <script src="{% static 'js/dashboard-charts.js' %}"></script>
+
+<script type="text/javascript">
+    // Inicializar exibição do mês quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📋 Inicializando dashboard...');
+        updateMonthDisplay();
+    });
+</script>
 
 {% endblock %}
