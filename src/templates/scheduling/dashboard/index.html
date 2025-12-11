@@ -802,6 +802,10 @@
                 console.log('✅ Aba histórico atualizada');
             }
             
+            // Atualizar os labels de período após o HTML ser substituído
+            updateMonthDisplay();
+            console.log('🏷️ Labels de período atualizados');
+            
             // Re-executar scripts que possam estar na página (gráficos, etc)
             const scripts = newDoc.querySelectorAll('script');
             scripts.forEach(script => {
