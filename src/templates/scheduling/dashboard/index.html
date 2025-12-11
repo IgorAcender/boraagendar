@@ -1336,6 +1336,7 @@
     // Função para trocar abas
     function switchTab(event, tabName) {
         event.preventDefault();
+        event.stopPropagation();
         
         // Esconder todos os conteúdos
         const contents = document.querySelectorAll('.dashboard-tab-content');
@@ -1352,12 +1353,19 @@
         });
         
         // Mostrar o conteúdo selecionado
-        document.getElementById(tabName).style.display = 'block';
+        const targetContent = document.getElementById(tabName);
+        if (targetContent) {
+            targetContent.style.display = 'block';
+        }
         
         // Adicionar active ao botão clicado
-        event.target.closest('.dashboard-tab-button').style.color = '#667eea';
-        event.target.closest('.dashboard-tab-button').style.borderBottom = '3px solid #667eea';
-        event.target.closest('.dashboard-tab-button').style.marginBottom = '-2px';
+        const clickedButton = event.target.closest('button') || event.target;
+        if (clickedButton) {
+            clickedButton.style.color = '#667eea';
+            clickedButton.style.borderBottom = '3px solid #667eea';
+            clickedButton.style.marginBottom = '-2px';
+        }
+    }
     }
 
     // Passar dados dos gráficos para o JavaScript
