@@ -412,6 +412,48 @@ class OperationalAnalytics:
             'top_services': self.get_bookings_by_service(days, 5),
         }
     
+    def get_occupation_rate_by_range(self, start_date, end_date):
+        """Taxa de ocupação (%) - percentual do tempo disponível ocupado"""
+        # Buscar agendamentos no período
+        bookings = Booking.objects.filter(
+            tenant=self.tenant,
+            scheduled_for__range=(start_date, end_date)
+        )
+        
+        if not bookings.exists():
+            return 0.0
+        
+        # Somar duração total de todos os agendamentos
+        total_duration = bookings.aggregate(Sum('duration_minutes'))['duration_minutes__sum'] or 0
+        
+        # Calcular total de minutos disponíveis
+        # Assumindo: 8 horas por dia, 6 dias por semana (segunda a sábado)
+        from django.db.models.functions import TruncDate
+        
+        # Contar dias únicos no período (de segunda a sábado)
+        distinct_dates = bookings.annotate(
+            booking_date=TruncDate('scheduled_for')
+        ).values('booking_date').distinct()
+        
+        # Verificar quais dias da semana (0=segunda, 6=domingo)
+        working_days = 0
+        for date_entry in distinct_dates:
+            date = date_entry['booking_date']
+            # Se o dia não é domingo (6), conta como dia de trabalho
+            if date.weekday() < 6:  # 0-5 = seg-sab, 6 = dom
+                working_days += 1
+        
+        if working_days == 0:
+            working_days = 1
+        
+        # Total de minutos disponíveis: 8 horas/dia × 60 min/hora × dias de trabalho
+        total_available_minutes = working_days * 8 * 60
+        
+        # Calcular percentual
+        occupation_rate = (total_duration / total_available_minutes * 100) if total_available_minutes > 0 else 0.0
+        
+        return round(min(occupation_rate, 100), 1)  # Máximo 100%
+    
     def get_summary_by_date_range(self, start_date, end_date):
         """Resumo para período customizado"""
         bookings = Booking.objects.filter(
@@ -455,6 +497,7 @@ class OperationalAnalytics:
             'no_show_rate': (bookings.filter(status='no_show').count() / total * 100) if total > 0 else 0.0,
             'average_bookings_per_day': average_per_day,
             'average_bookings_per_professional': self.get_average_bookings_per_professional_by_range(start_date, end_date),
+            'occupation_rate': self.get_occupation_rate_by_range(start_date, end_date),
             
             'peak_hours': self.get_peak_hours_by_range(start_date, end_date),
             'peak_days': self.get_peak_days_by_range(start_date, end_date),
