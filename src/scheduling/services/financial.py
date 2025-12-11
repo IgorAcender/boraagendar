@@ -32,6 +32,10 @@ class FinancialAnalytics:
         total = query.aggregate(Sum('price'))['price__sum'] or Decimal('0.00')
         return float(total)
     
+    def get_annual_revenue(self):
+        """Receita anual (últimos 365 dias)"""
+        return self.get_total_revenue(days=365)
+    
     def get_revenue_today(self):
         """Receita das últimas 24 horas"""
         today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -257,7 +261,7 @@ class FinancialAnalytics:
         """Resumo completo para o dashboard"""
         return {
             # Métricas Financeiras
-            'total_revenue': self.get_total_revenue(days),
+            'annual_revenue': self.get_annual_revenue(),
             'revenue_today': self.get_revenue_today(),
             'revenue_this_week': self.get_revenue_this_week(),
             'revenue_this_month': self.get_revenue_this_month(),
