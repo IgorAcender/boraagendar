@@ -1015,8 +1015,15 @@
 
 <script type="text/javascript">
     // Passar dados dos gráficos para o JavaScript
-    window.chart7DaysData = JSON.parse('{{ financial.revenue_last_7_days|safe|escapejs }}');
-    window.chart12MonthsData = JSON.parse('{{ financial.revenue_last_12_months|safe|escapejs }}');
+    try {
+        window.chart7DaysData = {{ financial.revenue_last_7_days|safe }};
+        window.chart12MonthsData = {{ financial.revenue_last_12_months|safe }};
+        console.log('✅ Dados dos gráficos carregados com sucesso');
+    } catch(e) {
+        console.error('❌ Erro ao carregar dados dos gráficos:', e);
+        window.chart7DaysData = [];
+        window.chart12MonthsData = [];
+    }
 </script>
 
 <script src="{% static 'js/dashboard-charts.js' %}"></script>
