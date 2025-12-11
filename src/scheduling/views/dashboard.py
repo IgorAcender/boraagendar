@@ -143,8 +143,8 @@ def index(request: HttpRequest) -> HttpResponse:
     
     # Converter dados operacionais para JSON
     operational_data['bookings_by_status_last_7_days'] = json.dumps(operational_data['bookings_by_status_last_7_days'])
-    operational_data['peak_hours'] = json.dumps(operational_data['peak_hours'])
-    operational_data['peak_days'] = json.dumps(operational_data['peak_days'])
+    # peak_hours e peak_days são listas e devem permanecer como objetos Python para iteração no template
+    # operational_data['peak_hours'] e operational_data['peak_days'] já são listas e não precisam de JSON
     
     context = {
         "tenant": tenant,
