@@ -104,6 +104,10 @@ def index(request: HttpRequest) -> HttpResponse:
     # Obter análise financeira
     financial_service = FinancialAnalytics(tenant)
     
+    # Obter análise operacional
+    from ..services.operational import OperationalAnalytics
+    operational_service = OperationalAnalytics(tenant)
+    
     # Verificar se há filtro de data customizada
     filter_start_date = request.GET.get('start_date')
     filter_end_date = request.GET.get('end_date')
@@ -117,12 +121,15 @@ def index(request: HttpRequest) -> HttpResponse:
             
             # Usar filtro customizado
             financial_data = financial_service.get_summary_by_date_range(custom_start, custom_end)
+            operational_data = operational_service.get_summary_by_date_range(custom_start, custom_end)
         except (ValueError, AttributeError):
             # Se erro ao parsear datas, usar padrão
             financial_data = financial_service.get_dashboard_summary(days=30)
+            operational_data = operational_service.get_dashboard_summary(days=30)
     else:
         # Sem filtro customizado, usar padrão
         financial_data = financial_service.get_dashboard_summary(days=30)
+        operational_data = operational_service.get_dashboard_summary(days=30)
     
     # Obter comparação de períodos
     from ..services.period_comparison import PeriodComparison
@@ -133,6 +140,11 @@ def index(request: HttpRequest) -> HttpResponse:
     # Converter dados dos gráficos para JSON
     financial_data['revenue_last_7_days'] = json.dumps(financial_data['revenue_last_7_days'])
     financial_data['revenue_last_12_months'] = json.dumps(financial_data['revenue_last_12_months'])
+    
+    # Converter dados operacionais para JSON
+    operational_data['bookings_by_status_last_7_days'] = json.dumps(operational_data['bookings_by_status_last_7_days'])
+    operational_data['peak_hours'] = json.dumps(operational_data['peak_hours'])
+    operational_data['peak_days'] = json.dumps(operational_data['peak_days'])
     
     context = {
         "tenant": tenant,
@@ -146,6 +158,8 @@ def index(request: HttpRequest) -> HttpResponse:
         "filter_start_date": filter_start_date,
         "filter_end_date": filter_end_date,
         "subscription": tenant.subscription if hasattr(tenant, 'subscription') else None,
+        # Dados operacionais
+        "operational": operational_data,
         # Dados financeiros
         "financial": financial_data,
         # Comparação de períodos
