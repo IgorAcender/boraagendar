@@ -1,6 +1,6 @@
 from collections import defaultdict
 from datetime import datetime, time, timedelta
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import json
 
 from django.conf import settings
@@ -31,7 +31,10 @@ def index(request: HttpRequest) -> HttpResponse:
     if redirect_response:
         return redirect_response
     tenant = membership.tenant
-    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    try:
+        tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    except ZoneInfoNotFoundError:
+        tz = ZoneInfo(settings.TIME_ZONE)
     
     # Obter filtro de período
     period_filter = request.GET.get('period', 'all')
@@ -427,7 +430,10 @@ def booking_past_list(request: HttpRequest) -> HttpResponse:
         return redirect_response
 
     tenant = membership.tenant
-    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    try:
+        tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    except ZoneInfoNotFoundError:
+        tz = ZoneInfo(settings.TIME_ZONE)
     current_time = now().astimezone(tz)
 
     past_bookings = (
