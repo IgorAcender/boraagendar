@@ -777,7 +777,10 @@
             </p>
             {% endif %}
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{% url 'dashboard:export_report_pdf' %}{% if filter_start_date and filter_end_date %}?start_date={{ filter_start_date }}&end_date={{ filter_end_date }}{% endif %}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; text-decoration: none; transition: all 0.3s; display: flex; align-items: center; gap: 6px;">
+                📥 Exportar PDF
+            </a>
             <span style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">🔓 Liberado</span>
         </div>
     </div>

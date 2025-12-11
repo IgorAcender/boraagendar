@@ -6,6 +6,7 @@ app_name = "dashboard"
 
 urlpatterns = [
     path("", dashboard_views.index, name="index"),
+    path("relatorio-pdf/", dashboard_views.export_report_pdf, name="export_report_pdf"),
     path("agenda/", dashboard_views.calendar_view, name="calendar"),
     path("agenda/dia/", dashboard_views.calendar_day_view, name="calendar_day"),
     path("agendamentos/<int:pk>/", dashboard_views.booking_detail, name="booking_detail"),

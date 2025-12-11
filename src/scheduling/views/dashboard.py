@@ -1679,3 +1679,57 @@ def _get_date_range(period: str, tz: ZoneInfo) -> tuple:
         return (None, None)
     
     return (start, end)
+
+
+@login_required
+def export_report_pdf(request: HttpRequest) -> HttpResponse:
+    """Exportar relatório financeiro em PDF"""
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager"],
+    )
+    if redirect_response:
+        return redirect_response
+    
+    tenant = membership.tenant
+    
+    # Obter análise financeira
+    financial_service = FinancialAnalytics(tenant)
+    
+    # Verificar se há filtro de data customizada
+    filter_start_date = request.GET.get('start_date')
+    filter_end_date = request.GET.get('end_date')
+    period_label = "30 Últimos Dias"
+    
+    if filter_start_date and filter_end_date:
+        try:
+            from datetime import datetime
+            tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+            # Parsear as datas do formulário
+            custom_start = datetime.strptime(filter_start_date, '%Y-%m-%d').replace(tzinfo=tz)
+            custom_end = datetime.strptime(filter_end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999, tzinfo=tz)
+            
+            # Usar filtro customizado
+            financial_data = financial_service.get_summary_by_date_range(custom_start, custom_end)
+            period_label = f"De {filter_start_date} até {filter_end_date}"
+        except (ValueError, AttributeError):
+            # Se erro ao parsear datas, usar padrão
+            financial_data = financial_service.get_dashboard_summary(days=30)
+    else:
+        # Sem filtro customizado, usar padrão
+        financial_data = financial_service.get_dashboard_summary(days=30)
+    
+    # Gerar PDF
+    from ..services.pdf_generator import PDFReportGenerator
+    
+    pdf_gen = PDFReportGenerator(tenant, financial_data)
+    pdf_buffer = pdf_gen.generate(period_label)
+    
+    # Retornar como download
+    response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+    filename = f"relatorio-financeiro-{tenant.slug}-{django_timezone.now().strftime('%Y%m%d-%H%M%S')}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
