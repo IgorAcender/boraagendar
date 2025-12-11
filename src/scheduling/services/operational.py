@@ -160,9 +160,30 @@ class OperationalAnalytics:
         return (no_show / total) * 100
     
     def get_average_bookings_per_day(self, days=30):
-        """Média de agendamentos por dia"""
-        total = self.get_total_bookings(days)
-        return round(total / days, 2) if days > 0 else 0.0
+        """Média de agendamentos por dia com agendamentos"""
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=days)
+        
+        bookings = Booking.objects.filter(
+            tenant=self.tenant,
+            scheduled_for__range=(start_date, end_date)
+        )
+        
+        total = bookings.count()
+        
+        if total == 0:
+            return 0.0
+        
+        # Calcular número de dias distintos com agendamentos
+        from django.db.models.functions import TruncDate
+        days_with_bookings = bookings.annotate(
+            booking_date=TruncDate('scheduled_for')
+        ).values('booking_date').distinct().count()
+        
+        # Se não houver dias, usar 1 para evitar divisão por zero
+        days_with_bookings = max(days_with_bookings, 1)
+        
+        return round(total / days_with_bookings, 2)
     
     def get_average_bookings_per_professional(self, days=30):
         """Média de agendamentos por profissional"""
@@ -342,6 +363,19 @@ class OperationalAnalytics:
         rescheduled = bookings.filter(notes__icontains='Reagendado').count()
         total = bookings.count()
         
+        # Calcular número de dias distintos com agendamentos
+        from django.db.models import Count
+        from django.db.models.functions import TruncDate
+        days_with_bookings = bookings.annotate(
+            booking_date=TruncDate('scheduled_for')
+        ).values('booking_date').distinct().count()
+        
+        # Se não houver agendamentos, usar 1 para evitar divisão por zero
+        days_with_bookings = max(days_with_bookings, 1) if total > 0 else 1
+        
+        # Calcular média por dia com agendamentos
+        average_per_day = round(total / days_with_bookings, 2) if total > 0 else 0.0
+        
         return {
             'total_bookings': total,
             'confirmed_bookings': confirmed,
@@ -357,7 +391,7 @@ class OperationalAnalytics:
             
             'cancellation_rate': (cancelled / total * 100) if total > 0 else 0.0,
             'no_show_rate': (bookings.filter(status='no_show').count() / total * 100) if total > 0 else 0.0,
-            'average_bookings_per_day': round(total / max((end_date - start_date).days, 1), 2),
+            'average_bookings_per_day': average_per_day,
             'average_bookings_per_professional': self.get_average_bookings_per_professional(30),
             
             'peak_hours': self.get_peak_hours(7),
