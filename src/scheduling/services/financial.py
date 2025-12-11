@@ -33,8 +33,18 @@ class FinancialAnalytics:
         return float(total)
     
     def get_annual_revenue(self):
-        """Receita anual (últimos 365 dias)"""
-        return self.get_total_revenue(days=365)
+        """Receita anual do ano atual (01/jan até 31/dez)"""
+        now = timezone.now()
+        year_start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        year_end = now.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
+        
+        revenue = Booking.objects.filter(
+            tenant=self.tenant,
+            status='confirmed',
+            scheduled_for__range=(year_start, year_end)
+        ).aggregate(Sum('price'))['price__sum'] or Decimal('0.00')
+        
+        return float(revenue)
     
     def get_revenue_today(self):
         """Receita do dia de hoje (00:00 até 23:59 do dia atual)"""
