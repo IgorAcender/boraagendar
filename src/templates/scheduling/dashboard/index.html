@@ -553,6 +553,24 @@
             font-size: 0.85rem;
         }
     }
+
+    /* Estilos para botões de navegação de mês */
+    #btn-prev-month,
+    #btn-next-month {
+        transition: all 0.2s ease !important;
+    }
+
+    #btn-prev-month:hover,
+    #btn-next-month:hover {
+        background: #764ba2 !important;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+    }
+
+    #btn-prev-month:active,
+    #btn-next-month:active {
+        transform: scale(0.98);
+    }
 </style>
 {% endblock %}
 
@@ -740,7 +758,7 @@
     
     <div style="display: flex; align-items: center; gap: 15px;">
         <!-- Botão Voltar -->
-        <button type="button" onclick="previousMonth()" style="padding: 8px 12px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; font-size: 16px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;">
+        <button id="btn-prev-month" type="button" style="padding: 10px 14px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold; min-width: 44px; min-height: 44px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); position: relative; z-index: 100;">
             ← 
         </button>
         
@@ -752,7 +770,7 @@
         </div>
         
         <!-- Botão Avançar -->
-        <button type="button" onclick="nextMonth()" style="padding: 8px 12px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; font-size: 16px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;">
+        <button id="btn-next-month" type="button" style="padding: 10px 14px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold; min-width: 44px; min-height: 44px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); position: relative; z-index: 100;">
             →
         </button>
     </div>
@@ -1574,6 +1592,34 @@
         console.log('📋 Inicializando dashboard...');
         restoreCurrentDateFromQuery();
         updateMonthDisplay();
+        
+        // Adicionar event listeners aos botões de navegação de mês
+        const btnPrevMonth = document.getElementById('btn-prev-month');
+        const btnNextMonth = document.getElementById('btn-next-month');
+        
+        if (btnPrevMonth) {
+            btnPrevMonth.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('⬅️ Clicou em mês anterior (via addEventListener)');
+                previousMonth();
+            });
+            console.log('✅ Event listener adicionado ao botão anterior');
+        } else {
+            console.error('❌ Botão anterior não encontrado');
+        }
+        
+        if (btnNextMonth) {
+            btnNextMonth.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('➡️ Clicou em próximo mês (via addEventListener)');
+                nextMonth();
+            });
+            console.log('✅ Event listener adicionado ao botão próximo');
+        } else {
+            console.error('❌ Botão próximo não encontrado');
+        }
     });
 </script>
 
