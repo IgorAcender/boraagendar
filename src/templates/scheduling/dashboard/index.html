@@ -725,40 +725,40 @@
 
 <script>
     function filterByType(event, eventType) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        console.log('filterByType chamado com:', eventType);
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         
         // Remover active class de todos os botões
-        document.querySelectorAll('.tab-button').forEach(btn => {
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(btn => {
             btn.classList.remove('active');
         });
         
         // Adicionar active class ao botão clicado
-        const button = event.target.closest('.tab-button');
-        if (button) {
-            button.classList.add('active');
-            console.log('Botão ativado');
+        if (event && event.target) {
+            const button = event.target.closest('.tab-button');
+            if (button) {
+                button.classList.add('active');
+            }
         }
         
         // Filtrar linhas da tabela
         const rows = document.querySelectorAll('.history-row');
-        console.log('Total de linhas encontradas:', rows.length);
         
         rows.forEach(row => {
             const rowType = row.getAttribute('data-event-type');
-            console.log('Verificando linha com tipo:', rowType);
             
             if (eventType === 'all') {
+                // Mostrar todas as linhas
                 row.style.display = '';
-                console.log('Mostrando linha (all)');
             } else if (rowType && rowType.trim() === eventType) {
+                // Mostrar apenas as linhas que correspondem
                 row.style.display = '';
-                console.log('Mostrando linha (match)');
             } else {
+                // Ocultar as outras
                 row.style.display = 'none';
-                console.log('Ocultando linha');
             }
         });
     }
