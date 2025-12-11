@@ -54,26 +54,8 @@ def index(request: HttpRequest) -> HttpResponse:
     # Calcular datas baseado no filtro de tempo
     now_tz = django_timezone.now().astimezone(tz)
     
-    if time_filter == 'diario':
-        # Últimas 24 horas
-        custom_start_date = now_tz.replace(hour=0, minute=0, second=0, microsecond=0)
-        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
-    elif time_filter == 'semanal':
-        # Últimos 7 dias
-        custom_start_date = now_tz - timedelta(days=7)
-        custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
-    elif time_filter == 'mensal':
-        # Últimos 30 dias
-        custom_start_date = now_tz - timedelta(days=30)
-        custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
-    elif time_filter == 'anual':
-        # Últimos 365 dias
-        custom_start_date = now_tz - timedelta(days=365)
-        custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
-    elif time_filter.startswith('custom:'):
+    # Sempre usar o formato de mês (padrão é mês atual, mas pode vir custom:YYYY-MM-DD:YYYY-MM-DD)
+    if time_filter.startswith('custom:'):
         # Filtro personalizado: custom:YYYY-MM-DD:YYYY-MM-DD
         try:
             parts = time_filter.split(':')
@@ -89,15 +71,13 @@ def index(request: HttpRequest) -> HttpResponse:
                     timezone=tz
                 )
         except (ValueError, IndexError):
-            # Se erro, usar padrão de últimos 30 dias
-            custom_start_date = now_tz - timedelta(days=30)
-            custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-            custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
+            # Se erro, usar padrão de mês atual
+            custom_start_date = now_tz.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            custom_end_date = (custom_start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
     else:
-        # Default: últimos 30 dias
-        custom_start_date = now_tz - timedelta(days=30)
-        custom_start_date = custom_start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        custom_end_date = now_tz.replace(hour=23, minute=59, second=59, microsecond=999999)
+        # Padrão: mês atual
+        custom_start_date = now_tz.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        custom_end_date = (custom_start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
     
     # ====== FIM PROCESSAMENTO DO FILTRO DE TEMPO ======
     
