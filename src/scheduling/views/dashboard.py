@@ -1,6 +1,6 @@
 from collections import defaultdict
 from datetime import datetime, time, timedelta
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+from zoneinfo import ZoneInfo
 import json
 
 from django.conf import settings
@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone as django_timezone
 from django.utils.timezone import make_aware, now
 from django.views.decorators.http import require_POST
 
@@ -22,6 +23,18 @@ from ..services.notification_dispatcher import send_booking_confirmation
 from ..services.financial import FinancialAnalytics
 
 
+def _get_tenant_timezone(tenant):
+    """Retorna timezone do tenant com fallback seguro."""
+    tz_name = (getattr(tenant, "timezone", None) or settings.TIME_ZONE or "").strip()
+    try:
+        return ZoneInfo(tz_name)
+    except Exception:
+        try:
+            return ZoneInfo(settings.TIME_ZONE)
+        except Exception:
+            return django_timezone.get_default_timezone()
+
+
 @login_required
 def index(request: HttpRequest) -> HttpResponse:
     membership, redirect_response = _membership_or_redirect(
@@ -31,10 +44,7 @@ def index(request: HttpRequest) -> HttpResponse:
     if redirect_response:
         return redirect_response
     tenant = membership.tenant
-    try:
-        tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
-    except ZoneInfoNotFoundError:
-        tz = ZoneInfo(settings.TIME_ZONE)
+    tz = _get_tenant_timezone(tenant)
     
     # Obter filtro de período
     period_filter = request.GET.get('period', 'all')
@@ -150,7 +160,7 @@ def calendar_view(request: HttpRequest) -> HttpResponse:
     if redirect_response:
         return redirect_response
     tenant = membership.tenant
-    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    tz = _get_tenant_timezone(tenant)
 
     # Get week offset (default to current week)
     week_offset = int(request.GET.get('week_offset', 0))
@@ -290,7 +300,7 @@ def calendar_day_view(request: HttpRequest) -> HttpResponse:
     if redirect_response:
         return redirect_response
     tenant = membership.tenant
-    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    tz = _get_tenant_timezone(tenant)
 
     # Get selected date from query param or use today
     today = now().astimezone(tz).date()
@@ -430,10 +440,7 @@ def booking_past_list(request: HttpRequest) -> HttpResponse:
         return redirect_response
 
     tenant = membership.tenant
-    try:
-        tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
-    except ZoneInfoNotFoundError:
-        tz = ZoneInfo(settings.TIME_ZONE)
+    tz = _get_tenant_timezone(tenant)
     current_time = now().astimezone(tz)
 
     past_bookings = (
@@ -600,7 +607,7 @@ def booking_create(request: HttpRequest) -> HttpResponse:
             "form": form,
             "services": sorted(services_list, key=lambda svc: ((svc.category or "").lower(), svc.name.lower())),
             "services_json": json.dumps(services_payload, ensure_ascii=False),
-            "today": datetime.now(ZoneInfo(tenant.timezone or settings.TIME_ZONE)).date(),
+            "today": datetime.now(_get_tenant_timezone(tenant)).date(),
         },
     )
 
@@ -1035,7 +1042,7 @@ def booking_move(request: HttpRequest, pk: int) -> JsonResponse:
 
     tenant = membership.tenant
     booking = get_object_or_404(Booking, pk=pk, tenant=tenant)
-    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    tz = _get_tenant_timezone(tenant)
 
     try:
         data = json.loads(request.body)
@@ -1086,7 +1093,7 @@ def professional_schedule(request: HttpRequest, pk: int) -> HttpResponse:
 
     tenant = membership.tenant
     professional = get_object_or_404(Professional, pk=pk, tenant=tenant)
-    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    tz = _get_tenant_timezone(tenant)
 
     # Handle form submissions
     if request.method == "POST":
@@ -1174,7 +1181,7 @@ def my_schedule(request: HttpRequest) -> HttpResponse:
         return redirect_response
 
     tenant = membership.tenant
-    tz = ZoneInfo(tenant.timezone or settings.TIME_ZONE)
+    tz = _get_tenant_timezone(tenant)
 
     try:
         professional = Professional.objects.get(user=request.user, tenant=tenant)
