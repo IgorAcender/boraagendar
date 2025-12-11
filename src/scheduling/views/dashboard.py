@@ -418,6 +418,43 @@ def booking_detail(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
+@require_POST
+def booking_update_status(request: HttpRequest, pk: int) -> HttpResponse:
+    """Atualiza o status de um agendamento via AJAX"""
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff"],
+    )
+    if redirect_response:
+        return JsonResponse({"success": False, "error": "Sem permissão"}, status=403)
+    
+    tenant = membership.tenant
+    booking = get_object_or_404(Booking, pk=pk, tenant=tenant)
+    
+    # Obter novo status do request
+    new_status = request.POST.get('status', '').strip()
+    
+    # Validar status
+    valid_statuses = [status[0] for status in Booking.Status.choices]
+    if new_status not in valid_statuses:
+        return JsonResponse({"success": False, "error": "Status inválido"}, status=400)
+    
+    # Atualizar status
+    old_status = booking.status
+    booking.status = new_status
+    booking.save()
+    
+    print(f"DEBUG booking_update_status: Status atualizado de '{old_status}' para '{new_status}' no booking {booking.id}")
+    
+    return JsonResponse({
+        "success": True,
+        "message": f"Status atualizado para {booking.get_status_display()}",
+        "status": booking.status,
+        "status_display": booking.get_status_display(),
+    })
+
+
+@login_required
 def booking_create(request: HttpRequest) -> HttpResponse:
     membership, redirect_response = _membership_or_redirect(
         request,

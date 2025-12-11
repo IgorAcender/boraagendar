@@ -1,15 +1,388 @@
 ﻿{% extends "base_dashboard.html" %}
 {% block title %}Agendamento #{{ booking.id }}{% endblock %}
+{% block extra_head %}
+<style>
+    .booking-details {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border-left: 4px solid var(--brand-primary);
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #64748b;
+        min-width: 120px;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+    }
+
+    .detail-value {
+        color: #1e293b;
+        font-size: 1rem;
+    }
+
+    .status-selector {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .status-select {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        color: #1e293b;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .status-select:hover {
+        border-color: var(--brand-primary);
+        background: #f8fafc;
+    }
+
+    .status-select:focus {
+        outline: none;
+        border-color: var(--brand-primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-update-status {
+        padding: 0.625rem 1.5rem;
+        background: var(--brand-primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-update-status:hover {
+        background: var(--brand-secondary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-update-status:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-badge.confirmed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-badge.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-badge.no_show {
+        background: #f3e8ff;
+        color: #5b21b6;
+    }
+
+    .status-badge.completed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .alert-success {
+        padding: 1rem;
+        background: #d1fae5;
+        border: 1px solid #a7f3d0;
+        border-radius: 8px;
+        color: #065f46;
+        margin-bottom: 1rem;
+        display: none;
+    }
+
+    .alert-success.show {
+        display: block;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .booking-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .booking-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .booking-header h2 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 1.5rem;
+    }
+
+    .booking-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .booking-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .status-selector {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .status-select, .btn-update-status {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
 {% block content %}
-<div class="card">
-    <h2>Agendamento #{{ booking.id }}</h2>
-    <p><strong>Cliente:</strong> {{ booking.customer_name }} ({{ booking.customer_phone }})</p>
-    <p><strong>Servico:</strong> {{ booking.service.name }}</p>
-    <p><strong>Profissional:</strong> {{ booking.professional.display_name }}</p>
-    <p><strong>Data:</strong> {{ booking.scheduled_for|date:"d/m/Y H:i" }}</p>
-    <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
-    {% if booking.notes %}
-        <p><strong>Observacoes:</strong> {{ booking.notes }}</p>
-    {% endif %}
+<div class="booking-card">
+    <div class="alert-success" id="successMessage">
+        <i class="fas fa-check-circle"></i> <span id="successText"></span>
+    </div>
+
+    <div class="booking-header">
+        <h2><i class="fas fa-calendar-check"></i> Agendamento #{{ booking.id }}</h2>
+    </div>
+
+    <div class="booking-details">
+        <!-- Cliente -->
+        <div class="detail-row">
+            <div class="detail-label">
+                <i class="fas fa-user"></i> Cliente
+            </div>
+            <div class="detail-value">
+                {{ booking.customer_name }} <br>
+                <small style="color: #64748b;">{{ booking.customer_phone }}</small>
+                {% if booking.customer_email %}
+                <br><small style="color: #64748b;">{{ booking.customer_email }}</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Serviço -->
+        <div class="detail-row">
+            <div class="detail-label">
+                <i class="fas fa-briefcase"></i> Serviço
+            </div>
+            <div class="detail-value">
+                {{ booking.service.name }}
+                {% if booking.service.category %}
+                <br><small style="color: #64748b;">{{ booking.service.category }}</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Profissional -->
+        {% if booking.professional %}
+        <div class="detail-row">
+            <div class="detail-label">
+                <i class="fas fa-user-tie"></i> Profissional
+            </div>
+            <div class="detail-value">
+                {{ booking.professional.display_name }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Data e Hora -->
+        <div class="detail-row">
+            <div class="detail-label">
+                <i class="fas fa-clock"></i> Data/Hora
+            </div>
+            <div class="detail-value">
+                {{ booking.scheduled_for|date:"d/m/Y H:i" }}
+                <br><small style="color: #64748b;">Duração: {{ booking.duration_minutes }} minutos</small>
+            </div>
+        </div>
+
+        <!-- Preço -->
+        <div class="detail-row">
+            <div class="detail-label">
+                <i class="fas fa-money-bill"></i> Valor
+            </div>
+            <div class="detail-value">
+                R$ {{ booking.price|floatformat:2 }}
+            </div>
+        </div>
+
+        <!-- Status (com opção de edição) -->
+        <div class="detail-row">
+            <div class="detail-label">
+                <i class="fas fa-flag"></i> Status
+            </div>
+            <div class="detail-value">
+                <div class="status-selector">
+                    <select id="statusSelect" class="status-select">
+                        {% for status_value, status_display in booking.Status.choices %}
+                        <option value="{{ status_value }}" {% if status_value == booking.status %}selected{% endif %}>
+                            {{ status_display }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn-update-status" id="updateStatusBtn" onclick="updateBookingStatus()">
+                        <i class="fas fa-save"></i> Atualizar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        {% if booking.notes %}
+        <div class="detail-row">
+            <div class="detail-label">
+                <i class="fas fa-sticky-note"></i> Observações
+            </div>
+            <div class="detail-value">
+                {{ booking.notes }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Datas de Criação/Atualização -->
+        <div class="detail-row" style="border-left-color: #cbd5e1;">
+            <div class="detail-label">
+                <i class="fas fa-info-circle"></i> Info
+            </div>
+            <div class="detail-value">
+                <small style="color: #64748b;">
+                    Criado em: {{ booking.created_at|date:"d/m/Y H:i" }}<br>
+                    Atualizado em: {{ booking.updated_at|date:"d/m/Y H:i" }}
+                </small>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+function updateBookingStatus() {
+    const statusSelect = document.getElementById('statusSelect');
+    const updateBtn = document.getElementById('updateStatusBtn');
+    const successMessage = document.getElementById('successMessage');
+    const successText = document.getElementById('successText');
+    
+    const newStatus = statusSelect.value;
+    const bookingId = {{ booking.id }};
+    
+    // Desabilitar botão enquanto faz requisição
+    updateBtn.disabled = true;
+    updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
+    
+    // Fazer requisição AJAX
+    fetch(`/dashboard/agendamentos/${bookingId}/status/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken'),
+        },
+        body: `status=${encodeURIComponent(newStatus)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar mensagem de sucesso
+            successText.textContent = data.message || 'Status atualizado com sucesso!';
+            successMessage.classList.add('show');
+            
+            // Esconder mensagem após 3 segundos
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 3000);
+            
+            // Se houver um modal aberto, recarregar o conteúdo
+            if (window.parent && window.parent.openBookingModal) {
+                // Aguardar um pouco para o usuário ver a mensagem
+                setTimeout(() => {
+                    window.parent.location.reload();
+                }, 1000);
+            }
+        } else {
+            alert('Erro: ' + (data.error || 'Não foi possível atualizar o status'));
+            statusSelect.value = '{{ booking.status }}';
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao atualizar status. Tente novamente.');
+        statusSelect.value = '{{ booking.status }}';
+    })
+    .finally(() => {
+        // Reabilitar botão
+        updateBtn.disabled = false;
+        updateBtn.innerHTML = '<i class="fas fa-save"></i> Atualizar';
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 {% endblock %}
