@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AvailabilityRule, Booking, Professional, ProfessionalService, Service, TimeOff
+from .models import AvailabilityRule, Booking, Professional, ProfessionalService, Service, TimeOff, Target
 
 
 class ProfessionalServiceInline(admin.TabularInline):
@@ -35,6 +35,21 @@ class TimeOffAdmin(admin.ModelAdmin):
     list_filter = ("tenant", "professional")
 
 
+@admin.register(Target)
+class TargetAdmin(admin.ModelAdmin):
+    list_display = ("tenant", "get_period_label", "get_target_type_label", "target_value", "is_active")
+    list_filter = ("tenant", "period", "target_type", "is_active")
+    search_fields = ("tenant__name", "description")
+    fieldsets = (
+        ('Informações Básicas', {
+            'fields': ('tenant', 'period', 'target_type', 'target_value', 'description')
+        }),
+        ('Status', {
+            'fields': ('is_active',)
+        }),
+    )
+
+
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = (
@@ -47,3 +62,4 @@ class BookingAdmin(admin.ModelAdmin):
     )
     list_filter = ("tenant", "professional", "status")
     search_fields = ("customer_name", "customer_phone", "service__name")
+

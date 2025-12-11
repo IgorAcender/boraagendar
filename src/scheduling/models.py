@@ -268,3 +268,48 @@ class BookingPolicy(models.Model):
         """Retorna a política do tenant, criando uma com valores padrão se não existir"""
         policy, created = cls.objects.get_or_create(tenant=tenant)
         return policy
+
+
+class Target(models.Model):
+    """Metas e targets financeiros do negócio"""
+    
+    PERIOD_CHOICES = [
+        ('daily', 'Diário'),
+        ('weekly', 'Semanal'),
+        ('monthly', 'Mensal'),
+        ('yearly', 'Anual'),
+    ]
+    
+    TARGET_TYPE_CHOICES = [
+        ('revenue', 'Receita'),
+        ('bookings', 'Agendamentos'),
+        ('average_ticket', 'Ticket Médio'),
+        ('confirmed_rate', 'Taxa de Confirmação'),
+    ]
+    
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="targets")
+    period = models.CharField(max_length=10, choices=PERIOD_CHOICES, default='monthly')
+    target_type = models.CharField(max_length=20, choices=TARGET_TYPE_CHOICES)
+    target_value = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.CharField(max_length=255, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Meta"
+        verbose_name_plural = "Metas"
+        unique_together = ('tenant', 'period', 'target_type')
+        ordering = ('period', 'target_type')
+    
+    def __str__(self) -> str:
+        return f"{self.get_target_type_display()} - {self.get_period_display()}: {self.target_value}"
+    
+    def get_period_label(self) -> str:
+        """Retorna o rótulo do período"""
+        return dict(self.PERIOD_CHOICES).get(self.period, '')
+    
+    def get_target_type_label(self) -> str:
+        """Retorna o rótulo do tipo de target"""
+        return dict(self.TARGET_TYPE_CHOICES).get(self.target_type, '')
+
