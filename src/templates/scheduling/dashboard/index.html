@@ -626,18 +626,11 @@
     function switchTab(buttonElement, tabName) {
         console.log('🔄 Tentando alternar para aba:', tabName);
         
-        // Remover display de TODOS os elementos com classe dashboard-tab-content
+        // Remover classe active de TODOS os elementos com classe dashboard-tab-content
         const contents = document.querySelectorAll('.dashboard-tab-content');
         console.log('📦 Encontrados', contents.length, 'conteúdos de abas');
         contents.forEach(content => {
-            // Aplicar inline styles muito específicos
-            content.style.display = 'none';
-            content.style.visibility = 'hidden';
-            content.style.position = 'absolute';
-            content.style.height = '0';
-            content.style.overflow = 'hidden';
-            content.style.pointerEvents = 'none';
-            content.style.opacity = '0';
+            content.classList.remove('tab-active');
             console.log(`  ❌ Ocultando: ${content.id}`);
         });
         
@@ -650,19 +643,10 @@
             button.style.marginBottom = '-2px';
         });
         
-        // MOSTRAR apenas o conteúdo selecionado
+        // MOSTRAR apenas o conteúdo selecionado adicionando a classe
         const targetContent = document.getElementById(tabName);
         if (targetContent) {
-            targetContent.style.display = 'block';
-            targetContent.style.visibility = 'visible';
-            targetContent.style.position = 'relative';
-            targetContent.style.height = 'auto';
-            targetContent.style.overflow = 'visible';
-            targetContent.style.pointerEvents = 'auto';
-            targetContent.style.opacity = '1';
-            targetContent.style.padding = '40px';
-            targetContent.style.background = 'white';
-            targetContent.style.borderRadius = '0 0 12px 12px';
+            targetContent.classList.add('tab-active');
             console.log('✅ Aba exibida:', tabName);
         } else {
             console.error('❌ Aba não encontrada:', tabName);
@@ -687,20 +671,17 @@
         const operational = document.getElementById('operational');
         
         if (financial) {
-            financial.style.display = 'none';
-            financial.style.visibility = 'hidden';
+            financial.classList.remove('tab-active');
             console.log('✅ Aba financeira ocultada');
         }
         
         if (history) {
-            history.style.display = 'none';
-            history.style.visibility = 'hidden';
+            history.classList.remove('tab-active');
             console.log('✅ Aba histórico ocultada');
         }
         
         if (operational) {
-            operational.style.display = 'block';
-            operational.style.visibility = 'visible';
+            operational.classList.add('tab-active');
             console.log('✅ Aba operacional visível');
         }
     }, { once: true });
@@ -1263,7 +1244,7 @@
     </div> <!-- Fim da aba Operacional -->
 
     <!-- Aba 2: Módulo Financeiro -->
-    <div id="financial" class="dashboard-tab-content" style="display: none; background: white; padding: 40px; border-radius: 0 0 12px 12px;">
+    <div id="financial" class="dashboard-tab-content">
 
 <!-- SEÇÃO: MÓDULO FINANCEIRO -->
 <section class="dashboard-section financial-module-section">
@@ -1569,7 +1550,7 @@
     </div> <!-- Fim da aba Financeira -->
 
     <!-- Aba 3: Histórico Completo -->
-    <div id="history" class="dashboard-tab-content" style="display: none; background: white; padding: 40px; border-radius: 0 0 12px 12px;">
+    <div id="history" class="dashboard-tab-content">
 
 <!-- Histórico Completo com Abas Internas -->
 <div class="tabs-container">
@@ -1724,10 +1705,23 @@
     border: 0 !important;
 }
 
-/* MOSTRAR APENAS A ABA ATIVA */
-#operational[style*="display: block"],
-#financial[style*="display: block"],
-#history[style*="display: block"] {
+/* MOSTRAR APENAS A ABA ATIVA - Estado Inicial (Operacional) */
+#operational {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    overflow: visible !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    margin: 0 !important;
+    padding: 40px !important;
+    background: white !important;
+    border-radius: 0 0 12px 12px !important;
+}
+
+/* MOSTRAR QUANDO ESTIVER ATIVO - VIA JAVASCRIPT */
+.tab-active {
     display: block !important;
     visibility: visible !important;
     height: auto !important;
