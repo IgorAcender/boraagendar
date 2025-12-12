@@ -1034,6 +1034,13 @@
     <!-- =============== SEÇÃO 2: MÉTRICAS SECUNDÁRIAS =============== -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 40px;">
         
+        <!-- Taxa de Conversão -->
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">📈 Taxa de Conversão</p>
+            <p style="font-size: 24px; font-weight: 700; margin: 0; color: #667eea;">{{ operational.conversion_rate|floatformat:1 }}%</p>
+            <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Agendamentos confirmados</p>
+        </div>
+
         <!-- Remarcações -->
         <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
             <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">🔄 Remarcações</p>
