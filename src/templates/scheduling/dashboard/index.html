@@ -631,6 +631,7 @@
         console.log('📦 Encontrados', contents.length, 'conteúdos');
         contents.forEach(content => {
             content.style.display = 'none';
+            content.style.visibility = 'hidden';
         });
         
         // Remover active de todos os botões
@@ -646,6 +647,7 @@
         const targetContent = document.getElementById(tabName);
         if (targetContent) {
             targetContent.style.display = 'block';
+            targetContent.style.visibility = 'visible';
             console.log('✅ Aba exibida:', tabName);
         } else {
             console.error('❌ Aba não encontrada:', tabName);
@@ -1660,12 +1662,40 @@
     animation: fadeIn 0.3s ease-in;
 }
 
-.dashboard-tab-content[style*="display: none"] {
+/* Ocultar abas inativas com máxima força */
+.dashboard-tab-content {
+    position: relative;
+}
+
+#financial {
     display: none !important;
     visibility: hidden !important;
-    pointer-events: none !important;
     position: absolute !important;
-    left: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+}
+
+#history {
+    display: none !important;
+    visibility: hidden !important;
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+}
+
+#financial[style*="display: block"],
+#history[style*="display: block"] {
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
 }
 
 @keyframes fadeIn {
