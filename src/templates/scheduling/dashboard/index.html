@@ -927,9 +927,9 @@
 </div>
 
 <!-- Sistema de Abas Principal -->
-<div style="margin-top: 40px;">
+<div style="margin-top: 40px; position: relative;">
     <!-- Abas Navegação -->
-    <div style="display: flex; gap: 0; border-bottom: 2px solid #e5e7eb; background: white; border-radius: 12px 12px 0 0; overflow: hidden; box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);">
+    <div style="display: flex; gap: 0; border-bottom: 2px solid #e5e7eb; background: white; border-radius: 12px 12px 0 0; overflow: hidden; box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08); position: relative; z-index: 10;">
         <button id="btn-operational" class="dashboard-tab-button active" onclick="switchTab(this, 'operational')" style="padding: 16px 28px; border: none; background: none; cursor: pointer; font-size: 15px; font-weight: 600; color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; position: relative;">
             <i class="fas fa-chart-pie"></i> Módulo Operacional
         </button>
@@ -1677,33 +1677,28 @@
 
 /* OCULTAR TODAS AS ABAS POR PADRÃO */
 .dashboard-tab-content {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: 0;
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
-    height: 0 !important;
-    width: 0 !important;
-    overflow: hidden !important;
     pointer-events: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    position: absolute !important;
+    z-index: 0;
 }
 
 /* MOSTRAR QUANDO ESTIVER ATIVO - VIA JAVASCRIPT */
 .dashboard-tab-content.tab-active {
+    position: relative !important;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    height: auto !important;
-    width: auto !important;
-    overflow: visible !important;
     pointer-events: auto !important;
     padding: 40px !important;
     background: white !important;
     border-radius: 0 0 12px 12px !important;
-    margin: 0 !important;
-    position: relative !important;
+    z-index: 1;
 }
 
 @keyframes fadeIn {
