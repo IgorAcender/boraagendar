@@ -1681,8 +1681,13 @@
     visibility: hidden !important;
     opacity: 0 !important;
     height: 0 !important;
+    width: 0 !important;
     overflow: hidden !important;
     pointer-events: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    position: absolute !important;
 }
 
 /* MOSTRAR QUANDO ESTIVER ATIVO - VIA JAVASCRIPT */
@@ -1691,11 +1696,14 @@
     visibility: visible !important;
     opacity: 1 !important;
     height: auto !important;
+    width: auto !important;
     overflow: visible !important;
     pointer-events: auto !important;
     padding: 40px !important;
     background: white !important;
     border-radius: 0 0 12px 12px !important;
+    margin: 0 !important;
+    position: relative !important;
 }
 
 @keyframes fadeIn {
