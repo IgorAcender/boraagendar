@@ -1677,20 +1677,14 @@
 
 /* OCULTAR TODAS AS ABAS POR PADRÃO */
 .dashboard-tab-content {
-    position: absolute !important;
-    top: 0;
-    left: 0;
-    right: 0;
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
-    z-index: 0;
 }
 
 /* MOSTRAR QUANDO ESTIVER ATIVO - VIA JAVASCRIPT */
 .dashboard-tab-content.tab-active {
-    position: relative !important;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -1698,7 +1692,6 @@
     padding: 40px !important;
     background: white !important;
     border-radius: 0 0 12px 12px !important;
-    z-index: 1;
 }
 
 @keyframes fadeIn {
