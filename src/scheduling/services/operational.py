@@ -19,12 +19,16 @@ class OperationalAnalytics:
     # ==================== MÉTRICAS BÁSICAS ====================
     
     def get_total_bookings(self, days=30):
-        """Total de agendamentos no período"""
-        start_date = timezone.now() - timedelta(days=days)
-        return Booking.objects.filter(
-            tenant=self.tenant,
-            scheduled_for__gte=start_date
-        ).count()
+        """Total de agendamentos no período = Confirmados + Pendentes + Cancelados
+        
+        Evita duplicação ao contar remarcações:
+        - Agendamentos remarcados mantêm seu status original (pending/confirmed)
+        - Contados apenas uma vez, sem duplicação
+        """
+        confirmed = self.get_confirmed_bookings(days)
+        pending = self.get_pending_bookings(days)
+        cancelled = self.get_cancelled_bookings(days)
+        return confirmed + pending + cancelled
     
     def get_confirmed_bookings(self, days=30):
         """Agendamentos confirmados"""
@@ -527,7 +531,9 @@ class OperationalAnalytics:
         pending = bookings.filter(status='pending').count()
         cancelled = bookings.filter(status='cancelled').count()
         rescheduled = bookings.filter(notes__icontains='Reagendado').count()
-        total = bookings.count()
+        
+        # Total = Confirmados + Pendentes + Cancelados (evita duplicação com remarcações)
+        total = confirmed + pending + cancelled
         
         # Calcular número de dias distintos com agendamentos
         from django.db.models import Count
