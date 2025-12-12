@@ -1010,43 +1010,43 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 40px;">
         
         <!-- Taxa de Conversão -->
-        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">📈 Taxa de Conversão</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Taxa de Conversão</p>
             <p style="font-size: 24px; font-weight: 700; margin: 0; color: #667eea;">{{ operational.conversion_rate|floatformat:1 }}%</p>
             <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Agendamentos confirmados</p>
         </div>
 
         <!-- Remarcações -->
-        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">🔄 Remarcações</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Remarcações</p>
             <p style="font-size: 24px; font-weight: 700; margin: 0; color: #667eea;">{{ operational.rescheduled_bookings }}</p>
             <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Reagendados</p>
         </div>
 
         <!-- Hoje Agendado -->
-        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">📆 Hoje</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Hoje</p>
             <p style="font-size: 24px; font-weight: 700; margin: 0; color: #667eea;">{{ operational.today_bookings }}</p>
             <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Agendamentos</p>
         </div>
 
         <!-- Hoje Confirmado -->
-        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">✅ Hoje Confirmado</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Hoje Confirmado</p>
             <p style="font-size: 24px; font-weight: 700; margin: 0; color: #10b981;">{{ operational.today_confirmed }}</p>
             <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Confirmados</p>
         </div>
 
         <!-- Taxa Cancelamento -->
-        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">📊 Taxa Cancelamento</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Taxa Cancelamento</p>
             <p style="font-size: 24px; font-weight: 700; margin: 0; color: #ef4444;">{{ operational.cancellation_rate|floatformat:1 }}%</p>
             <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Cancelamentos</p>
         </div>
 
         <!-- Taxa de Ocupação -->
-        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">🎯 Taxa de Ocupação</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Taxa de Ocupação</p>
             <p style="font-size: 24px; font-weight: 700; margin: 0; color: #10b981;">{{ operational.occupation_rate|floatformat:1 }}%</p>
             <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Horários ocupados</p>
         </div>
@@ -1057,15 +1057,15 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 40px;">
         
         <!-- Média por Dia -->
-        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">📊 Média por Dia</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Média por Dia</p>
             <p style="font-size: 24px; font-weight: 700; margin: 0; color: #667eea;">{{ operational.average_bookings_per_day|floatformat:1 }}</p>
             <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Agendamentos diários</p>
         </div>
 
         <!-- Média por Profissional -->
-        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
-            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">👥 Média por Profissional</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb; text-align: center;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Média por Profissional</p>
             <p style="font-size: 24px; font-weight: 700; margin: 0; color: #10b981;">{{ operational.average_bookings_per_professional|floatformat:1 }}</p>
             <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Por profissional</p>
         </div>
