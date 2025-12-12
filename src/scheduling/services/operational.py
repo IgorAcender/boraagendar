@@ -404,15 +404,33 @@ class OperationalAnalytics:
     
     def get_dashboard_summary(self, days=30):
         """Resumo completo para o dashboard operacional"""
+        total = self.get_total_bookings(days)
+        confirmed = self.get_confirmed_bookings(days)
+        pending = self.get_pending_bookings(days)
+        cancelled = self.get_cancelled_bookings(days)
+        no_show = self.get_no_show_bookings(days)
+        
+        # Calcular porcentagens
+        confirmed_pct = (confirmed / total * 100) if total > 0 else 0.0
+        pending_pct = (pending / total * 100) if total > 0 else 0.0
+        cancelled_pct = (cancelled / total * 100) if total > 0 else 0.0
+        no_show_pct = (no_show / total * 100) if total > 0 else 0.0
+        
         return {
             # Totais
-            'total_bookings': self.get_total_bookings(days),
-            'confirmed_bookings': self.get_confirmed_bookings(days),
-            'pending_bookings': self.get_pending_bookings(days),
-            'cancelled_bookings': self.get_cancelled_bookings(days),
+            'total_bookings': total,
+            'confirmed_bookings': confirmed,
+            'pending_bookings': pending,
+            'cancelled_bookings': cancelled,
             'rescheduled_bookings': self.get_rescheduled_bookings(days),
             'completed_bookings': self.get_completed_bookings(days),
-            'no_show_bookings': self.get_no_show_bookings(days),
+            'no_show_bookings': no_show,
+            
+            # Porcentagens
+            'confirmed_percentage': confirmed_pct,
+            'pending_percentage': pending_pct,
+            'cancelled_percentage': cancelled_pct,
+            'no_show_percentage': no_show_pct,
             
             # Hoje
             'today_bookings': self.get_today_bookings(),
@@ -551,6 +569,12 @@ class OperationalAnalytics:
         # Calcular média por dia com agendamentos
         average_per_day = round(total / days_with_bookings, 2) if total > 0 else 0.0
         
+        # Calcular porcentagens
+        confirmed_pct = (confirmed / total * 100) if total > 0 else 0.0
+        pending_pct = (pending / total * 100) if total > 0 else 0.0
+        cancelled_pct = (cancelled / total * 100) if total > 0 else 0.0
+        no_show_pct = (no_show / total * 100) if total > 0 else 0.0
+        
         return {
             'total_bookings': total,
             'confirmed_bookings': confirmed,
@@ -559,6 +583,12 @@ class OperationalAnalytics:
             'rescheduled_bookings': rescheduled,
             'completed_bookings': confirmed,
             'no_show_bookings': no_show,
+            
+            # Porcentagens
+            'confirmed_percentage': confirmed_pct,
+            'pending_percentage': pending_pct,
+            'cancelled_percentage': cancelled_pct,
+            'no_show_percentage': no_show_pct,
             
             'today_bookings': 0,
             'today_confirmed': 0,
