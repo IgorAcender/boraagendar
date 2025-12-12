@@ -138,6 +138,25 @@ class OperationalAnalytics:
         
         return (cancelled / total) * 100
     
+    def get_conversion_rate(self, days=30):
+        """Taxa de conversão (%) - percentual de agendamentos confirmados em relação ao total"""
+        start_date = timezone.now() - timedelta(days=days)
+        total = Booking.objects.filter(
+            tenant=self.tenant,
+            scheduled_for__gte=start_date
+        ).count()
+        
+        if total == 0:
+            return 0.0
+        
+        confirmed = Booking.objects.filter(
+            tenant=self.tenant,
+            status='confirmed',
+            scheduled_for__gte=start_date
+        ).count()
+        
+        return (confirmed / total) * 100
+    
     def get_no_show_rate(self, days=30):
         """Taxa de no-show (%)"""
         end_date = timezone.now()
@@ -395,6 +414,7 @@ class OperationalAnalytics:
             'today_pending': self.get_today_pending(),
             
             # Taxas e médias
+            'conversion_rate': self.get_conversion_rate(days),
             'cancellation_rate': self.get_cancellation_rate(days),
             'no_show_rate': self.get_no_show_rate(days),
             'average_bookings_per_day': self.get_average_bookings_per_day(days),
