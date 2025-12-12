@@ -626,7 +626,7 @@
     function switchTab(buttonElement, tabName) {
         console.log('🔄 Tentando alternar para aba:', tabName);
         
-        // Remover classe active de TODOS os elementos com classe dashboard-tab-content
+        // Remover classe tab-active de TODOS os elementos
         const contents = document.querySelectorAll('.dashboard-tab-content');
         console.log('📦 Encontrados', contents.length, 'conteúdos de abas');
         contents.forEach(content => {
@@ -640,23 +640,22 @@
         buttons.forEach(button => {
             button.style.color = '#64748b';
             button.style.borderBottom = 'none';
-            button.style.marginBottom = '-2px';
         });
         
-        // MOSTRAR apenas o conteúdo selecionado adicionando a classe
+        // MOSTRAR apenas o conteúdo selecionado adicionando a classe tab-active
         const targetContent = document.getElementById(tabName);
         if (targetContent) {
             targetContent.classList.add('tab-active');
             console.log('✅ Aba exibida:', tabName);
         } else {
             console.error('❌ Aba não encontrada:', tabName);
+            return;
         }
         
         // Adicionar active ao botão clicado
         if (buttonElement) {
             buttonElement.style.color = '#667eea';
             buttonElement.style.borderBottom = '3px solid #667eea';
-            buttonElement.style.marginBottom = '-2px';
             console.log('✅ Botão ativado');
         }
     }
@@ -666,23 +665,10 @@
         console.log('🚀 Inicializando sistema de abas...');
         
         // Garantir que apenas a aba operacional está visível no início
-        const financial = document.getElementById('financial');
-        const history = document.getElementById('history');
-        const operational = document.getElementById('operational');
-        
-        if (financial) {
-            financial.classList.remove('tab-active');
-            console.log('✅ Aba financeira ocultada');
-        }
-        
-        if (history) {
-            history.classList.remove('tab-active');
-            console.log('✅ Aba histórico ocultada');
-        }
-        
-        if (operational) {
-            operational.classList.add('tab-active');
-            console.log('✅ Aba operacional visível');
+        const operationalBtn = document.getElementById('btn-operational');
+        if (operationalBtn) {
+            switchTab(operationalBtn, 'operational');
+            console.log('✅ Aba operacional inicializada');
         }
     }, { once: true });
 
@@ -1689,47 +1675,24 @@
     z-index: 1;
 }
 
-/* OCULTAR TODAS AS ABAS POR PADRÃO - Máxima força */
-#operational,
-#financial,
-#history {
+/* OCULTAR TODAS AS ABAS POR PADRÃO */
+.dashboard-tab-content {
     display: none !important;
     visibility: hidden !important;
+    opacity: 0 !important;
     height: 0 !important;
     overflow: hidden !important;
-    position: absolute !important;
     pointer-events: none !important;
-    opacity: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-}
-
-/* MOSTRAR APENAS A ABA ATIVA - Estado Inicial (Operacional) */
-#operational {
-    display: block !important;
-    visibility: visible !important;
-    height: auto !important;
-    overflow: visible !important;
-    position: relative !important;
-    pointer-events: auto !important;
-    opacity: 1 !important;
-    margin: 0 !important;
-    padding: 40px !important;
-    background: white !important;
-    border-radius: 0 0 12px 12px !important;
 }
 
 /* MOSTRAR QUANDO ESTIVER ATIVO - VIA JAVASCRIPT */
-.tab-active {
+.dashboard-tab-content.tab-active {
     display: block !important;
     visibility: visible !important;
+    opacity: 1 !important;
     height: auto !important;
     overflow: visible !important;
-    position: relative !important;
     pointer-events: auto !important;
-    opacity: 1 !important;
-    margin: 0 !important;
     padding: 40px !important;
     background: white !important;
     border-radius: 0 0 12px 12px !important;
