@@ -19,16 +19,18 @@ class OperationalAnalytics:
     # ==================== MÉTRICAS BÁSICAS ====================
     
     def get_total_bookings(self, days=30):
-        """Total de agendamentos no período = Confirmados + Pendentes + Cancelados
+        """Total de agendamentos no período = Confirmados + Pendentes + Cancelados + Não Compareceu
         
         Evita duplicação ao contar remarcações:
         - Agendamentos remarcados mantêm seu status original (pending/confirmed)
         - Contados apenas uma vez, sem duplicação
+        - Inclui no_show para que porcentagens somem 100%
         """
         confirmed = self.get_confirmed_bookings(days)
         pending = self.get_pending_bookings(days)
         cancelled = self.get_cancelled_bookings(days)
-        return confirmed + pending + cancelled
+        no_show = self.get_no_show_bookings(days)
+        return confirmed + pending + cancelled + no_show
     
     def get_confirmed_bookings(self, days=30):
         """Agendamentos confirmados"""
@@ -530,10 +532,11 @@ class OperationalAnalytics:
         confirmed = bookings.filter(status='confirmed').count()
         pending = bookings.filter(status='pending').count()
         cancelled = bookings.filter(status='cancelled').count()
+        no_show = bookings.filter(status='no_show').count()
         rescheduled = bookings.filter(notes__icontains='Reagendado').count()
         
-        # Total = Confirmados + Pendentes + Cancelados (evita duplicação com remarcações)
-        total = confirmed + pending + cancelled
+        # Total = Confirmados + Pendentes + Cancelados + Não Compareceu (evita duplicação com remarcações)
+        total = confirmed + pending + cancelled + no_show
         
         # Calcular número de dias distintos com agendamentos
         from django.db.models import Count
@@ -555,7 +558,7 @@ class OperationalAnalytics:
             'cancelled_bookings': cancelled,
             'rescheduled_bookings': rescheduled,
             'completed_bookings': confirmed,
-            'no_show_bookings': bookings.filter(status='no_show').count(),
+            'no_show_bookings': no_show,
             
             'today_bookings': 0,
             'today_confirmed': 0,
