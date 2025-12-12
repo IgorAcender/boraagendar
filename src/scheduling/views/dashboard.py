@@ -183,6 +183,9 @@ def index(request: HttpRequest) -> HttpResponse:
         "operational": operational_data,
         # Dados financeiros
         "financial": financial_data,
+        # Filtro de datas customizadas para a aba financeira
+        "filter_start_date": custom_start_date.strftime('%Y-%m-%d') if custom_start_date else None,
+        "filter_end_date": custom_end_date.strftime('%Y-%m-%d') if custom_end_date else None,
         # Comparação de períodos
         "month_comparison": month_comparison,
         "week_comparison": week_comparison,
