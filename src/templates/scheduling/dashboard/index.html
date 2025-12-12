@@ -751,6 +751,7 @@
         // Fazer requisição AJAX ao invés de recarregar
         fetch(url.toString(), {
             method: 'GET',
+            credentials: 'include',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
             }

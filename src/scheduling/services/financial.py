@@ -287,18 +287,42 @@ class FinancialAnalytics:
     
     def get_summary_by_date_range(self, start_date, end_date):
         """Resumo completo para um período customizado"""
-        bookings = Booking.objects.filter(
+        # Bookings confirmados no período
+        bookings_confirmed = Booking.objects.filter(
             tenant=self.tenant,
             status='confirmed',
             scheduled_for__range=(start_date, end_date)
         )
         
-        total_revenue = bookings.aggregate(Sum('price'))['price__sum'] or Decimal('0.00')
-        booking_count = bookings.count()
-        avg_ticket = bookings.aggregate(Avg('price'))['price__avg'] or Decimal('0.00')
+        # Bookings totais (todas as categorias)
+        bookings_all = Booking.objects.filter(
+            tenant=self.tenant,
+            scheduled_for__range=(start_date, end_date)
+        )
+        
+        # Contar confirmados, pendentes e cancelados no período
+        confirmed_count = bookings_confirmed.count()
+        pending_count = Booking.objects.filter(
+            tenant=self.tenant,
+            status='pending',
+            scheduled_for__range=(start_date, end_date)
+        ).count()
+        cancelled_count = Booking.objects.filter(
+            tenant=self.tenant,
+            status='cancelled',
+            scheduled_for__range=(start_date, end_date)
+        ).count()
+        
+        # Calcular taxa de conversão no período
+        total_bookings = bookings_all.count()
+        conversion_rate = (confirmed_count / total_bookings * 100) if total_bookings > 0 else 0
+        
+        # Receita total do período
+        total_revenue = bookings_confirmed.aggregate(Sum('price'))['price__sum'] or Decimal('0.00')
+        avg_ticket = bookings_confirmed.aggregate(Avg('price'))['price__avg'] or Decimal('0.00')
         
         # Top profissionais no período
-        top_professionals = bookings.values(
+        top_professionals = bookings_confirmed.values(
             'professional__display_name', 'professional_id'
         ).annotate(
             total_revenue=Sum('price'),
@@ -307,7 +331,7 @@ class FinancialAnalytics:
         ).order_by('-total_revenue')[:5]
         
         # Top serviços no período
-        top_services = bookings.values(
+        top_services = bookings_confirmed.values(
             'service__name', 'service_id'
         ).annotate(
             total_revenue=Sum('price'),
@@ -315,30 +339,52 @@ class FinancialAnalytics:
             avg_ticket=Avg('price')
         ).order_by('-total_revenue')[:5]
         
-        # Adicionar dados de gráficos para compatibilidade com o template
-        # Usar os mesmos dados do período customizado para os gráficos
+        # Calcular receita estimada (confirmados + pendentes do período)
+        pending_revenue = Booking.objects.filter(
+            tenant=self.tenant,
+            status='pending',
+            scheduled_for__range=(start_date, end_date)
+        ).aggregate(Sum('price'))['price__sum'] or Decimal('0.00')
+        estimated_revenue = total_revenue + pending_revenue
+        
+        # Dados de gráficos pelo período
         revenue_by_date = {}
-        for booking in bookings.order_by('scheduled_for'):
+        for booking in bookings_confirmed.order_by('scheduled_for'):
             date_key = booking.scheduled_for.strftime('%Y-%m-%d')
             if date_key not in revenue_by_date:
                 revenue_by_date[date_key] = 0
             revenue_by_date[date_key] += float(booking.price or 0)
         
         # Formatar para Chart.js
-        revenue_last_7_days = {
+        revenue_chart = {
             'labels': list(revenue_by_date.keys()),
             'data': list(revenue_by_date.values())
         }
         
         return {
-            'total_revenue': float(total_revenue),
-            'booking_count': booking_count,
+            # Métricas de receita do período
+            'annual_revenue': float(total_revenue),  # No período (não real anual)
+            'revenue_today': float(total_revenue),   # Usar como receita do período
+            'revenue_this_week': float(total_revenue),
+            'revenue_this_month': float(total_revenue),
+            'estimated_revenue_this_month': float(estimated_revenue),
             'average_ticket': float(avg_ticket),
+            'total_revenue': float(total_revenue),
+            
+            # Agendamentos
+            'total_bookings': total_bookings,
+            'confirmed_bookings': confirmed_count,
+            'pending_bookings': pending_count,
+            'cancelled_bookings': cancelled_count,
+            'conversion_rate': round(conversion_rate, 2),
+            
+            # Top informações
             'top_professionals': list(top_professionals),
             'top_services': list(top_services),
-            # Adicionar chaves esperadas pelo template
-            'revenue_last_7_days': revenue_last_7_days,
-            'revenue_last_12_months': revenue_last_7_days,  # Usar mesmos dados para período customizado
+            
+            # Gráficos
+            'revenue_last_7_days': revenue_chart,
+            'revenue_last_12_months': revenue_chart,
         }
     
     # ==================== RESUMO COMPLETO ====================
