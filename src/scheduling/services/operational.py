@@ -556,6 +556,7 @@ class OperationalAnalytics:
             'today_pending': 0,
             
             'cancellation_rate': (cancelled / total * 100) if total > 0 else 0.0,
+            'conversion_rate': (confirmed / total * 100) if total > 0 else 0.0,
             'no_show_rate': (bookings.filter(status='no_show').count() / total * 100) if total > 0 else 0.0,
             'average_bookings_per_day': average_per_day,
             'average_bookings_per_professional': self.get_average_bookings_per_professional_by_range(start_date, end_date),
