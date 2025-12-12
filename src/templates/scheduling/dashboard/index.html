@@ -1078,38 +1078,26 @@
 
     </div>
 
-    <!-- =============== SEÇÃO 3: MÉDIAS E ESTATÍSTICAS =============== -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px;">
+    <!-- =============== SEÇÃO 2B: MÉTRICAS SECUNDÁRIAS ADICIONAIS =============== -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 40px;">
         
         <!-- Média por Dia -->
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-                <p style="font-size: 12px; margin: 0; opacity: 0.9; text-transform: uppercase; font-weight: 600;">Média por Dia</p>
-                <div class="metric-tooltip" style="font-size: 16px; opacity: 0.7;">
-                    ℹ️
-                    <span class="tooltip-text">Calculado dividindo o total de agendamentos pelo número de dias que tiveram pelo menos um agendamento (não pelos 31 dias do mês).</span>
-                </div>
-            </div>
-            <p style="font-size: 28px; font-weight: 700; margin: 0;">{{ operational.average_bookings_per_day|floatformat:1 }}</p>
-            <p style="font-size: 12px; margin: 8px 0 0 0; opacity: 0.8;">Agendamentos diários</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">📊 Média por Dia</p>
+            <p style="font-size: 24px; font-weight: 700; margin: 0; color: #667eea;">{{ operational.average_bookings_per_day|floatformat:1 }}</p>
+            <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Agendamentos diários</p>
         </div>
 
         <!-- Média por Profissional -->
-        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-                <p style="font-size: 12px; margin: 0; opacity: 0.9; text-transform: uppercase; font-weight: 600;">Média por Profissional</p>
-                <div class="metric-tooltip" style="font-size: 16px; opacity: 0.7;">
-                    ℹ️
-                    <span class="tooltip-text">Número médio de agendamentos por profissional ativo no período. Útil para entender a distribuição de carga entre a equipe.</span>
-                </div>
-            </div>
-            <p style="font-size: 28px; font-weight: 700; margin: 0;">{{ operational.average_bookings_per_professional|floatformat:1 }}</p>
-            <p style="font-size: 12px; margin: 8px 0 0 0; opacity: 0.8;">Por profissional</p>
+        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(31, 38, 135, 0.08); border: 1px solid #e5e7eb;">
+            <p style="font-size: 11px; margin: 0 0 10px 0; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">👥 Média por Profissional</p>
+            <p style="font-size: 24px; font-weight: 700; margin: 0; color: #10b981;">{{ operational.average_bookings_per_professional|floatformat:1 }}</p>
+            <p style="font-size: 11px; margin: 5px 0 0 0; color: #94a3b8;">Por profissional</p>
         </div>
 
     </div>
 
-    <!-- =============== SEÇÃO 4: HORÁRIOS E DIAS DE PICO =============== -->
+    <!-- =============== SEÇÃO 3: HORÁRIOS E DIAS DE PICO =============== -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px;">
         
         <!-- Horários de Pico -->
