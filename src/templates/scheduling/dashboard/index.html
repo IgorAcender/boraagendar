@@ -981,7 +981,7 @@
             <p style="font-size: 12px; margin: 0 0 15px 0; opacity: 0.9; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Confirmados</p>
             <p style="font-size: 32px; font-weight: 700; margin: 0;">{{ operational.confirmed_bookings }}</p>
             <p style="font-size: 11px; margin: 8px 0 0 0; opacity: 0.8;">Prontos para execução</p>
-            <p style="font-size: 14px; font-weight: 600; margin: 5px 0 0 0;">{% if operational.total_bookings > 0 %}{{ operational.confirmed_percentage|floatformat:0 }}% do total{% else %}-%{% endif %}</p>
+            <p style="font-size: 14px; font-weight: 600; margin: 5px 0 0 0;">{% if operational.total_bookings > 0 %}{{ operational.confirmed_percentage|floatformat:0 }}%{% else %}-%{% endif %}</p>
         </div>
 
         <!-- Pendentes -->
@@ -989,7 +989,7 @@
             <p style="font-size: 12px; margin: 0 0 15px 0; opacity: 0.9; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Pendentes</p>
             <p style="font-size: 32px; font-weight: 700; margin: 0;">{{ operational.pending_bookings }}</p>
             <p style="font-size: 11px; margin: 8px 0 0 0; opacity: 0.8;">Aguardando confirmação</p>
-            <p style="font-size: 14px; font-weight: 600; margin: 5px 0 0 0;">{% if operational.total_bookings > 0 %}{{ operational.pending_percentage|floatformat:0 }}% do total{% else %}-%{% endif %}</p>
+            <p style="font-size: 14px; font-weight: 600; margin: 5px 0 0 0;">{% if operational.total_bookings > 0 %}{{ operational.pending_percentage|floatformat:0 }}%{% else %}-%{% endif %}</p>
         </div>
 
         <!-- Cancelados -->
@@ -997,7 +997,7 @@
             <p style="font-size: 12px; margin: 0 0 15px 0; opacity: 0.9; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Cancelados</p>
             <p style="font-size: 32px; font-weight: 700; margin: 0;">{{ operational.cancelled_bookings }}</p>
             <p style="font-size: 11px; margin: 8px 0 0 0; opacity: 0.8;">Não realizados</p>
-            <p style="font-size: 14px; font-weight: 600; margin: 5px 0 0 0;">{% if operational.total_bookings > 0 %}{{ operational.cancelled_percentage|floatformat:0 }}% do total{% else %}-%{% endif %}</p>
+            <p style="font-size: 14px; font-weight: 600; margin: 5px 0 0 0;">{% if operational.total_bookings > 0 %}{{ operational.cancelled_percentage|floatformat:0 }}%{% else %}-%{% endif %}</p>
         </div>
 
         <!-- Não Compareceu -->
@@ -1005,7 +1005,7 @@
             <p style="font-size: 12px; margin: 0 0 15px 0; opacity: 0.9; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Não Compareceu</p>
             <p style="font-size: 32px; font-weight: 700; margin: 0;">{{ operational.no_show_bookings }}</p>
             <p style="font-size: 11px; margin: 8px 0 0 0; opacity: 0.8;">Faltaram à consulta</p>
-            <p style="font-size: 14px; font-weight: 600; margin: 5px 0 0 0;">{% if operational.total_bookings > 0 %}{{ operational.no_show_percentage|floatformat:0 }}% do total{% else %}-%{% endif %}</p>
+            <p style="font-size: 14px; font-weight: 600; margin: 5px 0 0 0;">{% if operational.total_bookings > 0 %}{{ operational.no_show_percentage|floatformat:0 }}%{% else %}-%{% endif %}</p>
         </div>
 
     </div>
