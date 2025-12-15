@@ -250,17 +250,17 @@
                         {% if whatsapp.is_connected %}
                             {% if not whatsapp.is_primary %}
                                 <button class="btn btn-small btn-outline-primary" 
-                                        onclick="setPrimary({{ whatsapp.id }})">
+                                        onclick="setPrimary('{% url 'whatsapp:set_primary' whatsapp.id %}')">
                                     ⭐ Definir como Principal
                                 </button>
                             {% endif %}
                             <button class="btn btn-small btn-outline-danger" 
-                                    onclick="disconnect({{ whatsapp.id }})">
+                                    onclick="disconnect('{% url 'whatsapp:disconnect' whatsapp.id %}')">
                                 ❌ Desconectar
                             </button>
                         {% else %}
                             <button class="btn btn-small btn-primary" 
-                                    onclick="generateQrCode({{ whatsapp.id }})">
+                                    onclick="generateQrCode('{% url 'whatsapp:generate_qrcode' whatsapp.id %}')">
                                 🔗 Gerar QR Code
                             </button>
                         {% endif %}
@@ -306,14 +306,14 @@
 {% block extra_js %}
 <script>
 // Função para gerar QR code
-function generateQrCode(whatsappId) {
+function generateQrCode(endpoint) {
     const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
     const container = document.getElementById('qrCodeContainer');
     
     container.innerHTML = '<div class="loading"></div>';
     modal.show();
     
-    fetch(`/whatsapp/${whatsappId}/gerar-qrcode/`, {
+    fetch(endpoint, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
@@ -337,12 +337,12 @@ function generateQrCode(whatsappId) {
 }
 
 // Função para desconectar
-function disconnect(whatsappId) {
+function disconnect(endpoint) {
     if (!confirm('Tem certeza que deseja desconectar este WhatsApp?')) {
         return;
     }
     
-    fetch(`/whatsapp/${whatsappId}/desconectar/`, {
+    fetch(endpoint, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
@@ -361,8 +361,8 @@ function disconnect(whatsappId) {
 }
 
 // Função para definir como principal
-function setPrimary(whatsappId) {
-    fetch(`/whatsapp/${whatsappId}/set-primary/`, {
+function setPrimary(endpoint) {
+    fetch(endpoint, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',

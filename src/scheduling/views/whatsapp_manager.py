@@ -44,9 +44,9 @@ def whatsapp_dashboard(request):
     
     stats = {
         'total': whatsapps.count(),
-        'conectados': whatsapps.filter(status='connected').count(),
-        'desconectados': whatsapps.filter(status='disconnected').count(),
-        'pendentes': whatsapps.filter(status='pending').count(),
+        'conectados': whatsapps.filter(connection_status='connected').count(),
+        'desconectados': whatsapps.filter(connection_status='disconnected').count(),
+        'pendentes': whatsapps.filter(connection_status='pending').count(),
     }
     
     context = {
@@ -69,6 +69,7 @@ def whatsapp_detail(request, id):
     whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
     
     context = {
+        'tenant': tenant,
         'whatsapp': whatsapp,
         'qr_code_valid': whatsapp.qr_code_is_valid,
         'status_display': whatsapp.get_status_display_verbose(),
@@ -108,7 +109,7 @@ def whatsapp_generate_qrcode(request, id):
         
         whatsapp.qr_code = img_str
         whatsapp.qr_code_expires_at = timezone.now() + timedelta(minutes=5)
-        whatsapp.status = 'pending'
+        whatsapp.connection_status = 'pending'
         whatsapp.save()
         
         return JsonResponse({
@@ -119,7 +120,7 @@ def whatsapp_generate_qrcode(request, id):
         })
     
     except Exception as e:
-        whatsapp.status = 'error'
+        whatsapp.connection_status = 'error'
         whatsapp.error_message = str(e)
         whatsapp.save()
         
@@ -140,7 +141,7 @@ def whatsapp_disconnect(request, id):
     whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
     
     try:
-        whatsapp.status = 'disconnected'
+        whatsapp.connection_status = 'disconnected'
         whatsapp.disconnected_at = timezone.now()
         whatsapp.session_id = ''
         whatsapp.save()
@@ -202,7 +203,7 @@ def whatsapp_status_api(request, id):
     return JsonResponse({
         'id': whatsapp.id,
         'phone_number': whatsapp.phone_number,
-        'status': whatsapp.status,
+        'status': whatsapp.connection_status,
         'status_display': whatsapp.get_status_display_verbose(),
         'is_connected': whatsapp.is_connected,
         'is_primary': whatsapp.is_primary,
@@ -255,7 +256,7 @@ def whatsapp_webhook_update(request):
         ).first()
         
         if whatsapp:
-            whatsapp.status = status
+            whatsapp.connection_status = status
             whatsapp.session_id = session_id
             
             if status == 'connected':
