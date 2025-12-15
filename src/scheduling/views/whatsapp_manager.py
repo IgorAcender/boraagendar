@@ -1,12 +1,5 @@
 """
 Views para gerenciamento de WhatsApp pelo dono da barbearia
-
-O dono pode:
-- Ver WhatsApps conectados/desconectados
-- Gerar QR code para conectar
-- Desconectar WhatsApp
-- Ver status de conexão
-- Gerenciar múltiplos WhatsApps
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -15,39 +8,45 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.db.models import Q
+from django.conf import settings
 import json
 import base64
 from io import BytesIO
 import qrcode
+from datetime import timedelta
 
 from scheduling.models import WhatsAppInstance, EvolutionAPI
 from tenants.models import Tenant
-from tenants.utils import get_tenant_from_request
+from tenants.services import ensure_membership_for_request, TenantSelectionRequired
+from django.urls import reverse
+
+
+def _get_tenant_or_redirect(request):
+    """Helper para obter tenant do request"""
+    try:
+        membership = ensure_membership_for_request(request, allowed_roles=["owner", "manager"])
+    except TenantSelectionRequired:
+        select_url = f"{reverse('accounts:select_tenant')}?next={request.get_full_path()}"
+        return None, redirect(select_url)
+    return membership.tenant, None
 
 
 @login_required
 def whatsapp_dashboard(request):
-    """
-    Dashboard principal de gerenciamento de WhatsApp
-    Mostra status de todos os WhatsApps do tenant
-    """
-    tenant = get_tenant_from_request(request)
+    """Dashboard principal de gerenciamento de WhatsApp"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
     
-    if not tenant:
-        return redirect('login')
-    
-    # Buscar todos os WhatsApps do tenant
     whatsapps = WhatsAppInstance.objects.filter(
         tenant=tenant
     ).select_related('evolution_api').order_by('-is_primary', '-connected_at')
     
-    # Contar por status
     stats = {
         'total': whatsapps.count(),
-        'conectados': whatsapps.filter(connection_status='connected').count(),
-        'desconectados': whatsapps.filter(connection_status='disconnected').count(),
-        'pendentes': whatsapps.filter(connection_status='pending').count(),
-        'erros': whatsapps.filter(connection_status='error').count(),
+        'conectados': whatsapps.filter(status='connected').count(),
+        'desconectados': whatsapps.filter(status='disconnected').count(),
+        'pendentes': whatsapps.filter(status='pending').count(),
     }
     
     context = {
@@ -61,18 +60,13 @@ def whatsapp_dashboard(request):
 
 
 @login_required
-def whatsapp_detail(request, whatsapp_id):
-    """
-    Página de detalhes de um WhatsApp específico
-    Mostra QR code, status, histórico de conexões
-    """
-    tenant = get_tenant_from_request(request)
+def whatsapp_detail(request, id):
+    """Página de detalhes de um WhatsApp"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
     
-    whatsapp = get_object_or_404(
-        WhatsAppInstance,
-        id=whatsapp_id,
-        tenant=tenant
-    )
+    whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
     
     context = {
         'whatsapp': whatsapp,
@@ -86,23 +80,15 @@ def whatsapp_detail(request, whatsapp_id):
 
 @login_required
 @require_http_methods(["POST"])
-def whatsapp_generate_qrcode(request, whatsapp_id):
-    """
-    Gerar QR code para conectar um WhatsApp
-    Retorna QR code em Base64
-    """
-    tenant = get_tenant_from_request(request)
+def whatsapp_generate_qrcode(request, id):
+    """Gerar QR code para conectar"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
     
-    whatsapp = get_object_or_404(
-        WhatsAppInstance,
-        id=whatsapp_id,
-        tenant=tenant
-    )
+    whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
     
     try:
-        # Aqui você chamaria a API do Evolution para gerar QR code
-        # Por enquanto, criamos um QR code dummy como exemplo
-        
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -110,33 +96,30 @@ def whatsapp_generate_qrcode(request, whatsapp_id):
             border=4,
         )
         
-        # Usar o session_id ou phone_number como conteúdo
         qr_content = f"evolution://{whatsapp.evolution_api.instance_id}/{whatsapp.phone_number}"
         qr.add_data(qr_content)
         qr.make(fit=True)
         
         img = qr.make_image(fill_color="black", back_color="white")
         
-        # Converter para Base64
         buffer = BytesIO()
         img.save(buffer, format='PNG')
         img_str = base64.b64encode(buffer.getvalue()).decode()
         
-        # Salvar no banco
         whatsapp.qr_code = img_str
-        whatsapp.qr_code_expires_at = timezone.now() + timezone.timedelta(minutes=5)
-        whatsapp.connection_status = 'pending'
+        whatsapp.qr_code_expires_at = timezone.now() + timedelta(minutes=5)
+        whatsapp.status = 'pending'
         whatsapp.save()
         
         return JsonResponse({
             'success': True,
             'qr_code': f"data:image/png;base64,{img_str}",
             'expires_at': whatsapp.qr_code_expires_at.isoformat(),
-            'message': 'QR code gerado com sucesso! Aponte sua câmera para conectar.'
+            'message': 'QR code gerado com sucesso!'
         })
     
     except Exception as e:
-        whatsapp.connection_status = 'error'
+        whatsapp.status = 'error'
         whatsapp.error_message = str(e)
         whatsapp.save()
         
@@ -148,23 +131,16 @@ def whatsapp_generate_qrcode(request, whatsapp_id):
 
 @login_required
 @require_http_methods(["POST"])
-def whatsapp_disconnect(request, whatsapp_id):
-    """
-    Desconectar um WhatsApp
-    """
-    tenant = get_tenant_from_request(request)
+def whatsapp_disconnect(request, id):
+    """Desconectar um WhatsApp"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
     
-    whatsapp = get_object_or_404(
-        WhatsAppInstance,
-        id=whatsapp_id,
-        tenant=tenant
-    )
+    whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
     
     try:
-        # Aqui você chamaria a API do Evolution para desconectar
-        # Por enquanto, apenas mudamos o status
-        
-        whatsapp.connection_status = 'disconnected'
+        whatsapp.status = 'disconnected'
         whatsapp.disconnected_at = timezone.now()
         whatsapp.session_id = ''
         whatsapp.save()
@@ -183,17 +159,13 @@ def whatsapp_disconnect(request, whatsapp_id):
 
 @login_required
 @require_http_methods(["POST"])
-def whatsapp_set_primary(request, whatsapp_id):
-    """
-    Definir um WhatsApp como principal
-    """
-    tenant = get_tenant_from_request(request)
+def whatsapp_set_primary(request, id):
+    """Definir como principal"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
     
-    whatsapp = get_object_or_404(
-        WhatsAppInstance,
-        id=whatsapp_id,
-        tenant=tenant
-    )
+    whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
     
     if not whatsapp.is_connected:
         return JsonResponse({
@@ -202,12 +174,7 @@ def whatsapp_set_primary(request, whatsapp_id):
         }, status=400)
     
     try:
-        # Remover primary de todos os outros
-        WhatsAppInstance.objects.filter(
-            tenant=tenant
-        ).update(is_primary=False)
-        
-        # Definir este como primary
+        WhatsAppInstance.objects.filter(tenant=tenant).update(is_primary=False)
         whatsapp.is_primary = True
         whatsapp.save()
         
@@ -224,23 +191,18 @@ def whatsapp_set_primary(request, whatsapp_id):
 
 
 @login_required
-def whatsapp_status_api(request, whatsapp_id):
-    """
-    API para obter status atual de um WhatsApp
-    Útil para atualização em tempo real no frontend
-    """
-    tenant = get_tenant_from_request(request)
+def whatsapp_status_api(request, id):
+    """API para obter status"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
     
-    whatsapp = get_object_or_404(
-        WhatsAppInstance,
-        id=whatsapp_id,
-        tenant=tenant
-    )
+    whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
     
     return JsonResponse({
         'id': whatsapp.id,
         'phone_number': whatsapp.phone_number,
-        'status': whatsapp.connection_status,
+        'status': whatsapp.status,
         'status_display': whatsapp.get_status_display_verbose(),
         'is_connected': whatsapp.is_connected,
         'is_primary': whatsapp.is_primary,
@@ -252,15 +214,15 @@ def whatsapp_status_api(request, whatsapp_id):
 
 @login_required
 def whatsapp_list_api(request):
-    """
-    API para listar todos os WhatsApps do tenant em JSON
-    """
-    tenant = get_tenant_from_request(request)
+    """API para listar todos"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
     
     whatsapps = WhatsAppInstance.objects.filter(
         tenant=tenant
     ).values(
-        'id', 'phone_number', 'connection_status', 
+        'id', 'phone_number', 'status', 
         'is_primary', 'is_active', 'display_name'
     ).order_by('-is_primary', '-connected_at')
     
@@ -273,21 +235,17 @@ def whatsapp_list_api(request):
 @login_required
 @require_http_methods(["POST"])
 def whatsapp_webhook_update(request):
-    """
-    Webhook para receber atualizações de status do Evolution API
-    Chamado quando WhatsApp conecta/desconecta
-    """
+    """Webhook para atualizações de status"""
     try:
         data = json.loads(request.body)
         
-        # Verificar token de segurança
         token = request.headers.get('X-API-Key')
-        if token != 'seu-token-secreto-aqui':
+        if token != getattr(settings, 'WHATSAPP_WEBHOOK_API_KEY', 'secret'):
             return JsonResponse({'error': 'Unauthorized'}, status=401)
         
         instance_id = data.get('instance_id')
         phone_number = data.get('phone_number')
-        status = data.get('status')  # connected, disconnected, error
+        status = data.get('status')
         session_id = data.get('session_id')
         error_message = data.get('error_message', '')
         
@@ -297,7 +255,7 @@ def whatsapp_webhook_update(request):
         ).first()
         
         if whatsapp:
-            whatsapp.connection_status = status
+            whatsapp.status = status
             whatsapp.session_id = session_id
             
             if status == 'connected':

@@ -4,12 +4,14 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import include, path
 from django.views.generic import RedirectView
+from scheduling.urls import whatsapp as whatsapp_urls
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("healthz/", lambda request: HttpResponse("ok"), name="healthz"),
     path("api/", include("config.urls_api")),
     path("dashboard/", include("scheduling.urls.dashboard")),
+    path("dashboard/whatsapp/", include(whatsapp_urls)),
     path("accounts/", include("accounts.urls")),
     path("", include("scheduling.urls.public")),  # Movido para o final (mais específico primeiro)
     path("", RedirectView.as_view(pattern_name="dashboard:index", permanent=False)),
