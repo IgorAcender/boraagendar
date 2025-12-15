@@ -33,12 +33,12 @@ python manage.py shell << 'EOF'
 from scheduling.models import EvolutionAPI
 from django.utils import timezone
 
-# Dados do Evolution API fornecido pelo usuário
+# Dados do seu Evolution API (do .env)
 EVOLUTION_DOMAIN = "robo-de-agendamento-igor.ivhjcm.easypanel.host"
 EVOLUTION_API_KEY = "429683C4C977415CAAFCCE10F7D57E11"
 EVOLUTION_INSTANCE_ID = "evolution-1"
 
-# URL do Evolution API
+# URL base do seu domínio (será usada para comunicação)
 EVOLUTION_URL = f"https://{EVOLUTION_DOMAIN}"
 
 try:
