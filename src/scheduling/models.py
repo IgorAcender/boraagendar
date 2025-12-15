@@ -446,6 +446,62 @@ class WhatsAppInstance(models.Model):
         verbose_name="Ativo"
     )
     
+    # Campos para gerenciamento de QR Code
+    qr_code = models.TextField(
+        blank=True,
+        verbose_name="QR Code",
+        help_text="Base64 encoded QR code para conectar WhatsApp"
+    )
+    
+    qr_code_expires_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="QR Code Expira em"
+    )
+    
+    # Campos de controle
+    session_id = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Session ID",
+        help_text="ID da sessão no Evolution API"
+    )
+    
+    connection_code = models.CharField(
+        max_length=6,
+        blank=True,
+        verbose_name="Código de Conexão",
+        help_text="Código numérico para conectar"
+    )
+    
+    connected_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Conectado em"
+    )
+    
+    disconnected_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Desconectado em"
+    )
+    
+    error_message = models.TextField(
+        blank=True,
+        verbose_name="Mensagem de Erro",
+        help_text="Erro da última tentativa de conexão"
+    )
+    
+    # Para rastrear tenant (dono)
+    tenant = models.ForeignKey(
+        'tenants.Tenant',
+        on_delete=models.CASCADE,
+        related_name="whatsapp_instances",
+        null=True,
+        blank=True,
+        verbose_name="Inquilino (Dono)"
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -465,4 +521,28 @@ class WhatsAppInstance(models.Model):
         }
         icon = status_icon.get(self.connection_status, '❓')
         return f"{icon} {self.phone_number} ({self.evolution_api.instance_id})"
+    
+    @property
+    def is_connected(self):
+        """Verificar se está conectado"""
+        return self.connection_status == 'connected'
+    
+    @property
+    def qr_code_is_valid(self):
+        """Verificar se QR code ainda é válido"""
+        if not self.qr_code_expires_at:
+            return False
+        from django.utils import timezone
+        return timezone.now() < self.qr_code_expires_at
+    
+    def get_status_display_verbose(self):
+        """Retorna status em português mais detalhado"""
+        statuses = {
+            'pending': '📋 Aguardando QR Code',
+            'connecting': '⏳ Conectando...',
+            'connected': '✅ Conectado e Pronto',
+            'disconnected': '❌ Desconectado',
+            'error': '⚠️ Erro na Conexão'
+        }
+        return statuses.get(self.connection_status, self.get_connection_status_display())
 

@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gerenciar WhatsApp - Bora Agendar{% endblock %}
+
+{% block extra_css %}
+<style>
+    .whatsapp-dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        border-left: 4px solid #007bff;
+    }
+    
+    .stat-card h3 {
+        font-size: 2em;
+        margin: 10px 0;
+        color: #007bff;
+    }
+    
+    .stat-card p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9em;
+    }
+    
+    .stat-card.conectados { border-left-color: #28a745; }
+    .stat-card.conectados h3 { color: #28a745; }
+    
+    .stat-card.desconectados { border-left-color: #dc3545; }
+    .stat-card.desconectados h3 { color: #dc3545; }
+    
+    .stat-card.pendentes { border-left-color: #ffc107; }
+    .stat-card.pendentes h3 { color: #ffc107; }
+    
+    .whatsapp-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .whatsapp-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .whatsapp-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .whatsapp-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+    }
+    
+    .whatsapp-phone {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 500;
+    }
+    
+    .status-badge.connected {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-badge.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-badge.disconnected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-badge.error {
+        background: #f5c6cb;
+        color: #721c24;
+    }
+    
+    .primary-badge {
+        background: #007bff;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 0.75em;
+        margin-left: 5px;
+    }
+    
+    .whatsapp-info {
+        margin: 15px 0;
+        font-size: 0.9em;
+        color: #6c757d;
+    }
+    
+    .whatsapp-info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+    }
+    
+    .whatsapp-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-small {
+        flex: 1;
+        min-width: 80px;
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+    
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-size: 0.9em;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+    }
+    
+    .empty-state svg {
+        width: 80px;
+        height: 80px;
+        opacity: 0.5;
+        margin-bottom: 20px;
+    }
+    
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="whatsapp-dashboard">
+    <div class="mb-4">
+        <h1>📱 Gerenciar WhatsApp</h1>
+        <p class="text-muted">Conecte seus WhatsApps para enviar mensagens de confirmação de agendamentos</p>
+    </div>
+    
+    <!-- Estatísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>{{ stats.total }}</h3>
+            <p>Total</p>
+        </div>
+        <div class="stat-card conectados">
+            <h3>{{ stats.conectados }}</h3>
+            <p>Conectados ✅</p>
+        </div>
+        <div class="stat-card desconectados">
+            <h3>{{ stats.desconectados }}</h3>
+            <p>Desconectados</p>
+        </div>
+        <div class="stat-card pendentes">
+            <h3>{{ stats.pendentes }}</h3>
+            <p>Aguardando</p>
+        </div>
+    </div>
+    
+    <!-- Lista de WhatsApps -->
+    {% if whatsapps %}
+        <div class="whatsapp-list">
+            {% for whatsapp in whatsapps %}
+                <div class="whatsapp-card">
+                    <div class="whatsapp-header">
+                        <div>
+                            <div class="whatsapp-phone">
+                                📱 {{ whatsapp.phone_number }}
+                                {% if whatsapp.is_primary %}
+                                    <span class="primary-badge">Principal</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">{{ whatsapp.display_name }}</small>
+                        </div>
+                        <span class="status-badge {{ whatsapp.connection_status }}">
+                            {{ whatsapp.get_status_display_verbose }}
+                        </span>
+                    </div>
+                    
+                    <div class="whatsapp-info">
+                        <div class="whatsapp-info-row">
+                            <span>Evolution API:</span>
+                            <strong>{{ whatsapp.evolution_api.instance_id }}</strong>
+                        </div>
+                        {% if whatsapp.connected_at %}
+                            <div class="whatsapp-info-row">
+                                <span>Conectado em:</span>
+                                <strong>{{ whatsapp.connected_at|date:"d/m/Y H:i" }}</strong>
+                            </div>
+                        {% endif %}
+                        {% if whatsapp.error_message %}
+                            <div class="error-message">
+                                ⚠️ {{ whatsapp.error_message }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="whatsapp-actions">
+                        {% if whatsapp.is_connected %}
+                            {% if not whatsapp.is_primary %}
+                                <button class="btn btn-small btn-outline-primary" 
+                                        onclick="setPrimary({{ whatsapp.id }})">
+                                    ⭐ Definir como Principal
+                                </button>
+                            {% endif %}
+                            <button class="btn btn-small btn-outline-danger" 
+                                    onclick="disconnect({{ whatsapp.id }})">
+                                ❌ Desconectar
+                            </button>
+                        {% else %}
+                            <button class="btn btn-small btn-primary" 
+                                    onclick="generateQrCode({{ whatsapp.id }})">
+                                🔗 Gerar QR Code
+                            </button>
+                        {% endif %}
+                        <a href="{% url 'whatsapp:detail' whatsapp.id %}" class="btn btn-small btn-secondary">
+                            📋 Detalhes
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>Nenhum WhatsApp conectado</h3>
+            <p>Comece gerando um QR code para conectar seu primeiro WhatsApp</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal para QR Code -->
+<div class="modal fade" id="qrCodeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Conectar WhatsApp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Aponte sua câmera para o QR code abaixo para conectar seu WhatsApp:</p>
+                <div id="qrCodeContainer" class="my-4">
+                    <div class="loading"></div>
+                </div>
+                <small class="text-muted">O QR code expira em 5 minutos</small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Função para gerar QR code
+function generateQrCode(whatsappId) {
+    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+    const container = document.getElementById('qrCodeContainer');
+    
+    container.innerHTML = '<div class="loading"></div>';
+    modal.show();
+    
+    fetch(`/whatsapp/${whatsappId}/gerar-qrcode/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            container.innerHTML = `
+                <img src="${data.qr_code}" alt="QR Code" style="max-width: 300px; margin: 20px auto;">
+                <p class="mt-3"><strong>${data.message}</strong></p>
+            `;
+        } else {
+            container.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        }
+    })
+    .catch(error => {
+        container.innerHTML = `<div class="alert alert-danger">Erro ao gerar QR code: ${error}</div>`;
+    });
+}
+
+// Função para desconectar
+function disconnect(whatsappId) {
+    if (!confirm('Tem certeza que deseja desconectar este WhatsApp?')) {
+        return;
+    }
+    
+    fetch(`/whatsapp/${whatsappId}/desconectar/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert(`Erro: ${data.error}`);
+        }
+    });
+}
+
+// Função para definir como principal
+function setPrimary(whatsappId) {
+    fetch(`/whatsapp/${whatsappId}/set-primary/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert(`Erro: ${data.error}`);
+        }
+    });
+}
+
+// Atualizar status a cada 5 segundos
+setInterval(function() {
+    // Você pode adicionar lógica para atualizar o status sem recarregar a página
+}, 5000);
+</script>
+{% endblock %}

@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}{{ whatsapp.phone_number }} - Gerenciar WhatsApp{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="mb-4">
+        <a href="{% url 'whatsapp:dashboard' %}" class="btn btn-outline-secondary">← Voltar</a>
+        <h1 class="mt-3">{{ whatsapp.phone_number }}</h1>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Status -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Status da Conexão</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div>
+                            <strong>Status:</strong> 
+                            <span class="badge badge-lg {% if whatsapp.is_connected %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ whatsapp.get_status_display_verbose }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    {% if whatsapp.is_primary %}
+                        <div class="alert alert-info">
+                            ⭐ Este é o WhatsApp principal para agendamentos
+                        </div>
+                    {% endif %}
+                    
+                    <table class="table table-sm">
+                        <tr>
+                            <td><strong>Evolution API:</strong></td>
+                            <td>{{ whatsapp.evolution_api.instance_id }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nome de Exibição:</strong></td>
+                            <td>{{ whatsapp.display_name|default:"Não configurado" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Session ID:</strong></td>
+                            <td><code>{{ whatsapp.session_id|default:"—" }}</code></td>
+                        </tr>
+                        {% if whatsapp.connected_at %}
+                            <tr>
+                                <td><strong>Conectado em:</strong></td>
+                                <td>{{ whatsapp.connected_at|date:"d/m/Y H:i:s" }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if whatsapp.disconnected_at %}
+                            <tr>
+                                <td><strong>Desconectado em:</strong></td>
+                                <td>{{ whatsapp.disconnected_at|date:"d/m/Y H:i:s" }}</td>
+                            </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Erro (se houver) -->
+            {% if whatsapp.error_message %}
+                <div class="alert alert-danger" role="alert">
+                    <h5>⚠️ Erro na Conexão</h5>
+                    <p class="mb-0">{{ whatsapp.error_message }}</p>
+                </div>
+            {% endif %}
+            
+            <!-- QR Code -->
+            {% if not whatsapp.is_connected %}
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Conectar WhatsApp</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        {% if qr_code_valid %}
+                            <p>Aponte sua câmera para o QR code abaixo:</p>
+                            <img src="data:image/png;base64,{{ whatsapp.qr_code }}" 
+                                 alt="QR Code" 
+                                 style="max-width: 300px; margin: 20px auto;">
+                            <p class="text-muted">Expira em: {{ whatsapp.qr_code_expires_at|date:"H:i:s" }}</p>
+                        {% else %}
+                            <button class="btn btn-primary btn-lg" 
+                                    onclick="generateQrCode({{ whatsapp.id }})">
+                                🔗 Gerar QR Code
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Ações</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% if whatsapp.is_connected %}
+                        {% if not whatsapp.is_primary %}
+                            <button class="list-group-item list-group-item-action" 
+                                    onclick="setPrimary({{ whatsapp.id }})">
+                                ⭐ Definir como Principal
+                            </button>
+                        {% endif %}
+                        <button class="list-group-item list-group-item-action text-danger" 
+                                onclick="disconnect({{ whatsapp.id }})">
+                            ❌ Desconectar
+                        </button>
+                    {% else %}
+                        <button class="list-group-item list-group-item-action" 
+                                onclick="generateQrCode({{ whatsapp.id }})">
+                            🔗 Gerar QR Code
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Informações -->
+            <div class="card mt-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Informações</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        <strong>Ativo:</strong> 
+                        {% if whatsapp.is_active %}
+                            <span class="badge bg-success">Sim</span>
+                        {% else %}
+                            <span class="badge bg-danger">Não</span>
+                        {% endif %}
+                    </p>
+                    <p>
+                        <strong>Criado em:</strong><br>
+                        {{ whatsapp.created_at|date:"d/m/Y H:i" }}
+                    </p>
+                    <p>
+                        <strong>Última atualização:</strong><br>
+                        {{ whatsapp.updated_at|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function generateQrCode(whatsappId) {
+    fetch(`/whatsapp/${whatsappId}/gerar-qrcode/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(`Erro: ${data.error}`);
+        }
+    });
+}
+
+function disconnect(whatsappId) {
+    if (!confirm('Desconectar este WhatsApp?')) return;
+    
+    fetch(`/whatsapp/${whatsappId}/desconectar/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert(`Erro: ${data.error}`);
+        }
+    });
+}
+
+function setPrimary(whatsappId) {
+    fetch(`/whatsapp/${whatsappId}/set-primary/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert(`Erro: ${data.error}`);
+        }
+    });
+}
+</script>
+{% endblock %}
