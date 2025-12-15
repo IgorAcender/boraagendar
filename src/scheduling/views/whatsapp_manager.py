@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
+from django.db import models
 from django.db.models import Q
 from django.conf import settings
 import json
@@ -231,6 +232,97 @@ def whatsapp_list_api(request):
         'count': len(list(whatsapps)),
         'whatsapps': list(whatsapps)
     })
+
+
+@login_required
+@require_http_methods(["POST"])
+def whatsapp_create(request):
+    """Criar um novo WhatsApp para o tenant"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
+    
+    try:
+        data = json.loads(request.body) if request.body else {}
+        
+        # Buscar Evolution API com melhor capacidade disponível
+        evolution_api = EvolutionAPI.objects.filter(
+            is_active=True
+        ).annotate(
+            usage=models.Count('whatsapp_instances')
+        ).filter(
+            usage__lt=models.F('capacity')
+        ).order_by('priority', 'usage').first()
+        
+        if not evolution_api:
+            return JsonResponse({
+                'success': False,
+                'error': 'Nenhum Evolution API disponível. Entre em contato com o suporte.'
+            }, status=400)
+        
+        # Gerar número único para este WhatsApp
+        base_number = data.get('phone_number', '')
+        if not base_number:
+            # Gerar automático se não fornecido
+            last_wa = WhatsAppInstance.objects.filter(
+                tenant=tenant
+            ).order_by('-id').first()
+            wa_count = WhatsAppInstance.objects.filter(tenant=tenant).count() + 1
+            base_number = f"55119990{wa_count:04d}"
+        
+        # Criar instância
+        whatsapp = WhatsAppInstance.objects.create(
+            evolution_api=evolution_api,
+            phone_number=base_number,
+            display_name=data.get('display_name', f'WhatsApp #{WhatsAppInstance.objects.filter(tenant=tenant).count() + 1}'),
+            tenant=tenant,
+            connection_status='pending',
+            is_primary=WhatsAppInstance.objects.filter(tenant=tenant).count() == 0
+        )
+        
+        # Gerar QR code automaticamente
+        try:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            
+            qr_content = f"evolution://{evolution_api.instance_id}/{base_number}"
+            qr.add_data(qr_content)
+            qr.make(fit=True)
+            
+            img = qr.make_image(fill_color="black", back_color="white")
+            
+            buffer = BytesIO()
+            img.save(buffer, format='PNG')
+            img_str = base64.b64encode(buffer.getvalue()).decode()
+            
+            whatsapp.qr_code = img_str
+            whatsapp.qr_code_expires_at = timezone.now() + timedelta(minutes=5)
+            whatsapp.save()
+            
+            return JsonResponse({
+                'success': True,
+                'whatsapp_id': whatsapp.id,
+                'phone_number': base_number,
+                'qr_code': f"data:image/png;base64,{img_str}",
+                'expires_at': whatsapp.qr_code_expires_at.isoformat(),
+                'message': 'WhatsApp criado com sucesso! Aponte sua câmera para o QR code.'
+            })
+        except Exception as qr_error:
+            whatsapp.delete()
+            return JsonResponse({
+                'success': False,
+                'error': f'Erro ao gerar QR code: {str(qr_error)}'
+            }, status=400)
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
 
 
 @login_required

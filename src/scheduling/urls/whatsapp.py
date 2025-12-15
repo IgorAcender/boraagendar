@@ -6,6 +6,7 @@ from django.urls import path
 from scheduling.views.whatsapp_manager import (
     whatsapp_dashboard,
     whatsapp_detail,
+    whatsapp_create,
     whatsapp_generate_qrcode,
     whatsapp_disconnect,
     whatsapp_set_primary,
@@ -19,6 +20,9 @@ app_name = 'whatsapp'
 urlpatterns = [
     # Dashboard
     path('', whatsapp_dashboard, name='dashboard'),
+    
+    # Criar novo WhatsApp
+    path('criar/', whatsapp_create, name='create'),
     
     # Detalhes
     path('<int:whatsapp_id>/', whatsapp_detail, name='detail'),

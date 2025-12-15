@@ -1,9 +1,1150 @@
-{% extends "base_dashboard.html" %}
-{% load static %}
+{% extends "base_dashboard.html" %}{% extends "base_dashboard.html" %}
 
-{% block title %}Gerenciar WhatsApp - Bora Agendar{% endblock %}
+{% load static %}{% load static %}
 
-{% block extra_css %}
+
+
+{% block title %}Gerenciar WhatsApp - Bora Agendar{% endblock %}{% block title %}Gerenciar WhatsApp - Bora Agendar{% endblock %}
+
+
+
+{% block extra_css %}{% block extra_css %}
+
+<style><style>
+
+    .whatsapp-dashboard {    .whatsapp-dashboard {
+
+        max-width: 1400px;        max-width: 1200px;
+
+        margin: 0 auto;        margin: 0 auto;
+
+        padding: 20px;        padding: 20px;
+
+    }    }
+
+        
+
+    .dashboard-header {    .dashboard-header {
+
+        display: flex;        display: flex;
+
+        justify-content: space-between;        justify-content: space-between;
+
+        align-items: center;        align-items: center;
+
+        margin-bottom: 30px;        margin-bottom: 30px;
+
+        padding-bottom: 20px;        padding-bottom: 20px;
+
+        border-bottom: 2px solid #e5e7eb;        border-bottom: 2px solid #e5e7eb;
+
+    }    }
+
+        
+
+    .dashboard-header h1 {    .dashboard-header h1 {
+
+        margin: 0;        margin: 0;
+
+        color: #1f2937;        color: #1f2937;
+
+        font-size: 28px;        font-size: 28px;
+
+    }    }
+
+        
+
+    .btn-connect {    .btn-connect-whatsapp {
+
+        background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);        background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+
+        color: white;        color: white;
+
+        padding: 12px 24px;        padding: 12px 24px;
+
+        border-radius: 8px;        border-radius: 8px;
+
+        border: none;        border: none;
+
+        font-weight: 600;        font-weight: 600;
+
+        cursor: pointer;        cursor: pointer;
+
+        transition: all 0.3s ease;        transition: all 0.3s ease;
+
+    }        display: flex;
+
+            align-items: center;
+
+    .btn-connect:hover {        gap: 8px;
+
+        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);    }
+
+        transform: translateY(-2px);    
+
+    }    .btn-connect-whatsapp:hover {
+
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+
+    .stats-grid {        transform: translateY(-2px);
+
+        display: grid;    }
+
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));    
+
+        gap: 20px;    .stats-grid {
+
+        margin-bottom: 40px;        display: grid;
+
+    }        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+            gap: 20px;
+
+    .stat-card {        margin-bottom: 40px;
+
+        border-radius: 12px;    }
+
+        padding: 25px;    
+
+        text-align: center;    .stat-card {
+
+        color: white;        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);        border-radius: 12px;
+
+        transition: all 0.3s ease;        padding: 25px;
+
+    }        text-align: center;
+
+            border: none;
+
+    .stat-card:hover {        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+        transform: translateY(-4px);        transition: all 0.3s ease;
+
+    }    }
+
+        
+
+    .stat-card h3 {    .stat-card:hover {
+
+        font-size: 2.5em;        transform: translateY(-4px);
+
+        margin: 10px 0;        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+
+        font-weight: 700;    }
+
+    }    
+
+        .stat-card h3 {
+
+    .stat-card p {        font-size: 2.5em;
+
+        margin: 0;        margin: 10px 0;
+
+        font-size: 0.95em;        font-weight: 700;
+
+        font-weight: 500;    }
+
+    }    
+
+        .stat-card p {
+
+    .stat-card.total {        margin: 0;
+
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);        color: #6c757d;
+
+    }        font-size: 0.95em;
+
+            font-weight: 500;
+
+    .stat-card.conectados {    }
+
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);    
+
+    }    .stat-card.total {
+
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    .stat-card.desconectados {        color: white;
+
+        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);    }
+
+    }    
+
+        .stat-card.total h3,
+
+    .stat-card.pendentes {    .stat-card.total p {
+
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);        color: white;
+
+    }    }
+
+        
+
+    .whatsapp-list {    .stat-card.conectados {
+
+        display: grid;        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));        color: white;
+
+        gap: 20px;    }
+
+    }    
+
+        .stat-card.conectados h3,
+
+    .whatsapp-card {    .stat-card.conectados p {
+
+        background: white;        color: white;
+
+        border: 1px solid #e5e7eb;    }
+
+        border-radius: 12px;    
+
+        padding: 25px;    .stat-card.desconectados {
+
+        transition: all 0.3s ease;        background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);        color: white;
+
+    }    }
+
+        
+
+    .whatsapp-card:hover {    .stat-card.desconectados h3,
+
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);    .stat-card.desconectados p {
+
+        transform: translateY(-4px);        color: white;
+
+        border-color: #667eea;    }
+
+    }    
+
+        .stat-card.pendentes {
+
+    .whatsapp-header {        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+
+        display: flex;        color: white;
+
+        justify-content: space-between;    }
+
+        align-items: flex-start;    
+
+        margin-bottom: 15px;    .stat-card.pendentes h3,
+
+        padding-bottom: 15px;    .stat-card.pendentes p {
+
+        border-bottom: 1px solid #e5e7eb;        color: white;
+
+    }    }
+
+        
+
+    .whatsapp-phone {    .whatsapp-list {
+
+        font-size: 1.3em;        display: grid;
+
+        font-weight: bold;        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+
+        color: #1f2937;        gap: 20px;
+
+    }    }
+
+        
+
+    .status-badge {    .whatsapp-card {
+
+        display: inline-block;        background: white;
+
+        padding: 6px 12px;        border: 1px solid #e5e7eb;
+
+        border-radius: 20px;        border-radius: 12px;
+
+        font-size: 0.85em;        padding: 25px;
+
+        font-weight: 600;        transition: all 0.3s ease;
+
+    }        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+        }
+
+    .status-badge.connected {    
+
+        background: #d4edda;    .whatsapp-card:hover {
+
+        color: #155724;        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+
+    }        transform: translateY(-4px);
+
+            border-color: #667eea;
+
+    .status-badge.pending {    }
+
+        background: #fff3cd;    
+
+        color: #856404;    .whatsapp-header {
+
+    }        display: flex;
+
+            justify-content: space-between;
+
+    .status-badge.disconnected {        align-items: flex-start;
+
+        background: #f8d7da;        margin-bottom: 15px;
+
+        color: #842029;        padding-bottom: 15px;
+
+    }        border-bottom: 1px solid #e5e7eb;
+
+        }
+
+    .status-badge.error {    
+
+        background: #f5c6cb;    .whatsapp-phone {
+
+        color: #721c24;        font-size: 1.3em;
+
+    }        font-weight: bold;
+
+            color: #1f2937;
+
+    .primary-badge {        display: flex;
+
+        background: #667eea;        align-items: center;
+
+        color: white;        gap: 8px;
+
+        padding: 4px 10px;    }
+
+        border-radius: 4px;    
+
+        font-size: 0.75em;    .status-badge {
+
+        margin-left: 8px;        display: inline-block;
+
+    }        padding: 6px 12px;
+
+            border-radius: 20px;
+
+    .whatsapp-info {        font-size: 0.85em;
+
+        margin: 15px 0;        font-weight: 600;
+
+        font-size: 0.95em;        text-transform: uppercase;
+
+    }        letter-spacing: 0.5px;
+
+        }
+
+    .whatsapp-info-row {    
+
+        display: flex;    .status-badge.connected {
+
+        justify-content: space-between;        background: #d4edda;
+
+        padding: 8px 0;        color: #155724;
+
+    }    }
+
+        
+
+    .whatsapp-actions {    .status-badge.pending {
+
+        display: flex;        background: #fff3cd;
+
+        gap: 10px;        color: #856404;
+
+        margin-top: 20px;    }
+
+        flex-wrap: wrap;    
+
+    }    .status-badge.connecting {
+
+            background: #cfe2ff;
+
+    .btn-action {        color: #084298;
+
+        flex: 1;    }
+
+        min-width: 120px;    
+
+        padding: 10px 14px;    .status-badge.disconnected {
+
+        font-size: 0.9em;        background: #f8d7da;
+
+        border-radius: 6px;        color: #842029;
+
+        border: 2px solid;    }
+
+        cursor: pointer;    
+
+        font-weight: 600;    .status-badge.error {
+
+        transition: all 0.3s ease;        background: #f5c6cb;
+
+    }        color: #721c24;
+
+        }
+
+    .btn-primary-action {    
+
+        background: #667eea;    .primary-badge {
+
+        color: white;        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        border-color: #667eea;        color: white;
+
+    }        padding: 4px 10px;
+
+            border-radius: 4px;
+
+    .btn-primary-action:hover {        font-size: 0.75em;
+
+        background: #5568d3;        margin-left: 8px;
+
+    }        font-weight: 600;
+
+        }
+
+    .btn-danger-action {    
+
+        background: white;    .whatsapp-info {
+
+        color: #dc3545;        margin: 15px 0;
+
+        border-color: #dc3545;        font-size: 0.95em;
+
+    }    }
+
+        
+
+    .btn-danger-action:hover {    .whatsapp-info-row {
+
+        background: #dc3545;        display: flex;
+
+        color: white;        justify-content: space-between;
+
+    }        padding: 8px 0;
+
+            border-bottom: 1px solid #f0f0f0;
+
+    .btn-secondary-action {    }
+
+        background: white;    
+
+        color: #6c757d;    .whatsapp-info-row:last-child {
+
+        border-color: #6c757d;        border-bottom: none;
+
+        text-decoration: none;    }
+
+    }    
+
+        .whatsapp-info-label {
+
+    .btn-secondary-action:hover {        color: #6c757d;
+
+        background: #6c757d;        font-weight: 500;
+
+        color: white;    }
+
+    }    
+
+        .whatsapp-info-value {
+
+    .empty-state {        color: #1f2937;
+
+        text-align: center;        font-weight: 600;
+
+        padding: 60px 20px;    }
+
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);    
+
+        border-radius: 12px;    .whatsapp-actions {
+
+        margin-top: 30px;        display: flex;
+
+    }        gap: 10px;
+
+            margin-top: 20px;
+
+    .loading {        flex-wrap: wrap;
+
+        display: inline-block;    }
+
+        width: 40px;    
+
+        height: 40px;    .btn-small {
+
+        border: 4px solid #f3f3f3;        flex: 1;
+
+        border-top: 4px solid #667eea;        min-width: 140px;
+
+        border-radius: 50%;        padding: 10px 14px;
+
+        animation: spin 1s linear infinite;        font-size: 0.9em;
+
+    }        border-radius: 6px;
+
+            border: none;
+
+    @keyframes spin {        cursor: pointer;
+
+        0% { transform: rotate(0deg); }        font-weight: 600;
+
+        100% { transform: rotate(360deg); }        transition: all 0.3s ease;
+
+    }        text-decoration: none;
+
+</style>        display: inline-flex;
+
+{% endblock %}        align-items: center;
+
+        justify-content: center;
+
+{% block content %}        gap: 6px;
+
+<div class="whatsapp-dashboard">    }
+
+    <!-- Header -->    
+
+    <div class="dashboard-header">    .btn-primary {
+
+        <div>        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+            <h1>📱 Gerenciar WhatsApp</h1>        color: white;
+
+            <p style="color: #6c757d; margin: 8px 0 0 0;">Conecte seus WhatsApps para enviar confirmações de agendamento</p>    }
+
+        </div>    
+
+        <button class="btn-connect" data-action="create-whatsapp">+ Conectar WhatsApp</button>    .btn-primary:hover {
+
+    </div>        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+
+        }
+
+    <!-- Stats -->    
+
+    <div class="stats-grid">    .btn-outline-primary {
+
+        <div class="stat-card total">        border: 2px solid #667eea;
+
+            <h3>{{ stats.total }}</h3>        color: #667eea;
+
+            <p>Total de WhatsApps</p>        background: white;
+
+        </div>    }
+
+        <div class="stat-card conectados">    
+
+            <h3>{{ stats.conectados }}</h3>    .btn-outline-primary:hover {
+
+            <p>Conectados ✅</p>        background: #667eea;
+
+        </div>        color: white;
+
+        <div class="stat-card desconectados">    }
+
+            <h3>{{ stats.desconectados }}</h3>    
+
+            <p>Desconectados</p>    .btn-outline-danger {
+
+        </div>        border: 2px solid #dc3545;
+
+        <div class="stat-card pendentes">        color: #dc3545;
+
+            <h3>{{ stats.pendentes }}</h3>        background: white;
+
+            <p>Aguardando Conexão</p>    }
+
+        </div>    
+
+    </div>    .btn-outline-danger:hover {
+
+            background: #dc3545;
+
+    <!-- Lista de WhatsApps -->        color: white;
+
+    {% if whatsapps %}    }
+
+        <div class="whatsapp-list">    
+
+            {% for whatsapp in whatsapps %}    .btn-secondary {
+
+                <div class="whatsapp-card">        border: 2px solid #6c757d;
+
+                    <div class="whatsapp-header">        color: #6c757d;
+
+                        <div>        background: white;
+
+                            <div class="whatsapp-phone">    }
+
+                                📱 {{ whatsapp.phone_number }}    
+
+                                {% if whatsapp.is_primary %}    .btn-secondary:hover {
+
+                                    <span class="primary-badge">⭐ Principal</span>        background: #6c757d;
+
+                                {% endif %}        color: white;
+
+                            </div>    }
+
+                            {% if whatsapp.display_name %}    
+
+                                <small style="color: #6c757d;">{{ whatsapp.display_name }}</small>    .error-message {
+
+                            {% endif %}        background: #f8d7da;
+
+                        </div>        color: #721c24;
+
+                        <span class="status-badge {{ whatsapp.connection_status }}">        padding: 12px;
+
+                            {{ whatsapp.get_status_display }}        border-radius: 6px;
+
+                        </span>        margin: 10px 0;
+
+                    </div>        border-left: 4px solid #dc3545;
+
+                        }
+
+                    <div class="whatsapp-info">    
+
+                        <div class="whatsapp-info-row">    .empty-state {
+
+                            <span>Evolution API:</span>        text-align: center;
+
+                            <strong>{{ whatsapp.evolution_api.instance_id }}</strong>        padding: 60px 20px;
+
+                        </div>        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+                        {% if whatsapp.connected_at %}        border-radius: 12px;
+
+                            <div class="whatsapp-info-row">        margin-top: 30px;
+
+                                <span>Conectado em:</span>    }
+
+                                <strong>{{ whatsapp.connected_at|date:"d/m/Y H:i" }}</strong>    
+
+                            </div>    .empty-state h3 {
+
+                        {% endif %}        color: #1f2937;
+
+                        {% if whatsapp.error_message %}        font-size: 1.5em;
+
+                            <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin: 10px 0;">        margin-bottom: 10px;
+
+                                ⚠️ {{ whatsapp.error_message }}    }
+
+                            </div>    
+
+                        {% endif %}    .empty-state p {
+
+                    </div>        color: #6c757d;
+
+                            font-size: 1em;
+
+                    <div class="whatsapp-actions">        margin-bottom: 20px;
+
+                        {% if whatsapp.connection_status == 'connected' %}    }
+
+                            {% if not whatsapp.is_primary %}    
+
+                                <button class="btn-action btn-primary-action" data-action="set-primary" data-id="{{ whatsapp.id }}">    .loading {
+
+                                    ⭐ Principal        display: inline-block;
+
+                                </button>        width: 40px;
+
+                            {% endif %}        height: 40px;
+
+                            <button class="btn-action btn-danger-action" data-action="disconnect" data-id="{{ whatsapp.id }}">        border: 4px solid #f3f3f3;
+
+                                ❌ Desconectar        border-top: 4px solid #667eea;
+
+                            </button>        border-radius: 50%;
+
+                        {% else %}        animation: spin 1s linear infinite;
+
+                            <button class="btn-action btn-primary-action" data-action="generate-qr" data-id="{{ whatsapp.id }}">    }
+
+                                🔗 Gerar QR    
+
+                            </button>    @keyframes spin {
+
+                        {% endif %}        0% { transform: rotate(0deg); }
+
+                        <a href="{% url 'whatsapp:detail' whatsapp.id %}" class="btn-action btn-secondary-action">        100% { transform: rotate(360deg); }
+
+                            📋 Detalhes    }
+
+                        </a></style>
+
+                    </div>{% endblock %}
+
+                </div>
+
+            {% endfor %}{% block content %}
+
+        </div><div class="whatsapp-dashboard">
+
+    {% else %}    <!-- Header -->
+
+        <div class="empty-state">    <div class="dashboard-header">
+
+            <h3>📭 Nenhum WhatsApp Conectado</h3>        <div>
+
+            <p>Comece clicando no botão "Conectar WhatsApp"</p>            <h1>📱 Gerenciar WhatsApp</h1>
+
+            <button class="btn-connect" data-action="create-whatsapp" style="margin-top: 20px;">            <p style="color: #6c757d; margin: 8px 0 0 0;">Conecte seus WhatsApps para enviar confirmações de agendamento</p>
+
+                + Conectar Primeiro WhatsApp        </div>
+
+            </button>        <button class="btn-connect-whatsapp" onclick="createNewWhatsApp()">
+
+        </div>            <i class="fas fa-plus"></i> Conectar WhatsApp
+
+    {% endif %}        </button>
+
+</div>    </div>
+
+    
+
+<!-- Modal para QR Code -->    <!-- Stats -->
+
+<div class="modal fade" id="qrCodeModal" tabindex="-1">    <div class="stats-grid">
+
+    <div class="modal-dialog modal-dialog-centered">        <div class="stat-card total">
+
+        <div class="modal-content">            <h3>{{ stats.total }}</h3>
+
+            <div class="modal-header">            <p>Total de WhatsApps</p>
+
+                <h5 class="modal-title">Conectar WhatsApp</h5>        </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>        <div class="stat-card conectados">
+
+            </div>            <h3>{{ stats.conectados }}</h3>
+
+            <div class="modal-body text-center">            <p>Conectados ✅</p>
+
+                <p>Aponte sua câmera para o QR code abaixo:</p>        </div>
+
+                <div id="qrCodeContainer" style="min-height: 320px; display: flex; align-items: center; justify-content: center;">        <div class="stat-card desconectados">
+
+                    <div class="loading"></div>            <h3>{{ stats.desconectados }}</h3>
+
+                </div>            <p>Desconectados</p>
+
+                <small style="color: #6c757d;">O QR code expira em 5 minutos</small>        </div>
+
+            </div>        <div class="stat-card pendentes">
+
+            <div class="modal-footer">            <h3>{{ stats.pendentes }}</h3>
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>            <p>Aguardando Conexão</p>
+
+            </div>        </div>
+
+        </div>    </div>
+
+    </div>    
+
+</div>    <!-- Lista de WhatsApps -->
+
+    {% if whatsapps %}
+
+{% endblock %}        <div class="whatsapp-list">
+
+            {% for whatsapp in whatsapps %}
+
+{% block extra_js %}                <div class="whatsapp-card">
+
+<script>                    <div class="whatsapp-header">
+
+document.addEventListener('DOMContentLoaded', function() {                        <div>
+
+    document.addEventListener('click', function(e) {                            <div class="whatsapp-phone">
+
+        const btn = e.target.closest('[data-action]');                                📱 {{ whatsapp.phone_number }}
+
+        if (!btn) return;                                {% if whatsapp.is_primary %}
+
+                                            <span class="primary-badge">⭐ Principal</span>
+
+        const action = btn.dataset.action;                                {% endif %}
+
+        const id = btn.dataset.id;                            </div>
+
+                                    {% if whatsapp.display_name %}
+
+        if (action === 'create-whatsapp') {                                <small style="color: #6c757d; display: block; margin-top: 4px;">{{ whatsapp.display_name }}</small>
+
+            createNewWhatsApp();                            {% endif %}
+
+        } else if (action === 'generate-qr') {                        </div>
+
+            generateQrCode(id);                        <span class="status-badge {{ whatsapp.connection_status }}">
+
+        } else if (action === 'disconnect') {                            {{ whatsapp.get_status_display }}
+
+            disconnectWhatsApp(id);                        </span>
+
+        } else if (action === 'set-primary') {                    </div>
+
+            setPrimaryWhatsApp(id);                    
+
+        }                    <div class="whatsapp-info">
+
+    });                        <div class="whatsapp-info-row">
+
+});                            <span class="whatsapp-info-label">Evolution API:</span>
+
+                            <span class="whatsapp-info-value">{{ whatsapp.evolution_api.instance_id }}</span>
+
+function createNewWhatsApp() {                        </div>
+
+    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));                        {% if whatsapp.connected_at %}
+
+    const container = document.getElementById('qrCodeContainer');                            <div class="whatsapp-info-row">
+
+                                    <span class="whatsapp-info-label">Conectado em:</span>
+
+    container.innerHTML = '<div class="loading"></div>';                                <span class="whatsapp-info-value">{{ whatsapp.connected_at|date:"d/m/Y H:i" }}</span>
+
+    modal.show();                            </div>
+
+                            {% endif %}
+
+    fetch('{% url "whatsapp:create" %}', {                        {% if whatsapp.session_id %}
+
+        method: 'POST',                            <div class="whatsapp-info-row">
+
+        headers: {                                <span class="whatsapp-info-label">Session ID:</span>
+
+            'X-CSRFToken': '{{ csrf_token }}',                                <span class="whatsapp-info-value" style="font-size: 0.85em; font-family: monospace;">{{ whatsapp.session_id|truncatechars:15 }}</span>
+
+            'Content-Type': 'application/json'                            </div>
+
+        },                        {% endif %}
+
+        body: JSON.stringify({})                        {% if whatsapp.error_message %}
+
+    })                            <div class="error-message">
+
+    .then(response => response.json())                                ⚠️ {{ whatsapp.error_message }}
+
+    .then(data => {                            </div>
+
+        if (data.success) {                        {% endif %}
+
+            container.innerHTML = `                    </div>
+
+                <div style="text-align: center;">                    
+
+                    <img src="${data.qr_code}" alt="QR Code" style="max-width: 280px; border-radius: 8px;">                    <div class="whatsapp-actions">
+
+                    <div style="margin-top: 20px;">                        {% if whatsapp.connection_status == 'connected' %}
+
+                        <p><strong>${data.message}</strong></p>                            {% if not whatsapp.is_primary %}
+
+                        <p style="color: #6c757d; font-size: 0.9em;">Número: <strong>${data.phone_number}</strong></p>                                <button class="btn-small btn-outline-primary" 
+
+                    </div>                                        onclick="setPrimary('{% url 'whatsapp:set_primary' whatsapp.id %}', '{{ whatsapp.phone_number }}')">
+
+                </div>                                    <i class="fas fa-star"></i> Principal
+
+            `;                                </button>
+
+        } else {                            {% endif %}
+
+            container.innerHTML = `<div class="alert alert-danger">Erro: ${data.error}</div>`;                            <button class="btn-small btn-outline-danger" 
+
+        }                                    onclick="disconnect('{% url 'whatsapp:disconnect' whatsapp.id %}', '{{ whatsapp.phone_number }}')">
+
+    })                                <i class="fas fa-power-off"></i> Desconectar
+
+    .catch(error => {                            </button>
+
+        container.innerHTML = `<div class="alert alert-danger">Erro: ${error}</div>`;                        {% else %}
+
+    });                            <button class="btn-small btn-primary" 
+
+}                                    onclick="generateQrCode('{% url 'whatsapp:generate_qrcode' whatsapp.id %}', '{{ whatsapp.id }}')">
+
+                                <i class="fas fa-qrcode"></i> Gerar QR
+
+function generateQrCode(whatsappId) {                            </button>
+
+    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));                        {% endif %}
+
+    const container = document.getElementById('qrCodeContainer');                        <a href="{% url 'whatsapp:detail' whatsapp.id %}" class="btn-small btn-secondary">
+
+                                <i class="fas fa-info-circle"></i> Detalhes
+
+    container.innerHTML = '<div class="loading"></div>';                        </a>
+
+    modal.show();                    </div>
+
+                    </div>
+
+    const endpoint = `/dashboard/whatsapp/${whatsappId}/gerar-qrcode/`;            {% endfor %}
+
+            </div>
+
+    fetch(endpoint, {    {% else %}
+
+        method: 'POST',        <div class="empty-state">
+
+        headers: {            <h3>📭 Nenhum WhatsApp Conectado</h3>
+
+            'X-CSRFToken': '{{ csrf_token }}',            <p>Comece clicando no botão "Conectar WhatsApp" para adicionar seu primeiro número</p>
+
+            'Content-Type': 'application/json'            <button class="btn-connect-whatsapp" onclick="createNewWhatsApp()" style="margin-top: 20px;">
+
+        }                <i class="fas fa-plus"></i> Conectar Primeiro WhatsApp
+
+    })            </button>
+
+    .then(response => response.json())        </div>
+
+    .then(data => {    {% endif %}
+
+        if (data.success) {</div>
+
+            container.innerHTML = `
+
+                <div style="text-align: center;"><!-- Modal para QR Code -->
+
+                    <img src="${data.qr_code}" alt="QR Code" style="max-width: 280px; border-radius: 8px;"><div class="modal fade" id="qrCodeModal" tabindex="-1" aria-hidden="true">
+
+                    <div style="margin-top: 20px;">    <div class="modal-dialog modal-dialog-centered">
+
+                        <p><strong>${data.message}</strong></p>        <div class="modal-content">
+
+                    </div>            <div class="modal-header" style="border-bottom: 2px solid #667eea;">
+
+                </div>                <h5 class="modal-title" style="color: #1f2937; font-weight: 700;">
+
+            `;                    <i class="fas fa-qrcode" style="color: #667eea; margin-right: 8px;"></i> Conectar WhatsApp
+
+        } else {                </h5>
+
+            container.innerHTML = `<div class="alert alert-danger">Erro: ${data.error}</div>`;                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+        }            </div>
+
+    })            <div class="modal-body text-center" style="padding: 40px 20px;">
+
+    .catch(error => {                <p style="color: #6c757d; margin-bottom: 20px; font-size: 1em;">
+
+        container.innerHTML = `<div class="alert alert-danger">Erro: ${error}</div>`;                    Aponte sua câmera para o QR code abaixo para conectar seu WhatsApp:
+
+    });                </p>
+
+}                <div id="qrCodeContainer" style="min-height: 320px; display: flex; align-items: center; justify-content: center;">
+
+                    <div class="loading"></div>
+
+function disconnectWhatsApp(whatsappId) {                </div>
+
+    if (!confirm('Tem certeza que deseja desconectar este WhatsApp?')) return;                <small style="color: #6c757d; display: block; margin-top: 20px;">
+
+                        ⏰ O QR code expira em <span id="qrExpireTime">5</span> minutos
+
+    const endpoint = `/dashboard/whatsapp/${whatsappId}/desconectar/`;                </small>
+
+                    <p style="color: #667eea; margin-top: 15px; font-weight: 600;">
+
+    fetch(endpoint, {                    📱 Abra WhatsApp no seu telefone → Configurações → Aparelhos Conectados
+
+        method: 'POST',                </p>
+
+        headers: {            </div>
+
+            'X-CSRFToken': '{{ csrf_token }}',            <div class="modal-footer" style="border-top: 1px solid #e5e7eb;">
+
+            'Content-Type': 'application/json'                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+
+        }                <button type="button" class="btn btn-primary" onclick="refreshQRCode()">🔄 Atualizar QR</button>
+
+    })            </div>
+
+    .then(response => response.json())        </div>
+
+    .then(data => {    </div>
+
+        if (data.success) {</div>
+
+            alert('✅ WhatsApp desconectado com sucesso!');
+
+            location.reload();{% endblock %}
+
+        } else {
+
+            alert('Erro: ' + data.error);{% block extra_js %}
+
+        }<script>
+
+    });// Função para criar novo WhatsApp
+
+}function createNewWhatsApp() {
+
+    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+
+function setPrimaryWhatsApp(whatsappId) {    const container = document.getElementById('qrCodeContainer');
+
+    const endpoint = `/dashboard/whatsapp/${whatsappId}/set-primary/`;    
+
+        container.innerHTML = '<div class="loading"></div>';
+
+    fetch(endpoint, {    modal.show();
+
+        method: 'POST',    
+
+        headers: {    fetch('{% url "whatsapp:create" %}', {
+
+            'X-CSRFToken': '{{ csrf_token }}',        method: 'POST',
+
+            'Content-Type': 'application/json'        headers: {
+
+        }            'X-CSRFToken': '{{ csrf_token }}',
+
+    })            'Content-Type': 'application/json'
+
+    .then(response => response.json())        },
+
+    .then(data => {        body: JSON.stringify({})
+
+        if (data.success) {    })
+
+            alert('✅ WhatsApp definido como principal!');    .then(response => response.json())
+
+            location.reload();    .then(data => {
+
+        } else {        if (data.success) {
+
+            alert('Erro: ' + data.error);            container.innerHTML = `
+
+        }                <div style="text-align: center;">
+
+    });                    <img src="${data.qr_code}" alt="QR Code" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+
+}                    <p style="margin-top: 20px; color: #1f2937; font-weight: 600;">${data.message}</p>
+
+</script>                    <p style="color: #6c757d; font-size: 0.9em;">📞 Número: <strong>${data.phone_number}</strong></p>
+
+{% endblock %}                </div>
+
+            `;
+            
+            // Auto-atualizar a página após conexão bem-sucedida
+            let checkInterval = setInterval(() => {
+                fetch('{% url "whatsapp:list_api" %}')
+                    .then(r => r.json())
+                    .then(data => {
+                        // Se houver WhatsApps conectados, recarregar página
+                        if (data.count > 0) {
+                            clearInterval(checkInterval);
+                            // location.reload();
+                        }
+                    });
+            }, 5000);
+        } else {
+            container.innerHTML = `<div class="alert alert-danger">❌ Erro: ${data.error}</div>`;
+        }
+    })
+    .catch(error => {
+        container.innerHTML = `<div class="alert alert-danger">❌ Erro ao criar WhatsApp: ${error}</div>`;
+    });
+}
+
+// Função para gerar QR code
+function generateQrCode(endpoint, whatsappId) {
+    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+    const container = document.getElementById('qrCodeContainer');
+    
+    container.innerHTML = '<div class="loading"></div>';
+    modal.show();
+    
+    fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            container.innerHTML = `
+                <div style="text-align: center;">
+                    <img src="${data.qr_code}" alt="QR Code" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <p style="margin-top: 20px; color: #1f2937; font-weight: 600;">${data.message}</p>
+                </div>
+            `;
+        } else {
+            container.innerHTML = `<div class="alert alert-danger">❌ Erro: ${data.error}</div>`;
+        }
+    })
+    .catch(error => {
+        container.innerHTML = `<div class="alert alert-danger">❌ Erro ao gerar QR code: ${error}</div>`;
+    });
+}
+
+// Função para atualizar QR code
+function refreshQRCode() {
+    alert('⏳ Atualizando QR code...');
+    location.reload();
+}
+
+// Função para desconectar
+function disconnect(endpoint, phoneNumber) {
+    if (!confirm(`⚠️ Desconectar WhatsApp ${phoneNumber}?\n\nVocê não receberá mais confirmações de agendamento por este número.`)) {
+        return;
+    }
+    
+    fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`✅ ${data.message}`);
+            location.reload();
+        } else {
+            alert(`❌ Erro: ${data.error}`);
+        }
+    });
+}
+
+// Função para definir como principal
+function setPrimary(endpoint, phoneNumber) {
+    fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`✅ ${phoneNumber} foi definido como principal!`);
+            location.reload();
+        } else {
+            alert(`❌ Erro: ${data.error}`);
+        }
+    });
+}
+</script>
+{% endblock %}
 <style>
     .whatsapp-dashboard {
         max-width: 1200px;
