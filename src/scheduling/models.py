@@ -313,3 +313,156 @@ class Target(models.Model):
         """Retorna o rótulo do tipo de target"""
         return dict(self.TARGET_TYPE_CHOICES).get(self.target_type, '')
 
+
+# ============================================================================
+# Evolution API - Gerenciamento de múltiplas instâncias WhatsApp
+# ============================================================================
+
+class EvolutionAPI(models.Model):
+    """
+    Representa uma instância do Evolution API
+    Cada instância pode conter até 50 WhatsApps para MVP
+    """
+    
+    instance_id = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name="ID da Instância",
+        help_text="Ex: evolution-1, evolution-2"
+    )
+    
+    url = models.URLField(
+        verbose_name="URL da API",
+        help_text="Ex: https://seu-dominio.com"
+    )
+    
+    api_key = models.CharField(
+        max_length=500,
+        verbose_name="API Key",
+        help_text="Chave de autenticação da instância"
+    )
+    
+    capacity = models.IntegerField(
+        default=50,
+        verbose_name="Capacidade (WhatsApps)",
+        help_text="Máximo recomendado: 50 (conservador: 20, agressivo: 100)"
+    )
+    
+    priority = models.IntegerField(
+        default=10,
+        verbose_name="Prioridade",
+        help_text="Maior número = maior prioridade no load balancing (0-10)"
+    )
+    
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Ativa",
+        help_text="Se desativada, não será usada para enviar mensagens"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Evolution API"
+        verbose_name_plural = "Evolution APIs"
+        ordering = ["-priority", "instance_id"]
+    
+    def __str__(self):
+        status = "✅" if self.is_active else "❌"
+        count = self.whatsapp_instances.count()
+        return f"{status} {self.instance_id} ({count}/{self.capacity})"
+    
+    @property
+    def current_usage(self):
+        """Retorna quantas instâncias estão usando"""
+        return self.whatsapp_instances.count()
+    
+    @property
+    def has_capacity(self):
+        """Verifica se ainda pode adicionar WhatsApps"""
+        return self.current_usage < self.capacity
+    
+    @property
+    def available_slots(self):
+        """Retorna quantos WhatsApps ainda podem ser adicionados"""
+        return max(0, self.capacity - self.current_usage)
+    
+    def get_usage_percentage(self):
+        """Retorna o percentual de uso (0-100)"""
+        if self.capacity == 0:
+            return 0
+        return int((self.current_usage / self.capacity) * 100)
+
+
+class WhatsAppInstance(models.Model):
+    """
+    Representa um WhatsApp individual dentro de uma instância Evolution API
+    """
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pendente'),
+        ('connecting', 'Conectando'),
+        ('connected', 'Conectado'),
+        ('disconnected', 'Desconectado'),
+        ('error', 'Erro'),
+    ]
+    
+    evolution_api = models.ForeignKey(
+        EvolutionAPI,
+        on_delete=models.CASCADE,
+        related_name="whatsapp_instances",
+        verbose_name="Evolution API"
+    )
+    
+    phone_number = models.CharField(
+        max_length=20,
+        verbose_name="Número de WhatsApp",
+        help_text="Formato: 5511987654321"
+    )
+    
+    display_name = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Nome de Exibição",
+        help_text="Como o WhatsApp aparece nos contatos"
+    )
+    
+    connection_status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name="Status de Conexão"
+    )
+    
+    is_primary = models.BooleanField(
+        default=False,
+        verbose_name="Principal",
+        help_text="WhatsApp principal para agendamentos"
+    )
+    
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Ativo"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "WhatsApp Instance"
+        verbose_name_plural = "WhatsApp Instances"
+        ordering = ["evolution_api", "-is_primary", "phone_number"]
+        unique_together = ("evolution_api", "phone_number")
+    
+    def __str__(self):
+        status_icon = {
+            "connected": "✅",
+            "connecting": "⏳",
+            "pending": "📋",
+            "disconnected": "❌",
+            "error": "⚠️",
+        }
+        icon = status_icon.get(self.connection_status, '❓')
+        return f"{icon} {self.phone_number} ({self.evolution_api.instance_id})"
+
