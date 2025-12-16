@@ -7,7 +7,7 @@ import logging
 from typing import Optional
 
 from django.conf import settings
-from django.db.models import F
+from django.db.models import F, Count
 
 from scheduling.models import EvolutionAPI, WhatsAppInstance
 from notifications.services import EvolutionApiClient, WhatsappMessage
@@ -25,23 +25,41 @@ class EvolutionAPIManager:
         
         Critérios:
         1. Ativa
-        2. Com espaço disponível
+        2. Com espaço disponível (compatível com esquemas antigos)
         3. Maior prioridade
         4. Menor uso (load balancing)
         """
-        instance = EvolutionAPI.objects.filter(
-            is_active=True,
-            whatsapp_connected__lt=F("whatsapp_capacity")  # Tem espaço
-        ).order_by(
-            "-priority",  # Maior prioridade primeiro
-            "whatsapp_connected",  # Depois a menos usada
-        ).first()
+        # Descobre nomes de campos conforme o schema em uso
+        capacity_field = "whatsapp_capacity" if "whatsapp_capacity" in [f.name for f in EvolutionAPI._meta.fields] else "capacity"
+        connected_field = "whatsapp_connected" if "whatsapp_connected" in [f.name for f in EvolutionAPI._meta.fields] else None
+
+        queryset = EvolutionAPI.objects.filter(is_active=True)
+
+        if connected_field:
+            # Usa campo dedicado, se existir
+            queryset = queryset.filter(**{f"{connected_field}__lt": F(capacity_field)}).order_by(
+                "-priority",
+                connected_field,
+            )
+        else:
+            # Fallback: conta quantos WhatsApps estão relacionados
+            queryset = (
+                queryset.annotate(connected_count=Count("whatsapp_instances"))
+                .filter(connected_count__lt=F(capacity_field))
+                .order_by("-priority", "connected_count")
+            )
+
+        instance = queryset.first()
         
         if not instance:
             logger.warning("Nenhuma instância Evolution API disponível")
             return None
         
-        logger.info(f"Selecionada Evolution API: {instance.name} ({instance.whatsapp_connected}/{instance.whatsapp_capacity})")
+        # Log seguro para diferentes esquemas
+        name = getattr(instance, "name", None) or getattr(instance, "instance_id", "sem-nome")
+        capacity_val = getattr(instance, capacity_field, None)
+        connected_val = getattr(instance, connected_field or "connected_count", None)
+        logger.info(f"Selecionada Evolution API: {name} ({connected_val}/{capacity_val})")
         return instance
     
     @staticmethod
@@ -139,10 +157,11 @@ class EvolutionAPIManager:
         
         success = client.send_message(payload)
         
+        evo_name = getattr(evolution_api, "name", None) or getattr(evolution_api, "instance_id", "EvolutionAPI")
         if success:
-            logger.info(f"Mensagem enviada via {evolution_api.name}")
+            logger.info(f"Mensagem enviada via {evo_name}")
         else:
-            logger.error(f"Falha ao enviar via {evolution_api.name}")
+            logger.error(f"Falha ao enviar via {evo_name}")
         
         return success
     
@@ -159,28 +178,43 @@ class EvolutionAPIManager:
         if evolution_api:
             query = query.filter(evolution_api=evolution_api)
         
-        return query.order_by("evolution_api__name", "-is_primary")
+        evo_name_field = "evolution_api__name"
+        if "name" not in [f.name for f in EvolutionAPI._meta.fields] and "instance_id" in [f.name for f in EvolutionAPI._meta.fields]:
+            evo_name_field = "evolution_api__instance_id"
+        return query.order_by(evo_name_field, "-is_primary")
     
     @staticmethod
     def get_usage_stats():
         """Retorna estatísticas de uso de todas as instâncias"""
+        capacity_field = "whatsapp_capacity" if "whatsapp_capacity" in [f.name for f in EvolutionAPI._meta.fields] else "capacity"
+        connected_field = "whatsapp_connected" if "whatsapp_connected" in [f.name for f in EvolutionAPI._meta.fields] else None
+
         instances = EvolutionAPI.objects.filter(is_active=True)
-        
+        if not connected_field:
+            instances = instances.annotate(connected_count=Count("whatsapp_instances"))
+
         stats = {
             "total_instances": instances.count(),
-            "total_capacity": sum(i.whatsapp_capacity for i in instances),
-            "total_connected": sum(i.whatsapp_connected for i in instances),
+            "total_capacity": sum(getattr(i, capacity_field, 0) or 0 for i in instances),
+            "total_connected": sum(
+                getattr(i, connected_field or "connected_count", 0) or 0 for i in instances
+            ),
             "instances": []
         }
         
         for instance in instances:
+            connected_val = getattr(instance, connected_field or "connected_count", 0) or 0
+            capacity_val = getattr(instance, capacity_field, 0) or 0
+            available = max(capacity_val - connected_val, 0) if capacity_val else 0
+            usage_percentage = int((connected_val / capacity_val) * 100) if capacity_val else 0
+            name = getattr(instance, "name", None) or getattr(instance, "instance_id", "sem-nome")
             stats["instances"].append({
-                "name": instance.name,
+                "name": name,
                 "url": instance.url,
-                "connected": instance.whatsapp_connected,
-                "capacity": instance.whatsapp_capacity,
-                "available": instance.available_slots,
-                "usage_percentage": instance.get_usage_percentage(),
+                "connected": connected_val,
+                "capacity": capacity_val,
+                "available": available,
+                "usage_percentage": usage_percentage,
                 "status": "✅ Online" if instance.is_active else "❌ Offline"
             })
         
