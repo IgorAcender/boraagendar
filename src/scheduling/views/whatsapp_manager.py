@@ -136,6 +136,7 @@ def whatsapp_generate_qrcode(request, id):
 
 @login_required
 @require_http_methods(["POST"])
+@login_required
 @require_http_methods(["POST"])
 def whatsapp_disconnect(request, id):
     """Desconectar um WhatsApp via Evolution API"""

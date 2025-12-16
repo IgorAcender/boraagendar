@@ -476,8 +476,23 @@ function desconectarWhatsApp() {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📊 Status:', response.status);
+        console.log('📊 Content-Type:', response.headers.get('content-type'));
+        
+        // Se não for JSON, tentar ler como texto para debug
+        if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
+            return response.text().then(text => {
+                console.error('❌ Resposta não-JSON:', text.substring(0, 500));
+                throw new Error(`Erro HTTP ${response.status}: ${text.substring(0, 200)}`);
+            });
+        }
+        
+        return response.json();
+    })
     .then(data => {
+        console.log('✅ Resposta:', data);
+        
         if (data.success) {
             resultado.innerHTML = `
                 <div class="alert alert-success">
@@ -494,7 +509,7 @@ function desconectarWhatsApp() {
         }
     })
     .catch(error => {
-        console.error('❌ Erro:', error);
+        console.error('❌ Erro completo:', error);
         resultado.innerHTML = `
             <div class="alert alert-danger">
                 ❌ Erro ao desconectar: ${error.message}
