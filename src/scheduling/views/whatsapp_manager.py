@@ -516,31 +516,6 @@ def whatsapp_create(request):
                     'success': False,
                     'error': f'Erro ao conectar com Evolution API: {str(e)}'
                 }, status=400)
-                
-                # Atualizar QR code no banco
-                existing_whatsapp.qr_code = qr_code_base64
-                existing_whatsapp.qr_code_expires_at = timezone.now() + timedelta(minutes=5)
-                existing_whatsapp.connection_status = 'connecting'
-                existing_whatsapp.save()
-                
-                print(f"✅ QR code atualizado para instância {instance_name}")
-                
-                return JsonResponse({
-                    'success': True,
-                    'whatsapp_id': existing_whatsapp.id,
-                    'qr_code': f"data:image/png;base64,{qr_code_base64}",
-                    'expires_at': existing_whatsapp.qr_code_expires_at.isoformat(),
-                    'message': 'Reconecte seu WhatsApp escaneando o QR code!',
-                    'instance_name': instance_name,
-                    'is_reconnect': True
-                })
-                
-            except requests.exceptions.RequestException as e:
-                print(f"❌ Erro ao obter QR code: {e}")
-                return JsonResponse({
-                    'success': False,
-                    'error': f'Erro ao conectar com Evolution API: {str(e)}'
-                }, status=400)
         
         else:
             # PRIMEIRA VEZ - Criar nova instância com nome do salão
