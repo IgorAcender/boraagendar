@@ -287,7 +287,11 @@ def whatsapp_create(request):
             connect_response.raise_for_status()
             
             api_response = connect_response.json()
-            qr_code_base64 = api_response.get('base64', '')
+            qr_code_base64 = api_response.get('base64') or api_response.get('qrcode') or ''
+            # A Evolution API já pode retornar com prefixo data:image/png;base64,
+            # então limpamos para armazenar apenas o payload base64.
+            if isinstance(qr_code_base64, str) and qr_code_base64.startswith('data:image'):
+                qr_code_base64 = qr_code_base64.split(',', 1)[-1]
             
             if not qr_code_base64:
                 print(f"⚠️  Resposta sem base64. Keys: {list(api_response.keys())}")
