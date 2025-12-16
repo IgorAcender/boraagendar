@@ -384,14 +384,36 @@ def whatsapp_send_test(request):
 
     try:
         data = json.loads(request.body or "{}")
-        recipient = data.get('recipient')
-        message = data.get('message')
+        recipient = data.get('recipient', '').strip()
+        message = data.get('message', '').strip()
         
         if not recipient or not message:
             return JsonResponse({
                 'success': False, 
                 'error': 'Campos recipient e message são obrigatórios'
             }, status=400)
+        
+        # Validação básica do formato
+        is_group = '@g.us' in recipient.lower()
+        
+        if not is_group:
+            # Para números: deve conter apenas dígitos após remover + e espaços
+            test_number = recipient.replace('+', '').replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+            if not test_number.isdigit():
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Número inválido. Use apenas dígitos (ex: 5511999999999 ou +55 11 99999-9999). Você enviou: {recipient}'
+                }, status=400)
+            
+            if len(test_number) < 10:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Número muito curto. Use com código do país e DDD (ex: 5511999999999). Você enviou: {recipient}'
+                }, status=400)
+        
+        print(f"📤 Enviando mensagem teste para: {recipient}")
+        print(f"💬 Mensagem: {message[:50]}...")
+        print(f"🏢 Tenant: {tenant.slug}")
 
         # Tenta enviar via EvolutionAPIManager
         success = EvolutionAPIManager.send_message_auto(
@@ -401,12 +423,24 @@ def whatsapp_send_test(request):
         )
 
         if success:
-            return JsonResponse({'success': True, 'message': 'Mensagem enviada com sucesso'})
+            return JsonResponse({
+                'success': True, 
+                'message': f'✅ Mensagem enviada com sucesso para {recipient}!'
+            })
         else:
-            return JsonResponse({'success': False, 'error': 'Falha ao enviar mensagem'}, status=500)
+            return JsonResponse({
+                'success': False, 
+                'error': 'Falha ao enviar mensagem. Verifique se o WhatsApp está conectado e se o número está correto.'
+            }, status=500)
 
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+        print(f"❌ Erro ao enviar mensagem teste: {e}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False, 
+            'error': f'Erro ao enviar: {str(e)}'
+        }, status=400)
 
 
 @login_required
