@@ -467,12 +467,20 @@
 
 {% block extra_js %}
 <script>
+let qrModal = null;
+
 // Debug: Mostrar URLs geradas
 document.addEventListener('DOMContentLoaded', function() {
     console.log('JS whatsapp dashboard carregado');
     console.log('CSRF Token:', '{{ csrf_token }}');
     console.log('Create URL:', '{% url "whatsapp:create" %}');
     console.log('List API URL:', '{% url "whatsapp:list_api" %}');
+
+    // Instancia modal com backdrop estático para não sumir sozinho
+    const modalEl = document.getElementById('qrCodeModal');
+    if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+        qrModal = new bootstrap.Modal(modalEl, {backdrop: 'static', keyboard: false});
+    }
 
     // Bind botões via JS (evita depender de onclick inline)
     const btnConnect = document.getElementById('btn-connect-whatsapp');
@@ -491,7 +499,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 function createNewWhatsApp() {
     console.log('Iniciando createNewWhatsApp...');
-    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+    const modal = qrModal || new bootstrap.Modal(document.getElementById('qrCodeModal'), {backdrop: 'static', keyboard: false});
     const container = document.getElementById('qrCodeContainer');
     
     container.innerHTML = '<div class="loading"></div>';
