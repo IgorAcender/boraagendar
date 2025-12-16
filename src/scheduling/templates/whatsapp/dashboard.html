@@ -381,6 +381,9 @@
 <script>
 console.log('✅ Script carregado');
 
+// ID do WhatsApp (se existir)
+const whatsappId = {% if whatsapps %}{{ whatsapps.0.id }}{% else %}null{% endif %};
+
 function atualizarStatus() {
     console.log('🔄 Atualizando status...');
     location.reload();
@@ -454,10 +457,50 @@ function mostrarQRCode() {
 }
 
 function desconectarWhatsApp() {
+    if (!whatsappId) {
+        alert('Nenhum WhatsApp conectado para desconectar');
+        return;
+    }
+    
     if (!confirm('Deseja realmente desconectar o WhatsApp?')) return;
     
     console.log('⛔ Desconectando WhatsApp...');
-    alert('Função de desconectar em desenvolvimento');
+    
+    const resultado = document.getElementById('resultado');
+    resultado.innerHTML = '<div class="loading"></div>';
+    
+    fetch(`/scheduling/whatsapp/${whatsappId}/desconectar/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            resultado.innerHTML = `
+                <div class="alert alert-success">
+                    ✅ ${data.message}
+                </div>
+            `;
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            resultado.innerHTML = `
+                <div class="alert alert-danger">
+                    ❌ Erro: ${data.error}
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erro:', error);
+        resultado.innerHTML = `
+            <div class="alert alert-danger">
+                ❌ Erro ao desconectar: ${error.message}
+            </div>
+        `;
+    });
 }
 
 function enviarMensagemTeste() {
