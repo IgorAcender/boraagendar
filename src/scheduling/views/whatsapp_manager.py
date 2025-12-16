@@ -146,7 +146,10 @@ def whatsapp_disconnect(request, id):
     whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
     
     try:
-        print(f"🔌 Desconectando WhatsApp ID: {id}, Instance: {whatsapp.instance_name}")
+        print(f"🔌 Desconectando WhatsApp ID: {id}")
+        print(f"   Instance Name: {whatsapp.instance_name}")
+        print(f"   Phone: {whatsapp.phone_number}")
+        print(f"   Status atual: {whatsapp.connection_status}")
         
         # Opcional: Desconectar na Evolution API também
         if whatsapp.instance_name and settings.EVOLUTION_API_URL and settings.EVOLUTION_API_KEY:
@@ -159,12 +162,13 @@ def whatsapp_disconnect(request, id):
             except Exception as api_error:
                 print(f"⚠️  Erro ao deslogar na Evolution API (não crítico): {api_error}")
         
-        # Atualizar status no banco
-        whatsapp.connection_status = 'disconnected'
-        whatsapp.disconnected_at = timezone.now()
-        whatsapp.save(update_fields=['connection_status', 'disconnected_at'])
+        # Atualizar status no banco usando QuerySet.update() para evitar validações
+        WhatsAppInstance.objects.filter(id=id).update(
+            connection_status='disconnected',
+            disconnected_at=timezone.now()
+        )
         
-        print(f"✅ WhatsApp {whatsapp.instance_name} desconectado com sucesso")
+        print(f"✅ WhatsApp desconectado com sucesso")
         
         return JsonResponse({
             'success': True,
@@ -173,6 +177,7 @@ def whatsapp_disconnect(request, id):
     
     except Exception as e:
         print(f"❌ Erro ao desconectar WhatsApp: {e}")
+        print(f"❌ Tipo do erro: {type(e).__name__}")
         import traceback
         traceback.print_exc()
         return JsonResponse({
