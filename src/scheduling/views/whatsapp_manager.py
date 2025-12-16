@@ -463,6 +463,40 @@ def whatsapp_send_test(request):
                 'success': False, 
                 'error': 'Campos recipient e message são obrigatórios'
             }, status=400)
+
+        # Garantir que há um WhatsApp conectado
+        wa_fields = [f.name for f in WhatsAppInstance._meta.fields]
+        status_field = "connection_status" if "connection_status" in wa_fields else "status"
+        is_active_field = "is_active" if "is_active" in wa_fields else None
+
+        filters = {f"{status_field}": "connected", "tenant": tenant}
+        if is_active_field:
+            filters[is_active_field] = True
+
+        whatsapp = (
+            WhatsAppInstance.objects.filter(**filters)
+            .order_by("-is_primary", "-connected_at" if "connected_at" in wa_fields else "-updated_at")
+            .first()
+        )
+
+        if not whatsapp:
+            # Se houver algum WhatsApp, informar o status atual
+            fallback_filters = {"tenant": tenant}
+            if is_active_field:
+                fallback_filters[is_active_field] = True
+            whatsapp_any = WhatsAppInstance.objects.filter(**fallback_filters).order_by("-updated_at").first()
+
+            if whatsapp_any:
+                current_status = getattr(whatsapp_any, status_field, "desconhecido")
+                return JsonResponse({
+                    'success': False,
+                    'error': f'WhatsApp não está conectado (status atual: {current_status}). Escaneie o QR Code e tente novamente.'
+                }, status=400)
+
+            return JsonResponse({
+                'success': False,
+                'error': 'Nenhum WhatsApp configurado para este salão. Conecte um WhatsApp antes de enviar mensagens.'
+            }, status=400)
         
         # Validação básica do formato
         is_group = '@g.us' in recipient.lower()

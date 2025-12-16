@@ -94,6 +94,10 @@ class EvolutionAPIManager:
         Returns:
             bool: True se enviado com sucesso
         """
+        wa_fields = [f.name for f in WhatsAppInstance._meta.fields]
+        status_field = "connection_status" if "connection_status" in wa_fields else "status"
+        is_active_field = "is_active" if "is_active" in wa_fields else None
+
         # Se não especificou instância, seleciona automaticamente
         if evolution_api is None:
             evolution_api = EvolutionAPIManager.get_best_instance()
@@ -105,14 +109,14 @@ class EvolutionAPIManager:
         whatsapp_instance = (
             WhatsAppInstance.objects.filter(
                 tenant__slug=tenant_slug,
-                is_active=True,
-                connection_status="connected",
+                **({is_active_field: True} if is_active_field else {}),
+                **{status_field: "connected"},
             )
             .order_by("-is_primary", "-connected_at")
             .first()
             or WhatsAppInstance.objects.filter(
                 tenant__slug=tenant_slug,
-                is_active=True,
+                **({is_active_field: True} if is_active_field else {}),
             )
             .order_by("-is_primary", "-connected_at")
             .first()
