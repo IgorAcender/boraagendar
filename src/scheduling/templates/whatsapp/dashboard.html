@@ -296,82 +296,17 @@
     
     /* Features Cards */
     .features-section {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .feature-card {
-        background: linear-gradient(135deg, rgba(37, 211, 102, 0.1) 0%, rgba(18, 140, 126, 0.1) 100%);
-        border: 2px solid rgba(37, 211, 102, 0.2);
-        border-radius: 12px;
-        padding: 1.5rem;
-        text-align: center;
-        transition: all 0.3s;
-        cursor: pointer;
-    }
-    
-    .feature-card:hover {
-        transform: translateY(-4px);
-        border-color: #25d366;
-        box-shadow: 0 8px 24px rgba(37, 211, 102, 0.2);
-        background: linear-gradient(135deg, rgba(37, 211, 102, 0.15) 0%, rgba(18, 140, 126, 0.15) 100%);
-    }
-    
-    .feature-icon {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-    }
-    
-    .feature-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: #1e293b;
-        margin-bottom: 5px;
-    }
-    
-    .feature-desc {
-        font-size: 12px;
-        color: #64748b;
+        display: none;
     }
     
     /* Stats Section */
     .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-    
-    .stat-box {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        border-radius: 12px;
-        padding: 1.5rem;
-        text-align: center;
-        border: 1px solid #e2e8f0;
-    }
-    
-    .stat-value {
-        font-size: 28px;
-        font-weight: 700;
-        color: #25d366;
-        margin-bottom: 5px;
-    }
-    
-    .stat-label {
-        font-size: 12px;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 500;
+        display: none;
     }
     
     /* Info Divider */
     .divider {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
-        margin: 2rem 0;
+        display: none;
     }
 </style>
 {% endblock %}
@@ -381,34 +316,8 @@
     <!-- Hero Header -->
     <div class="hero-header">
         <h1>📱 Gerenciador WhatsApp</h1>
-        <p>Integração com Evolution API • Mensagens em Tempo Real • Automação Inteligente</p>
+        <p>Integração Evolution API • Mensagens em Tempo Real</p>
     </div>
-    
-    <!-- Features Section -->
-    <div class="features-section">
-        <div class="feature-card">
-            <div class="feature-icon">📨</div>
-            <div class="feature-title">Mensagens</div>
-            <div class="feature-desc">Envie mensagens para contatos e grupos</div>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">⚡</div>
-            <div class="feature-title">Automação</div>
-            <div class="feature-desc">Automatize suas comunicações</div>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">🔄</div>
-            <div class="feature-title">Sincronização</div>
-            <div class="feature-desc">Sempre sincronizado em tempo real</div>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">📊</div>
-            <div class="feature-title">Estatísticas</div>
-            <div class="feature-desc">Acompanhe suas campanhas</div>
-        </div>
-    </div>
-    
-    <div class="divider"></div>
     
     <!-- Cards de Status e Info -->
     <div class="section-card">
@@ -432,11 +341,11 @@
                     <div class="info-value">{{ EVOLUTION_API_URL }}</div>
                 </div>
                 <div class="info-box">
-                    <div class="info-label">📱 Instância WhatsApp</div>
+                    <div class="info-label">📱 Instância</div>
                     <div class="info-value">{{ wa.instance_name|default:"rifas-whatsapp" }}</div>
                 </div>
                 <div class="info-box">
-                    <div class="info-label">🛡️ Estado da Conexão</div>
+                    <div class="info-label">🛡️ Estado</div>
                     <div class="info-value">{{ wa.connection_status }}</div>
                 </div>
             </div>
@@ -452,52 +361,30 @@
                     <div class="info-value">{{ EVOLUTION_API_URL }}</div>
                 </div>
                 <div class="info-box">
-                    <div class="info-label">📱 Instância WhatsApp</div>
+                    <div class="info-label">📱 Instância</div>
                     <div class="info-value">Nenhuma configurada</div>
                 </div>
                 <div class="info-box">
-                    <div class="info-label">🛡️ Estado da Conexão</div>
+                    <div class="info-label">🛡️ Estado</div>
                     <div class="info-value">disconnected</div>
                 </div>
             </div>
         {% endif %}
     </div>
     
-    <!-- Stats Section -->
-    <div class="stats-grid">
-        <div class="stat-box">
-            <div class="stat-value">{% if whatsapps %}✅{% else %}❌{% endif %}</div>
-            <div class="stat-label">Instância</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-value">API</div>
-            <div class="stat-label">Evolution v2</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-value">📲</div>
-            <div class="stat-label">Pronto para Usar</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-value">🚀</div>
-            <div class="stat-label">Ativo & Seguro</div>
-        </div>
-    </div>
-    
-    <div class="divider"></div>
-    
     <!-- Botões de Ação -->
     <div class="actions-grid">
         <button class="action-btn btn-refresh" onclick="atualizarStatus()">
-            🔄 Atualizar Status
+            🔄 Atualizar<br>Status
         </button>
         <button class="action-btn btn-reconnect" onclick="reconectarWhatsApp()">
-            ⚡ Reconectar WhatsApp
+            ⚡ Reconectar<br>WhatsApp
         </button>
         <button class="action-btn btn-qrcode" onclick="mostrarQRCode()">
-            📲 Mostrar QR Code
+            📲 Mostrar<br>QR Code
         </button>
         <button class="action-btn btn-disconnect" onclick="desconectarWhatsApp()">
-            ⛔ Desconectar WhatsApp
+            ⛔ Desconectar<br>WhatsApp
         </button>
     </div>
     
@@ -505,7 +392,7 @@
     <div class="test-section">
         <h2 class="test-title">💬 Enviar Mensagem de Teste</h2>
         <p class="test-hint">
-            💡 <strong>Dica:</strong> Você pode enviar para números individuais ou para grupos. Para grupos, copie o ID do grupo do WhatsApp (formato: <code>120363xxx@g.us</code>)
+            Você pode enviar para números individuais ou para grupos WhatsApp
         </p>
         
         <div class="form-group">
@@ -517,8 +404,7 @@
                 placeholder="5511999999999 ou 120363xxx@g.us"
             >
             <div class="form-hint">
-                📱 <strong>Para número:</strong> Use com ou sem + e código do país<br>
-                👥 <strong>Para grupo:</strong> Cole o ID do grupo (termine com @g.us)
+                Para número: 5511999999999 | Para grupo: 120363xxx@g.us
             </div>
         </div>
         
@@ -527,8 +413,8 @@
             <textarea 
                 id="message" 
                 class="form-textarea" 
-                placeholder="Olá! Esta é uma mensagem de teste do sistema de rifas. 🎉"
-            >Olá! Esta é uma mensagem de teste do sistema de rifas. 🎉</textarea>
+                placeholder="Olá! Esta é uma mensagem de teste. 🎉"
+            >Olá! Esta é uma mensagem de teste do sistema. 🎉</textarea>
         </div>
         
         <button class="btn-send" onclick="enviarMensagemTeste()">
