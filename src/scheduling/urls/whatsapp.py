@@ -13,6 +13,7 @@ from scheduling.views.whatsapp_manager import (
     whatsapp_status_api,
     whatsapp_list_api,
     whatsapp_webhook_update,
+    whatsapp_send_test,
 )
 from scheduling.views.whatsapp_debug import whatsapp_create_debug
 
@@ -39,6 +40,7 @@ urlpatterns = [
     # APIs (para frontend)
     path('<int:id>/status/', whatsapp_status_api, name='status_api'),
     path('list/api/', whatsapp_list_api, name='list_api'),
+    path('send-test/', whatsapp_send_test, name='send_test'),
     
     # Webhook (para Evolution API)
     path('webhook/update/', whatsapp_webhook_update, name='webhook_update'),

@@ -21,6 +21,7 @@ from scheduling.models import WhatsAppInstance, EvolutionAPI
 from tenants.models import Tenant
 from tenants.services import ensure_membership_for_request, TenantSelectionRequired
 from django.urls import reverse
+from scheduling.services.evolution_manager import EvolutionAPIManager
 
 
 def _get_tenant_or_redirect(request):
@@ -214,6 +215,37 @@ def whatsapp_status_api(request, id):
         'error_message': whatsapp.error_message,
         'qr_code_valid': whatsapp.qr_code_is_valid,
     })
+
+
+@login_required
+@require_http_methods(["POST"])
+def whatsapp_send_test(request):
+    """Enviar mensagem de teste a partir do dashboard"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
+
+    try:
+        data = json.loads(request.body or "{}")
+        to_number = data.get('to')
+        message = data.get('message')
+        if not to_number or not message:
+            return JsonResponse({'success': False, 'error': 'Campos to e message são obrigatórios'}, status=400)
+
+        # Tenta enviar via EvolutionAPIManager
+        success = EvolutionAPIManager.send_message_auto(
+            tenant_slug=tenant.slug,
+            to_number=to_number,
+            message=message,
+        )
+
+        if success:
+            return JsonResponse({'success': True, 'message': 'Mensagem enviada com sucesso'})
+        else:
+            return JsonResponse({'success': False, 'error': 'Falha ao enviar mensagem'}, status=500)
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 
 @login_required

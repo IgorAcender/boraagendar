@@ -6,222 +6,192 @@
 {% block extra_css %}
 <style>
     .whatsapp-container {
-        max-width: 800px;
+        max-width: 1100px;
         margin: 40px auto;
         padding: 30px;
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-    
-    .header h1 {
-        color: #1f2937;
-        margin-bottom: 10px;
-    }
-    
-    .header p {
-        color: #6b7280;
-    }
-    
-    .btn-connect {
-        background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-        color: white;
-        padding: 16px 32px;
         border-radius: 8px;
-        border: none;
-        font-weight: 600;
-        font-size: 18px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     
-    .btn-connect:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-    }
-    
-    .loading {
-        text-align: center;
-        padding: 40px;
-    }
-    
-    .loading::after {
-        content: "";
-        display: inline-block;
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #25d366;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .qr-display {
-        text-align: center;
-        padding: 30px;
-    }
-    
-    .qr-display img {
-        max-width: 300px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        margin-bottom: 20px;
-    }
-    
-    .alert {
-        padding: 15px 20px;
-        border-radius: 8px;
-        margin: 20px 0;
-    }
-    
-    .alert-success {
-        background-color: #d1fae5;
-        border: 1px solid #34d399;
-        color: #065f46;
-    }
-    
-    .alert-danger {
-        background-color: #fee2e2;
-        border: 1px solid #f87171;
-        color: #991b1b;
-    }
-    
-    .status-card {
-        background: #f9fafb;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 20px;
-        margin: 20px 0;
-    }
-    
-    .status-connected {
-        border-color: #34d399;
-        background: #d1fae5;
-    }
+    .header { margin-bottom: 18px }
+    .header h1 { color: #111827; margin: 6px 0 }
+
+    .loading { text-align:center; padding:30px }
+    .loading::after { content:""; display:inline-block; width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid #10b981; border-radius:50%; animation:spin 1s linear infinite }
+    @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+
+    .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:start }
+    .info-box { background:#f8fafc; border-radius:6px; padding:18px; border-left:6px solid #10b981 }
+
+    .btn-connect { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border-radius:6px; border:none; font-weight:600; cursor:pointer }
+    .btn-green{background:#10b981;color:white} .btn-teal{background:#0f766e;color:white} .btn-yellow{background:#f59e0b;color:white} .btn-red{background:#ef4444;color:white}
+
+    .panel { background:#fff; border-radius:8px; padding:20px; box-shadow:0 1px 3px rgba(0,0,0,0.03); margin-bottom:18px }
+    .form-control{width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:6px}
+    .help-muted{color:#6b7280; font-size:0.95em}
+    .qr-display img{max-width:320px; border-radius:8px}
+    .alert{padding:12px 16px; border-radius:8px; margin-top:12px}
+    .alert-success{background:#d1fae5; border:1px solid #34d399; color:#065f46}
+    .alert-danger{background:#fee2e2; border:1px solid #f87171; color:#991b1b}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="whatsapp-container">
-    <div class="header">
-        <h1>📱 Gerenciar WhatsApp</h1>
-        <p>Conecte seu WhatsApp para enviar confirmações de agendamento</p>
+    <div class="header"><h1>Gerenciador WhatsApp Evolution API</h1></div>
+
+    <div class="panel">
+        <h3 style="margin:0 0 8px">Status da Conexão</h3>
+        <p style="margin:6px 0 14px; color:#6b7280"><span id="status-dot">🔴</span> <strong id="status-text">Desconectado</strong></p>
+
+        <div class="grid-3">
+            <div class="info-box">
+                <div style="font-size:0.9em; color:#6b7280">URL da API</div>
+                <div style="margin-top:8px; word-break:break-all; font-weight:600">{{ EVOLUTION_API_URL }}</div>
+            </div>
+
+            <div class="info-box">
+                <div style="font-size:0.9em; color:#6b7280">Instância</div>
+                <div style="margin-top:8px; font-weight:600">{% if whatsapps and whatsapps.0.instance_name %}{{ whatsapps.0.instance_name }}{% else %}-{% endif %}</div>
+            </div>
+
+            <div class="info-box">
+                <div style="font-size:0.9em; color:#6b7280">Estado</div>
+                <div style="margin-top:8px; font-weight:600" id="instance-state">{% if whatsapps and whatsapps.0.connection_status %}{{ whatsapps.0.connection_status }}{% else %}disconnected{% endif %}</div>
+            </div>
+        </div>
+
+        <div style="margin-top:14px; display:flex; gap:12px">
+            <button class="btn-connect btn-green" onclick="updateStatusAll()">🔄 Atualizar Status</button>
+            <button class="btn-connect btn-teal" onclick="showQr()">📷 Mostrar QR Code</button>
+            <button class="btn-connect btn-yellow" onclick="restartInstance()">🔁 Reiniciar Instância</button>
+            <button class="btn-connect btn-red" onclick="disconnect()">⛔ Desconectar WhatsApp</button>
+        </div>
     </div>
-    
-    {% if whatsapps %}
-        {% for wa in whatsapps %}
-        <div class="status-card {% if wa.connection_status == 'connected' %}status-connected{% endif %}">
-            <h3>WhatsApp {{ wa.display_name }}</h3>
-            <p>
-                <strong>Status:</strong> 
-                {% if wa.connection_status == 'connected' %}
-                    ✅ Conectado
-                {% elif wa.connection_status == 'connecting' %}
-                    🔄 Conectando...
-                {% else %}
-                    ⚠️ Desconectado
-                {% endif %}
-            </p>
-            {% if wa.phone_number and wa.phone_number != 'pending' %}
-            <p><strong>Número:</strong> {{ wa.phone_number }}</p>
-            {% endif %}
-            
-            {% if wa.connection_status != 'connected' %}
-            <button class="btn-connect" onclick="conectarWhatsApp()">
-                🔄 Reconectar WhatsApp
-            </button>
-            {% endif %}
+
+    <div class="panel">
+        <h3 style="margin:0 0 8px">Enviar Mensagem de Teste</h3>
+        <p class="help-muted">💡 Dica: Você pode enviar para números individuais ou para grupos. Para grupos, copie o ID do grupo do WhatsApp (formato: 120363xxx@g.us)</p>
+
+        <label style="display:block; margin-top:12px; font-weight:600">Número do WhatsApp ou ID do Grupo</label>
+        <input id="to-number" class="form-control" placeholder="5511999999999  ou  120363xxx@g.us">
+        <div style="margin-top:8px" class="help-muted">📱 Para número: Use com ou sem + e código do país<br>👥 Para grupo: Cole o ID do grupo (termine com @g.us)</div>
+
+        <label style="display:block; margin-top:14px; font-weight:600">Mensagem</label>
+        <textarea id="message" class="form-control" rows="4">Olá! Esta é uma mensagem de teste do sistema de rifas. 🎉</textarea>
+
+        <div style="margin-top:12px">
+            <button class="btn-connect btn-green" onclick="sendTestMessage()">📩 Enviar Mensagem</button>
         </div>
-        {% endfor %}
-    {% else %}
-        <div class="text-center">
-            <p style="color: #6b7280; margin-bottom: 30px;">
-                Nenhum WhatsApp conectado ainda.
-            </p>
-            <button class="btn-connect" onclick="conectarWhatsApp()">
-                ➕ Conectar WhatsApp
-            </button>
-        </div>
-    {% endif %}
-    
-    <div id="resultado" style="margin-top: 30px;"></div>
+
+        <div id="resultado" style="margin-top:10px"></div>
+    </div>
 </div>
 
 <script>
 console.log('✅ Script carregado');
 
-function conectarWhatsApp() {
-    console.log('🚀 Iniciando conexão WhatsApp...');
-    
+function updateStatusAll() {
+    const statusText = document.getElementById('status-text');
+    const statusDot = document.getElementById('status-dot');
+
+    fetch('{% url "whatsapp:list_api" %}')
+        .then(r => r.json())
+        .then(data => {
+            const whats = data.whatsapps || [];
+            if (whats.length === 0) {
+                statusText.textContent = 'Desconectado';
+                statusDot.textContent = '🔴';
+                document.getElementById('instance-state').textContent = 'disconnected';
+                return;
+            }
+
+            const first = whats[0];
+            document.getElementById('instance-state').textContent = first.status || 'disconnected';
+            if (first.status === 'connected') {
+                statusText.textContent = 'Conectado'; statusDot.textContent = '🟢';
+            } else if (first.status === 'connecting') {
+                statusText.textContent = 'Conectando'; statusDot.textContent = '🟡';
+            } else {
+                statusText.textContent = 'Desconectado'; statusDot.textContent = '🔴';
+            }
+        })
+        .catch(err => console.error(err));
+}
+
+function showQr() {
     const resultado = document.getElementById('resultado');
     resultado.innerHTML = '<div class="loading"></div>';
-    
-    const url = '{% url "whatsapp:create" %}';
-    console.log('📡 URL:', url);
-    
-    fetch(url, {
+
+    fetch('{% url "whatsapp:create" %}', { method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token }}'} })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.qr_code) {
+                resultado.innerHTML = `\n                    <div class="qr-display">\n                        <h3>✅ QR Code Gerado!</h3>\n                        <img src="${data.qr_code}" alt="QR Code WhatsApp">\n                        <p style="color: #6b7280;">${data.message || 'Escaneie o QR code com seu WhatsApp'}</p>\n                    </div>\n                `;
+            } else {
+                resultado.innerHTML = `<div class="alert alert-danger">❌ Erro: ${data.error || 'Sem QR code'}</div>`;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            resultado.innerHTML = `<div class="alert alert-danger">❌ Erro ao gerar QR: ${err.message}</div>`;
+        });
+}
+
+function restartInstance() {
+    if (!confirm('🔁 Reiniciar instância?')) return;
+    showQr();
+}
+
+function disconnect() {
+    if (!confirm('⚠️ Desconectar WhatsApp? Você não receberá mais confirmações por este número.')) return;
+
+    fetch('{% if whatsapps and whatsapps.0 %}{% url "whatsapp:disconnect" whatsapps.0.id %}{% else %}#{% endif %}', {
+        method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            updateStatusAll();
+            alert(data.message);
+        } else {
+            alert('Erro: ' + (data.error || 'unknown'));
+        }
+    })
+    .catch(err => { console.error(err); alert('Erro ao desconectar') });
+}
+
+function sendTestMessage() {
+    const to = document.getElementById('to-number').value.trim();
+    const message = document.getElementById('message').value.trim();
+    const resultado = document.getElementById('resultado');
+    resultado.innerHTML = '';
+
+    if (!to || !message) {
+        resultado.innerHTML = '<div class="alert alert-danger">❌ Preencha número e mensagem</div>';
+        return;
+    }
+
+    fetch('{% url "whatsapp:send_test" %}', {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({ to, message })
     })
-    .then(response => {
-        console.log('📊 Status:', response.status);
-        console.log('📊 Content-Type:', response.headers.get('content-type'));
-        
-        if (!response.ok) {
-            return response.text().then(text => {
-                throw new Error(`HTTP ${response.status}: ${text.substring(0, 200)}`);
-            });
-        }
-        
-        return response.json();
-    })
+    .then(r => r.json())
     .then(data => {
-        console.log('✅ Resposta:', data);
-        
-        if (data.success && data.qr_code) {
-            resultado.innerHTML = `
-                <div class="qr-display">
-                    <h3>✅ QR Code Gerado!</h3>
-                    <img src="${data.qr_code}" alt="QR Code WhatsApp">
-                    <p style="color: #6b7280;">
-                        ${data.message || 'Escaneie o QR code com seu WhatsApp'}
-                    </p>
-                    ${data.instance_name ? `<p style="font-size: 0.9em; color: #9ca3af;">Instância: ${data.instance_name}</p>` : ''}
-                </div>
-            `;
+        if (data.success) {
+            resultado.innerHTML = '<div class="alert alert-success">✅ ' + data.message + '</div>';
         } else {
-            resultado.innerHTML = `
-                <div class="alert alert-danger">
-                    ❌ Erro: ${data.error || 'Resposta sem QR code'}
-                    <pre style="margin-top: 10px; font-size: 0.85em;">${JSON.stringify(data, null, 2)}</pre>
-                </div>
-            `;
+            resultado.innerHTML = '<div class="alert alert-danger">❌ ' + (data.error || 'Falha') + '</div>';
         }
     })
-    .catch(error => {
-        console.error('❌ Erro:', error);
-        resultado.innerHTML = `
-            <div class="alert alert-danger">
-                ❌ Erro ao conectar: ${error.message}
-            </div>
-        `;
+    .catch(err => {
+        console.error(err);
+        resultado.innerHTML = '<div class="alert alert-danger">❌ Erro ao enviar mensagem</div>';
     });
 }
 </script>
