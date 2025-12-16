@@ -136,8 +136,6 @@ def whatsapp_generate_qrcode(request, id):
 
 @login_required
 @require_http_methods(["POST"])
-@login_required
-@require_http_methods(["POST"])
 def whatsapp_disconnect(request, id):
     """Desconectar um WhatsApp via Evolution API"""
     tenant, redirect_response = _get_tenant_or_redirect(request)
@@ -159,26 +157,35 @@ def whatsapp_disconnect(request, id):
                 'error': 'Instance name não configurado. Não é possível desconectar.'
             }, status=400)
         
-        if not settings.EVOLUTION_API_URL or not settings.EVOLUTION_API_KEY:
+        api_url = (whatsapp.evolution_api.url if whatsapp.evolution_api else settings.EVOLUTION_API_URL).rstrip("/")
+        api_key = whatsapp.evolution_api.api_key if whatsapp.evolution_api else settings.EVOLUTION_API_KEY
+
+        if not api_url or not api_key:
             return JsonResponse({
                 'success': False,
                 'error': 'Evolution API não configurada. Não é possível desconectar.'
             }, status=400)
         
-        headers = {'apikey': settings.EVOLUTION_API_KEY}
+        headers = {'apikey': api_key}
+        accepted_codes = {200, 201, 202, 204}
         
         # Fazer LOGOUT na Evolution API (mantém a instância)
         try:
-            logout_url = f"{settings.EVOLUTION_API_URL}/instance/logout/{whatsapp.instance_name}"
-            print(f"🔗 Chamando logout: {logout_url}")
-            logout_response = requests.post(logout_url, headers=headers, timeout=10)
-            print(f"📊 Resposta logout: {logout_response.status_code}")
+            logout_url = f"{api_url}/instance/logout/{whatsapp.instance_name}"
+            print(f"🔗 Chamando logout (DELETE): {logout_url}")
+            logout_response = requests.delete(logout_url, headers=headers, timeout=10)
+            print(f"📊 Resposta logout (DELETE): {logout_response.status_code} - {logout_response.text[:200]}")
             
-            if logout_response.status_code in [200, 201]:
-                print(f"✅ Logout realizado com sucesso - instância mantida")
+            if logout_response.status_code not in accepted_codes:
+                # Algumas versões exigem POST
+                print("↩️  Tentando logout via POST (fallback)")
+                logout_response = requests.post(logout_url, headers=headers, timeout=10)
+                print(f"📊 Resposta logout (POST): {logout_response.status_code} - {logout_response.text[:200]}")
+            
+            if logout_response.status_code in accepted_codes:
+                print(f"✅ Logout realizado com sucesso na Evolution")
             else:
-                print(f"⚠️  Logout retornou código {logout_response.status_code}")
-                # Mesmo assim, vamos marcar como desconectado no banco
+                print(f"⚠️  Logout retornou código {logout_response.status_code}, mantendo fluxo de desconexão local")
         except Exception as logout_error:
             print(f"⚠️  Erro no logout: {logout_error}")
             return JsonResponse({
