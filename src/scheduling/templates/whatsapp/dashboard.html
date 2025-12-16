@@ -324,7 +324,7 @@
             <h1>📱 Gerenciar WhatsApp</h1>
             <p style="color: #6c757d; margin: 8px 0 0 0;">Conecte seus WhatsApps para enviar confirmações de agendamento</p>
         </div>
-        <button class="btn-connect-whatsapp" onclick="window.createNewWhatsApp ? window.createNewWhatsApp() : null">
+        <button class="btn-connect-whatsapp" id="btn-connect-whatsapp">
             <i class="fas fa-plus"></i> Conectar WhatsApp
         </button>
     </div>
@@ -424,7 +424,7 @@
         <div class="empty-state">
             <h3>📭 Nenhum WhatsApp Conectado</h3>
             <p>Comece clicando no botão "Conectar WhatsApp" para adicionar seu primeiro número</p>
-            <button class="btn-connect-whatsapp" onclick="window.createNewWhatsApp ? window.createNewWhatsApp() : null" style="margin-top: 20px;">
+            <button class="btn-connect-whatsapp" id="btn-connect-first" style="margin-top: 20px;">
                 <i class="fas fa-plus"></i> Conectar Primeiro WhatsApp
             </button>
         </div>
@@ -457,7 +457,7 @@
             </div>
             <div class="modal-footer" style="border-top: 1px solid #e5e7eb;">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-primary" onclick="window.refreshQRCode ? window.refreshQRCode() : null">🔄 Atualizar QR</button>
+                <button type="button" class="btn btn-primary" id="btn-refresh-qr">🔄 Atualizar QR</button>
             </div>
         </div>
     </div>
@@ -473,6 +473,21 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('CSRF Token:', '{{ csrf_token }}');
     console.log('Create URL:', '{% url "whatsapp:create" %}');
     console.log('List API URL:', '{% url "whatsapp:list_api" %}');
+
+    // Bind botões via JS (evita depender de onclick inline)
+    const btnConnect = document.getElementById('btn-connect-whatsapp');
+    const btnFirst = document.getElementById('btn-connect-first');
+    const btnRefresh = document.getElementById('btn-refresh-qr');
+
+    if (btnConnect) {
+        btnConnect.addEventListener('click', createNewWhatsApp);
+    }
+    if (btnFirst) {
+        btnFirst.addEventListener('click', createNewWhatsApp);
+    }
+    if (btnRefresh) {
+        btnRefresh.addEventListener('click', refreshQRCode);
+    }
 });
 function createNewWhatsApp() {
     console.log('Iniciando createNewWhatsApp...');
