@@ -579,10 +579,10 @@ function generateQrCode(endpoint, whatsappId) {
     });
 }
 
-// Função para atualizar QR code
+// Função para atualizar QR code (regenera sem recarregar)
 function refreshQRCode() {
-    alert('⏳ Atualizando QR code...');
-    location.reload();
+    console.log('Atualizando QR code...');
+    createNewWhatsApp();
 }
 
 // Função para desconectar
@@ -649,10 +649,11 @@ function refreshAfterCode() {
     location.reload();
 }
 
-function refreshQRCode() {
-    console.log('refreshQRCode chamada');
-    // Função para atualizar QR code - por enquanto apenas recarrega
-    location.reload();
-}
+// Disponibiliza no escopo global para os atributos onclick do template
+window.createNewWhatsApp = createNewWhatsApp;
+window.generateQrCode = generateQrCode;
+window.refreshQRCode = refreshQRCode;
+window.disconnect = disconnect;
+window.setPrimary = setPrimary;
 </script>
 {% endblock %}
