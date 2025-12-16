@@ -259,20 +259,41 @@ def whatsapp_create(request):
         
         # Requisitar QR code DA EVOLUTION API (IGUAL AO RIFAS!)
         try:
-            url = f"{settings.EVOLUTION_API_URL}/instance/connect/{instance_name}"
-            headers = {'apikey': settings.EVOLUTION_API_KEY}
+            headers = {'apikey': settings.EVOLUTION_API_KEY, 'Content-Type': 'application/json'}
             
-            print(f"🔗 [RIFAS PATTERN] Requisitando QR code de: {url}")
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
+            # Passo 1: Criar a instância na Evolution API
+            create_url = f"{settings.EVOLUTION_API_URL}/instance/create"
+            create_data = {
+                "instanceName": instance_name,
+                "qrcode": True,
+                "integration": "WHATSAPP-BAILEYS"
+            }
             
-            api_response = response.json()
+            print(f"🔗 [1/2] Criando instância: {create_url}")
+            print(f"📦 Data: {create_data}")
+            
+            create_response = requests.post(create_url, json=create_data, headers=headers, timeout=10)
+            print(f"📊 Status criação: {create_response.status_code}")
+            print(f"📄 Response: {create_response.text[:500]}")
+            
+            # Passo 2: Conectar e obter QR code
+            connect_url = f"{settings.EVOLUTION_API_URL}/instance/connect/{instance_name}"
+            print(f"🔗 [2/2] Conectando: {connect_url}")
+            
+            connect_response = requests.get(connect_url, headers=headers, timeout=10)
+            print(f"📊 Status conexão: {connect_response.status_code}")
+            print(f"📄 Response: {connect_response.text[:500]}")
+            
+            connect_response.raise_for_status()
+            
+            api_response = connect_response.json()
             qr_code_base64 = api_response.get('base64', '')
             
             if not qr_code_base64:
+                print(f"⚠️  Resposta sem base64. Keys: {list(api_response.keys())}")
                 return JsonResponse({
                     'success': False,
-                    'error': 'Evolution API não retornou QR code'
+                    'error': f'Evolution API não retornou QR code. Response: {api_response}'
                 }, status=400)
             
             # Criar instância WhatsApp no banco (SEM evolution_api FK)
