@@ -308,17 +308,45 @@ def whatsapp_create(request):
                 connect_response.raise_for_status()
                 
                 api_response = connect_response.json()
-                qr_code_base64 = api_response.get('base64') or api_response.get('qrcode') or ''
+                print(f"📡 API Response: {api_response}")
+                
+                # Tentar extrair QR code de diferentes formatos de resposta
+                qr_code_base64 = None
+                if isinstance(api_response, dict):
+                    # Tentar vários campos possíveis
+                    qr_code_base64 = (
+                        api_response.get('base64') or 
+                        api_response.get('qrcode') or 
+                        api_response.get('qr_code') or
+                        api_response.get('qr') or
+                        (api_response.get('instance', {}).get('qrcode')) or
+                        (api_response.get('instance', {}).get('base64'))
+                    )
                 
                 # Limpar prefixo se já vier com data:image
                 if isinstance(qr_code_base64, str) and qr_code_base64.startswith('data:image'):
                     qr_code_base64 = qr_code_base64.split(',', 1)[-1]
                 
                 if not qr_code_base64:
-                    return JsonResponse({
-                        'success': False,
-                        'error': f'Evolution API não retornou QR code. Response: {api_response}'
-                    }, status=400)
+                    print(f"⚠️  Tentando gerar QR code via endpoint /qrcode/")
+                    # Se não conseguiu extrair, tentar outro endpoint
+                    qr_url = f"{settings.EVOLUTION_API_URL}/instance/qrcode/{instance_name}"
+                    qr_response = requests.get(qr_url, headers=headers, timeout=10)
+                    if qr_response.status_code == 200:
+                        qr_data = qr_response.json()
+                        print(f"📡 QR Endpoint Response: {qr_data}")
+                        qr_code_base64 = (
+                            qr_data.get('base64') or 
+                            qr_data.get('qrcode') or 
+                            qr_data.get('qr_code') or
+                            qr_data.get('qr')
+                        )
+                    
+                    if not qr_code_base64:
+                        return JsonResponse({
+                            'success': False,
+                            'error': f'Evolution API não retornou QR code. Response: {api_response}'
+                        }, status=400)
                 
                 # Atualizar QR code no banco
                 existing_whatsapp.qr_code = qr_code_base64
@@ -390,17 +418,45 @@ def whatsapp_create(request):
                 connect_response.raise_for_status()
                 
                 api_response = connect_response.json()
-                qr_code_base64 = api_response.get('base64') or api_response.get('qrcode') or ''
+                print(f"📡 API Response: {api_response}")
+                
+                # Tentar extrair QR code de diferentes formatos de resposta
+                qr_code_base64 = None
+                if isinstance(api_response, dict):
+                    # Tentar vários campos possíveis
+                    qr_code_base64 = (
+                        api_response.get('base64') or 
+                        api_response.get('qrcode') or 
+                        api_response.get('qr_code') or
+                        api_response.get('qr') or
+                        (api_response.get('instance', {}).get('qrcode')) or
+                        (api_response.get('instance', {}).get('base64'))
+                    )
                 
                 # Limpar prefixo se já vier com data:image
                 if isinstance(qr_code_base64, str) and qr_code_base64.startswith('data:image'):
                     qr_code_base64 = qr_code_base64.split(',', 1)[-1]
                 
                 if not qr_code_base64:
-                    return JsonResponse({
-                        'success': False,
-                        'error': f'Evolution API não retornou QR code. Response: {api_response}'
-                    }, status=400)
+                    print(f"⚠️  Tentando gerar QR code via endpoint /qrcode/")
+                    # Se não conseguiu extrair, tentar outro endpoint
+                    qr_url = f"{settings.EVOLUTION_API_URL}/instance/qrcode/{instance_name}"
+                    qr_response = requests.get(qr_url, headers=headers, timeout=10)
+                    if qr_response.status_code == 200:
+                        qr_data = qr_response.json()
+                        print(f"📡 QR Endpoint Response: {qr_data}")
+                        qr_code_base64 = (
+                            qr_data.get('base64') or 
+                            qr_data.get('qrcode') or 
+                            qr_data.get('qr_code') or
+                            qr_data.get('qr')
+                        )
+                    
+                    if not qr_code_base64:
+                        return JsonResponse({
+                            'success': False,
+                            'error': f'Evolution API não retornou QR code. Response: {api_response}'
+                        }, status=400)
                 
                 # Criar registro no banco (PRIMEIRA VEZ)
                 whatsapp = WhatsAppInstance.objects.create(
