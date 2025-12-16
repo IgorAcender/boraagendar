@@ -118,6 +118,10 @@ REST_FRAMEWORK = {
 CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://redis:6379/0")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=CELERY_BROKER_URL)
 
+# Evolution API Configuration
+EVOLUTION_API_URL = env("EVOLUTION_API_URL", default="")
+EVOLUTION_API_KEY = env("EVOLUTION_API_KEY", default="")
+
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "dashboard:index"
 LOGOUT_REDIRECT_URL = "accounts:login"

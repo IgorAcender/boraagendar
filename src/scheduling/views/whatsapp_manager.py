@@ -238,37 +238,31 @@ def whatsapp_list_api(request):
 @login_required
 @require_http_methods(["POST"])
 def whatsapp_create(request):
-    """Criar um novo WhatsApp para o tenant - Requisita QR code da Evolution API"""
+    """Criar um novo WhatsApp para o tenant - VERSÃO SIMPLIFICADA COMO RIFAS"""
     tenant, redirect_response = _get_tenant_or_redirect(request)
     if redirect_response:
         return redirect_response
     
     try:
-        data = json.loads(request.body) if request.body else {}
-        
-        # Buscar Evolution API com melhor capacidade disponível
-        evolution_api = EvolutionAPI.objects.filter(
-            is_active=True
-        ).annotate(
-            usage=models.Count('whatsapp_instances')
-        ).filter(
-            usage__lt=models.F('capacity')
-        ).order_by('priority', 'usage').first()
-        
-        if not evolution_api:
+        # Verificar se as variáveis de ambiente estão configuradas
+        if not settings.EVOLUTION_API_URL or not settings.EVOLUTION_API_KEY:
             return JsonResponse({
                 'success': False,
-                'error': 'Nenhum Evolution API disponível. Entre em contato com o suporte.'
-            }, status=400)
+                'error': 'Evolution API não configurada. Verifique as variáveis EVOLUTION_API_URL e EVOLUTION_API_KEY'
+            }, status=500)
         
-        # Requisitar QR code DA EVOLUTION API (como o RIFAS faz!)
+        data = json.loads(request.body) if request.body else {}
+        
+        # Gerar instance_name único para este tenant
+        wa_count = WhatsAppInstance.objects.filter(tenant=tenant).count() + 1
+        instance_name = f"{tenant.slug}_wa_{wa_count}"
+        
+        # Requisitar QR code DA EVOLUTION API (IGUAL AO RIFAS!)
         try:
-            import requests
+            url = f"{settings.EVOLUTION_API_URL}/instance/connect/{instance_name}"
+            headers = {'apikey': settings.EVOLUTION_API_KEY}
             
-            url = f"{evolution_api.api_url}/instance/connect/{evolution_api.instance_id}"
-            headers = {'apikey': evolution_api.api_key}
-            
-            print(f"🔗 Requisitando QR code de: {url}")
+            print(f"🔗 [RIFAS PATTERN] Requisitando QR code de: {url}")
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
             
@@ -281,18 +275,16 @@ def whatsapp_create(request):
                     'error': 'Evolution API não retornou QR code'
                 }, status=400)
             
-            # Criar instância WhatsApp no banco
-            wa_count = WhatsAppInstance.objects.filter(tenant=tenant).count() + 1
-            
+            # Criar instância WhatsApp no banco (SEM evolution_api FK)
             whatsapp = WhatsAppInstance.objects.create(
-                evolution_api=evolution_api,
                 phone_number=f"pending_{wa_count}",
                 display_name=data.get('display_name', f'WhatsApp #{wa_count}'),
                 tenant=tenant,
                 connection_status='pending',
                 is_primary=wa_count == 1,
                 qr_code=qr_code_base64,
-                qr_code_expires_at=timezone.now() + timedelta(minutes=5)
+                qr_code_expires_at=timezone.now() + timedelta(minutes=5),
+                instance_name=instance_name  # Salvar o instance_name
             )
             
             return JsonResponse({
@@ -300,10 +292,12 @@ def whatsapp_create(request):
                 'whatsapp_id': whatsapp.id,
                 'qr_code': f"data:image/png;base64,{qr_code_base64}",
                 'expires_at': whatsapp.qr_code_expires_at.isoformat(),
-                'message': 'Aponte sua câmera para o QR code para conectar seu WhatsApp!'
+                'message': 'Aponte sua câmera para o QR code para conectar seu WhatsApp!',
+                'instance_name': instance_name
             })
             
         except requests.exceptions.RequestException as e:
+            print(f"❌ Erro ao conectar com Evolution API: {e}")
             return JsonResponse({
                 'success': False,
                 'error': f'Erro ao conectar com Evolution API: {str(e)}'

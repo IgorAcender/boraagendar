@@ -412,7 +412,17 @@ class WhatsAppInstance(models.Model):
         EvolutionAPI,
         on_delete=models.CASCADE,
         related_name="whatsapp_instances",
-        verbose_name="Evolution API"
+        verbose_name="Evolution API",
+        null=True,
+        blank=True,
+        help_text="(Opcional) Para multi-instâncias Evolution API"
+    )
+    
+    instance_name = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Nome da Instância",
+        help_text="Nome único da instância no Evolution API (ex: tenant_wa_1)"
     )
     
     phone_number = models.CharField(
