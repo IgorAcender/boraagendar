@@ -238,7 +238,11 @@ def whatsapp_list_api(request):
 @login_required
 @require_http_methods(["POST"])
 def whatsapp_create(request):
-    """Criar um novo WhatsApp para o tenant - VERSÃO SIMPLIFICADA COMO RIFAS"""
+    """
+    Conectar WhatsApp do salão (SaaS Multi-tenant)
+    - Primeira vez: Cria instância na Evolution API com nome do salão
+    - Próximas vezes: Apenas reconecta (gera novo QR) na mesma instância
+    """
     tenant, redirect_response = _get_tenant_or_redirect(request)
     if redirect_response:
         return redirect_response
@@ -248,20 +252,72 @@ def whatsapp_create(request):
         if not settings.EVOLUTION_API_URL or not settings.EVOLUTION_API_KEY:
             return JsonResponse({
                 'success': False,
-                'error': 'Evolution API não configurada. Verifique as variáveis EVOLUTION_API_URL e EVOLUTION_API_KEY'
+                'error': 'Evolution API não configurada. Contate o suporte.'
             }, status=500)
         
         data = json.loads(request.body) if request.body else {}
+        headers = {'apikey': settings.EVOLUTION_API_KEY, 'Content-Type': 'application/json'}
         
-        # Gerar instance_name único para este tenant
-        wa_count = WhatsAppInstance.objects.filter(tenant=tenant).count() + 1
-        instance_name = f"{tenant.slug}_wa_{wa_count}"
+        # Verificar se já existe instância para este tenant
+        existing_whatsapp = WhatsAppInstance.objects.filter(tenant=tenant).first()
         
-        # Requisitar QR code DA EVOLUTION API (IGUAL AO RIFAS!)
-        try:
-            headers = {'apikey': settings.EVOLUTION_API_KEY, 'Content-Type': 'application/json'}
+        if existing_whatsapp:
+            # JÁ EXISTE INSTÂNCIA - Apenas reconectar (gerar novo QR)
+            instance_name = existing_whatsapp.instance_name
+            print(f"♻️  Reconectando instância existente: {instance_name}")
             
-            # Passo 1: Criar a instância na Evolution API
+            # Obter novo QR code da instância existente
+            connect_url = f"{settings.EVOLUTION_API_URL}/instance/connect/{instance_name}"
+            print(f"🔗 GET {connect_url}")
+            
+            try:
+                connect_response = requests.get(connect_url, headers=headers, timeout=10)
+                connect_response.raise_for_status()
+                
+                api_response = connect_response.json()
+                qr_code_base64 = api_response.get('base64') or api_response.get('qrcode') or ''
+                
+                # Limpar prefixo se já vier com data:image
+                if isinstance(qr_code_base64, str) and qr_code_base64.startswith('data:image'):
+                    qr_code_base64 = qr_code_base64.split(',', 1)[-1]
+                
+                if not qr_code_base64:
+                    return JsonResponse({
+                        'success': False,
+                        'error': f'Evolution API não retornou QR code. Response: {api_response}'
+                    }, status=400)
+                
+                # Atualizar QR code no banco
+                existing_whatsapp.qr_code = qr_code_base64
+                existing_whatsapp.qr_code_expires_at = timezone.now() + timedelta(minutes=5)
+                existing_whatsapp.connection_status = 'connecting'
+                existing_whatsapp.save()
+                
+                print(f"✅ QR code atualizado para instância {instance_name}")
+                
+                return JsonResponse({
+                    'success': True,
+                    'whatsapp_id': existing_whatsapp.id,
+                    'qr_code': f"data:image/png;base64,{qr_code_base64}",
+                    'expires_at': existing_whatsapp.qr_code_expires_at.isoformat(),
+                    'message': 'Reconecte seu WhatsApp escaneando o QR code!',
+                    'instance_name': instance_name,
+                    'is_reconnect': True
+                })
+                
+            except requests.exceptions.RequestException as e:
+                print(f"❌ Erro ao obter QR code: {e}")
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Erro ao conectar com Evolution API: {str(e)}'
+                }, status=400)
+        
+        else:
+            # PRIMEIRA VEZ - Criar nova instância com nome do salão
+            instance_name = f"{tenant.slug}_whatsapp"  # Nome único baseado no slug do tenant
+            print(f"🆕 Criando PRIMEIRA instância para {tenant.name}: {instance_name}")
+            
+            # Passo 1: Criar instância na Evolution API
             create_url = f"{settings.EVOLUTION_API_URL}/instance/create"
             create_data = {
                 "instanceName": instance_name,
@@ -269,70 +325,80 @@ def whatsapp_create(request):
                 "integration": "WHATSAPP-BAILEYS"
             }
             
-            print(f"🔗 [1/2] Criando instância: {create_url}")
+            print(f"🔗 [1/2] POST {create_url}")
             print(f"📦 Data: {create_data}")
             
-            create_response = requests.post(create_url, json=create_data, headers=headers, timeout=10)
-            print(f"📊 Status criação: {create_response.status_code}")
-            print(f"📄 Response: {create_response.text[:500]}")
-            
-            # Passo 2: Conectar e obter QR code
-            connect_url = f"{settings.EVOLUTION_API_URL}/instance/connect/{instance_name}"
-            print(f"🔗 [2/2] Conectando: {connect_url}")
-            
-            connect_response = requests.get(connect_url, headers=headers, timeout=10)
-            print(f"📊 Status conexão: {connect_response.status_code}")
-            print(f"📄 Response: {connect_response.text[:500]}")
-            
-            connect_response.raise_for_status()
-            
-            api_response = connect_response.json()
-            qr_code_base64 = api_response.get('base64') or api_response.get('qrcode') or ''
-            # A Evolution API já pode retornar com prefixo data:image/png;base64,
-            # então limpamos para armazenar apenas o payload base64.
-            if isinstance(qr_code_base64, str) and qr_code_base64.startswith('data:image'):
-                qr_code_base64 = qr_code_base64.split(',', 1)[-1]
-            
-            if not qr_code_base64:
-                print(f"⚠️  Resposta sem base64. Keys: {list(api_response.keys())}")
+            try:
+                create_response = requests.post(create_url, json=create_data, headers=headers, timeout=10)
+                print(f"📊 Status criação: {create_response.status_code}")
+                
+                # Se já existe (409), tudo bem - vamos apenas conectar
+                if create_response.status_code not in [200, 201, 409]:
+                    return JsonResponse({
+                        'success': False,
+                        'error': f'Erro ao criar instância: {create_response.text[:200]}'
+                    }, status=400)
+                
+                print(f"✅ Instância criada/encontrada: {instance_name}")
+                
+            except requests.exceptions.RequestException as e:
+                print(f"❌ Erro ao criar instância: {e}")
                 return JsonResponse({
                     'success': False,
-                    'error': f'Evolution API não retornou QR code. Response: {api_response}'
+                    'error': f'Erro ao criar instância: {str(e)}'
                 }, status=400)
             
-            # Criar instância WhatsApp no banco (SEM evolution_api FK)
-            whatsapp = WhatsAppInstance.objects.create(
-                phone_number=f"pending_{wa_count}",
-                display_name=data.get('display_name', f'WhatsApp #{wa_count}'),
-                tenant=tenant,
-                connection_status='pending',
-                is_primary=wa_count == 1,
-                qr_code=qr_code_base64,
-                qr_code_expires_at=timezone.now() + timedelta(minutes=5),
-                instance_name=instance_name  # Salvar o instance_name
-            )
+            # Passo 2: Obter QR code
+            connect_url = f"{settings.EVOLUTION_API_URL}/instance/connect/{instance_name}"
+            print(f"🔗 [2/2] GET {connect_url}")
             
-            return JsonResponse({
-                'success': True,
-                'whatsapp_id': whatsapp.id,
-                'qr_code': f"data:image/png;base64,{qr_code_base64}",
-                'expires_at': whatsapp.qr_code_expires_at.isoformat(),
-                'message': 'Aponte sua câmera para o QR code para conectar seu WhatsApp!',
-                'instance_name': instance_name
-            })
-            
-        except requests.exceptions.RequestException as e:
-            print(f"❌ Erro ao conectar com Evolution API: {e}")
-            return JsonResponse({
-                'success': False,
-                'error': f'Erro ao conectar com Evolution API: {str(e)}'
-            }, status=400)
-        except Exception as qr_error:
-            print(f"❌ Erro ao processar resposta da Evolution API: {qr_error}")
-            return JsonResponse({
-                'success': False,
-                'error': f'Erro ao processar QR code: {str(qr_error)}'
-            }, status=400)
+            try:
+                connect_response = requests.get(connect_url, headers=headers, timeout=10)
+                connect_response.raise_for_status()
+                
+                api_response = connect_response.json()
+                qr_code_base64 = api_response.get('base64') or api_response.get('qrcode') or ''
+                
+                # Limpar prefixo se já vier com data:image
+                if isinstance(qr_code_base64, str) and qr_code_base64.startswith('data:image'):
+                    qr_code_base64 = qr_code_base64.split(',', 1)[-1]
+                
+                if not qr_code_base64:
+                    return JsonResponse({
+                        'success': False,
+                        'error': f'Evolution API não retornou QR code. Response: {api_response}'
+                    }, status=400)
+                
+                # Criar registro no banco (PRIMEIRA VEZ)
+                whatsapp = WhatsAppInstance.objects.create(
+                    instance_name=instance_name,
+                    phone_number="pending",
+                    display_name=f"WhatsApp {tenant.name}",
+                    tenant=tenant,
+                    connection_status='connecting',
+                    is_primary=True,
+                    qr_code=qr_code_base64,
+                    qr_code_expires_at=timezone.now() + timedelta(minutes=5)
+                )
+                
+                print(f"✅ Registro criado no banco para {tenant.name}")
+                
+                return JsonResponse({
+                    'success': True,
+                    'whatsapp_id': whatsapp.id,
+                    'qr_code': f"data:image/png;base64,{qr_code_base64}",
+                    'expires_at': whatsapp.qr_code_expires_at.isoformat(),
+                    'message': 'Escaneie o QR code para conectar seu WhatsApp!',
+                    'instance_name': instance_name,
+                    'is_reconnect': False
+                })
+                
+            except requests.exceptions.RequestException as e:
+                print(f"❌ Erro ao obter QR code: {e}")
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Erro ao conectar com Evolution API: {str(e)}'
+                }, status=400)
     
     except Exception as e:
         print(f"❌ Erro geral em whatsapp_create: {e}")
