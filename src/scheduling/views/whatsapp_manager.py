@@ -138,7 +138,7 @@ def whatsapp_generate_qrcode(request, id):
 @require_http_methods(["POST"])
 @require_http_methods(["POST"])
 def whatsapp_disconnect(request, id):
-    """Desconectar um WhatsApp"""
+    """Desconectar um WhatsApp via Evolution API"""
     tenant, redirect_response = _get_tenant_or_redirect(request)
     if redirect_response:
         return redirect_response
@@ -151,24 +151,58 @@ def whatsapp_disconnect(request, id):
         print(f"   Phone: {whatsapp.phone_number}")
         print(f"   Status atual: {whatsapp.connection_status}")
         
-        # Opcional: Desconectar na Evolution API também
-        if whatsapp.instance_name and settings.EVOLUTION_API_URL and settings.EVOLUTION_API_KEY:
-            try:
-                headers = {'apikey': settings.EVOLUTION_API_KEY}
-                logout_url = f"{settings.EVOLUTION_API_URL}/instance/logout/{whatsapp.instance_name}"
-                print(f"🔗 Chamando logout: {logout_url}")
-                response = requests.post(logout_url, headers=headers, timeout=10)
-                print(f"📊 Resposta logout: {response.status_code}")
-            except Exception as api_error:
-                print(f"⚠️  Erro ao deslogar na Evolution API (não crítico): {api_error}")
+        # DESCONECTAR NA EVOLUTION API
+        if not whatsapp.instance_name:
+            return JsonResponse({
+                'success': False,
+                'error': 'Instance name não configurado. Não é possível desconectar.'
+            }, status=400)
+        
+        if not settings.EVOLUTION_API_URL or not settings.EVOLUTION_API_KEY:
+            return JsonResponse({
+                'success': False,
+                'error': 'Evolution API não configurada. Não é possível desconectar.'
+            }, status=400)
+        
+        headers = {'apikey': settings.EVOLUTION_API_KEY}
+        
+        # Tentar logout primeiro
+        try:
+            logout_url = f"{settings.EVOLUTION_API_URL}/instance/logout/{whatsapp.instance_name}"
+            print(f"🔗 [1/2] Chamando logout: {logout_url}")
+            logout_response = requests.post(logout_url, headers=headers, timeout=10)
+            print(f"📊 Resposta logout: {logout_response.status_code}")
+            
+            if logout_response.status_code in [200, 201]:
+                print(f"✅ Logout realizado com sucesso")
+            else:
+                print(f"⚠️  Logout retornou código {logout_response.status_code}")
+        except Exception as logout_error:
+            print(f"⚠️  Erro no logout (tentando deletar): {logout_error}")
+        
+        # Deletar a instância (mais definitivo)
+        try:
+            delete_url = f"{settings.EVOLUTION_API_URL}/instance/delete/{whatsapp.instance_name}"
+            print(f"🔗 [2/2] Chamando delete: {delete_url}")
+            delete_response = requests.delete(delete_url, headers=headers, timeout=10)
+            print(f"📊 Resposta delete: {delete_response.status_code}")
+            
+            if delete_response.status_code in [200, 201, 404]:
+                print(f"✅ Instância deletada/não encontrada")
+            else:
+                print(f"⚠️  Delete retornou código {delete_response.status_code}")
+        except Exception as delete_error:
+            print(f"⚠️  Erro no delete: {delete_error}")
         
         # Atualizar status no banco usando QuerySet.update() para evitar validações
         WhatsAppInstance.objects.filter(id=id).update(
             connection_status='disconnected',
-            disconnected_at=timezone.now()
+            disconnected_at=timezone.now(),
+            qr_code='',
+            qr_code_expires_at=None
         )
         
-        print(f"✅ WhatsApp desconectado com sucesso")
+        print(f"✅ WhatsApp desconectado com sucesso no banco")
         
         return JsonResponse({
             'success': True,
@@ -247,19 +281,33 @@ def whatsapp_status_api(request, id):
                     # Mapear estado da Evolution para nossos status
                     if instance_state in ['open', 'connected']:
                         real_status = 'connected'
-                        whatsapp.connected_at = timezone.now()
-                        whatsapp.disconnected_at = None
+                        update_fields = {
+                            'connection_status': real_status,
+                            'connected_at': timezone.now(),
+                            'disconnected_at': None
+                        }
                     elif instance_state in ['qr']:
                         real_status = 'connecting'
+                        update_fields = {
+                            'connection_status': real_status
+                        }
                     else:
                         real_status = 'disconnected'
-                        whatsapp.disconnected_at = timezone.now()
+                        update_fields = {
+                            'connection_status': real_status,
+                            'disconnected_at': timezone.now()
+                        }
                     
-                    # Atualizar banco com status real
+                    # Atualizar banco com status real usando QuerySet.update()
                     if whatsapp.connection_status != real_status:
                         print(f"✅ Sincronizando status: {whatsapp.connection_status} → {real_status}")
+                        WhatsAppInstance.objects.filter(id=id).update(**update_fields)
+                        # Atualizar objeto em memória para resposta JSON
                         whatsapp.connection_status = real_status
-                        whatsapp.save()
+                        if 'connected_at' in update_fields:
+                            whatsapp.connected_at = update_fields['connected_at']
+                        if 'disconnected_at' in update_fields:
+                            whatsapp.disconnected_at = update_fields['disconnected_at']
         
         except requests.exceptions.RequestException as e:
             print(f"⚠️  Erro ao sincronizar com Evolution API: {e}")
