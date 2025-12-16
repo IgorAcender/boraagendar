@@ -263,32 +263,30 @@
     }
     
     /* Modal/Popup para QR Code */
-    .modal-overlay {
-        display: none;
+    #qrModal.modal-overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        z-index: 9999;
-        display: flex;
+        inset: 0;
+        display: none;
         align-items: center;
         justify-content: center;
         padding: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(2px);
         box-sizing: border-box;
+        z-index: 11000;
     }
     
-    .modal-overlay.show {
+    #qrModal.modal-overlay.show {
         display: flex;
     }
     
-    .modal-content {
+    #qrModal .modal-content {
         background: white;
         border-radius: 16px;
         padding: 40px;
         max-width: 500px;
-        width: 100%;
+        width: min(500px, 100%);
+        margin: 0 auto;
         max-height: 90vh;
         overflow-y: auto;
         position: relative;
