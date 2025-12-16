@@ -384,9 +384,67 @@ console.log('✅ Script carregado');
 // ID do WhatsApp (se existir)
 const whatsappId = {% if whatsapps %}{{ whatsapps.0.id }}{% else %}null{% endif %};
 
+let pollingInterval = null;
+
 function atualizarStatus() {
     console.log('🔄 Atualizando status...');
     location.reload();
+}
+
+function iniciarVerificacaoConexao(whatsappId) {
+    console.log('🔍 Iniciando verificação de conexão...');
+    
+    let tentativas = 0;
+    const maxTentativas = 40; // 40 x 3 segundos = 2 minutos
+    
+    // Limpar polling anterior se existir
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+    }
+    
+    pollingInterval = setInterval(() => {
+        tentativas++;
+        console.log(`🔍 Verificando conexão... (tentativa ${tentativas}/${maxTentativas})`);
+        
+        fetch(`/dashboard/whatsapp/${whatsappId}/status/`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('📊 Status:', data);
+            
+            if (data.status === 'connected' || data.is_connected) {
+                console.log('✅ WhatsApp conectado! Recarregando página...');
+                clearInterval(pollingInterval);
+                
+                // Exibir mensagem de sucesso antes de recarregar
+                const resultado = document.getElementById('resultado');
+                resultado.innerHTML = `
+                    <div class="alert alert-success">
+                        ✅ WhatsApp conectado com sucesso! Recarregando...
+                    </div>
+                `;
+                
+                setTimeout(() => location.reload(), 1500);
+            } else if (tentativas >= maxTentativas) {
+                console.log('⏱️  Timeout: QR Code expirou');
+                clearInterval(pollingInterval);
+                
+                const resultado = document.getElementById('resultado');
+                resultado.innerHTML = `
+                    <div class="alert alert-danger">
+                        ⏱️  QR Code expirou. Clique em "Reconectar WhatsApp" para gerar um novo.
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro ao verificar status:', error);
+        });
+    }, 3000); // Verifica a cada 3 segundos
 }
 
 function reconectarWhatsApp() {
@@ -424,8 +482,16 @@ function reconectarWhatsApp() {
                     <p style="color: #6b7280;">
                         ${data.message || 'Escaneie o QR code com seu WhatsApp'}
                     </p>
+                    <p style="color: #10b981; font-weight: 600; margin-top: 15px;">
+                        ⏳ Aguardando leitura do QR Code...
+                    </p>
                 </div>
             `;
+            
+            // Iniciar polling para verificar se conectou
+            if (data.whatsapp_id) {
+                iniciarVerificacaoConexao(data.whatsapp_id);
+            }
         } else if (data.success) {
             resultado.innerHTML = `
                 <div class="alert alert-success">
