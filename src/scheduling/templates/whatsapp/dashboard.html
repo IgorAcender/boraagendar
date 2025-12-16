@@ -469,7 +469,7 @@ function desconectarWhatsApp() {
     const resultado = document.getElementById('resultado');
     resultado.innerHTML = '<div class="loading"></div>';
     
-    fetch(`/scheduling/whatsapp/${whatsappId}/desconectar/`, {
+    fetch(`/dashboard/whatsapp/${whatsappId}/desconectar/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
@@ -532,7 +532,7 @@ function enviarMensagemTeste() {
     const resultado = document.getElementById('resultado');
     resultado.innerHTML = '<div class="loading"></div>';
     
-    fetch('/scheduling/whatsapp/send-test/', {
+    fetch('/dashboard/whatsapp/send-test/', {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
