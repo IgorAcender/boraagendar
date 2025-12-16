@@ -517,16 +517,17 @@ function createNewWhatsApp() {
     })
     .then(data => {
         console.log('Response data:', data);
-        if (data.success) {
+        if (data.success && data.qr_code) {
             container.innerHTML = `
                 <div style="text-align: center;">
                     <img src="${data.qr_code}" alt="QR Code" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                    <p style="margin-top: 20px; color: #1f2937; font-weight: 600;">${data.message}</p>
-                    <p style="color: #6c757d; font-size: 0.9em;">📞 Número: <strong>${data.phone_number}</strong></p>
+                    <p style="margin-top: 20px; color: #1f2937; font-weight: 600;">${data.message || ''}</p>
+                    <p style="color: #6c757d; font-size: 0.9em;">📞 Número: <strong>${data.phone_number || ''}</strong></p>
                 </div>
             `;
         } else {
-            container.innerHTML = `<div class="alert alert-danger">❌ Erro: ${data.error}</div>`;
+            const err = data.error || 'Resposta sem QR code. ' + JSON.stringify(data).slice(0, 200);
+            container.innerHTML = `<div class="alert alert-danger">❌ Erro: ${err}</div>`;
         }
     })
     .catch(error => {
@@ -560,15 +561,16 @@ function generateQrCode(endpoint, whatsappId) {
     })
     .then(data => {
         console.log('Response data:', data);
-        if (data.success) {
+        if (data.success && data.qr_code) {
             container.innerHTML = `
                 <div style="text-align: center;">
                     <img src="${data.qr_code}" alt="QR Code" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                    <p style="margin-top: 20px; color: #1f2937; font-weight: 600;">${data.message}</p>
+                    <p style="margin-top: 20px; color: #1f2937; font-weight: 600;">${data.message || ''}</p>
                 </div>
             `;
         } else {
-            container.innerHTML = `<div class="alert alert-danger">❌ Erro: ${data.error}</div>`;
+            const err = data.error || 'Resposta sem QR code. ' + JSON.stringify(data).slice(0, 200);
+            container.innerHTML = `<div class="alert alert-danger">❌ Erro: ${err}</div>`;
         }
     })
     .catch(error => {
