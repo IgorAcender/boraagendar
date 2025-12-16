@@ -515,6 +515,15 @@ const whatsappId = {% if whatsapps %}{{ whatsapps.0.id }}{% else %}null{% endif 
 
 let pollingInterval = null;
 
+// Garantir que o modal comece fechado
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Página carregada - garantindo modal fechado');
+    const modal = document.getElementById('qrModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+});
+
 function atualizarStatus() {
     console.log('🔄 Atualizando status...');
     location.reload();
