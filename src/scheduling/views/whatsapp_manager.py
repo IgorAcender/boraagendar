@@ -558,11 +558,45 @@ def whatsapp_create(request):
             instance_name = existing_whatsapp.instance_name
             print(f"♻️  Reconectando instância existente: {instance_name}")
             
-            # Obter novo QR code da instância existente
-            connect_url = f"{settings.EVOLUTION_API_URL}/instance/connect/{instance_name}"
-            print(f"🔗 GET {connect_url}")
+            # Primeiro, verificar estado atual da instância
+            status_url = f"{settings.EVOLUTION_API_URL}/instance/connectionState/{instance_name}"
+            print(f"🔗 [1/2] GET {status_url}")
             
             try:
+                status_response = requests.get(status_url, headers=headers, timeout=10)
+                
+                if status_response.status_code == 404:
+                    # Instância não existe mais na Evolution API - precisamos recriar
+                    print(f"⚠️  Instância não encontrada na Evolution API - recriando...")
+                    # Deletar do banco e forçar recriação
+                    existing_whatsapp.delete()
+                    existing_whatsapp = None
+                elif status_response.status_code == 200:
+                    status_data = status_response.json()
+                    print(f"📡 Status atual: {status_data}")
+                    
+                    instance_state = status_data.get('instance', {}).get('state') or status_data.get('state')
+                    
+                    if instance_state in ['open', 'connected']:
+                        # Já está conectado!
+                        print(f"✅ Instância já está conectada: {instance_state}")
+                        WhatsAppInstance.objects.filter(id=existing_whatsapp.id).update(
+                            connection_status='connected',
+                            connected_at=timezone.now()
+                        )
+                        
+                        return JsonResponse({
+                            'success': True,
+                            'whatsapp_id': existing_whatsapp.id,
+                            'message': f'✅ WhatsApp já está conectado!',
+                            'instance_name': instance_name,
+                            'state': instance_state,
+                            'qr_code': None
+                        })
+                
+                # Se chegou aqui, precisa gerar QR code
+                connect_url = f"{settings.EVOLUTION_API_URL}/instance/connect/{instance_name}"
+                print(f"🔗 [2/2] GET {connect_url}")
                 connect_response = requests.get(connect_url, headers=headers, timeout=10)
                 connect_response.raise_for_status()
                 
@@ -572,6 +606,9 @@ def whatsapp_create(request):
                 # Verificar estado da instância
                 instance_state = api_response.get('instance', {}).get('state') or api_response.get('state')
                 print(f"📊 Estado da instância: {instance_state}")
+                
+                # Re-fetch whatsapp do banco (pode ter sido deletado)
+                existing_whatsapp = WhatsAppInstance.objects.filter(tenant=tenant).first()
                 
                 # Se já está conectado (open), retornar sucesso direto
                 if instance_state in ['open', 'connected']:
