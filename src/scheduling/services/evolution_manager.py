@@ -6,7 +6,8 @@ Usa load balancing entre múltiplas instâncias
 import logging
 from typing import Optional
 
-from django.db.models import F, Q
+from django.conf import settings
+from django.db.models import F
 
 from scheduling.models import EvolutionAPI, WhatsAppInstance
 from notifications.services import EvolutionApiClient, WhatsappMessage
@@ -78,20 +79,62 @@ class EvolutionAPIManager:
         # Se não especificou instância, seleciona automaticamente
         if evolution_api is None:
             evolution_api = EvolutionAPIManager.get_best_instance()
-            if not evolution_api:
-                logger.error("Nenhuma Evolution API disponível para enviar mensagem")
-                return False
-        
+        if not evolution_api:
+            logger.error("Nenhuma Evolution API disponível para enviar mensagem")
+            return False
+
+        # Seleciona o WhatsApp principal/ativo do tenant
+        whatsapp_instance = (
+            WhatsAppInstance.objects.filter(
+                tenant__slug=tenant_slug,
+                is_active=True,
+                connection_status="connected",
+            )
+            .order_by("-is_primary", "-connected_at")
+            .first()
+            or WhatsAppInstance.objects.filter(
+                tenant__slug=tenant_slug,
+                is_active=True,
+            )
+            .order_by("-is_primary", "-connected_at")
+            .first()
+        )
+
+        # Descobre credenciais e instance_name a partir do WhatsApp ou dos defaults
+        api_url = None
+        api_key = None
+        instance_name = None
+
+        if whatsapp_instance:
+            instance_name = whatsapp_instance.instance_name or instance_name
+            if whatsapp_instance.evolution_api and evolution_api is None:
+                evolution_api = whatsapp_instance.evolution_api
+
+        if evolution_api:
+            api_url = evolution_api.url or api_url
+            api_key = evolution_api.api_key or api_key
+            instance_name = instance_name or evolution_api.instance_id
+
+        api_url = (api_url or getattr(settings, "EVOLUTION_API_URL", "")).rstrip("/")
+        api_key = api_key or getattr(settings, "EVOLUTION_API_KEY", "")
+        instance_name = instance_name or getattr(settings, "EVOLUTION_INSTANCE_NAME", "")
+
+        if not api_url or not api_key or not instance_name:
+            logger.error("Configuração da Evolution API incompleta (url/api_key/instance_name).")
+            return False
+
         # Criar cliente e enviar
         client = EvolutionApiClient(
-            base_url=evolution_api.url,
-            api_key=evolution_api.api_key
+            base_url=api_url,
+            api_key=api_key,
+            instance_name=instance_name,
         )
         
         payload = WhatsappMessage(
             tenant_slug=tenant_slug,
             to_number=to_number,
-            message=message
+            message=message,
+            instance_name=instance_name,
         )
         
         success = client.send_message(payload)

@@ -121,6 +121,7 @@ CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=CELERY_BROKER_URL)
 # Evolution API Configuration
 EVOLUTION_API_URL = env("EVOLUTION_API_URL", default="")
 EVOLUTION_API_KEY = env("EVOLUTION_API_KEY", default="")
+EVOLUTION_INSTANCE_NAME = env("EVOLUTION_INSTANCE_NAME", default="")
 
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "dashboard:index"
