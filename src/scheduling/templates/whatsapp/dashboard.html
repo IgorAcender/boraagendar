@@ -494,24 +494,6 @@
     <div id="resultado"></div>
 </div>
 
-<!-- Modal para QR Code -->
-<div id="qrModal" class="modal-overlay" onclick="fecharModalSeForaDoConteudo(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <button class="modal-close" onclick="fecharModal()">×</button>
-        <h2 class="modal-qr-title">📱 Conectar WhatsApp</h2>
-        <p class="modal-qr-subtitle">Escaneie o QR Code com seu WhatsApp</p>
-        
-        <div id="modalQRContent">
-            <!-- QR Code será inserido aqui -->
-        </div>
-        
-        <div id="modalQRStatus" class="modal-qr-status" style="display: none;">
-            <span class="spinner"></span>
-            <span id="statusText">Aguardando leitura do QR Code...</span>
-        </div>
-    </div>
-</div>
-
 <script>
 console.log('✅ Script carregado');
 
@@ -819,4 +801,23 @@ function enviarMensagemTeste() {
     });
 }
 </script>
+
+<!-- Modal para QR Code - FORA DE TODOS OS CONTAINERS -->
+<div id="qrModal" class="modal-overlay" onclick="fecharModalSeForaDoConteudo(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="fecharModal()">×</button>
+        <h2 class="modal-qr-title">📱 Conectar WhatsApp</h2>
+        <p class="modal-qr-subtitle">Escaneie o QR Code com seu WhatsApp</p>
+        
+        <div id="modalQRContent">
+            <!-- QR Code será inserido aqui -->
+        </div>
+        
+        <div id="modalQRStatus" class="modal-qr-status" style="display: none;">
+            <span class="spinner"></span>
+            <span id="statusText">Aguardando leitura do QR Code...</span>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
