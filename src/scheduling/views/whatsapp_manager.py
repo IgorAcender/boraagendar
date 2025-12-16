@@ -375,6 +375,41 @@ def whatsapp_send_test(request):
 
 
 @login_required
+@require_http_methods(["POST"])
+def whatsapp_send_test(request):
+    """Enviar mensagem de teste"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
+
+    try:
+        data = json.loads(request.body or "{}")
+        recipient = data.get('recipient')
+        message = data.get('message')
+        
+        if not recipient or not message:
+            return JsonResponse({
+                'success': False, 
+                'error': 'Campos recipient e message são obrigatórios'
+            }, status=400)
+
+        # Tenta enviar via EvolutionAPIManager
+        success = EvolutionAPIManager.send_message_auto(
+            tenant_slug=tenant.slug,
+            to_number=recipient,
+            message=message,
+        )
+
+        if success:
+            return JsonResponse({'success': True, 'message': 'Mensagem enviada com sucesso'})
+        else:
+            return JsonResponse({'success': False, 'error': 'Falha ao enviar mensagem'}, status=500)
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@login_required
 def whatsapp_list_api(request):
     """API para listar todos"""
     tenant, redirect_response = _get_tenant_or_redirect(request)
