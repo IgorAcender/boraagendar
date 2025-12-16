@@ -12,6 +12,7 @@ from django.db.models import Q
 from django.conf import settings
 import json
 import base64
+import requests
 from io import BytesIO
 import qrcode
 from datetime import timedelta
@@ -237,7 +238,7 @@ def whatsapp_list_api(request):
 @login_required
 @require_http_methods(["POST"])
 def whatsapp_create(request):
-    """Criar um novo WhatsApp para o tenant"""
+    """Criar um novo WhatsApp para o tenant - Requisita QR code da Evolution API"""
     tenant, redirect_response = _get_tenant_or_redirect(request)
     if redirect_response:
         return redirect_response
@@ -260,65 +261,62 @@ def whatsapp_create(request):
                 'error': 'Nenhum Evolution API disponível. Entre em contato com o suporte.'
             }, status=400)
         
-        # Gerar número único para este WhatsApp
-        base_number = data.get('phone_number', '')
-        if not base_number:
-            # Gerar automático se não fornecido
-            last_wa = WhatsAppInstance.objects.filter(
-                tenant=tenant
-            ).order_by('-id').first()
-            wa_count = WhatsAppInstance.objects.filter(tenant=tenant).count() + 1
-            base_number = f"55119990{wa_count:04d}"
-        
-        # Criar instância
-        whatsapp = WhatsAppInstance.objects.create(
-            evolution_api=evolution_api,
-            phone_number=base_number,
-            display_name=data.get('display_name', f'WhatsApp #{WhatsAppInstance.objects.filter(tenant=tenant).count() + 1}'),
-            tenant=tenant,
-            connection_status='pending',
-            is_primary=WhatsAppInstance.objects.filter(tenant=tenant).count() == 0
-        )
-        
-        # Gerar QR code automaticamente
+        # Requisitar QR code DA EVOLUTION API (como o RIFAS faz!)
         try:
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
+            import requests
+            
+            url = f"{evolution_api.api_url}/instance/connect/{evolution_api.instance_id}"
+            headers = {'apikey': evolution_api.api_key}
+            
+            print(f"🔗 Requisitando QR code de: {url}")
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            
+            api_response = response.json()
+            qr_code_base64 = api_response.get('base64', '')
+            
+            if not qr_code_base64:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Evolution API não retornou QR code'
+                }, status=400)
+            
+            # Criar instância WhatsApp no banco
+            wa_count = WhatsAppInstance.objects.filter(tenant=tenant).count() + 1
+            
+            whatsapp = WhatsAppInstance.objects.create(
+                evolution_api=evolution_api,
+                phone_number=f"pending_{wa_count}",
+                display_name=data.get('display_name', f'WhatsApp #{wa_count}'),
+                tenant=tenant,
+                connection_status='pending',
+                is_primary=wa_count == 1,
+                qr_code=qr_code_base64,
+                qr_code_expires_at=timezone.now() + timedelta(minutes=5)
             )
-            
-            qr_content = f"evolution://{evolution_api.instance_id}/{base_number}"
-            qr.add_data(qr_content)
-            qr.make(fit=True)
-            
-            img = qr.make_image(fill_color="black", back_color="white")
-            
-            buffer = BytesIO()
-            img.save(buffer, format='PNG')
-            img_str = base64.b64encode(buffer.getvalue()).decode()
-            
-            whatsapp.qr_code = img_str
-            whatsapp.qr_code_expires_at = timezone.now() + timedelta(minutes=5)
-            whatsapp.save()
             
             return JsonResponse({
                 'success': True,
                 'whatsapp_id': whatsapp.id,
-                'phone_number': base_number,
-                'qr_code': f"data:image/png;base64,{img_str}",
+                'qr_code': f"data:image/png;base64,{qr_code_base64}",
                 'expires_at': whatsapp.qr_code_expires_at.isoformat(),
-                'message': 'WhatsApp criado com sucesso! Aponte sua câmera para o QR code.'
+                'message': 'Aponte sua câmera para o QR code para conectar seu WhatsApp!'
             })
-        except Exception as qr_error:
-            whatsapp.delete()
+            
+        except requests.exceptions.RequestException as e:
             return JsonResponse({
                 'success': False,
-                'error': f'Erro ao gerar QR code: {str(qr_error)}'
+                'error': f'Erro ao conectar com Evolution API: {str(e)}'
+            }, status=400)
+        except Exception as qr_error:
+            print(f"❌ Erro ao processar resposta da Evolution API: {qr_error}")
+            return JsonResponse({
+                'success': False,
+                'error': f'Erro ao processar QR code: {str(qr_error)}'
             }, status=400)
     
     except Exception as e:
+        print(f"❌ Erro geral em whatsapp_create: {e}")
         return JsonResponse({
             'success': False,
             'error': str(e)
