@@ -264,7 +264,7 @@
     
     /* Modal/Popup para QR Code */
     .modal-overlay {
-        display: none !important;
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
@@ -277,7 +277,7 @@
     }
     
     .modal-overlay.show {
-        display: flex !important;
+        display: flex;
     }
     
     .modal-content {
@@ -515,40 +515,22 @@ const whatsappId = {% if whatsapps %}{{ whatsapps.0.id }}{% else %}null{% endif 
 
 let pollingInterval = null;
 
-// Garantir que o modal comece fechado - executar IMEDIATAMENTE
-(function() {
-    console.log('🚀 Forçando modal fechado IMEDIATAMENTE');
-    const modal = document.getElementById('qrModal');
-    if (modal) {
-        modal.classList.remove('show');
-        modal.style.display = 'none';
-    }
-})();
-
-// Garantir novamente quando a página carregar completamente
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Página carregada - garantindo modal fechado novamente');
-    const modal = document.getElementById('qrModal');
-    if (modal) {
-        modal.classList.remove('show');
-        modal.style.display = 'none';
-    }
-});
-
 function atualizarStatus() {
     console.log('🔄 Atualizando status...');
     location.reload();
 }
 
 function abrirModal() {
-    document.getElementById('qrModal').classList.add('show');
+    console.log('🚀 Abrindo modal');
+    const modal = document.getElementById('qrModal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
 }
 
 function fecharModal() {
     console.log('🚪 Fechando modal');
     const modal = document.getElementById('qrModal');
     modal.classList.remove('show');
-    modal.style.display = 'none';
     
     // Limpar polling ao fechar modal
     if (pollingInterval) {
