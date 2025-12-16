@@ -136,6 +136,7 @@ def whatsapp_generate_qrcode(request, id):
 
 @login_required
 @require_http_methods(["POST"])
+@require_http_methods(["POST"])
 def whatsapp_disconnect(request, id):
     """Desconectar um WhatsApp"""
     tenant, redirect_response = _get_tenant_or_redirect(request)
@@ -145,10 +146,25 @@ def whatsapp_disconnect(request, id):
     whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
     
     try:
+        print(f"🔌 Desconectando WhatsApp ID: {id}, Instance: {whatsapp.instance_name}")
+        
+        # Opcional: Desconectar na Evolution API também
+        if whatsapp.instance_name and settings.EVOLUTION_API_URL and settings.EVOLUTION_API_KEY:
+            try:
+                headers = {'apikey': settings.EVOLUTION_API_KEY}
+                logout_url = f"{settings.EVOLUTION_API_URL}/instance/logout/{whatsapp.instance_name}"
+                print(f"🔗 Chamando logout: {logout_url}")
+                response = requests.post(logout_url, headers=headers, timeout=10)
+                print(f"📊 Resposta logout: {response.status_code}")
+            except Exception as api_error:
+                print(f"⚠️  Erro ao deslogar na Evolution API (não crítico): {api_error}")
+        
+        # Atualizar status no banco
         whatsapp.connection_status = 'disconnected'
         whatsapp.disconnected_at = timezone.now()
-        whatsapp.session_id = ''
-        whatsapp.save()
+        whatsapp.save(update_fields=['connection_status', 'disconnected_at'])
+        
+        print(f"✅ WhatsApp {whatsapp.instance_name} desconectado com sucesso")
         
         return JsonResponse({
             'success': True,
@@ -156,9 +172,12 @@ def whatsapp_disconnect(request, id):
         })
     
     except Exception as e:
+        print(f"❌ Erro ao desconectar WhatsApp: {e}")
+        import traceback
+        traceback.print_exc()
         return JsonResponse({
             'success': False,
-            'error': str(e)
+            'error': f'Erro ao desconectar: {str(e)}'
         }, status=400)
 
 
