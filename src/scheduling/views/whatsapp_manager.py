@@ -167,33 +167,24 @@ def whatsapp_disconnect(request, id):
         
         headers = {'apikey': settings.EVOLUTION_API_KEY}
         
-        # Tentar logout primeiro
+        # Fazer LOGOUT na Evolution API (mantém a instância)
         try:
             logout_url = f"{settings.EVOLUTION_API_URL}/instance/logout/{whatsapp.instance_name}"
-            print(f"🔗 [1/2] Chamando logout: {logout_url}")
+            print(f"🔗 Chamando logout: {logout_url}")
             logout_response = requests.post(logout_url, headers=headers, timeout=10)
             print(f"📊 Resposta logout: {logout_response.status_code}")
             
             if logout_response.status_code in [200, 201]:
-                print(f"✅ Logout realizado com sucesso")
+                print(f"✅ Logout realizado com sucesso - instância mantida")
             else:
                 print(f"⚠️  Logout retornou código {logout_response.status_code}")
+                # Mesmo assim, vamos marcar como desconectado no banco
         except Exception as logout_error:
-            print(f"⚠️  Erro no logout (tentando deletar): {logout_error}")
-        
-        # Deletar a instância (mais definitivo)
-        try:
-            delete_url = f"{settings.EVOLUTION_API_URL}/instance/delete/{whatsapp.instance_name}"
-            print(f"🔗 [2/2] Chamando delete: {delete_url}")
-            delete_response = requests.delete(delete_url, headers=headers, timeout=10)
-            print(f"📊 Resposta delete: {delete_response.status_code}")
-            
-            if delete_response.status_code in [200, 201, 404]:
-                print(f"✅ Instância deletada/não encontrada")
-            else:
-                print(f"⚠️  Delete retornou código {delete_response.status_code}")
-        except Exception as delete_error:
-            print(f"⚠️  Erro no delete: {delete_error}")
+            print(f"⚠️  Erro no logout: {logout_error}")
+            return JsonResponse({
+                'success': False,
+                'error': f'Erro ao desconectar da Evolution API: {str(logout_error)}'
+            }, status=500)
         
         # Atualizar status no banco usando QuerySet.update() para evitar validações
         WhatsAppInstance.objects.filter(id=id).update(
