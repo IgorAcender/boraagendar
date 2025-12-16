@@ -41,6 +41,10 @@
 <div class="whatsapp-container">
     <div class="header"><h1>Gerenciador WhatsApp Evolution API</h1></div>
 
+    {% if whatsapps and whatsapps.0 %}
+    <div data-whatsapp-id="{{ whatsapps.0.id }}"></div>
+    {% endif %}
+
     <div class="panel">
         <h3 style="margin:0 0 8px">Status da Conexão</h3>
         <p style="margin:6px 0 14px; color:#6b7280"><span id="status-dot">🔴</span> <strong id="status-text">Desconectado</strong></p>
@@ -64,8 +68,8 @@
 
         <div style="margin-top:14px; display:flex; gap:12px">
             <button class="btn-connect btn-green" onclick="updateStatusAll()">🔄 Atualizar Status</button>
-            <button class="btn-connect btn-teal" onclick="showQr()">📷 Mostrar QR Code</button>
-            <button class="btn-connect btn-yellow" onclick="restartInstance()">🔁 Reiniciar Instância</button>
+            <button class="btn-connect btn-teal" onclick="reconectar()">� Reconectar WhatsApp</button>
+            <button class="btn-connect btn-yellow" onclick="showQr()">� Mostrar QR Code</button>
             <button class="btn-connect btn-red" onclick="disconnect()">⛔ Desconectar WhatsApp</button>
         </div>
     </div>
@@ -137,6 +141,39 @@ function showQr() {
             console.error(err);
             resultado.innerHTML = `<div class="alert alert-danger">❌ Erro ao gerar QR: ${err.message}</div>`;
         });
+}
+
+function reconectar() {
+    const resultado = document.getElementById('resultado');
+    resultado.innerHTML = '<div class="loading"></div>';
+
+    const whatsappId = document.querySelector('[data-whatsapp-id]')?.getAttribute('data-whatsapp-id');
+    if (!whatsappId) {
+        resultado.innerHTML = '<div class="alert alert-danger">❌ Nenhum WhatsApp para reconectar</div>';
+        return;
+    }
+
+    fetch('{% url "whatsapp:reconnect" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ whatsapp_id: whatsappId })
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        if (data.qr_code) {
+            resultado.innerHTML = `\n                    <div class="qr-display">\n                        <h3>✅ Reconectando!</h3>\n                        <img src="${data.qr_code}" alt="QR Code WhatsApp">\n                        <p style="color: #6b7280;">${data.message}</p>\n                    </div>\n                `;
+            updateStatusAll();
+        } else {
+            resultado.innerHTML = `<div class="alert alert-danger">❌ ${data.error || 'Erro ao reconectar'}</div>`;
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        resultado.innerHTML = `<div class="alert alert-danger">❌ Erro: ${err.message}</div>`;
+    });
 }
 
 function restartInstance() {

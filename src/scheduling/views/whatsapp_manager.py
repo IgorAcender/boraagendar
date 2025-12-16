@@ -219,6 +219,96 @@ def whatsapp_status_api(request, id):
 
 @login_required
 @require_http_methods(["POST"])
+def whatsapp_reconnect(request):
+    """Reconectar a instância via Evolution API"""
+    tenant, redirect_response = _get_tenant_or_redirect(request)
+    if redirect_response:
+        return redirect_response
+
+    try:
+        data = json.loads(request.body or "{}")
+        whatsapp_id = data.get('whatsapp_id')
+        
+        if not whatsapp_id:
+            return JsonResponse({'success': False, 'error': 'whatsapp_id é obrigatório'}, status=400)
+        
+        whatsapp = get_object_or_404(WhatsAppInstance, id=whatsapp_id, tenant=tenant)
+        instance_name = whatsapp.instance_name
+        
+        if not instance_name or not settings.EVOLUTION_API_URL or not settings.EVOLUTION_API_KEY:
+            return JsonResponse({'success': False, 'error': 'Configuração incompleta'}, status=400)
+        
+        headers = {'apikey': settings.EVOLUTION_API_KEY, 'Content-Type': 'application/json'}
+        
+        # Chamar endpoint connect para reabrir a instância
+        connect_url = f"{settings.EVOLUTION_API_URL}/instance/connect/{instance_name}"
+        print(f"🔗 Reconectando: GET {connect_url}")
+        
+        connect_response = requests.get(connect_url, headers=headers, timeout=10)
+        connect_response.raise_for_status()
+        
+        api_response = connect_response.json()
+        print(f"📡 Resposta: {api_response}")
+        
+        # Extrair QR code
+        qr_code_base64 = (
+            api_response.get('base64') or 
+            api_response.get('qrcode') or 
+            (api_response.get('instance', {}).get('base64')) or
+            (api_response.get('instance', {}).get('qrcode'))
+        )
+        
+        if qr_code_base64 and isinstance(qr_code_base64, str) and qr_code_base64.startswith('data:image'):
+            qr_code_base64 = qr_code_base64.split(',', 1)[-1]
+        
+        # Se conseguiu QR code, atualizar instância
+        if qr_code_base64:
+            whatsapp.qr_code = qr_code_base64
+            whatsapp.qr_code_expires_at = timezone.now() + timedelta(minutes=5)
+            whatsapp.connection_status = 'connecting'
+            whatsapp.save()
+            
+            return JsonResponse({
+                'success': True,
+                'qr_code': f"data:image/png;base64,{qr_code_base64}",
+                'message': 'Reconectando... Escaneie o QR code com seu WhatsApp'
+            })
+        else:
+            # Tentar alternativa
+            qr_url = f"{settings.EVOLUTION_API_URL}/instance/qrcode/{instance_name}"
+            qr_response = requests.get(qr_url, headers=headers, timeout=10)
+            
+            if qr_response.status_code == 200:
+                qr_data = qr_response.json()
+                qr_code_base64 = qr_data.get('base64') or qr_data.get('qrcode')
+                
+                if qr_code_base64:
+                    if isinstance(qr_code_base64, str) and qr_code_base64.startswith('data:image'):
+                        qr_code_base64 = qr_code_base64.split(',', 1)[-1]
+                    
+                    whatsapp.qr_code = qr_code_base64
+                    whatsapp.qr_code_expires_at = timezone.now() + timedelta(minutes=5)
+                    whatsapp.connection_status = 'connecting'
+                    whatsapp.save()
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'qr_code': f"data:image/png;base64,{qr_code_base64}",
+                        'message': 'Reconectando... Escaneie o QR code com seu WhatsApp'
+                    })
+        
+        return JsonResponse({
+            'success': False,
+            'error': 'Não foi possível gerar QR code. Tente novamente.'
+        }, status=500)
+        
+    except Exception as e:
+        print(f"❌ Erro: {e}")
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["POST"])
 def whatsapp_send_test(request):
     """Enviar mensagem de teste a partir do dashboard"""
     tenant, redirect_response = _get_tenant_or_redirect(request)
