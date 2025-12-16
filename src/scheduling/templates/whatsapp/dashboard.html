@@ -96,10 +96,43 @@
 <script>
 console.log('✅ Script carregado');
 
+// Sincronizar status ao carregar a página
+window.addEventListener('load', () => {
+    console.log('📟 Página carregada, sincronizando status...');
+    updateStatusAll();
+});
+
+// Sincronizar a cada 10 segundos
+setInterval(updateStatusAll, 10000);
+
 function updateStatusAll() {
     const statusText = document.getElementById('status-text');
     const statusDot = document.getElementById('status-dot');
 
+    // Primeiro, sincroniza com Evolution API via whatsapp_status_api
+    const whatsappId = document.querySelector('[data-whatsapp-id]')?.getAttribute('data-whatsapp-id');
+    if (whatsappId) {
+        fetch(`/dashboard/whatsapp/${whatsappId}/status/`)
+            .then(r => r.json())
+            .then(data => {
+                console.log('✅ Status sincronizado:', data.status);
+                document.getElementById('instance-state').textContent = data.status || 'disconnected';
+                
+                if (data.status === 'connected') {
+                    statusText.textContent = 'Conectado'; 
+                    statusDot.textContent = '🟢';
+                } else if (data.status === 'connecting') {
+                    statusText.textContent = 'Conectando'; 
+                    statusDot.textContent = '�';
+                } else {
+                    statusText.textContent = 'Desconectado'; 
+                    statusDot.textContent = '🔴';
+                }
+            })
+            .catch(err => console.error('Erro ao sincronizar:', err));
+    }
+
+    // Depois, tenta listar todos
     fetch('{% url "whatsapp:list_api" %}')
         .then(r => r.json())
         .then(data => {
@@ -112,14 +145,7 @@ function updateStatusAll() {
             }
 
             const first = whats[0];
-            document.getElementById('instance-state').textContent = first.status || 'disconnected';
-            if (first.status === 'connected') {
-                statusText.textContent = 'Conectado'; statusDot.textContent = '🟢';
-            } else if (first.status === 'connecting') {
-                statusText.textContent = 'Conectando'; statusDot.textContent = '🟡';
-            } else {
-                statusText.textContent = 'Desconectado'; statusDot.textContent = '🔴';
-            }
+            console.log('📊 Lista de WhatsApps:', first);
         })
         .catch(err => console.error(err));
 }

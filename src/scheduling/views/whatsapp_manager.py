@@ -197,12 +197,48 @@ def whatsapp_set_primary(request, id):
 
 @login_required
 def whatsapp_status_api(request, id):
-    """API para obter status"""
+    """API para obter status - SINCRONIZADO COM EVOLUTION API"""
     tenant, redirect_response = _get_tenant_or_redirect(request)
     if redirect_response:
         return redirect_response
     
     whatsapp = get_object_or_404(WhatsAppInstance, id=id, tenant=tenant)
+    
+    # Tentar sincronizar com Evolution API se configurado
+    if whatsapp.instance_name and settings.EVOLUTION_API_URL and settings.EVOLUTION_API_KEY:
+        try:
+            headers = {'apikey': settings.EVOLUTION_API_KEY}
+            # Chamar Evolution API para obter status real
+            status_url = f"{settings.EVOLUTION_API_URL}/instance/{whatsapp.instance_name}"
+            status_response = requests.get(status_url, headers=headers, timeout=10)
+            
+            if status_response.status_code == 200:
+                api_data = status_response.json()
+                print(f"📡 Status real da Evolution API: {api_data}")
+                
+                # Extrair estado real
+                instance_state = api_data.get('instance', {}).get('state') or api_data.get('state')
+                
+                if instance_state:
+                    # Mapear estado da Evolution para nossos status
+                    if instance_state in ['open', 'connected']:
+                        real_status = 'connected'
+                        whatsapp.connected_at = timezone.now()
+                        whatsapp.disconnected_at = None
+                    elif instance_state in ['qr']:
+                        real_status = 'connecting'
+                    else:
+                        real_status = 'disconnected'
+                        whatsapp.disconnected_at = timezone.now()
+                    
+                    # Atualizar banco com status real
+                    if whatsapp.connection_status != real_status:
+                        print(f"✅ Sincronizando status: {whatsapp.connection_status} → {real_status}")
+                        whatsapp.connection_status = real_status
+                        whatsapp.save()
+        
+        except requests.exceptions.RequestException as e:
+            print(f"⚠️  Erro ao sincronizar com Evolution API: {e}")
     
     return JsonResponse({
         'id': whatsapp.id,
