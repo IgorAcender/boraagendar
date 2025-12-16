@@ -163,6 +163,8 @@
 <script>
 console.log('✅ Script carregado');
 
+let checkStatusInterval = null;
+
 function conectarWhatsApp() {
     console.log('🚀 Iniciando conexão WhatsApp...');
     
@@ -198,14 +200,22 @@ function conectarWhatsApp() {
         if (data.success && data.qr_code) {
             resultado.innerHTML = `
                 <div class="qr-display">
-                    <h3>✅ QR Code Gerado!</h3>
-                    <img src="${data.qr_code}" alt="QR Code WhatsApp">
-                    <p style="color: #6b7280;">
+                    <h3>📱 Aguardando Conexão...</h3>
+                    <img src="${data.qr_code}" alt="QR Code WhatsApp" id="qrCodeImage">
+                    <p style="color: #6b7280; margin-top: 15px;">
                         ${data.message || 'Escaneie o QR code com seu WhatsApp'}
                     </p>
-                    ${data.instance_name ? `<p style="font-size: 0.9em; color: #9ca3af;">Instância: ${data.instance_name}</p>` : ''}
+                    <p style="font-size: 0.9em; color: #9ca3af; margin-top: 10px;">
+                        ⏱️ Verificando conexão...
+                    </p>
+                    ${data.instance_name ? `<p style="font-size: 0.85em; color: #d1d5db;">Instância: ${data.instance_name}</p>` : ''}
                 </div>
             `;
+            
+            // Iniciar polling para verificar status
+            if (data.whatsapp_id) {
+                iniciarVerificacaoStatus(data.whatsapp_id);
+            }
         } else {
             resultado.innerHTML = `
                 <div class="alert alert-danger">
@@ -224,5 +234,76 @@ function conectarWhatsApp() {
         `;
     });
 }
+
+function iniciarVerificacaoStatus(whatsappId) {
+    console.log('🔄 Iniciando verificação de status...');
+    
+    // Limpar intervalo anterior se existir
+    if (checkStatusInterval) {
+        clearInterval(checkStatusInterval);
+    }
+    
+    let tentativas = 0;
+    const maxTentativas = 60; // 5 minutos (5 segundos x 60)
+    
+    checkStatusInterval = setInterval(() => {
+        tentativas++;
+        console.log(`🔍 Verificando status (tentativa ${tentativas}/${maxTentativas})...`);
+        
+        // Verificar se WhatsApp conectou (simplificado - recarrega página)
+        // Em produção, você faria uma requisição AJAX para verificar o status
+        fetch(window.location.href, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            // Se a página mostra "Conectado", recarregar
+            if (html.includes('✅ Conectado') || html.includes('status-connected')) {
+                console.log('✅ WhatsApp conectado! Recarregando...');
+                clearInterval(checkStatusInterval);
+                
+                // Mostrar mensagem de sucesso antes de recarregar
+                const resultado = document.getElementById('resultado');
+                resultado.innerHTML = `
+                    <div class="alert alert-success">
+                        <h3>✅ WhatsApp Conectado com Sucesso!</h3>
+                        <p>Recarregando página...</p>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+        })
+        .catch(err => console.error('Erro ao verificar status:', err));
+        
+        // Parar após max tentativas
+        if (tentativas >= maxTentativas) {
+            console.log('⏰ Timeout: QR code expirou');
+            clearInterval(checkStatusInterval);
+            
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = `
+                <div class="alert alert-danger">
+                    ⏰ QR Code expirou (5 minutos)
+                    <button class="btn-connect" onclick="conectarWhatsApp()" style="margin-top: 15px;">
+                        🔄 Gerar Novo QR Code
+                    </button>
+                </div>
+            `;
+        }
+    }, 5000); // Verifica a cada 5 segundos
+}
+
+// Limpar intervalo ao sair da página
+window.addEventListener('beforeunload', () => {
+    if (checkStatusInterval) {
+        clearInterval(checkStatusInterval);
+    }
+});
 </script>
 {% endblock %}
