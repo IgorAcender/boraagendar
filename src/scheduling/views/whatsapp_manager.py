@@ -56,6 +56,7 @@ def whatsapp_dashboard(request):
         'stats': stats,
         'tenant': tenant,
         'has_primary': whatsapps.filter(is_primary=True).exists(),
+        'EVOLUTION_API_URL': settings.EVOLUTION_API_URL,
     }
     
     return render(request, 'whatsapp/dashboard.html', context)
