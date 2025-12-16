@@ -492,7 +492,7 @@
 </div>
 
 <!-- Modal para QR Code -->
-<div id="qrModal" class="modal-overlay" style="display: none;" onclick="fecharModalSeForaDoConteudo(event)">
+<div id="qrModal" class="modal-overlay" onclick="fecharModalSeForaDoConteudo(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <button class="modal-close" onclick="fecharModal()">×</button>
         <h2 class="modal-qr-title">📱 Conectar WhatsApp</h2>
@@ -511,6 +511,13 @@
 
 <script>
 console.log('✅ Script carregado');
+
+// Forçar modal fechado no carregamento
+const qrModal = document.getElementById('qrModal');
+if (qrModal) {
+    qrModal.classList.remove('show');
+    qrModal.style.display = 'none';
+}
 
 // ID do WhatsApp (se existir)
 const whatsappId = {% if whatsapps %}{{ whatsapps.0.id }}{% else %}null{% endif %};
