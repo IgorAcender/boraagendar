@@ -5,17 +5,34 @@
 
 {% block extra_css %}
 <style>
+    /* Grid 2 Colunas */
     .whatsapp-container {
-        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        padding: 2rem 0;
     }
-    
+
+    .left-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
     /* Hero Header */
     .hero-header {
+        grid-column: 1 / -1;
         background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
         color: white;
         border-radius: 20px;
         padding: 2rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1rem;
         box-shadow: 0 10px 40px rgba(37, 211, 102, 0.3);
     }
 
@@ -30,38 +47,14 @@
         margin: 0;
         font-size: 1rem;
     }
-    
-    /* Main Content Grid - 2 Colunas */
-    .whatsapp-content {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
 
-    /* ========================
-       COLUNA ESQUERDA
-       ======================== */
-    
-    .left-column {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    /* Status Card com Timeline */
+    /* Status Card */
     .status-card {
         background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
         border-left: 5px solid #25d366;
         border-radius: 14px;
         padding: 1.5rem;
         box-shadow: 0 4px 16px rgba(37, 211, 102, 0.12);
-        transition: all 0.3s ease;
-    }
-
-    .status-card:hover {
-        box-shadow: 0 8px 24px rgba(37, 211, 102, 0.18);
-        transform: translateY(-2px);
     }
 
     .status-card h3 {
@@ -69,9 +62,6 @@
         font-size: 18px;
         font-weight: 600;
         color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: 8px;
     }
 
     .status-badge {
@@ -83,12 +73,6 @@
         padding: 0.75rem 1.25rem;
         border-radius: 10px;
         margin-bottom: 1rem;
-        width: fit-content;
-    }
-
-    .status-badge.disconnected {
-        color: #991b1b;
-        background: #fee2e2;
     }
 
     .status-badge.connected {
@@ -96,46 +80,46 @@
         background: #d1fae5;
     }
 
-    .status-badge.connecting {
-        color: #92400e;
-        background: #fef3c7;
+    .status-badge.disconnected {
+        color: #991b1b;
+        background: #fee2e2;
     }
 
-    .status-info-inline {
+    .status-info {
         background: white;
         border-radius: 10px;
         padding: 1rem;
         margin-bottom: 1rem;
+        font-size: 14px;
+        line-height: 1.6;
     }
 
-    .status-info-inline p {
+    .status-info p {
         margin: 0.5rem 0;
-        font-size: 14px;
         color: #1e293b;
     }
 
-    .status-info-inline strong {
+    .status-info strong {
         color: #25d366;
     }
 
-    .status-timeline {
+    /* Timeline */
+    .timeline {
         margin-top: 1rem;
         padding-top: 1rem;
         border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
 
-    .status-timeline-title {
+    .timeline-title {
         font-size: 12px;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
         color: #64748b;
         margin-bottom: 0.75rem;
     }
 
     .timeline-item {
         display: flex;
-        align-items: center;
         gap: 0.75rem;
         margin-bottom: 0.65rem;
         color: #475569;
@@ -147,10 +131,9 @@
         flex-shrink: 0;
         color: #25d366;
         font-weight: bold;
-        font-size: 14px;
     }
 
-    /* Test Message Section */
+    /* Form Section */
     .test-section {
         background: white;
         border-radius: 14px;
@@ -163,16 +146,6 @@
         font-size: 18px;
         font-weight: 600;
         color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .test-hint {
-        font-size: 12px;
-        color: #64748b;
-        margin-bottom: 1.25rem;
-        font-style: italic;
     }
 
     .form-group {
@@ -194,29 +167,19 @@
         border: 2px solid #e2e8f0;
         border-radius: 8px;
         font-size: 14px;
-        font-family: 'Poppins', sans-serif;
-        transition: all 0.2s;
         box-sizing: border-box;
     }
-    
+
     .form-input:focus,
     .form-textarea:focus {
         outline: none;
         border-color: #25d366;
         box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
-        background: #f0fdf4;
     }
 
     .form-textarea {
         min-height: 85px;
         resize: vertical;
-    }
-
-    .form-hint {
-        font-size: 12px;
-        color: #64748b;
-        margin-top: 5px;
-        font-style: italic;
     }
 
     .btn-send {
@@ -228,28 +191,18 @@
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        display: inline-flex;
+        display: flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
+        width: 100%;
         transition: all 0.2s;
         box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-        width: 100%;
-        justify-content: center;
     }
-    
+
     .btn-send:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-    }
-
-    /* ========================
-       COLUNA DIREITA
-       ======================== */
-
-    .right-column {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
     }
 
     /* QR Code Section */
@@ -258,9 +211,6 @@
         border-radius: 14px;
         padding: 1.5rem;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
         text-align: center;
     }
 
@@ -271,11 +221,10 @@
         color: #1e293b;
     }
 
-    .qr-section > p:first-of-type {
+    .qr-section > p {
         font-size: 13px;
         color: #64748b;
         margin-bottom: 1.5rem;
-        font-style: italic;
     }
 
     .qr-container {
@@ -300,7 +249,6 @@
         font-size: 12px;
         color: #f59e0b;
         font-weight: 500;
-        margin-top: 0.75rem;
     }
 
     /* Actions Grid 2x2 */
@@ -317,26 +265,19 @@
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 8px;
         color: white;
-        text-decoration: none;
+        transition: all 0.2s;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        text-align: center;
-        line-height: 1.4;
     }
 
     .action-btn:hover {
         transform: translateY(-3px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
-
-    .action-btn:active {
-        transform: translateY(-1px);
     }
 
     .btn-refresh {
@@ -356,11 +297,6 @@
     }
 
     /* Loading & Alerts */
-    .loading {
-        text-align: center;
-        padding: 30px;
-    }
-    
     .loading::after {
         content: "";
         display: inline-block;
@@ -371,35 +307,31 @@
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
-    
+
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
-    
+
     .alert {
         padding: 15px 20px;
         border-radius: 8px;
         margin: 20px 0;
     }
-    
+
     .alert-success {
         background-color: #d1fae5;
         border: 1px solid #34d399;
         color: #065f46;
     }
-    
+
     .alert-danger {
         background-color: #fee2e2;
         border: 1px solid #f87171;
         color: #991b1b;
     }
 
-    #resultado {
-        margin-top: 1rem;
-    }
-
-    /* Modal Styles */
+    /* Modal */
     .qr-modal-overlay {
         display: none;
         position: fixed;
@@ -425,18 +357,6 @@
         width: 90%;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         position: relative;
-        animation: slideIn 0.3s ease-out;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
 
     .modal-close {
@@ -447,12 +367,6 @@
         border: none;
         font-size: 28px;
         cursor: pointer;
-        color: #94a3b8;
-        transition: color 0.2s;
-    }
-
-    .modal-close:hover {
-        color: #1e293b;
     }
 
     .modal-qr-title {
@@ -463,17 +377,6 @@
         text-align: center;
     }
 
-    .modal-qr-subtitle {
-        margin: 0 0 1.5rem 0;
-        font-size: 14px;
-        color: #64748b;
-        text-align: center;
-    }
-
-    #modalQRContent {
-        margin-bottom: 1.5rem;
-    }
-
     .modal-qr-image {
         display: flex;
         justify-content: center;
@@ -482,237 +385,111 @@
 
     .modal-qr-image img {
         max-width: 250px;
-        border-radius: 8px;
     }
 
-    .modal-qr-status {
-        background: #f0fdf4;
-        border: 2px solid #86efac;
-        border-radius: 8px;
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: #065f46;
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #25d366;
-        border-top-color: transparent;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-
-    /* Responsive Design */
+    /* Responsive */
     @media (max-width: 1024px) {
-        .whatsapp-content {
-            grid-template-columns: 1fr;
-        }
-
-        .hero-header {
-            padding: 1.5rem;
-        }
-
-        .hero-header h1 {
-            font-size: 1.5rem;
-        }
-
-        .status-card,
-        .test-section,
-        .qr-section {
-            padding: 1.25rem;
-        }
-    }
-
-    @media (max-width: 640px) {
         .whatsapp-container {
-            padding: 0;
-        }
-
-        .hero-header {
-            border-radius: 12px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero-header h1 {
-            font-size: 1.25rem;
-        }
-
-        .hero-header p {
-            font-size: 0.9rem;
-        }
-
-        .whatsapp-content {
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .status-card,
-        .test-section,
-        .qr-section {
-            padding: 1rem;
-            border-radius: 10px;
-        }
-
-        .status-card h3,
-        .test-section h2,
-        .qr-section h2 {
-            font-size: 16px;
-        }
-
-        .actions-grid {
-            gap: 0.75rem;
-        }
-
-        .action-btn {
-            padding: 1rem;
-            font-size: 12px;
-            gap: 6px;
-        }
-
-        .qr-container {
-            min-height: 200px;
-            padding: 1rem;
-        }
-
-        .qr-modal-content {
-            padding: 1.5rem;
-        }
-
-        .form-textarea {
-            min-height: 70px;
+            grid-template-columns: 1fr;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
+
+<!-- Hero Header -->
+<div class="hero-header">
+    <h1>📱 Gerenciador WhatsApp</h1>
+    <p>Integração Evolution API • Mensagens em Tempo Real</p>
+</div>
+
 <div class="whatsapp-container">
-    <!-- Hero Header -->
-    <div class="hero-header">
-        <h1>📱 Gerenciador WhatsApp</h1>
-        <p>Integração Evolution API • Mensagens em Tempo Real</p>
-    </div>
-    
-    <!-- Main Content - 2 Columns -->
-    <div class="whatsapp-content">
-        <!-- COLUNA ESQUERDA -->
-        <div class="left-column">
-            <!-- Status Card com Timeline -->
-            <div class="status-card">
-                <h3>🔌 Conexão WhatsApp</h3>
-                
-                {% if whatsapps %}
-                    {% with wa=whatsapps.0 %}
-                    <div class="status-badge {% if wa.connection_status == 'connected' %}connected{% elif wa.connection_status == 'connecting' %}connecting{% else %}disconnected{% endif %}">
-                        {% if wa.connection_status == 'connected' %}
-                            🟢 ✓ Conectado
-                        {% elif wa.connection_status == 'connecting' %}
-                            ⏳ ⟳ Conectando
-                        {% else %}
-                            🔴 ✗ Desconectado
-                        {% endif %}
-                    </div>
-                    
-                    <div class="status-info-inline">
-                        <p><strong>Instância:</strong> {{ wa.instance_name|default:"rifas-whatsapp" }}</p>
-                        <p><strong>Status:</strong> {{ wa.connection_status }}</p>
-                        <p><strong>URL:</strong> {{ EVOLUTION_API_URL }}</p>
-                    </div>
-                    {% endwith %}
-                {% else %}
-                    <div class="status-badge disconnected">
-                        🔴 ✗ Desconectado
-                    </div>
-                    
-                    <div class="status-info-inline">
-                        <p><strong>Instância:</strong> Nenhuma configurada</p>
-                        <p><strong>Status:</strong> disconnected</p>
-                        <p><strong>URL:</strong> {{ EVOLUTION_API_URL }}</p>
-                    </div>
-                {% endif %}
-
-                <!-- Timeline de Ações -->
-                <div class="status-timeline">
-                    <div class="status-timeline-title">Últimas Ações</div>
-                    <div class="timeline-item">Reconectou há 5 minutos</div>
-                    <div class="timeline-item">Mensagem enviada há 10 minutos</div>
-                    <div class="timeline-item">QR Code lido há 1 hora</div>
-                </div>
-            </div>
+    <!-- COLUNA ESQUERDA -->
+    <div class="left-column">
+        <!-- Status Card -->
+        <div class="status-card">
+            <h3>🔌 Conexão WhatsApp</h3>
             
-            <!-- Enviar Mensagem de Teste -->
-            <div class="test-section">
-                <h2>💬 Enviar Mensagem de Teste</h2>
-                <p class="test-hint">
-                    Você pode enviar para números individuais ou para grupos WhatsApp
-                </p>
-                
-                <div class="form-group">
-                    <label class="form-label">📱 Número do WhatsApp ou ID do Grupo</label>
-                    <input 
-                        type="text" 
-                        id="recipient" 
-                        class="form-input" 
-                        placeholder="Ex: 5511987654321 ou 120363012345678-1234567890@g.us"
-                    >
+            {% if whatsapps %}
+                {% with wa=whatsapps.0 %}
+                <div class="status-badge {% if wa.connection_status == 'connected' %}connected{% else %}disconnected{% endif %}">
+                    {% if wa.connection_status == 'connected' %}
+                        🟢 ✓ Conectado
+                    {% else %}
+                        🔴 ✗ Desconectado
+                    {% endif %}
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">💬 Mensagem</label>
-                    <textarea 
-                        id="message" 
-                        class="form-textarea" 
-                        placeholder="Digite a mensagem de teste..."
-                    ></textarea>
+                <div class="status-info">
+                    <p><strong>Instância:</strong> {{ wa.instance_name|default:"rifas-whatsapp" }}</p>
+                    <p><strong>Status:</strong> {{ wa.connection_status }}</p>
+                    <p><strong>URL:</strong> {{ EVOLUTION_API_URL }}</p>
+                </div>
+                {% endwith %}
+            {% else %}
+                <div class="status-badge disconnected">
+                    🔴 ✗ Desconectado
                 </div>
                 
-                <button class="btn-send" onclick="enviarMensagemTeste()">
-                    📤 Enviar Mensagem
-                </button>
+                <div class="status-info">
+                    <p><strong>Instância:</strong> Nenhuma configurada</p>
+                    <p><strong>Status:</strong> disconnected</p>
+                    <p><strong>URL:</strong> {{ EVOLUTION_API_URL }}</p>
+                </div>
+            {% endif %}
 
-                <div id="resultado"></div>
+            <!-- Timeline -->
+            <div class="timeline">
+                <div class="timeline-title">Últimas Ações</div>
+                <div class="timeline-item">Reconectou há 5 minutos</div>
+                <div class="timeline-item">Mensagem enviada há 10 minutos</div>
+                <div class="timeline-item">QR Code lido há 1 hora</div>
             </div>
         </div>
 
-        <!-- COLUNA DIREITA -->
-        <div class="right-column">
-            <!-- QR Code Section -->
-            <div class="qr-section">
-                <h2>📲 Conectar WhatsApp</h2>
-                <p>Escaneie o QR Code com seu celular</p>
-                
-                <div class="qr-container">
-                    <div style="text-align: center; color: #64748b;">
-                        <p style="margin: 0; font-size: 48px; margin-bottom: 10px;">📱</p>
-                        <p style="margin: 0; font-size: 13px;">Clique em "Novo QR Code" para gerar</p>
-                    </div>
-                </div>
-                
-                <p class="qr-expires">⏰ Código expira em 2 minutos</p>
+        <!-- Form -->
+        <div class="test-section">
+            <h2>💬 Enviar Mensagem de Teste</h2>
+            
+            <div class="form-group">
+                <label class="form-label">📱 Número do WhatsApp</label>
+                <input type="text" id="recipient" class="form-input" placeholder="Ex: 5511987654321">
             </div>
             
-            <!-- Botões de Ação Grid 2x2 -->
-            <div class="actions-grid">
-                <button class="action-btn btn-refresh" onclick="atualizarStatus()">
-                    🔄 Atualizar<br>Status
-                </button>
-                <button class="action-btn btn-reconnect" onclick="reconectarWhatsApp()">
-                    ⚡ Reconectar<br>WhatsApp
-                </button>
-                <button class="action-btn btn-qrcode" onclick="mostrarQRCode()">
-                    📲 Novo<br>QR Code
-                </button>
-                <button class="action-btn btn-disconnect" onclick="desconectarWhatsApp()">
-                    ⛔ Desconectar<br>WhatsApp
-                </button>
+            <div class="form-group">
+                <label class="form-label">💬 Mensagem</label>
+                <textarea id="message" class="form-textarea" placeholder="Digite a mensagem..."></textarea>
             </div>
+            
+            <button class="btn-send" onclick="enviarMensagemTeste()">📤 Enviar Mensagem</button>
+            <div id="resultado"></div>
+        </div>
+    </div>
+
+    <!-- COLUNA DIREITA -->
+    <div class="right-column">
+        <!-- QR Code -->
+        <div class="qr-section">
+            <h2>📲 Conectar WhatsApp</h2>
+            <p>Escaneie o QR Code com seu celular</p>
+            
+            <div class="qr-container">
+                <div style="text-align: center; color: #64748b;">
+                    <p style="margin: 0; font-size: 48px; margin-bottom: 10px;">📱</p>
+                    <p style="margin: 0; font-size: 13px;">Clique em "Novo QR Code"</p>
+                </div>
+            </div>
+            
+            <p class="qr-expires">⏰ Código expira em 2 minutos</p>
+        </div>
+
+        <!-- Botões -->
+        <div class="actions-grid">
+            <button class="action-btn btn-refresh" onclick="atualizarStatus()">🔄 Atualizar Status</button>
+            <button class="action-btn btn-reconnect" onclick="reconectarWhatsApp()">⚡ Reconectar</button>
+            <button class="action-btn btn-qrcode" onclick="mostrarQRCode()">📲 Novo QR</button>
+            <button class="action-btn btn-disconnect" onclick="desconectarWhatsApp()">⛔ Desconectar</button>
         </div>
     </div>
 </div>
@@ -721,39 +498,8 @@
 let whatsappId = {% if whatsapps %}'{{ whatsapps.0.id }}'{% else %}null{% endif %};
 
 function atualizarStatus() {
-    console.log('🔄 Atualizando status...');
-    
-    const qrContainer = document.querySelector('.qr-container');
-    qrContainer.innerHTML = '<div class="loading"></div>';
-    
-    fetch('/dashboard/whatsapp/status/', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('📊 Status:', data);
-        if (data.is_connected) {
-            qrContainer.innerHTML = `
-                <div style="text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
-                    <p style="margin: 0; color: #065f46; font-weight: 600;">
-                        Conectado com sucesso!
-                    </p>
-                </div>
-            `;
-        } else {
-            qrContainer.innerHTML = `
-                <div style="text-align: center; color: #64748b;">
-                    <p style="margin: 0; font-size: 48px; margin-bottom: 10px;">📱</p>
-                    <p style="margin: 0; font-size: 13px;">Desconectado</p>
-                </div>
-            `;
-        }
-    })
-    .catch(error => console.error('❌ Erro:', error));
+    fetch('/dashboard/whatsapp/status/', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+    .then(r => r.json()).then(data => console.log(data)).catch(e => console.error(e));
 }
 
 function abrirModal() {
@@ -764,280 +510,61 @@ function fecharModal() {
     document.getElementById('qrModal').classList.remove('active');
 }
 
-function fecharModalSeForaDoConteudo(event) {
-    if (event.target.id === 'qrModal') {
-        fecharModal();
-    }
-}
-
-function iniciarVerificacaoConexao(whatsappId) {
-    console.log('✓ Iniciando verificação de conexão...');
-    let tentativas = 0;
-    const maxTentativas = 40; // 40 * 3 segundos = 2 minutos
-
-    const pollingInterval = setInterval(() => {
-        tentativas++;
-        console.log(`Tentativa ${tentativas}/${maxTentativas}`);
-        
-        fetch(`/dashboard/whatsapp/${whatsappId}/status/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('📊 Status:', data);
-            
-            if (data.status === 'connected' || data.is_connected) {
-                console.log('✅ WhatsApp conectado! Recarregando página...');
-                clearInterval(pollingInterval);
-                
-                // Atualizar status no modal
-                document.getElementById('statusText').textContent = '✅ WhatsApp conectado com sucesso!';
-                document.getElementById('modalQRStatus').style.background = '#d1fae5';
-                document.getElementById('modalQRStatus').style.borderColor = '#34d399';
-                
-                // Fechar modal e recarregar após 2 segundos
-                setTimeout(() => {
-                    fecharModal();
-                    location.reload();
-                }, 2000);
-            } else if (tentativas >= maxTentativas) {
-                console.log('⏱️  Timeout: QR Code expirou');
-                clearInterval(pollingInterval);
-                
-                // Atualizar status no modal
-                document.getElementById('statusText').textContent = '⏱️ QR Code expirou. Gere um novo.';
-                document.getElementById('modalQRStatus').style.background = '#fee2e2';
-                document.getElementById('modalQRStatus').style.borderColor = '#f87171';
-            }
-        })
-        .catch(error => {
-            console.error('❌ Erro ao verificar status:', error);
-        });
-    }, 3000); // Verifica a cada 3 segundos
-}
-
 function reconectarWhatsApp() {
-    console.log('📱 Reconectando WhatsApp...');
-    
-    // Abrir modal e mostrar loading
     abrirModal();
-    document.getElementById('modalQRContent').innerHTML = '<div class="loading"></div>';
-    document.getElementById('modalQRStatus').style.display = 'none';
-    
-    const url = '{% url "whatsapp:create" %}';
-    
-    fetch(url, {
+    fetch('{% url "whatsapp:create" %}', {
         method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        },
+        headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' },
         body: JSON.stringify({})
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.text().then(text => {
-                throw new Error(`HTTP ${response.status}: ${text.substring(0, 200)}`);
-            });
-        }
-        return response.json();
-    })
+    .then(r => r.json())
     .then(data => {
-        console.log('✅ Resposta:', data);
-        
         if (data.success && data.qr_code) {
-            // Exibir QR Code no modal
-            document.getElementById('modalQRContent').innerHTML = `
-                <div class="modal-qr-image">
-                    <img src="${data.qr_code}" alt="QR Code WhatsApp">
-                </div>
-            `;
-            
-            // Mostrar status de aguardando no modal
-            const modalQRStatus = document.getElementById('modalQRStatus');
-            modalQRStatus.style.display = 'flex';
-            modalQRStatus.style.background = '#f0fdf4';
-            modalQRStatus.style.borderColor = '#86efac';
-            document.getElementById('statusText').textContent = '⏳ Aguardando leitura do QR Code...';
-            
-            // Iniciar polling para verificar se conectou
-            if (data.whatsapp_id) {
-                iniciarVerificacaoConexao(data.whatsapp_id);
-            }
-        } else if (data.success) {
-            // Mostrar mensagem de sucesso no modal
-            document.getElementById('modalQRContent').innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
-                    <div style="font-size: 18px; font-weight: 600; color: #10b981;">
-                        ${data.message}
-                    </div>
-                </div>
-            `;
-            setTimeout(() => location.reload(), 2000);
-        } else {
-            // Mostrar erro no modal
-            document.getElementById('modalQRContent').innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <div style="font-size: 48px; margin-bottom: 15px;">❌</div>
-                    <div style="font-size: 16px; color: #ef4444;">
-                        Erro: ${data.error}
-                    </div>
-                </div>
-            `;
+            document.getElementById('modalQRContent').innerHTML = `<div class="modal-qr-image"><img src="${data.qr_code}"></div>`;
         }
-    })
-    .catch(error => {
-        console.error('❌ Erro:', error);
-        // Mostrar erro no modal
-        document.getElementById('modalQRContent').innerHTML = `
-            <div style="text-align: center; padding: 20px;">
-                <div style="font-size: 48px; margin-bottom: 15px;">❌</div>
-                <div style="font-size: 16px; color: #ef4444;">
-                    Erro ao reconectar: ${error.message}
-                </div>
-            </div>
-        `;
-    });
+    }).catch(e => console.error(e));
 }
 
 function mostrarQRCode() {
-    console.log('📲 Mostrando QR Code...');
     reconectarWhatsApp();
 }
 
 function desconectarWhatsApp() {
-    if (!whatsappId) {
-        alert('Nenhum WhatsApp conectado para desconectar');
-        return;
-    }
-    
-    if (!confirm('Deseja realmente desconectar o WhatsApp?')) return;
-    
-    console.log('⛔ Desconectando WhatsApp...');
-    
-    const resultado = document.getElementById('resultado');
-    resultado.innerHTML = '<div class="loading"></div>';
-    
+    if (!whatsappId || !confirm('Deseja desconectar?')) return;
     fetch(`/dashboard/whatsapp/${whatsappId}/desconectar/`, {
         method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        }
+        headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' }
     })
-    .then(response => {
-        console.log('📊 Status:', response.status);
-        console.log('📊 Content-Type:', response.headers.get('content-type'));
-        
-        // Se não for JSON, tentar ler como texto para debug
-        if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
-            return response.text().then(text => {
-                console.error('❌ Resposta não-JSON:', text.substring(0, 500));
-                throw new Error(`Erro HTTP ${response.status}: ${text.substring(0, 200)}`);
-            });
-        }
-        
-        return response.json();
-    })
+    .then(r => r.json())
     .then(data => {
-        console.log('✅ Resposta:', data);
-        
-        if (data.success) {
-            resultado.innerHTML = `
-                <div class="alert alert-success">
-                    ✅ ${data.message}
-                </div>
-            `;
-            setTimeout(() => location.reload(), 2000);
-        } else {
-            resultado.innerHTML = `
-                <div class="alert alert-danger">
-                    ❌ Erro: ${data.error}
-                </div>
-            `;
-        }
-    })
-    .catch(error => {
-        console.error('❌ Erro completo:', error);
-        resultado.innerHTML = `
-            <div class="alert alert-danger">
-                ❌ Erro ao desconectar: ${error.message}
-            </div>
-        `;
-    });
+        if (data.success) location.reload();
+    }).catch(e => console.error(e));
 }
 
 function enviarMensagemTeste() {
     const recipient = document.getElementById('recipient').value.trim();
     const message = document.getElementById('message').value.trim();
-    
-    if (!recipient || !message) {
-        alert('Por favor, preencha o número/grupo e a mensagem');
-        return;
-    }
-    
-    console.log('📤 Enviando mensagem teste...');
-    
-    const resultado = document.getElementById('resultado');
-    resultado.innerHTML = '<div class="loading"></div>';
+    if (!recipient || !message) { alert('Preencha todos os campos'); return; }
     
     fetch('/dashboard/whatsapp/send-test/', {
         method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            recipient: recipient,
-            message: message
-        })
+        headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipient, message })
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
-        if (data.success) {
-            resultado.innerHTML = `
-                <div class="alert alert-success">
-                    ✅ Mensagem enviada com sucesso!
-                </div>
-            `;
-        } else {
-            resultado.innerHTML = `
-                <div class="alert alert-danger">
-                    ❌ Erro: ${data.error}
-                </div>
-            `;
-        }
-    })
-    .catch(error => {
-        console.error('❌ Erro:', error);
-        resultado.innerHTML = `
-            <div class="alert alert-danger">
-                ❌ Erro ao enviar: ${error.message}
-            </div>
-        `;
-    });
+        const resultado = document.getElementById('resultado');
+        resultado.innerHTML = data.success ? '<div class="alert alert-success">✅ Enviado!</div>' : '<div class="alert alert-danger">❌ Erro!</div>';
+    }).catch(e => console.error(e));
 }
 </script>
 
-<!-- Modal para QR Code - FORA DE TODOS OS CONTAINERS -->
-<div id="qrModal" class="qr-modal-overlay" onclick="fecharModalSeForaDoConteudo(event)">
+<!-- Modal -->
+<div id="qrModal" class="qr-modal-overlay" onclick="this.id === 'qrModal' && fecharModal()">
     <div class="qr-modal-content" onclick="event.stopPropagation()">
         <button class="modal-close" onclick="fecharModal()">×</button>
         <h2 class="modal-qr-title">📱 Conectar WhatsApp</h2>
-        <p class="modal-qr-subtitle">Escaneie o QR Code com seu WhatsApp</p>
-        
-        <div id="modalQRContent">
-            <!-- QR Code será inserido aqui -->
-        </div>
-        
-        <div id="modalQRStatus" class="modal-qr-status" style="display: none;">
-            <span class="spinner"></span>
-            <span id="statusText">Aguardando leitura do QR Code...</span>
-        </div>
+        <div id="modalQRContent"></div>
     </div>
 </div>
 
