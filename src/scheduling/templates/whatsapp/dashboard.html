@@ -521,6 +521,7 @@
 
 <script>
 let whatsappId = {% if whatsapps %}'{{ whatsapps.0.id }}'{% else %}null{% endif %};
+let monitorarConexao = false;
 
 function atualizarStatus() {
     fetch('/dashboard/whatsapp/status/', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
@@ -533,10 +534,56 @@ function abrirModal() {
 
 function fecharModal() {
     document.getElementById('qrModal').classList.remove('active');
+    monitorarConexao = false; // Parar de monitorar quando fechar
+}
+
+function verificarConexao() {
+    if (!monitorarConexao) return;
+    
+    fetch('/dashboard/whatsapp/status/', { 
+        method: 'GET', 
+        headers: { 'Content-Type': 'application/json' } 
+    })
+    .then(r => r.json())
+    .then(data => {
+        // Verificar se a conexão foi estabelecida
+        if (data.connection_status === 'connected' || data.status === 'connected') {
+            console.log('✅ Conexão estabelecida! Fechando modal...');
+            monitorarConexao = false;
+            
+            // Mostrar mensagem de sucesso
+            const modal = document.getElementById('qrModal');
+            modal.classList.add('active');
+            document.getElementById('modalQRContent').innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 60px; margin-bottom: 1rem;">✅</div>
+                    <h3 style="color: #065f46; margin: 0;">Conectado com Sucesso!</h3>
+                    <p style="color: #64748b; margin-top: 0.5rem;">WhatsApp conectado e pronto para usar.</p>
+                </div>
+            `;
+            
+            // Fechar automaticamente após 2 segundos
+            setTimeout(() => {
+                fecharModal();
+                location.reload(); // Recarregar para atualizar status
+            }, 2000);
+        } else {
+            // Continuar monitorando...
+            setTimeout(verificarConexao, 3000); // Verificar a cada 3 segundos
+        }
+    })
+    .catch(e => {
+        console.error('Erro ao verificar conexão:', e);
+        if (monitorarConexao) {
+            setTimeout(verificarConexao, 5000); // Tentar novamente em 5 segundos
+        }
+    });
 }
 
 function reconectarWhatsApp() {
     abrirModal();
+    monitorarConexao = true; // Começar a monitorar conexão
+    
     fetch('{% url "whatsapp:create" %}', {
         method: 'POST',
         headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' },
@@ -546,8 +593,28 @@ function reconectarWhatsApp() {
     .then(data => {
         if (data.success && data.qr_code) {
             document.getElementById('modalQRContent').innerHTML = `<div class="modal-qr-image"><img src="${data.qr_code}"></div>`;
+            console.log('📱 QR Code exibido. Escaneie com seu celular...');
+            
+            // Começar a verificar conexão após 2 segundos (tempo de leitura mínimo)
+            setTimeout(verificarConexao, 2000);
+            
+            // Timeout: parar de monitorar após 2 minutos se não conectar
+            setTimeout(() => {
+                if (monitorarConexao) {
+                    console.warn('⏱️ Timeout: QR Code expirou. Feche o modal e tente novamente.');
+                    monitorarConexao = false;
+                }
+            }, 120000); // 2 minutos
+        } else {
+            console.error('Erro ao obter QR Code:', data);
+            document.getElementById('modalQRContent').innerHTML = `<div style="color: #991b1b;">❌ Erro ao gerar QR Code</div>`;
+            monitorarConexao = false;
         }
-    }).catch(e => console.error(e));
+    })
+    .catch(e => {
+        console.error('Erro ao reconectar:', e);
+        monitorarConexao = false;
+    });
 }
 
 function mostrarQRCode() {
