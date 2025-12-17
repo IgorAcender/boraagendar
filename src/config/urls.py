@@ -14,15 +14,16 @@ urlpatterns = [
     path("dashboard/", include("scheduling.urls.dashboard")),
     path("dashboard/whatsapp/", include(whatsapp_urls)),
     path("accounts/", include("accounts.urls")),
-    path("", include("scheduling.urls.public")),  # Movido para o final (mais específico primeiro)
     
-    # ⭐ React SPA Routes - serve index.html para deixar React Router lidar
+    # ⭐ React SPA Routes - ANTES DO CATCHALL (mais específico primeiro)
+    re_path(r'^app(?:/.*)?$', serve_spa, {'path': 'index.html'}, name='spa-app'),
     re_path(r'^financeiro/.*$', serve_spa, {'path': 'index.html'}, name='spa-financeiro'),
-    re_path(r'^agendamentos.*$', serve_spa, {'path': 'index.html'}, name='spa-agendamentos'),
+    re_path(r'^transacoes.*$', serve_spa, {'path': 'index.html'}, name='spa-transacoes'),
     re_path(r'^relatorios.*$', serve_spa, {'path': 'index.html'}, name='spa-relatorios'),
     re_path(r'^configuracoes.*$', serve_spa, {'path': 'index.html'}, name='spa-configuracoes'),
-    re_path(r'^app(?:/.*)?$', serve_spa, {'path': 'index.html'}, name='spa-app'),
     
+    # Django public URLs (mais geral, vai por último)
+    path("", include("scheduling.urls.public")),
     path("", RedirectView.as_view(pattern_name="dashboard:index", permanent=False)),
 ]
 
