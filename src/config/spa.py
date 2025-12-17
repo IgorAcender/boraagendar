@@ -37,25 +37,30 @@ def serve_spa(request, path='index.html'):
     """
     Serve arquivos estáticos do React SPA
     
-    Tenta servir arquivo estático primeiro, depois retorna index.html
-    para deixar React Router lidar com as rotas
+    O React é buildado para: /src/static/dist/
+    Django serve static files automaticamente em: /static/
+    
+    Esta função serve o index.html para rotear via React Router
     """
     from django.http import FileResponse
+    from django.shortcuts import render
     import os
     
-    # Tenta arquivo estático em várias localizações
+    # Tenta arquivo estático em várias localizações (ordem de prioridade)
     possible_paths = [
-        BASE_DIR / 'frontend' / 'dist' / path,  # Build do Vite
+        BASE_DIR / 'static' / 'dist' / path,  # Build do Vite para Django static
+        BASE_DIR / 'frontend' / 'dist' / path,  # Build do Vite (fallback)
         BASE_DIR / 'frontend' / 'public' / path,  # Arquivos públicos
-        BASE_DIR / 'frontend' / 'src' / path,  # Desenvolvimento
-        BASE_DIR / 'frontend' / 'dist' / 'index.html',  # Fallback SPA
-        BASE_DIR / 'frontend' / 'index.html',  # Fallback SPA alt
+        BASE_DIR / 'static' / 'dist' / 'index.html',  # Fallback SPA (index)
+        BASE_DIR / 'frontend' / 'dist' / 'index.html',  # Fallback SPA alt
     ]
     
     for file_path in possible_paths:
         if os.path.exists(file_path):
-            return FileResponse(open(file_path, 'rb'))
+            try:
+                return FileResponse(open(file_path, 'rb'))
+            except Exception:
+                pass
     
-    # Se nada encontrado, retorna 404
-    from django.http import Http404
-    raise Http404(f"Arquivo não encontrado: {path}")
+    # Se nada encontrado, retorna o SPA template
+    return render(request, 'spa.html')
