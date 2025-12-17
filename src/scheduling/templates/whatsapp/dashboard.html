@@ -1,4 +1,4 @@
-{% extends 'base_dashboard.html' %}
+{% extends 'scheduling/base_dashboard.html' %}
 {% load static %}
 
 {% block title %}WhatsApp Dashboard{% endblock %}
@@ -26,8 +26,8 @@
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                    <div class="col-sm-4"><strong>Telefone:</strong></div>
-                        <div class="col-sm-8">{{ whatsapp.phone_number }}</div>
+                        <div class="col-sm-4"><strong>Telefone:</strong></div>
+                        <div class="col-sm-8">{{ whatsapp.telefone }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4"><strong>Status:</strong></div>
@@ -104,7 +104,7 @@
     <div class="alert alert-warning" role="alert">
         <h4 class="alert-heading">⚠️ Nenhuma Instância</h4>
         <p>Você ainda não tem nenhuma instância WhatsApp configurada.</p>
-        <a href="{% url 'whatsapp:create' %}" class="btn btn-primary">➕ Adicionar WhatsApp</a>
+        <a href="{% url 'criar_whatsapp' %}" class="btn btn-primary">➕ Adicionar WhatsApp</a>
     </div>
     {% endif %}
 </div>
@@ -155,7 +155,7 @@
 </div>
 
 <script>
-const WHATSAPP_ID = '{% if whatsapp %}{{ whatsapp.id }}{% endif %}';
+const WHATSAPP_ID = '{{ whatsapp.id if whatsapp else "" }}';
 const API_BASE = '/dashboard/whatsapp';
 let qrModal = null;
 let successModal = null;
@@ -222,7 +222,7 @@ function gerarQR() {
     
     qrModal.show();
     
-    fetch(API_BASE + '/' + WHATSAPP_ID + '/gerar-qrcode/', { method: 'POST' })
+    fetch(API_BASE + '/' + WHATSAPP_ID + '/qr/', { method: 'POST' })
         .then(r => r.json())
         .then(data => {
             if (data.qr_code) {
