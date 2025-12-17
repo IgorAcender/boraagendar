@@ -363,7 +363,8 @@
 <script>
 let whatsappId = {% if whatsapps %}'{{ whatsapps.0.id }}'{% else %}null{% endif %};
 let monitorarConexao = false;
-let connectedAtInicial = null;
+let statusAnterior = null;
+let tentativas = 0;
 
 function abrirModal() {
   document.getElementById('qrModal').classList.add('active');
@@ -372,45 +373,72 @@ function abrirModal() {
 function fecharModal() {
   document.getElementById('qrModal').classList.remove('active');
   monitorarConexao = false;
+  tentativas = 0;
 }
 
 function verificarConexao() {
   if (!monitorarConexao || !whatsappId) return;
   
+  tentativas++;
+  console.log('Verificando (tentativa ' + tentativas + ')...');
+  
   fetch('/dashboard/whatsapp/' + whatsappId + '/status/')
     .then(r => r.json())
     .then(data => {
-      console.log('Status atual:', data);
-      console.log('Connected At Inicial:', connectedAtInicial);
-      console.log('Connected At Atual:', data.connected_at);
+      console.log('Status: ' + data.status);
       
-      const mudouConnectedAt = connectedAtInicial !== null && data.connected_at !== connectedAtInicial;
+      // Se o status mudou DE "connecting" PARA qualquer outra coisa
+      if (statusAnterior === 'connecting' && data.status !== 'connecting') {
+        console.log('✅ STATUS MUDOU! De "connecting" para "' + data.status + '"');
+        monitorarConexao = false;
+        
+        if (data.status === 'connected') {
+          document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
+        } else {
+          document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">⚠️</div><h3>Status: ' + data.status + '</h3></div>';
+        }
+        
+        setTimeout(() => { fecharModal(); location.reload(); }, 2000);
+        return;
+      }
       
-      console.log('Mudou Connected At?', mudouConnectedAt);
-      console.log('Status é connected?', data.status === 'connected');
-      
-      if (mudouConnectedAt || data.status === 'connected') {
-        console.log('✅ CONEXÃO DETECTADA!');
+      // Ou se chegou a "connected"
+      if (data.status === 'connected') {
+        console.log('✅ JÁ ESTÁ CONECTADO!');
         monitorarConexao = false;
         document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
         setTimeout(() => { fecharModal(); location.reload(); }, 2000);
-      } else {
-        connectedAtInicial = data.connected_at;
-        if (monitorarConexao) {
-          setTimeout(verificarConexao, 1000);
-        }
+        return;
+      }
+      
+      statusAnterior = data.status;
+      
+      // Se passou de 120 segundos, para
+      if (tentativas > 120) {
+        console.log('❌ TIMEOUT - Passou de 2 minutos');
+        monitorarConexao = false;
+        document.getElementById('modalQRContent').innerHTML = '<div style="text-align: center; color: red;"><p>Timeout: Não conseguiu conectar em 2 minutos</p></div>';
+        setTimeout(() => { fecharModal(); }, 3000);
+        return;
+      }
+      
+      if (monitorarConexao) {
+        setTimeout(verificarConexao, 1000);
       }
     })
     .catch(e => {
-      console.error('Erro ao verificar:', e);
-      if (monitorarConexao) setTimeout(verificarConexao, 2000);
+      console.error('Erro:', e);
+      if (monitorarConexao) {
+        setTimeout(verificarConexao, 2000);
+      }
     });
 }
 
 function reconectarWhatsApp() {
   abrirModal();
   monitorarConexao = true;
-  connectedAtInicial = null;
+  statusAnterior = null;
+  tentativas = 0;
   
   fetch('{% url "whatsapp:create" %}', {
     method: 'POST',
@@ -423,6 +451,7 @@ function reconectarWhatsApp() {
   .then(r => r.json())
   .then(data => {
     if (data.success && data.qr_code) {
+      console.log('QR gerado, começando a monitorar...');
       document.getElementById('modalQRContent').innerHTML = '<img src="' + data.qr_code + '" style="max-width: 100%;">';
       setTimeout(verificarConexao, 1000);
     } else {
