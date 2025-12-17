@@ -7,8 +7,8 @@ from django.urls import re_path
 from django.views.static import serve
 from django.conf import settings
 
-# Caminho base
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# Caminho base - aponta para /src (onde manage.py está)
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # URL patterns para SPA
 def get_spa_urls():
@@ -46,21 +46,27 @@ def serve_spa(request, path='index.html'):
     from django.shortcuts import render
     import os
     
+    print(f"🔍 serve_spa called with path: {path}")
+    print(f"📁 BASE_DIR: {BASE_DIR}")
+    
     # Tenta arquivo estático em várias localizações (ordem de prioridade)
     possible_paths = [
         BASE_DIR / 'static' / 'dist' / path,  # Build do Vite para Django static
         BASE_DIR / 'frontend' / 'dist' / path,  # Build do Vite (fallback)
-        BASE_DIR / 'frontend' / 'public' / path,  # Arquivos públicos
         BASE_DIR / 'static' / 'dist' / 'index.html',  # Fallback SPA (index)
         BASE_DIR / 'frontend' / 'dist' / 'index.html',  # Fallback SPA alt
     ]
     
     for file_path in possible_paths:
+        print(f"  Tentando: {file_path}")
         if os.path.exists(file_path):
+            print(f"  ✅ Encontrado: {file_path}")
             try:
-                return FileResponse(open(file_path, 'rb'))
-            except Exception:
+                return FileResponse(open(file_path, 'rb'), content_type='text/html')
+            except Exception as e:
+                print(f"  ❌ Erro ao servir: {e}")
                 pass
     
+    print(f"  ❌ Nenhum arquivo encontrado, usando spa.html template")
     # Se nada encontrado, retorna o SPA template
     return render(request, 'spa.html')
