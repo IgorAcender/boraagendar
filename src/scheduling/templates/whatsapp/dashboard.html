@@ -540,14 +540,27 @@ function fecharModal() {
 function verificarConexao() {
     if (!monitorarConexao) return;
     
-    fetch('/dashboard/whatsapp/status/', { 
+    // Obter o ID do primeiro WhatsApp
+    const waId = whatsappId;
+    if (!waId) {
+        console.warn('Nenhum WhatsApp encontrado para verificar');
+        monitorarConexao = false;
+        return;
+    }
+    
+    fetch(`/dashboard/whatsapp/${waId}/status/`, { 
         method: 'GET', 
         headers: { 'Content-Type': 'application/json' } 
     })
     .then(r => r.json())
     .then(data => {
+        console.log('📊 Status retornado:', data);
+        
         // Verificar se a conexão foi estabelecida
-        if (data.connection_status === 'connected' || data.status === 'connected') {
+        // O campo é 'status' (não 'connection_status') e pode ter valor 'connected'
+        const isConnected = data.status === 'connected' || data.is_connected === true;
+        
+        if (isConnected) {
             console.log('✅ Conexão estabelecida! Fechando modal...');
             monitorarConexao = false;
             
@@ -569,6 +582,7 @@ function verificarConexao() {
             }, 2000);
         } else {
             // Continuar monitorando...
+            console.log('⏳ Aguardando conexão... Status atual:', data.status);
             setTimeout(verificarConexao, 3000); // Verificar a cada 3 segundos
         }
     })
