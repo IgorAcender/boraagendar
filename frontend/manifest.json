@@ -1,0 +1,31 @@
+{
+  "name": "BoraAgendar",
+  "short_name": "BoraAgendar",
+  "description": "Sistema de Agendamentos Profissional",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1890ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/screenshot-1.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ]
+}
