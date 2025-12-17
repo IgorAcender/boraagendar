@@ -523,28 +523,14 @@
 let whatsappId = {% if whatsapps %}'{{ whatsapps.0.id }}'{% else %}null{% endif %};
 let monitorarConexao = false;
 
+console.log('📱 Página carregada. WhatsApp ID:', whatsappId);
+
 function atualizarStatus() {
-    fetch('/dashboard/whatsapp/status/', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-    .then(r => r.json()).then(data => console.log(data)).catch(e => console.error(e));
-}
-
-function abrirModal() {
-    document.getElementById('qrModal').classList.add('active');
-}
-
-function fecharModal() {
-    document.getElementById('qrModal').classList.remove('active');
-    monitorarConexao = false; // Parar de monitorar quando fechar
-}
-
-function verificarConexao() {
-    if (!monitorarConexao) return;
-    
-    // Obter o ID do primeiro WhatsApp
     const waId = whatsappId;
+    console.log('🔄 Atualizando status para ID:', waId);
+    
     if (!waId) {
-        console.warn('Nenhum WhatsApp encontrado para verificar');
-        monitorarConexao = false;
+        console.warn('Nenhum WhatsApp configurado');
         return;
     }
     
@@ -554,14 +540,57 @@ function verificarConexao() {
     })
     .then(r => r.json())
     .then(data => {
-        console.log('📊 Status retornado:', data);
+        console.log('📊 Status recebido:', data);
+    })
+    .catch(e => console.error('❌ Erro ao atualizar status:', e));
+}
+
+function abrirModal() {
+    console.log('🔓 Abrindo modal...');
+    document.getElementById('qrModal').classList.add('active');
+}
+
+function fecharModal() {
+    console.log('🔒 Fechando modal...');
+    document.getElementById('qrModal').classList.remove('active');
+    monitorarConexao = false; // Parar de monitorar quando fechar
+}
+
+function verificarConexao() {
+    if (!monitorarConexao) {
+        console.log('⏹️  Monitoramento parado');
+        return;
+    }
+    
+    // Obter o ID do primeiro WhatsApp
+    const waId = whatsappId;
+    if (!waId) {
+        console.warn('Nenhum WhatsApp encontrado para verificar');
+        monitorarConexao = false;
+        return;
+    }
+    
+    console.log(`⏳ Verificando conexão... (ID: ${waId})`);
+    
+    fetch(`/dashboard/whatsapp/${waId}/status/`, { 
+        method: 'GET', 
+        headers: { 'Content-Type': 'application/json' } 
+    })
+    .then(r => {
+        console.log('📡 Resposta recebida:', r.status);
+        return r.json();
+    })
+    .then(data => {
+        console.log('📊 Dados de status:', data);
         
         // Verificar se a conexão foi estabelecida
         // O campo é 'status' (não 'connection_status') e pode ter valor 'connected'
         const isConnected = data.status === 'connected' || data.is_connected === true;
         
+        console.log(`📋 status: "${data.status}", is_connected: ${data.is_connected}, isConnected calculado: ${isConnected}`);
+        
         if (isConnected) {
-            console.log('✅ Conexão estabelecida! Fechando modal...');
+            console.log('✅✅✅ CONEXÃO ESTABELECIDA! FECHANDO MODAL...');
             monitorarConexao = false;
             
             // Mostrar mensagem de sucesso
@@ -577,6 +606,7 @@ function verificarConexao() {
             
             // Fechar automaticamente após 2 segundos
             setTimeout(() => {
+                console.log('🔄 Recarregando página...');
                 fecharModal();
                 location.reload(); // Recarregar para atualizar status
             }, 2000);
@@ -587,14 +617,16 @@ function verificarConexao() {
         }
     })
     .catch(e => {
-        console.error('Erro ao verificar conexão:', e);
+        console.error('❌ Erro ao verificar conexão:', e);
         if (monitorarConexao) {
+            console.log('🔁 Tentando novamente em 5 segundos...');
             setTimeout(verificarConexao, 5000); // Tentar novamente em 5 segundos
         }
     });
 }
 
 function reconectarWhatsApp() {
+    console.log('🚀 Reconectando WhatsApp...');
     abrirModal();
     monitorarConexao = true; // Começar a monitorar conexão
     
@@ -605,9 +637,10 @@ function reconectarWhatsApp() {
     })
     .then(r => r.json())
     .then(data => {
+        console.log('📲 Resposta de criar instância:', data);
         if (data.success && data.qr_code) {
             document.getElementById('modalQRContent').innerHTML = `<div class="modal-qr-image"><img src="${data.qr_code}"></div>`;
-            console.log('📱 QR Code exibido. Escaneie com seu celular...');
+            console.log('✅ QR Code exibido. Escaneie com seu celular...');
             
             // Começar a verificar conexão após 2 segundos (tempo de leitura mínimo)
             setTimeout(verificarConexao, 2000);
@@ -620,13 +653,13 @@ function reconectarWhatsApp() {
                 }
             }, 120000); // 2 minutos
         } else {
-            console.error('Erro ao obter QR Code:', data);
+            console.error('❌ Erro ao obter QR Code:', data);
             document.getElementById('modalQRContent').innerHTML = `<div style="color: #991b1b;">❌ Erro ao gerar QR Code</div>`;
             monitorarConexao = false;
         }
     })
     .catch(e => {
-        console.error('Erro ao reconectar:', e);
+        console.error('❌ Erro ao reconectar:', e);
         monitorarConexao = false;
     });
 }
