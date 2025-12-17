@@ -160,6 +160,32 @@
     box-shadow: 0 6px 16px rgba(37, 211, 102, 0.3);
   }
 
+  .btn-disconnect {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  }
+
+  .btn-disconnect:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+  }
+
+  .content-wrapper .button-group-full {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .content-wrapper .button-group-full .btn-disconnect {
+    grid-column: span 1;
+  }
+
+  @media (max-width: 768px) {
+    .content-wrapper .button-group-full {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .qr-modal-overlay {
     display: none;
     position: fixed;
@@ -317,9 +343,10 @@
       </div>
     </div>
 
-    <div class="button-group">
+    <div class="button-group-full">
       <button class="btn-whatsapp btn-reconnect" onclick="reconectarWhatsApp()">⚡ Reconectar</button>
       <button class="btn-whatsapp btn-qrcode" onclick="mostrarQRCode()">📲 Novo QR</button>
+      <button class="btn-whatsapp btn-disconnect" onclick="desconectarWhatsApp()">🚫 Desconectar</button>
     </div>
   </div>
 </div>
@@ -402,6 +429,39 @@ function reconectarWhatsApp() {
 
 function mostrarQRCode() {
   reconectarWhatsApp();
+}
+
+function desconectarWhatsApp() {
+  if (!whatsappId) {
+    alert('Nenhuma instância configurada');
+    return;
+  }
+
+  if (!confirm('Tem certeza que deseja desconectar o WhatsApp?')) {
+    return;
+  }
+
+  fetch('/dashboard/whatsapp/' + whatsappId + '/desconectar/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({})
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      alert('WhatsApp desconectado com sucesso!');
+      location.reload();
+    } else {
+      alert('Erro ao desconectar: ' + (data.message || 'Erro desconhecido'));
+    }
+  })
+  .catch(e => {
+    console.error(e);
+    alert('Erro na solicitação');
+  });
 }
 
 // Fechar modal clicando fora
