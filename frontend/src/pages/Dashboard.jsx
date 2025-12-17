@@ -15,7 +15,7 @@ import {
 import {
   DollarOutlined,
   CalendarOutlined,
-  UsersOutlined,
+  TeamOutlined,
   ShoppingOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
