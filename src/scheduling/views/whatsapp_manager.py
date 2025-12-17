@@ -54,6 +54,7 @@ def whatsapp_dashboard(request):
     
     context = {
         'whatsapps': whatsapps,
+        'whatsapp': whatsapps.first(),
         'stats': stats,
         'tenant': tenant,
         'has_primary': whatsapps.filter(is_primary=True).exists(),
