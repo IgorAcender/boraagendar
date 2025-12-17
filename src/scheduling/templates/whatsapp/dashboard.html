@@ -357,11 +357,15 @@ let monitorarConexao = false;
 let connectedAtInicial = null;
 let tentativas = 0;
 <<<<<<< HEAD
+<<<<<<< HEAD
 let maxTentativas = 120;
 =======
 let maxTentativas = 120; // 2 minutos
 >>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
 let intervaloMonitoramento = null;
+=======
+let ultimosEstados = [];
+>>>>>>> 316f1e6 (feat: Adicionar lógica para registrar últimos estados de conexão e otimizar verificação de status)
 
 // Função para gerar QR code
 async function gerarQR(whatsappId) {
@@ -545,6 +549,7 @@ function iniciarMonitoramento(whatsappId) {
 <<<<<<< HEAD
 function sucessoConexao(data) {
   monitorarConexao = false;
+<<<<<<< HEAD
   clearInterval(intervaloMonitoramento);
   atualizarProgresso(100, '✅ Conectado com sucesso!');
   $('#modalStatus').html('<span class="text-success">✅ WhatsApp conectado com sucesso!</span>');
@@ -604,6 +609,64 @@ async function desconectar(whatsappId) {
 =======
         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
 >>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
+=======
+  tentativas = 0;
+  ultimosEstados = [];
+}
+
+function verificarConexao() {
+  if (!monitorarConexao || !whatsappId) return;
+  
+  tentativas++;
+  
+  fetch('/dashboard/whatsapp/' + whatsappId + '/status/')
+    .then(r => r.json())
+    .then(data => {
+      console.log('Tentativa ' + tentativas + ': is_connected=' + data.is_connected + ', status=' + data.status);
+      
+      // Registra últimos 5 estados
+      ultimosEstados.push(data.is_connected);
+      if (ultimosEstados.length > 5) ultimosEstados.shift();
+      
+      // SE começou como false (desconectado) e agora está true (conectado)
+      if (isConnectedAnterior === false && data.is_connected === true) {
+        console.log('✅✅✅ CONECTADO COM SUCESSO!');
+        monitorarConexao = false;
+        document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
+        setTimeout(() => { fecharModal(); location.reload(); }, 2000);
+        return;
+      }
+      
+      // Se já estava conectado, mantém assim
+      if (data.is_connected === true) {
+        console.log('✅ JÁ ESTAVA CONECTADO');
+        monitorarConexao = false;
+        document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
+        setTimeout(() => { fecharModal(); location.reload(); }, 2000);
+        return;
+      }
+      
+      isConnectedAnterior = data.is_connected;
+      
+      // Se passou de 240 tentativas (2 minutos), para
+      if (tentativas > 240) {
+        console.log('⏱️ TIMEOUT - 2 minutos');
+        monitorarConexao = false;
+        document.getElementById('modalQRContent').innerHTML = '<div style="text-align: center;"><p style="color: #666;">Tempo limite atingido.</p><p style="font-size: 12px;">Últimos estados: ' + ultimosEstados.join(', ') + '</p></div>';
+        setTimeout(() => { fecharModal(); }, 2000);
+        return;
+      }
+      
+      if (monitorarConexao) {
+        // Polling mais rápido - a cada 500ms
+        setTimeout(verificarConexao, 500);
+      }
+    })
+    .catch(e => {
+      console.error('Erro:', e);
+      if (monitorarConexao) {
+        setTimeout(verificarConexao, 2000);
+>>>>>>> 316f1e6 (feat: Adicionar lógica para registrar últimos estados de conexão e otimizar verificação de status)
       }
     });
 
