@@ -3,189 +3,101 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/whatsapp-dashboard.css' %}">
-<style>
-  .content-wrapper .whatsapp-header {
-    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-    color: white;
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 8px 32px rgba(37, 211, 102, 0.2);
-  }
-
-  .whatsapp-header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
-  .whatsapp-header p {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    margin: 0;
-  }
-
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 2rem;
-  }
-
-  @media (max-width: 768px) {
-    .dashboard-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    .whatsapp-header {
-      padding: 1.5rem;
-    }
-
-    .whatsapp-header h1 {
-      font-size: 2rem;
-    }
-  }
-</style>
 {% endblock %}
 
 {% block content %}
 <div class="content-wrapper">
-  <!-- Header -->
-  <div class="whatsapp-header">
-    <h1>📱 WhatsApp Manager</h1>
-    <p>Gerencie suas conexões WhatsApp automaticamente</p>
+  <!-- Hero Header -->
+  <div class="hero-header" style="background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); color: white; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
+    <h1 style="margin: 0 0 0.5rem 0; font-size: 2.5rem; font-weight: 700;">📱 Gerenciar WhatsApp</h1>
+    <p style="margin: 0; font-size: 1.1rem; opacity: 0.9;">Integração Evolution API • Conecte seu WhatsApp para enviar confirmações</p>
   </div>
 
-  <div class="dashboard-grid">
-    <!-- Coluna Esquerda: Status + Formulário -->
-    <div class="left-column">
-      <!-- Status Card -->
-      <div class="card status-card">
-        <div class="card-header">
-          <h3>📊 Status da Conexão</h3>
+  <!-- WhatsApp List -->
+  <div class="whatsapp-list">
+    {% for whatsapp in whatsapps %}
+    <div class="whatsapp-card" style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+      <div class="whatsapp-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb;">
+        <div>
+          <div class="whatsapp-phone" style="font-size: 1.3rem; font-weight: bold; color: #1f2937;">📱 {{ whatsapp.phone_number }}</div>
+          <small style="color: #6b7280;">{{ whatsapp.display_name }}</small>
         </div>
-        <div class="card-body">
-          {% for whatsapp in whatsapps %}
-          <div class="status-item" data-whatsapp-id="{{ whatsapp.id }}">
-            <div class="status-info">
-              <div class="phone-number">{{ whatsapp.phone_number|default:"Não configurado" }}</div>
-              <div class="status-badge status-{{ whatsapp.connection_status|default:'disconnected' }}">
-                {% if whatsapp.connection_status == 'connected' %}
-                  🟢 Conectado
-                {% elif whatsapp.connection_status == 'connecting' %}
-                  🟡 Conectando...
-                {% elif whatsapp.connection_status == 'qr' %}
-                  🔵 Aguardando QR
-                {% else %}
-                  🔴 Desconectado
-                {% endif %}
-              </div>
-            </div>
-            <div class="status-actions">
-              {% if whatsapp.connection_status != 'connected' %}
-              <button class="btn btn-success btn-sm" onclick="gerarQR({{ whatsapp.id }})">
-                📱 Novo QR
-              </button>
-              {% endif %}
-              {% if whatsapp.connection_status == 'connected' %}
-              <button class="btn btn-danger btn-sm" onclick="desconectar({{ whatsapp.id }})">
-                ❌ Desconectar
-              </button>
-              {% endif %}
-            </div>
-          </div>
-          {% empty %}
-          <div class="no-whatsapps">
-            <p>Nenhuma instância WhatsApp configurada.</p>
-            <button class="btn btn-primary" onclick="location.reload()">🔄 Atualizar</button>
-          </div>
-          {% endfor %}
-        </div>
+        <span class="status-badge status-{{ whatsapp.connection_status|default:'disconnected' }}" style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+          {% if whatsapp.connection_status == 'connected' %}
+            🟢 Conectado
+          {% elif whatsapp.connection_status == 'connecting' %}
+            🟡 Conectando
+          {% elif whatsapp.connection_status == 'qr' %}
+            🔵 Aguardando QR
+          {% else %}
+            🔴 Desconectado
+          {% endif %}
+        </span>
       </div>
 
-      <!-- Formulário de Mensagem -->
-      <div class="card message-form-card">
-        <div class="card-header">
-          <h3>💬 Enviar Mensagem</h3>
+      <!-- Info -->
+      <div class="whatsapp-info" style="margin: 1rem 0; font-size: 0.95rem; font-weight: 500;">
+        <div class="whatsapp-info-row" style="display: flex; justify-content: space-between; padding: 8px 0;">
+          <span>Evolution API:</span>
+          <strong style="color: #25d366;">{{ whatsapp.evolution_api.instance_id }}</strong>
         </div>
-        <div class="card-body">
-          <form id="messageForm">
-            <div class="form-group">
-              <label for="phone">Número do Destinatário:</label>
-              <input type="tel" id="phone" name="phone" class="form-control"
-                     placeholder="5511999999999" required>
-            </div>
-            <div class="form-group">
-              <label for="message">Mensagem:</label>
-              <textarea id="message" name="message" class="form-control"
-                        placeholder="Digite sua mensagem..." rows="4" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">
-              📤 Enviar Mensagem
-            </button>
-          </form>
+        {% if whatsapp.connected_at %}
+        <div class="whatsapp-info-row" style="display: flex; justify-content: space-between; padding: 8px 0;">
+          <span>Conectado em:</span>
+          <strong>{{ whatsapp.connected_at|date:"d/m/Y H:i" }}</strong>
         </div>
+        {% endif %}
+        {% if whatsapp.error_message %}
+        <div class="error-message" style="background: #fee2e2; border-left: 3px solid #f87171; padding: 8px 12px; margin: 10px 0; color: #991b1b; border-radius: 4px;">
+          ⚠️ {{ whatsapp.error_message }}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Ações -->
+      <div class="whatsapp-actions" style="display: flex; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap;">
+        {% if whatsapp.connection_status != 'connected' %}
+        <button class="btn btn-success" onclick="gerarQR({{ whatsapp.id }})" style="flex: 1; min-width: 120px; padding: 0.5rem 1rem;">
+          📱 Novo QR
+        </button>
+        {% endif %}
+        
+        {% if whatsapp.connection_status == 'connected' %}
+        <button class="btn btn-danger" onclick="desconectar({{ whatsapp.id }})" style="flex: 1; min-width: 120px; padding: 0.5rem 1rem;">
+          ❌ Desconectar
+        </button>
+        {% endif %}
+        
+        <button class="btn btn-info" onclick="verDetalhes({{ whatsapp.id }})" style="flex: 1; min-width: 120px; padding: 0.5rem 1rem;">
+          📋 Detalhes
+        </button>
       </div>
     </div>
-
-    <!-- Coluna Direita: QR Code + Ações -->
-    <div class="right-column">
-      <!-- QR Code Section -->
-      <div class="card qr-card">
-        <div class="card-header">
-          <h3>📱 QR Code</h3>
-        </div>
-        <div class="card-body">
-          <div id="qrContainer" class="qr-container" style="display: none;">
-            <div id="qrCode" class="qr-code"></div>
-            <div class="qr-instructions">
-              <p><strong>📲 Instruções:</strong></p>
-              <ol>
-                <li>Abra o WhatsApp no seu celular</li>
-                <li>Toque em "Mais opções" (⋮) ou "Settings"</li>
-                <li>Selecione "WhatsApp Web" ou "Linked Devices"</li>
-                <li>Toque em "Link a Device"</li>
-                <li>Aponte a câmera para este QR code</li>
-              </ol>
-              <div class="connection-status">
-                <div id="connectionStatus">🔄 Preparando conexão...</div>
-              </div>
-            </div>
-          </div>
-
-          <div id="noQRMessage" class="no-qr-message">
-            <div class="no-qr-icon">📱</div>
-            <p>Clique em "Novo QR" para gerar um código QR</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ações Rápidas -->
-      <div class="card actions-card">
-        <div class="card-header">
-          <h3>⚡ Ações Rápidas</h3>
-        </div>
-        <div class="card-body">
-          <div class="action-buttons">
-            <button class="btn btn-outline-primary btn-block" onclick="atualizarStatus()">
-              🔄 Atualizar Status
-            </button>
-            <button class="btn btn-outline-info btn-block" onclick="verLogs()">
-              📋 Ver Logs
-            </button>
-            <button class="btn btn-outline-warning btn-block" onclick="testarConexao()">
-              🧪 Testar Conexão
-            </button>
-            <button class="btn btn-outline-secondary btn-block" onclick="configurarWebhooks()">
-              🎣 Configurar Webhooks
-            </button>
-          </div>
-        </div>
-      </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+      <p style="font-size: 1.1rem; color: #6b7280; margin-bottom: 1.5rem;">Nenhuma instância WhatsApp configurada.</p>
+      <button class="btn btn-primary" onclick="location.reload()">🔄 Atualizar</button>
     </div>
+    {% endfor %}
   </div>
+
+  <!-- Formulário de Mensagem -->
+  {% if whatsapps %}
+  <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 2rem;">
+    <h3 style="margin-top: 0;">💬 Enviar Mensagem</h3>
+    <form id="messageForm">
+      <div class="form-group">
+        <label for="phone">Número do Destinatário:</label>
+        <input type="tel" id="phone" name="phone" class="form-control" placeholder="5511999999999" required>
+      </div>
+      <div class="form-group">
+        <label for="message">Mensagem:</label>
+        <textarea id="message" name="message" class="form-control" placeholder="Digite sua mensagem..." rows="4" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">📤 Enviar Mensagem</button>
+    </form>
+  </div>
+  {% endif %}
 </div>
 
 <!-- Modal QR Code -->
@@ -209,13 +121,12 @@
             <li>Toque em "Link a Device"</li>
             <li><strong>Aponte a câmera para o QR code acima</strong></li>
           </ol>
-          <div class="alert alert-info">
+          <div class="alert alert-info" style="margin-top: 1rem;">
             <strong>🔄 Status:</strong> <span id="modalStatus">Gerando QR code...</span>
           </div>
-          <div class="connection-progress" id="connectionProgress" style="display: none;">
+          <div class="connection-progress" id="connectionProgress" style="display: none; margin-top: 1rem;">
             <div class="progress">
-              <div class="progress-bar progress-bar-striped progress-bar-animated"
-                   role="progressbar" style="width: 0%" id="progressBar"></div>
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" id="progressBar"></div>
             </div>
             <small class="text-muted" id="progressText">Aguardando leitura do QR...</small>
           </div>
@@ -237,7 +148,7 @@ let whatsappIdAtual = null;
 let monitorarConexao = false;
 let connectedAtInicial = null;
 let tentativas = 0;
-let maxTentativas = 120; // 2 minutos
+let maxTentativas = 120;
 let intervaloMonitoramento = null;
 
 // Função para gerar QR code
@@ -248,18 +159,18 @@ async function gerarQR(whatsappId) {
     tentativas = 0;
     connectedAtInicial = null;
 
-    // Mostrar modal
     $('#qrModal').modal('show');
     $('#modalStatus').text('🔄 Gerando QR code...');
     $('#connectionProgress').hide();
     $('#confirmarBtn').hide();
 
-    // Fazer requisição para gerar QR
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
     const response = await fetch(`/dashboard/whatsapp/criar/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        'X-CSRFToken': csrfToken
       },
       body: JSON.stringify({ whatsapp_id: whatsappId })
     });
@@ -267,21 +178,14 @@ async function gerarQR(whatsappId) {
     const data = await response.json();
 
     if (data.success) {
-      // Mostrar QR code
-      $('#modalQRCode').html(`<img src="${data.qr_code}" alt="QR Code" class="img-fluid">`);
+      $('#modalQRCode').html(`<img src="${data.qr_code}" alt="QR Code" class="img-fluid" style="max-width: 300px; border-radius: 8px;">`);
       $('#modalStatus').text('📱 QR code gerado! Escaneie com o WhatsApp.');
-
-      // Iniciar monitoramento automático
       iniciarMonitoramento(whatsappId);
-
-      // Mostrar progresso
       $('#connectionProgress').show();
       atualizarProgresso(0, 'Aguardando leitura do QR...');
-
     } else {
       $('#modalStatus').text('❌ Erro ao gerar QR: ' + (data.error || 'Erro desconhecido'));
     }
-
   } catch (error) {
     console.error('Erro ao gerar QR:', error);
     $('#modalStatus').text('❌ Erro de conexão. Tente novamente.');
@@ -312,70 +216,57 @@ function iniciarMonitoramento(whatsappId) {
       const response = await fetch(`/dashboard/whatsapp/${whatsappId}/status/`);
       const data = await response.json();
 
-      // Verificar se conectou
       if (data.is_connected === true || data.status === 'connected') {
-        // Conectado! Fechar modal automaticamente
         sucessoConexao(data);
         return;
       }
 
-      // Verificar mudança no timestamp (webhook)
       if (connectedAtInicial === null) {
         connectedAtInicial = data.connected_at;
       } else if (data.connected_at !== connectedAtInicial) {
-        // Timestamp mudou - conexão estabelecida via webhook
         sucessoConexao(data);
         return;
       }
 
-      // Atualizar status baseado na resposta
       if (data.status === 'connecting') {
         atualizarProgresso(progresso, '🔄 Conectando ao WhatsApp...');
       } else if (data.status === 'qr') {
         atualizarProgresso(progresso, '📱 Aguardando leitura do QR...');
       }
-
     } catch (error) {
       console.error('Erro no monitoramento:', error);
     }
   }, 1000);
 }
 
-// Função chamada quando conexão é bem-sucedida
 function sucessoConexao(data) {
   monitorarConexao = false;
   clearInterval(intervaloMonitoramento);
-
   atualizarProgresso(100, '✅ Conectado com sucesso!');
-
-  // Mostrar mensagem de sucesso
   $('#modalStatus').html('<span class="text-success">✅ WhatsApp conectado com sucesso!</span>');
-
-  // Fechar modal automaticamente após 2 segundos
   setTimeout(() => {
     $('#qrModal').modal('hide');
-    location.reload(); // Recarregar página para atualizar status
+    location.reload();
   }, 2000);
 }
 
-// Função para atualizar barra de progresso
 function atualizarProgresso(percentual, texto) {
   $('#progressBar').css('width', percentual + '%');
   $('#progressText').text(texto);
 }
 
-// Função para desconectar
 async function desconectar(whatsappId) {
   if (!confirm('Tem certeza que deseja desconectar este WhatsApp?')) {
     return;
   }
 
   try {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
     const response = await fetch(`/dashboard/whatsapp/${whatsappId}/desconectar/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        'X-CSRFToken': csrfToken
       }
     });
 
@@ -387,44 +278,21 @@ async function desconectar(whatsappId) {
     } else {
       alert('Erro ao desconectar: ' + (data.error || 'Erro desconhecido'));
     }
-
   } catch (error) {
     console.error('Erro ao desconectar:', error);
     alert('Erro de conexão. Tente novamente.');
   }
 }
 
-// Função para confirmar conexão manualmente (fallback)
 function confirmarConexao() {
   $('#qrModal').modal('hide');
   location.reload();
 }
 
-// Função para atualizar status
-function atualizarStatus() {
-  location.reload();
+function verDetalhes(whatsappId) {
+  window.location.href = `/dashboard/whatsapp/${whatsappId}/`;
 }
 
-// Função para ver logs (placeholder)
-function verLogs() {
-  alert('Funcionalidade de logs será implementada em breve.');
-}
-
-// Função para testar conexão (placeholder)
-function testarConexao() {
-  alert('Testando conexão com Evolution API...');
-  // TODO: Implementar teste de conectividade
-}
-
-// Função para configurar webhooks
-function configurarWebhooks() {
-  if (confirm('Deseja executar o script de configuração de webhooks? Isso ativará o fechamento automático do modal.')) {
-    // Abrir terminal ou executar comando
-    alert('Execute o comando: ./setup_webhooks.sh');
-  }
-}
-
-// Event listener para quando modal fecha
 $('#qrModal').on('hidden.bs.modal', function () {
   monitorarConexao = false;
   if (intervaloMonitoramento) {
@@ -432,24 +300,21 @@ $('#qrModal').on('hidden.bs.modal', function () {
   }
 });
 
-// Event listener para formulário de mensagem
-document.getElementById('messageForm').addEventListener('submit', async function(e) {
+document.getElementById('messageForm')?.addEventListener('submit', async function(e) {
   e.preventDefault();
 
   const phone = document.getElementById('phone').value;
   const message = document.getElementById('message').value;
 
   try {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
     const response = await fetch('/dashboard/whatsapp/enviar/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        'X-CSRFToken': csrfToken
       },
-      body: JSON.stringify({
-        phone: phone,
-        message: message
-      })
+      body: JSON.stringify({ phone: phone, message: message })
     });
 
     const data = await response.json();
@@ -460,14 +325,12 @@ document.getElementById('messageForm').addEventListener('submit', async function
     } else {
       alert('❌ Erro ao enviar mensagem: ' + (data.error || 'Erro desconhecido'));
     }
-
   } catch (error) {
     console.error('Erro ao enviar mensagem:', error);
     alert('❌ Erro de conexão. Tente novamente.');
   }
 });
 
-// Inicialização
 document.addEventListener('DOMContentLoaded', function() {
   console.log('WhatsApp Dashboard inicializado');
 });
