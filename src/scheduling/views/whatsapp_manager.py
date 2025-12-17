@@ -858,26 +858,29 @@ def whatsapp_webhook_update(request):
     """Webhook para atualizações de status"""
     try:
         data = json.loads(request.body)
-        
+
         token = request.headers.get('X-API-Key')
         if token != getattr(settings, 'WHATSAPP_WEBHOOK_API_KEY', 'secret'):
             return JsonResponse({'error': 'Unauthorized'}, status=401)
-        
+
         instance_id = data.get('instance_id')
         phone_number = data.get('phone_number')
         status = data.get('status')
         session_id = data.get('session_id')
         error_message = data.get('error_message', '')
-        
+
         whatsapp = WhatsAppInstance.objects.filter(
             evolution_api__instance_id=instance_id,
             phone_number=phone_number
         ).first()
-        
+
         if whatsapp:
+            # Salvar status anterior para detectar mudança
+            status_anterior = whatsapp.connection_status
+
             whatsapp.connection_status = status
             whatsapp.session_id = session_id
-            
+
             if status == 'connected':
                 whatsapp.connected_at = timezone.now()
                 whatsapp.error_message = ''
@@ -885,12 +888,23 @@ def whatsapp_webhook_update(request):
                 whatsapp.disconnected_at = timezone.now()
             elif status == 'error':
                 whatsapp.error_message = error_message
-            
+
             whatsapp.save()
-            
-            return JsonResponse({'success': True})
-        
+
+            # Retornar informações para o frontend detectar mudança automática
+            response_data = {
+                'success': True,
+                'instance_id': instance_id,
+                'phone_number': phone_number,
+                'status': status,
+                'status_changed': status != status_anterior,
+                'timestamp': timezone.now().isoformat(),
+                'webhook_received': True
+            }
+
+            return JsonResponse(response_data)
+
         return JsonResponse({'error': 'WhatsApp not found'}, status=404)
-    
+
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
