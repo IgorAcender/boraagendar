@@ -380,19 +380,29 @@ function verificarConexao() {
   fetch('/dashboard/whatsapp/' + whatsappId + '/status/')
     .then(r => r.json())
     .then(data => {
+      console.log('Status atual:', data);
+      console.log('Connected At Inicial:', connectedAtInicial);
+      console.log('Connected At Atual:', data.connected_at);
+      
       const mudouConnectedAt = connectedAtInicial !== null && data.connected_at !== connectedAtInicial;
       
-      if (mudouConnectedAt) {
-        console.log('✅ Conectado!');
+      console.log('Mudou Connected At?', mudouConnectedAt);
+      console.log('Status é connected?', data.status === 'connected');
+      
+      if (mudouConnectedAt || data.status === 'connected') {
+        console.log('✅ CONEXÃO DETECTADA!');
         monitorarConexao = false;
         document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
         setTimeout(() => { fecharModal(); location.reload(); }, 2000);
       } else {
         connectedAtInicial = data.connected_at;
-        setTimeout(verificarConexao, 1000);
+        if (monitorarConexao) {
+          setTimeout(verificarConexao, 1000);
+        }
       }
     })
     .catch(e => {
+      console.error('Erro ao verificar:', e);
       if (monitorarConexao) setTimeout(verificarConexao, 2000);
     });
 }
