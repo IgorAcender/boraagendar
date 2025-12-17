@@ -169,16 +169,25 @@ let intervaloMonitoramento = null;
 
 // Função para gerar QR code
 async function gerarQR(whatsappId) {
+  console.log('gerarQR chamado com ID:', whatsappId);
   try {
     whatsappIdAtual = whatsappId;
     monitorarConexao = true;
     tentativas = 0;
     connectedAtInicial = null;
 
-    $('#qrModal').modal('show');
-    $('#modalStatus').text('🔄 Gerando QR code...');
-    $('#connectionProgress').hide();
-    $('#confirmarBtn').hide();
+    // Usar jQuery se disponível, senão usar vanilla JS
+    if (typeof jQuery !== 'undefined') {
+      $('#qrModal').modal('show');
+      $('#modalStatus').text('🔄 Gerando QR code...');
+      $('#connectionProgress').hide();
+      $('#confirmarBtn').hide();
+    } else {
+      document.getElementById('qrModal').style.display = 'block';
+      document.getElementById('modalStatus').textContent = '🔄 Gerando QR code...';
+      document.getElementById('connectionProgress').style.display = 'none';
+      document.getElementById('confirmarBtn').style.display = 'none';
+    }
 
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
@@ -192,19 +201,39 @@ async function gerarQR(whatsappId) {
     });
 
     const data = await response.json();
+    console.log('Resposta do servidor:', data);
 
     if (data.success) {
-      $('#modalQRCode').html(`<img src="${data.qr_code}" alt="QR Code" class="img-fluid" style="max-width: 300px; border-radius: 8px;">`);
-      $('#modalStatus').text('📱 QR code gerado! Escaneie com o WhatsApp.');
+      document.getElementById('modalQRCode').innerHTML = `<img src="${data.qr_code}" alt="QR Code" style="max-width: 300px; border-radius: 8px;">`;
+      if (typeof jQuery !== 'undefined') {
+        $('#modalStatus').text('📱 QR code gerado! Escaneie com o WhatsApp.');
+      } else {
+        document.getElementById('modalStatus').textContent = '📱 QR code gerado! Escaneie com o WhatsApp.';
+      }
       iniciarMonitoramento(whatsappId);
-      $('#connectionProgress').show();
+      if (typeof jQuery !== 'undefined') {
+        $('#connectionProgress').show();
+      } else {
+        document.getElementById('connectionProgress').style.display = 'block';
+      }
       atualizarProgresso(0, 'Aguardando leitura do QR...');
     } else {
-      $('#modalStatus').text('❌ Erro ao gerar QR: ' + (data.error || 'Erro desconhecido'));
+      const msg = '❌ Erro ao gerar QR: ' + (data.error || 'Erro desconhecido');
+      console.error(msg);
+      if (typeof jQuery !== 'undefined') {
+        $('#modalStatus').text(msg);
+      } else {
+        document.getElementById('modalStatus').textContent = msg;
+      }
     }
   } catch (error) {
     console.error('Erro ao gerar QR:', error);
-    $('#modalStatus').text('❌ Erro de conexão. Tente novamente.');
+    const msg = '❌ Erro de conexão. Tente novamente.';
+    if (typeof jQuery !== 'undefined') {
+      $('#modalStatus').text(msg);
+    } else {
+      document.getElementById('modalStatus').textContent = msg;
+    }
   }
 }
 
@@ -272,6 +301,7 @@ function atualizarProgresso(percentual, texto) {
 }
 
 async function desconectar(whatsappId) {
+  console.log('desconectar chamado com ID:', whatsappId);
   if (!confirm('Tem certeza que deseja desconectar este WhatsApp?')) {
     return;
   }
@@ -287,6 +317,7 @@ async function desconectar(whatsappId) {
     });
 
     const data = await response.json();
+    console.log('Resposta desconectar:', data);
 
     if (data.success) {
       alert('WhatsApp desconectado com sucesso!');
@@ -306,6 +337,7 @@ function confirmarConexao() {
 }
 
 function verDetalhes(whatsappId) {
+  console.log('verDetalhes chamado com ID:', whatsappId);
   window.location.href = `/dashboard/whatsapp/${whatsappId}/`;
 }
 
