@@ -584,8 +584,9 @@ function verificarConexao() {
         console.log('📊 Dados de status:', data);
         
         // Verificar se a conexão foi estabelecida
-        // O campo é 'status' (não 'connection_status') e pode ter valor 'connected'
-        const isConnected = data.status === 'connected' || data.is_connected === true;
+        // Aceitar "connected" ou "open" ou is_connected=true
+        const statusValues = ['connected', 'open'];
+        const isConnected = statusValues.includes(data.status) || data.is_connected === true;
         
         console.log(`📋 status: "${data.status}", is_connected: ${data.is_connected}, isConnected calculado: ${isConnected}`);
         
