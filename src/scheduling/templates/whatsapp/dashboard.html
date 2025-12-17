@@ -3,10 +3,59 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/whatsapp-dashboard.css' %}">
+<<<<<<< HEAD
+=======
+<style>
+  .content-wrapper .whatsapp-header {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(37, 211, 102, 0.2);
+  }
+
+  .whatsapp-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .whatsapp-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .whatsapp-header {
+      padding: 1.5rem;
+    }
+
+    .whatsapp-header h1 {
+      font-size: 2rem;
+    }
+  }
+</style>
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
 {% endblock %}
 
 {% block content %}
 <div class="content-wrapper">
+<<<<<<< HEAD
   <!-- Hero Header -->
   <div class="hero-header" style="background: linear-gradient(135deg, #25d366 0%, #128c7e 100%); color: white; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
     <h1 style="margin: 0 0 0.5rem 0; font-size: 2.5rem; font-weight: 700;">📱 Gerenciar WhatsApp</h1>
@@ -54,6 +103,83 @@
           ⚠️ {{ whatsapp.error_message }}
         </div>
         {% endif %}
+=======
+  <!-- Header -->
+  <div class="whatsapp-header">
+    <h1>📱 WhatsApp Manager</h1>
+    <p>Gerencie suas conexões WhatsApp automaticamente</p>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Coluna Esquerda: Status + Formulário -->
+    <div class="left-column">
+      <!-- Status Card -->
+      <div class="card status-card">
+        <div class="card-header">
+          <h3>📊 Status da Conexão</h3>
+        </div>
+        <div class="card-body">
+          {% for whatsapp in whatsapps %}
+          <div class="status-item" data-whatsapp-id="{{ whatsapp.id }}">
+            <div class="status-info">
+              <div class="phone-number">{{ whatsapp.phone_number|default:"Não configurado" }}</div>
+              <div class="status-badge status-{{ whatsapp.connection_status|default:'disconnected' }}">
+                {% if whatsapp.connection_status == 'connected' %}
+                  🟢 Conectado
+                {% elif whatsapp.connection_status == 'connecting' %}
+                  🟡 Conectando...
+                {% elif whatsapp.connection_status == 'qr' %}
+                  🔵 Aguardando QR
+                {% else %}
+                  🔴 Desconectado
+                {% endif %}
+              </div>
+            </div>
+            <div class="status-actions">
+              {% if whatsapp.connection_status != 'connected' %}
+              <button class="btn btn-success btn-sm" onclick="gerarQR({{ whatsapp.id }})">
+                📱 Novo QR
+              </button>
+              {% endif %}
+              {% if whatsapp.connection_status == 'connected' %}
+              <button class="btn btn-danger btn-sm" onclick="desconectar({{ whatsapp.id }})">
+                ❌ Desconectar
+              </button>
+              {% endif %}
+            </div>
+          </div>
+          {% empty %}
+          <div class="no-whatsapps">
+            <p>Nenhuma instância WhatsApp configurada.</p>
+            <button class="btn btn-primary" onclick="location.reload()">🔄 Atualizar</button>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Formulário de Mensagem -->
+      <div class="card message-form-card">
+        <div class="card-header">
+          <h3>💬 Enviar Mensagem</h3>
+        </div>
+        <div class="card-body">
+          <form id="messageForm">
+            <div class="form-group">
+              <label for="phone">Número do Destinatário:</label>
+              <input type="tel" id="phone" name="phone" class="form-control"
+                     placeholder="5511999999999" required>
+            </div>
+            <div class="form-group">
+              <label for="message">Mensagem:</label>
+              <textarea id="message" name="message" class="form-control"
+                        placeholder="Digite sua mensagem..." rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              📤 Enviar Mensagem
+            </button>
+          </form>
+        </div>
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
       </div>
     </div>
     
@@ -67,6 +193,7 @@
         <p style="color: #6b7280; margin: 0;">Clique em "Novo QR" para gerar código</p>
       </div>
 
+<<<<<<< HEAD
       <!-- Ações -->
       <div class="whatsapp-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
         {% if whatsapp.connection_status != 'connected' %}
@@ -86,6 +213,61 @@
           ❌ Desconectar
         </button>
         {% endif %}
+=======
+    <!-- Coluna Direita: QR Code + Ações -->
+    <div class="right-column">
+      <!-- QR Code Section -->
+      <div class="card qr-card">
+        <div class="card-header">
+          <h3>📱 QR Code</h3>
+        </div>
+        <div class="card-body">
+          <div id="qrContainer" class="qr-container" style="display: none;">
+            <div id="qrCode" class="qr-code"></div>
+            <div class="qr-instructions">
+              <p><strong>📲 Instruções:</strong></p>
+              <ol>
+                <li>Abra o WhatsApp no seu celular</li>
+                <li>Toque em "Mais opções" (⋮) ou "Settings"</li>
+                <li>Selecione "WhatsApp Web" ou "Linked Devices"</li>
+                <li>Toque em "Link a Device"</li>
+                <li>Aponte a câmera para este QR code</li>
+              </ol>
+              <div class="connection-status">
+                <div id="connectionStatus">🔄 Preparando conexão...</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="noQRMessage" class="no-qr-message">
+            <div class="no-qr-icon">📱</div>
+            <p>Clique em "Novo QR" para gerar um código QR</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações Rápidas -->
+      <div class="card actions-card">
+        <div class="card-header">
+          <h3>⚡ Ações Rápidas</h3>
+        </div>
+        <div class="card-body">
+          <div class="action-buttons">
+            <button class="btn btn-outline-primary btn-block" onclick="atualizarStatus()">
+              🔄 Atualizar Status
+            </button>
+            <button class="btn btn-outline-info btn-block" onclick="verLogs()">
+              📋 Ver Logs
+            </button>
+            <button class="btn btn-outline-warning btn-block" onclick="testarConexao()">
+              🧪 Testar Conexão
+            </button>
+            <button class="btn btn-outline-secondary btn-block" onclick="configurarWebhooks()">
+              🎣 Configurar Webhooks
+            </button>
+          </div>
+        </div>
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
       </div>
     </div>
     
@@ -137,12 +319,22 @@
             <li>Toque em "Link a Device"</li>
             <li><strong>Aponte a câmera para o QR code acima</strong></li>
           </ol>
+<<<<<<< HEAD
           <div class="alert alert-info" style="margin-top: 1rem;">
             <strong>🔄 Status:</strong> <span id="modalStatus">Gerando QR code...</span>
           </div>
           <div class="connection-progress" id="connectionProgress" style="display: none; margin-top: 1rem;">
             <div class="progress">
               <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" id="progressBar"></div>
+=======
+          <div class="alert alert-info">
+            <strong>🔄 Status:</strong> <span id="modalStatus">Gerando QR code...</span>
+          </div>
+          <div class="connection-progress" id="connectionProgress" style="display: none;">
+            <div class="progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated"
+                   role="progressbar" style="width: 0%" id="progressBar"></div>
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
             </div>
             <small class="text-muted" id="progressText">Aguardando leitura do QR...</small>
           </div>
@@ -164,18 +356,26 @@ let whatsappIdAtual = null;
 let monitorarConexao = false;
 let connectedAtInicial = null;
 let tentativas = 0;
+<<<<<<< HEAD
 let maxTentativas = 120;
+=======
+let maxTentativas = 120; // 2 minutos
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
 let intervaloMonitoramento = null;
 
 // Função para gerar QR code
 async function gerarQR(whatsappId) {
+<<<<<<< HEAD
   console.log('gerarQR chamado com ID:', whatsappId);
+=======
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
   try {
     whatsappIdAtual = whatsappId;
     monitorarConexao = true;
     tentativas = 0;
     connectedAtInicial = null;
 
+<<<<<<< HEAD
     // Usar jQuery se disponível, senão usar vanilla JS
     if (typeof jQuery !== 'undefined') {
       $('#qrModal').modal('show');
@@ -191,16 +391,30 @@ async function gerarQR(whatsappId) {
 
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
+=======
+    // Mostrar modal
+    $('#qrModal').modal('show');
+    $('#modalStatus').text('🔄 Gerando QR code...');
+    $('#connectionProgress').hide();
+    $('#confirmarBtn').hide();
+
+    // Fazer requisição para gerar QR
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
     const response = await fetch(`/dashboard/whatsapp/criar/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+<<<<<<< HEAD
         'X-CSRFToken': csrfToken
+=======
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
       },
       body: JSON.stringify({ whatsapp_id: whatsappId })
     });
 
     const data = await response.json();
+<<<<<<< HEAD
     console.log('Resposta do servidor:', data);
 
     if (data.success) {
@@ -234,6 +448,28 @@ async function gerarQR(whatsappId) {
     } else {
       document.getElementById('modalStatus').textContent = msg;
     }
+=======
+
+    if (data.success) {
+      // Mostrar QR code
+      $('#modalQRCode').html(`<img src="${data.qr_code}" alt="QR Code" class="img-fluid">`);
+      $('#modalStatus').text('📱 QR code gerado! Escaneie com o WhatsApp.');
+
+      // Iniciar monitoramento automático
+      iniciarMonitoramento(whatsappId);
+
+      // Mostrar progresso
+      $('#connectionProgress').show();
+      atualizarProgresso(0, 'Aguardando leitura do QR...');
+
+    } else {
+      $('#modalStatus').text('❌ Erro ao gerar QR: ' + (data.error || 'Erro desconhecido'));
+    }
+
+  } catch (error) {
+    console.error('Erro ao gerar QR:', error);
+    $('#modalStatus').text('❌ Erro de conexão. Tente novamente.');
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
   }
 }
 
@@ -261,29 +497,52 @@ function iniciarMonitoramento(whatsappId) {
       const response = await fetch(`/dashboard/whatsapp/${whatsappId}/status/`);
       const data = await response.json();
 
+<<<<<<< HEAD
       if (data.is_connected === true || data.status === 'connected') {
+=======
+      // Verificar se conectou
+      if (data.is_connected === true || data.status === 'connected') {
+        // Conectado! Fechar modal automaticamente
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
         sucessoConexao(data);
         return;
       }
 
+<<<<<<< HEAD
       if (connectedAtInicial === null) {
         connectedAtInicial = data.connected_at;
       } else if (data.connected_at !== connectedAtInicial) {
+=======
+      // Verificar mudança no timestamp (webhook)
+      if (connectedAtInicial === null) {
+        connectedAtInicial = data.connected_at;
+      } else if (data.connected_at !== connectedAtInicial) {
+        // Timestamp mudou - conexão estabelecida via webhook
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
         sucessoConexao(data);
         return;
       }
 
+<<<<<<< HEAD
+=======
+      // Atualizar status baseado na resposta
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
       if (data.status === 'connecting') {
         atualizarProgresso(progresso, '🔄 Conectando ao WhatsApp...');
       } else if (data.status === 'qr') {
         atualizarProgresso(progresso, '📱 Aguardando leitura do QR...');
       }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
     } catch (error) {
       console.error('Erro no monitoramento:', error);
     }
   }, 1000);
 }
 
+<<<<<<< HEAD
 function sucessoConexao(data) {
   monitorarConexao = false;
   clearInterval(intervaloMonitoramento);
@@ -295,29 +554,64 @@ function sucessoConexao(data) {
   }, 2000);
 }
 
+=======
+// Função chamada quando conexão é bem-sucedida
+function sucessoConexao(data) {
+  monitorarConexao = false;
+  clearInterval(intervaloMonitoramento);
+
+  atualizarProgresso(100, '✅ Conectado com sucesso!');
+
+  // Mostrar mensagem de sucesso
+  $('#modalStatus').html('<span class="text-success">✅ WhatsApp conectado com sucesso!</span>');
+
+  // Fechar modal automaticamente após 2 segundos
+  setTimeout(() => {
+    $('#qrModal').modal('hide');
+    location.reload(); // Recarregar página para atualizar status
+  }, 2000);
+}
+
+// Função para atualizar barra de progresso
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
 function atualizarProgresso(percentual, texto) {
   $('#progressBar').css('width', percentual + '%');
   $('#progressText').text(texto);
 }
 
+<<<<<<< HEAD
 async function desconectar(whatsappId) {
   console.log('desconectar chamado com ID:', whatsappId);
+=======
+// Função para desconectar
+async function desconectar(whatsappId) {
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
   if (!confirm('Tem certeza que deseja desconectar este WhatsApp?')) {
     return;
   }
 
   try {
+<<<<<<< HEAD
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+=======
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
     const response = await fetch(`/dashboard/whatsapp/${whatsappId}/desconectar/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+<<<<<<< HEAD
         'X-CSRFToken': csrfToken
+=======
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
       }
     });
 
     const data = await response.json();
+<<<<<<< HEAD
     console.log('Resposta desconectar:', data);
+=======
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
 
     if (data.success) {
       alert('WhatsApp desconectado com sucesso!');
@@ -325,22 +619,58 @@ async function desconectar(whatsappId) {
     } else {
       alert('Erro ao desconectar: ' + (data.error || 'Erro desconhecido'));
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
   } catch (error) {
     console.error('Erro ao desconectar:', error);
     alert('Erro de conexão. Tente novamente.');
   }
 }
 
+<<<<<<< HEAD
+=======
+// Função para confirmar conexão manualmente (fallback)
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
 function confirmarConexao() {
   $('#qrModal').modal('hide');
   location.reload();
 }
 
+<<<<<<< HEAD
 function verDetalhes(whatsappId) {
   console.log('verDetalhes chamado com ID:', whatsappId);
   window.location.href = `/dashboard/whatsapp/${whatsappId}/`;
 }
 
+=======
+// Função para atualizar status
+function atualizarStatus() {
+  location.reload();
+}
+
+// Função para ver logs (placeholder)
+function verLogs() {
+  alert('Funcionalidade de logs será implementada em breve.');
+}
+
+// Função para testar conexão (placeholder)
+function testarConexao() {
+  alert('Testando conexão com Evolution API...');
+  // TODO: Implementar teste de conectividade
+}
+
+// Função para configurar webhooks
+function configurarWebhooks() {
+  if (confirm('Deseja executar o script de configuração de webhooks? Isso ativará o fechamento automático do modal.')) {
+    // Abrir terminal ou executar comando
+    alert('Execute o comando: ./setup_webhooks.sh');
+  }
+}
+
+// Event listener para quando modal fecha
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
 $('#qrModal').on('hidden.bs.modal', function () {
   monitorarConexao = false;
   if (intervaloMonitoramento) {
@@ -348,21 +678,38 @@ $('#qrModal').on('hidden.bs.modal', function () {
   }
 });
 
+<<<<<<< HEAD
 document.getElementById('messageForm')?.addEventListener('submit', async function(e) {
+=======
+// Event listener para formulário de mensagem
+document.getElementById('messageForm').addEventListener('submit', async function(e) {
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
   e.preventDefault();
 
   const phone = document.getElementById('phone').value;
   const message = document.getElementById('message').value;
 
   try {
+<<<<<<< HEAD
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+=======
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
     const response = await fetch('/dashboard/whatsapp/enviar/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+<<<<<<< HEAD
         'X-CSRFToken': csrfToken
       },
       body: JSON.stringify({ phone: phone, message: message })
+=======
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: JSON.stringify({
+        phone: phone,
+        message: message
+      })
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
     });
 
     const data = await response.json();
@@ -373,12 +720,20 @@ document.getElementById('messageForm')?.addEventListener('submit', async functio
     } else {
       alert('❌ Erro ao enviar mensagem: ' + (data.error || 'Erro desconhecido'));
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
   } catch (error) {
     console.error('Erro ao enviar mensagem:', error);
     alert('❌ Erro de conexão. Tente novamente.');
   }
 });
 
+<<<<<<< HEAD
+=======
+// Inicialização
+>>>>>>> 01fcb47 (feat: Atualizar dashboard do WhatsApp com melhorias na interface e monitoramento de conexão)
 document.addEventListener('DOMContentLoaded', function() {
   console.log('WhatsApp Dashboard inicializado');
 });
