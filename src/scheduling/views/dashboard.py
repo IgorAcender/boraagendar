@@ -110,7 +110,7 @@ def index(request: HttpRequest) -> HttpResponse:
     
     # Ordenar por data de atualização (para histórico completo)
     bookings_history = bookings_query.select_related(
-        'service', 'professional', 'client'
+        'service', 'professional'
     ).order_by('-updated_at')[:50]
     
     # Para exibição, precisamos identificar reagendamentos
@@ -130,7 +130,7 @@ def index(request: HttpRequest) -> HttpResponse:
     
     # Últimos 10 agendamentos (para a primeira seção)
     recent_bookings = Booking.objects.filter(tenant=tenant).select_related(
-        'professional', 'service', 'client'
+        'professional', 'service'
     ).order_by("-scheduled_for")[:10]
     
     totals = {
@@ -1946,7 +1946,7 @@ def dashboard_history_fragment(request: HttpRequest) -> HttpResponse:
     
     # Ordenar por data de atualização
     bookings_history = bookings_query.select_related(
-        'service', 'professional', 'client'
+        'service', 'professional'
     ).order_by('-updated_at')[:50]
     
     # Para exibição, precisamos identificar reagendamentos
