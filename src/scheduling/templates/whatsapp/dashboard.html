@@ -13,27 +13,29 @@
     <p style="margin: 0; font-size: 1.1rem; opacity: 0.9;">Integração Evolution API • Conecte seu WhatsApp para enviar confirmações</p>
   </div>
 
-  <!-- WhatsApp List -->
-  <div class="whatsapp-list">
+  <!-- WhatsApp Dashboard - 2 Colunas -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
     {% for whatsapp in whatsapps %}
-    <div class="whatsapp-card" style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
-      <div class="whatsapp-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb;">
-        <div>
-          <div class="whatsapp-phone" style="font-size: 1.3rem; font-weight: bold; color: #1f2937;">📱 {{ whatsapp.phone_number }}</div>
-          <small style="color: #6b7280;">{{ whatsapp.display_name }}</small>
-        </div>
-        <span class="status-badge status-{{ whatsapp.connection_status|default:'disconnected' }}" style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
-          {% if whatsapp.connection_status == 'connected' %}
-            🟢 Conectado
-          {% elif whatsapp.connection_status == 'connecting' %}
-            🟡 Conectando
-          {% elif whatsapp.connection_status == 'qr' %}
-            🔵 Aguardando QR
-          {% else %}
-            🔴 Desconectado
-          {% endif %}
-        </span>
+    
+    <!-- Coluna Esquerda: Status -->
+    <div class="whatsapp-card" style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <div class="whatsapp-header" style="margin-bottom: 1rem;">
+        <h3 style="margin: 0 0 1rem 0; color: #1f2937;">📊 Status da Conexão</h3>
+        <div style="font-size: 1.3rem; font-weight: bold; color: #1f2937;">📱 {{ whatsapp.phone_number }}</div>
+        <small style="color: #6b7280;">{{ whatsapp.display_name }}</small>
       </div>
+      
+      <span class="status-badge status-{{ whatsapp.connection_status|default:'disconnected' }}" style="display: inline-block; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem;">
+        {% if whatsapp.connection_status == 'connected' %}
+          🟢 Conectado
+        {% elif whatsapp.connection_status == 'connecting' %}
+          🟡 Conectando
+        {% elif whatsapp.connection_status == 'qr' %}
+          🔵 Aguardando QR
+        {% else %}
+          🔴 Desconectado
+        {% endif %}
+      </span>
 
       <!-- Info -->
       <div class="whatsapp-info" style="margin: 1rem 0; font-size: 0.95rem; font-weight: 500;">
@@ -53,26 +55,40 @@
         </div>
         {% endif %}
       </div>
+    </div>
+    
+    <!-- Coluna Direita: QR Code + Ações -->
+    <div class="whatsapp-card" style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <h3 style="margin-top: 0; margin-bottom: 1rem; color: #1f2937;">🔗 Conectar Novo QR</h3>
+      
+      <!-- QR Display -->
+      <div id="qrSection_{{ whatsapp.id }}" style="text-align: center; padding: 2rem; border: 2px dashed #e5e7eb; border-radius: 8px; margin-bottom: 1.5rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+        <p style="color: #6b7280; margin: 0;">Clique em "Novo QR" para gerar código</p>
+      </div>
 
       <!-- Ações -->
-      <div class="whatsapp-actions" style="display: flex; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap;">
+      <div class="whatsapp-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
         {% if whatsapp.connection_status != 'connected' %}
-        <button class="btn btn-success" onclick="gerarQR({{ whatsapp.id }})" style="flex: 1; min-width: 120px; padding: 0.5rem 1rem;">
+        <button class="btn btn-success" onclick="gerarQR({{ whatsapp.id }})" style="padding: 0.75rem 1rem;">
           📱 Novo QR
+        </button>
+        <button class="btn btn-info" onclick="verDetalhes({{ whatsapp.id }})" style="padding: 0.75rem 1rem;">
+          � Detalhes
         </button>
         {% endif %}
         
         {% if whatsapp.connection_status == 'connected' %}
-        <button class="btn btn-danger" onclick="desconectar({{ whatsapp.id }})" style="flex: 1; min-width: 120px; padding: 0.5rem 1rem;">
+        <button class="btn btn-secondary" onclick="gerarQR({{ whatsapp.id }})" style="padding: 0.75rem 1rem;">
+          🔄 Reconectar
+        </button>
+        <button class="btn btn-danger" onclick="desconectar({{ whatsapp.id }})" style="padding: 0.75rem 1rem;">
           ❌ Desconectar
         </button>
         {% endif %}
-        
-        <button class="btn btn-info" onclick="verDetalhes({{ whatsapp.id }})" style="flex: 1; min-width: 120px; padding: 0.5rem 1rem;">
-          📋 Detalhes
-        </button>
       </div>
     </div>
+    
     {% empty %}
     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
       <p style="font-size: 1.1rem; color: #6b7280; margin-bottom: 1.5rem;">Nenhuma instância WhatsApp configurada.</p>
