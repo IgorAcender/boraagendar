@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoraAgendar - Dashboard</title>
+    
+    <!-- Ant Design CSS via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/5.11.0/antd.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f2f5;
+        }
+        
+        #root {
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 256px;
+            background: #001529;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar h2 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #1890ff;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            padding: 10px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            padding-left: 10px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li:hover {
+            background: rgba(24, 144, 255, 0.2);
+        }
+        
+        .sidebar-menu li.active {
+            background: #1890ff;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            color: #001529;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #1890ff;
+        }
+        
+        .stat-box h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .stat-box .value {
+            font-size: 28px;
+            color: #1890ff;
+            font-weight: bold;
+        }
+        
+        .success { border-left-color: #52c41a; }
+        .success .value { color: #52c41a; }
+        
+        .warning { border-left-color: #faad14; }
+        .warning .value { color: #faad14; }
+        
+        .danger { border-left-color: #ff4d4f; }
+        .danger .value { color: #ff4d4f; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <!-- React via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <script>
+        const { useState, useEffect } = React;
+        const e = React.createElement;
+        
+        // App Component
+        function App() {
+            const [activeMenu, setActiveMenu] = useState('dashboard');
+            const [stats, setStats] = useState({
+                total: 9,
+                confirmados: 2,
+                pendentes: 6,
+                cancelados: 1
+            });
+            
+            const menuItems = [
+                { id: 'dashboard', label: '📊 Dashboard', icon: '📊' },
+                { id: 'agendamentos', label: '📅 Agendamentos', icon: '📅' },
+                { id: 'transacoes', label: '💰 Transações', icon: '💰' },
+                { id: 'relatorios', label: '📈 Relatórios', icon: '📈' },
+                { id: 'configuracoes', label: '⚙️ Configurações', icon: '⚙️' },
+            ];
+            
+            return e('div', { className: 'app-container' },
+                // Sidebar
+                e('div', { className: 'sidebar' },
+                    e('h2', null, '🎯 BoraAgendar'),
+                    e('ul', { className: 'sidebar-menu' },
+                        menuItems.map(item =>
+                            e('li', {
+                                key: item.id,
+                                className: activeMenu === item.id ? 'active' : '',
+                                onClick: () => setActiveMenu(item.id)
+                            }, item.label)
+                        )
+                    )
+                ),
+                
+                // Main Content
+                e('div', { className: 'main-content' },
+                    e('div', { className: 'header' },
+                        e('h1', null, activeMenu === 'dashboard' ? '📊 Dashboard' : 
+                                     activeMenu === 'agendamentos' ? '📅 Agendamentos' :
+                                     activeMenu === 'transacoes' ? '💰 Transações' :
+                                     activeMenu === 'relatorios' ? '📈 Relatórios' :
+                                     '⚙️ Configurações')
+                    ),
+                    
+                    e('div', { className: 'content' },
+                        activeMenu === 'dashboard' && e('div', null,
+                            e('div', { className: 'stats-grid' },
+                                e('div', { className: 'stat-box' },
+                                    e('h3', null, 'Total Agendado'),
+                                    e('div', { className: 'value' }, stats.total)
+                                ),
+                                e('div', { className: 'stat-box success' },
+                                    e('h3', null, 'Confirmados'),
+                                    e('div', { className: 'value' }, stats.confirmados)
+                                ),
+                                e('div', { className: 'stat-box warning' },
+                                    e('h3', null, 'Pendentes'),
+                                    e('div', { className: 'value' }, stats.pendentes)
+                                ),
+                                e('div', { className: 'stat-box danger' },
+                                    e('h3', null, 'Cancelados'),
+                                    e('div', { className: 'value' }, stats.cancelados)
+                                )
+                            ),
+                            e('div', { className: 'card' },
+                                e('h2', null, '✅ React SPA Ativo no Django!'),
+                                e('p', null, 'Dashboard carregado com sucesso via CDN'),
+                                e('p', null, 'Status: 🟢 Funcionando')
+                            )
+                        ),
+                        
+                        activeMenu === 'agendamentos' && e('div', { className: 'card' },
+                            e('h2', null, '📅 Agendamentos'),
+                            e('p', null, 'Lista de agendamentos em desenvolvimento...')
+                        ),
+                        
+                        activeMenu === 'transacoes' && e('div', { className: 'card' },
+                            e('h2', null, '💰 Transações'),
+                            e('p', null, 'Módulo financeiro em desenvolvimento...')
+                        ),
+                        
+                        activeMenu === 'relatorios' && e('div', { className: 'card' },
+                            e('h2', null, '📈 Relatórios'),
+                            e('p', null, 'Relatórios em desenvolvimento...')
+                        ),
+                        
+                        activeMenu === 'configuracoes' && e('div', { className: 'card' },
+                            e('h2', null, '⚙️ Configurações'),
+                            e('p', null, 'Configurações em desenvolvimento...')
+                        )
+                    )
+                )
+            );
+        }
+        
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(e(App));
+    </script>
+</body>
+</html>

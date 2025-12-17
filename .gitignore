@@ -26,6 +26,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 
+# ⭐ EXCETO: src/static/dist/ (React build para Django)
+!src/static/dist/
+!src/static/dist/**
+
 # PyInstaller
 *.manifest
 *.spec
