@@ -7,12 +7,13 @@ export default defineConfig({
   
   // Build config para Django
   build: {
-    outDir: 'dist',
+    outDir: '../src/static/dist',
     assetsDir: 'assets',
     emptyOutDir: true,
     target: 'es2015',
     minify: 'terser',
     sourcemap: false,
+    base: '/static/dist/',
   },
   
   // Dev server config
