@@ -3,36 +3,333 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/whatsapp-dashboard.css' %}">
+<style>
+  .content-wrapper .whatsapp-header {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(37, 211, 102, 0.15);
+  }
+  .content-wrapper .whatsapp-header h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+  }
+  .content-wrapper .whatsapp-header p {
+    margin: 0.5rem 0 0 0;
+    font-size: 16px;
+    opacity: 0.95;
+  }
+
+  .content-wrapper .whatsapp-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .content-wrapper .status-section {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border-left: 5px solid #25d366;
+  }
+
+  .content-wrapper .status-section h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    font-size: 15px;
+  }
+
+  .status-badge.connected {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-badge.disconnected {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .content-wrapper .status-info {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.25rem;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .content-wrapper .status-info p {
+    margin: 0.75rem 0;
+    color: #4a5568;
+  }
+
+  .content-wrapper .status-info strong {
+    color: #1a1a1a;
+  }
+
+  .content-wrapper .qr-section {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .content-wrapper .qr-section h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .content-wrapper .qr-placeholder {
+    background: #f0fdf4;
+    border: 2px dashed #25d366;
+    border-radius: 14px;
+    padding: 2rem;
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .content-wrapper .qr-placeholder-text {
+    font-size: 14px;
+    color: #4a5568;
+  }
+
+  .content-wrapper .button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .btn-whatsapp {
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+
+  .btn-reconnect {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  }
+
+  .btn-reconnect:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+  }
+
+  .btn-qrcode {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+  }
+
+  .btn-qrcode:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 211, 102, 0.3);
+  }
+
+  .qr-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qr-modal-overlay.active {
+    display: flex;
+  }
+
+  .qr-modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 95%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .qr-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .qr-modal-close:hover {
+    background: #e0e0e0;
+  }
+
+  .qr-modal-content h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    color: #1a1a1a;
+  }
+
+  .qr-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 1.5rem;
+    min-height: 280px;
+  }
+
+  .qr-display img {
+    max-width: 100%;
+    max-height: 250px;
+  }
+
+  .success-message {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .success-message .icon {
+    font-size: 60px;
+    margin-bottom: 1rem;
+  }
+
+  .success-message h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #065f46;
+    font-weight: 600;
+  }
+
+  @media (max-width: 1024px) {
+    .content-wrapper .whatsapp-container {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-<div style="padding: 20px;">
-  <h1>WhatsApp Dashboard</h1>
-  
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-    <div>
-      <h2>Status</h2>
-      {% if whatsapps %}
-        {% with wa=whatsapps.0 %}
-        <p>Instância: {{ wa.instance_name }}</p>
-        <p>Status: {{ wa.connection_status }}</p>
-        {% endwith %}
-      {% else %}
-        <p>Nenhuma instância</p>
-      {% endif %}
-    </div>
+<div class="whatsapp-header">
+  <h1>📱 Gerenciador WhatsApp</h1>
+  <p>Integração Evolution API - Controle suas instâncias</p>
+</div>
+
+<div class="whatsapp-container">
+  <!-- COLUNA ESQUERDA - STATUS -->
+  <div class="status-section">
+    <h2>🔌 Status da Conexão</h2>
     
-    <div>
-      <h2>Conectar</h2>
-      <button onclick="reconectarWhatsApp()">Novo QR</button>
+    {% if whatsapps %}
+      {% with wa=whatsapps.0 %}
+      
+      <div class="status-badge {% if wa.connection_status == 'connected' %}connected{% else %}disconnected{% endif %}">
+        <span>{% if wa.connection_status == 'connected' %}🟢{% else %}🔴{% endif %}</span>
+        <span>{% if wa.connection_status == 'connected' %}Conectado{% else %}Desconectado{% endif %}</span>
+      </div>
+
+      <div class="status-info">
+        <p><strong>Instância:</strong> {{ wa.instance_name }}</p>
+        <p><strong>Número:</strong> {% if wa.phone_number %}{{ wa.phone_number }}{% else %}N/A{% endif %}</p>
+        <p><strong>Status:</strong> {{ wa.connection_status }}</p>
+        <p><strong>Tipo:</strong> {% if wa.is_primary %}Principal{% else %}Secundária{% endif %}</p>
+      </div>
+      
+      {% endwith %}
+    {% else %}
+      <div class="status-badge disconnected">
+        <span>🔴</span>
+        <span>Sem instâncias</span>
+      </div>
+      <div class="status-info">
+        <p>Nenhuma instância WhatsApp configurada.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- COLUNA DIREITA - CONECTAR -->
+  <div class="qr-section">
+    <h2>📲 Conectar Novo QR</h2>
+    
+    <div class="qr-placeholder">
+      <div class="qr-placeholder-text">
+        <p style="font-size: 48px; margin: 0;">📱</p>
+        <p>Clique em "Novo QR" para gerar código</p>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="btn-whatsapp btn-reconnect" onclick="reconectarWhatsApp()">⚡ Reconectar</button>
+      <button class="btn-whatsapp btn-qrcode" onclick="mostrarQRCode()">📲 Novo QR</button>
     </div>
   </div>
-  
-  <div id="qrModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000;">
-    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
-      <button onclick="fecharModal()" style="float: right;">X</button>
-      <div id="modalQRContent"></div>
-    </div>
+</div>
+
+<!-- MODAL QR CODE -->
+<div id="qrModal" class="qr-modal-overlay">
+  <div class="qr-modal-content">
+    <button class="qr-modal-close" onclick="fecharModal()">×</button>
+    <h2>Escanear QR Code</h2>
+    <div id="modalQRContent" class="qr-display"></div>
   </div>
 </div>
 
@@ -42,11 +339,11 @@ let monitorarConexao = false;
 let connectedAtInicial = null;
 
 function abrirModal() {
-  document.getElementById('qrModal').style.display = 'flex';
+  document.getElementById('qrModal').classList.add('active');
 }
 
 function fecharModal() {
-  document.getElementById('qrModal').style.display = 'none';
+  document.getElementById('qrModal').classList.remove('active');
   monitorarConexao = false;
 }
 
@@ -61,7 +358,7 @@ function verificarConexao() {
       if (mudouConnectedAt) {
         console.log('✅ Conectado!');
         monitorarConexao = false;
-        document.getElementById('modalQRContent').innerHTML = '<h2>✅ Conectado!</h2>';
+        document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
         setTimeout(() => { fecharModal(); location.reload(); }, 2000);
       } else {
         connectedAtInicial = data.connected_at;
@@ -89,17 +386,30 @@ function reconectarWhatsApp() {
   .then(r => r.json())
   .then(data => {
     if (data.success && data.qr_code) {
-      document.getElementById('modalQRContent').innerHTML = '<img src="' + data.qr_code + '" style="max-width: 250px;">';
+      document.getElementById('modalQRContent').innerHTML = '<img src="' + data.qr_code + '" style="max-width: 100%;">';
       setTimeout(verificarConexao, 1000);
     } else {
-      document.getElementById('modalQRContent').innerHTML = '<p>Erro ao gerar QR</p>';
+      document.getElementById('modalQRContent').innerHTML = '<div style="text-align: center; color: red;"><p>Erro ao gerar QR Code</p></div>';
       monitorarConexao = false;
     }
   })
   .catch(e => { 
     console.error(e);
+    document.getElementById('modalQRContent').innerHTML = '<div style="text-align: center; color: red;"><p>Erro na solicitação</p></div>';
     monitorarConexao = false; 
   });
 }
+
+function mostrarQRCode() {
+  reconectarWhatsApp();
+}
+
+// Fechar modal clicando fora
+document.addEventListener('click', function(e) {
+  let modal = document.getElementById('qrModal');
+  if (e.target === modal) {
+    fecharModal();
+  }
+});
 </script>
 {% endblock %}
