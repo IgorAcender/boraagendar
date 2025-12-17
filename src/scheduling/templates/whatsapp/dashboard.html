@@ -363,7 +363,7 @@
 <script>
 let whatsappId = {% if whatsapps %}'{{ whatsapps.0.id }}'{% else %}null{% endif %};
 let monitorarConexao = false;
-let ultimoStatus = null;
+let isConnectedAnterior = null;
 let tentativas = 0;
 
 function abrirModal() {
@@ -384,36 +384,34 @@ function verificarConexao() {
   fetch('/dashboard/whatsapp/' + whatsappId + '/status/')
     .then(r => r.json())
     .then(data => {
-      const statusAtual = data.status;
+      console.log('Tentativa ' + tentativas + ': is_connected=' + data.is_connected + ', status=' + data.status);
       
-      console.log('Tentativa ' + tentativas + ': ' + statusAtual);
-      
-      // Se era "qr" ou null e agora mudou para outra coisa
-      if (ultimoStatus !== null && ultimoStatus !== statusAtual && ultimoStatus !== 'connected') {
-        console.log('✅ STATUS MUDOU de "' + ultimoStatus + '" para "' + statusAtual + '"');
-        
-        if (statusAtual === 'connected') {
-          monitorarConexao = false;
-          document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
-          setTimeout(() => { fecharModal(); location.reload(); }, 2000);
-          return;
-        } else if (statusAtual !== 'connecting') {
-          // Se virou algo diferente de "connecting", também fecha
-          monitorarConexao = false;
-          document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">⚠️</div><h3>Status: ' + statusAtual + '</h3></div>';
-          setTimeout(() => { fecharModal(); location.reload(); }, 2000);
-          return;
-        }
+      // SE começou como false (desconectado) e agora está true (conectado)
+      if (isConnectedAnterior === false && data.is_connected === true) {
+        console.log('✅ CONECTADO COM SUCESSO!');
+        monitorarConexao = false;
+        document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
+        setTimeout(() => { fecharModal(); location.reload(); }, 2000);
+        return;
       }
       
-      ultimoStatus = statusAtual;
-      
-      // Se chegou a 120 segundos, para
-      if (tentativas > 120) {
-        console.log('❌ TIMEOUT');
+      // Se já estava conectado, mantém assim
+      if (data.is_connected === true) {
+        console.log('✅ JÁ ESTAVA CONECTADO');
         monitorarConexao = false;
-        document.getElementById('modalQRContent').innerHTML = '<div style="text-align: center;"><p style="color: red;">Timeout - Verifique sua conexão</p></div>';
-        setTimeout(() => { fecharModal(); }, 3000);
+        document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
+        setTimeout(() => { fecharModal(); location.reload(); }, 2000);
+        return;
+      }
+      
+      isConnectedAnterior = data.is_connected;
+      
+      // Se passou de 120 segundos, para
+      if (tentativas > 120) {
+        console.log('⏱️ TIMEOUT - 2 minutos');
+        monitorarConexao = false;
+        document.getElementById('modalQRContent').innerHTML = '<div style="text-align: center;"><p style="color: #666;">Tempo limite atingido. Tente novamente.</p></div>';
+        setTimeout(() => { fecharModal(); }, 2000);
         return;
       }
       
