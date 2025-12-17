@@ -900,15 +900,22 @@
     </div>
 </div>
 
-<!-- Seletor de Mês -->
+<!-- Seletor de Mês com HTMX -->
 <div style="margin-top: 40px; margin-bottom: 30px; background: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08); display: flex; align-items: center; gap: 20px;">
     <label style="font-weight: 600; color: #1F2937; font-size: 15px; margin: 0;">
         📅 Período:
     </label>
     
     <div style="display: flex; align-items: center; gap: 15px;">
-        <!-- Botão Voltar -->
-        <button id="btn-prev-month" type="button" style="padding: 10px 14px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold; min-width: 44px; min-height: 44px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); position: relative; z-index: 100;">
+        <!-- Botão Voltar - HTMX -->
+        <button 
+            type="button"
+            hx-get="{% url 'dashboard:index' %}"
+            hx-vals='{"time_filter": "prevMonth"}'
+            hx-target="body"
+            hx-swap="outerHTML swap:1s"
+            hx-indicator="#htmx-loading"
+            style="padding: 10px 14px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold; min-width: 44px; min-height: 44px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); position: relative; z-index: 100;">
             ← 
         </button>
         
@@ -919,10 +926,22 @@
             </span>
         </div>
         
-        <!-- Botão Avançar -->
-        <button id="btn-next-month" type="button" style="padding: 10px 14px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold; min-width: 44px; min-height: 44px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); position: relative; z-index: 100;">
+        <!-- Botão Avançar - HTMX -->
+        <button 
+            type="button"
+            hx-get="{% url 'dashboard:index' %}"
+            hx-vals='{"time_filter": "nextMonth"}'
+            hx-target="body"
+            hx-swap="outerHTML swap:1s"
+            hx-indicator="#htmx-loading"
+            style="padding: 10px 14px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold; min-width: 44px; min-height: 44px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); position: relative; z-index: 100;">
             →
         </button>
+        
+        <!-- Indicador de Carregamento -->
+        <div id="htmx-loading" style="display: none; margin-left: 10px;">
+            <i class="fas fa-spinner fa-spin" style="color: #667eea;"></i>
+        </div>
     </div>
 </div>
 
@@ -1540,18 +1559,48 @@
     </div>
 
     <div class="tabs-nav">
-        <button class="tab-button active" onclick="filterByType(event, 'all')">
+        <!-- Botões de Filtro com HTMX -->
+        <button 
+            class="tab-button active" 
+            hx-get="{% url 'dashboard:dashboard_history_fragment' %}"
+            hx-vals='{"type": "all"}'
+            hx-target="#history-table-container"
+            hx-swap="innerHTML"
+            hx-indicator="#history-loading">
             <i class="fas fa-list"></i> Tudo
         </button>
-        <button class="tab-button" onclick="filterByType(event, 'Agendamento')">
+        <button 
+            class="tab-button" 
+            hx-get="{% url 'dashboard:dashboard_history_fragment' %}"
+            hx-vals='{"type": "agendamento"}'
+            hx-target="#history-table-container"
+            hx-swap="innerHTML"
+            hx-indicator="#history-loading">
             <i class="fas fa-calendar-plus"></i> Agendamentos
         </button>
-        <button class="tab-button" onclick="filterByType(event, 'Reagendamento')">
+        <button 
+            class="tab-button" 
+            hx-get="{% url 'dashboard:dashboard_history_fragment' %}"
+            hx-vals='{"type": "reagendamento"}'
+            hx-target="#history-table-container"
+            hx-swap="innerHTML"
+            hx-indicator="#history-loading">
             <i class="fas fa-sync"></i> Reagendamentos
         </button>
-        <button class="tab-button" onclick="filterByType(event, 'Cancelamento')">
+        <button 
+            class="tab-button" 
+            hx-get="{% url 'dashboard:dashboard_history_fragment' %}"
+            hx-vals='{"type": "cancelamento"}'
+            hx-target="#history-table-container"
+            hx-swap="innerHTML"
+            hx-indicator="#history-loading">
             <i class="fas fa-times-circle"></i> Cancelamentos
         </button>
+        
+        <!-- Indicador de Carregamento -->
+        <div id="history-loading" style="display: none; margin-left: 15px;">
+            <i class="fas fa-spinner fa-spin" style="color: #667eea;"></i>
+        </div>
     </div>
 
     <div id="history-table-container" class="tab-content active">

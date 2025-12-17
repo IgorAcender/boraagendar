@@ -33,4 +33,8 @@ urlpatterns = [
     path("configuracoes/politicas/", dashboard_views.booking_policies, name="booking_policies"),
     path("horario-padrao/", dashboard_views.default_availability_view, name="default_availability"),
     path("horario-padrao/salvar/", dashboard_views.default_availability_save, name="default_availability_save"),
+    
+    # Fragmentos HTMX
+    path("fragmentos/mes/", dashboard_views.dashboard_month_fragment, name="dashboard_month_fragment"),
+    path("fragmentos/historico/", dashboard_views.dashboard_history_fragment, name="dashboard_history_fragment"),
 ]

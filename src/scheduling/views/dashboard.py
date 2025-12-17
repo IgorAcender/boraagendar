@@ -1782,3 +1782,194 @@ def export_report_pdf(request: HttpRequest) -> HttpResponse:
     return response
 
 
+# ============================================================
+# VIEWS PARA FRAGMENTOS HTMX - Dashboard
+# ============================================================
+
+@login_required
+def dashboard_month_fragment(request: HttpRequest) -> HttpResponse:
+    """
+    Retorna fragmento HTML com dados do dashboard para um mês específico.
+    Usado por HTMX para atualizar apenas a seção relevante sem recarregar a página.
+    """
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff", "professional"],
+    )
+    if redirect_response:
+        return redirect_response
+    
+    tenant = membership.tenant
+    tz = _get_tenant_timezone(tenant)
+    
+    # ====== PROCESSAMENTO DO FILTRO DE TEMPO GLOBAL ======
+    time_filter = request.GET.get('time_filter', 'mensal')
+    custom_start_date = None
+    custom_end_date = None
+    
+    # Calcular datas baseado no filtro de tempo
+    now_tz = django_timezone.now().astimezone(tz)
+    
+    # Sempre usar o formato de mês (padrão é mês atual, mas pode vir custom:YYYY-MM-DD:YYYY-MM-DD)
+    if time_filter.startswith('custom:'):
+        # Filtro personalizado: custom:YYYY-MM-DD:YYYY-MM-DD
+        try:
+            parts = time_filter.split(':')
+            if len(parts) == 3:
+                start_str = parts[1]
+                end_str = parts[2]
+                custom_start_date = django_timezone.make_aware(
+                    datetime.strptime(f"{start_str} 00:00:00", "%Y-%m-%d %H:%M:%S"),
+                    timezone=tz
+                )
+                custom_end_date = django_timezone.make_aware(
+                    datetime.strptime(f"{end_str} 23:59:59", "%Y-%m-%d %H:%M:%S"),
+                    timezone=tz
+                )
+        except (ValueError, IndexError):
+            # Se erro, usar padrão de mês atual
+            custom_start_date = now_tz.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            custom_end_date = (custom_start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+    else:
+        # Padrão: mês atual
+        custom_start_date = now_tz.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        custom_end_date = (custom_start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+    
+    # ====== FIM PROCESSAMENTO DO FILTRO DE TEMPO ======
+    
+    start_date, end_date = custom_start_date, custom_end_date
+    
+    # Obter análise financeira e operacional
+    financial_service = FinancialAnalytics(tenant)
+    from ..services.operational import OperationalAnalytics
+    operational_service = OperationalAnalytics(tenant)
+    
+    financial_data = financial_service.get_summary_by_date_range(custom_start_date, custom_end_date)
+    operational_data = operational_service.get_summary_by_date_range(custom_start_date, custom_end_date)
+    
+    # Converter dados dos gráficos para JSON
+    financial_data['revenue_last_7_days'] = json.dumps(financial_data['revenue_last_7_days'])
+    financial_data['revenue_last_12_months'] = json.dumps(financial_data['revenue_last_12_months'])
+    operational_data['bookings_by_status_last_7_days'] = json.dumps(operational_data['bookings_by_status_last_7_days'])
+    
+    # Obter comparação de períodos
+    from ..services.period_comparison import PeriodComparison
+    period_comparison = PeriodComparison(tenant)
+    month_comparison = period_comparison.get_month_comparison()
+    
+    context = {
+        "tenant": tenant,
+        "start_date": start_date,
+        "end_date": end_date,
+        "financial": financial_data,
+        "operational": operational_data,
+        "month_comparison": month_comparison,
+    }
+    
+    return render(
+        request,
+        "scheduling/dashboard/fragments/month_data.html",
+        context
+    )
+
+
+@login_required
+def dashboard_history_fragment(request: HttpRequest) -> HttpResponse:
+    """
+    Retorna fragmento HTML com histórico de eventos.
+    Usado por HTMX para filtrar histórico por tipo de evento.
+    """
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff", "professional"],
+    )
+    if redirect_response:
+        return redirect_response
+    
+    tenant = membership.tenant
+    tz = _get_tenant_timezone(tenant)
+    
+    # ====== PROCESSAMENTO DO FILTRO DE TEMPO GLOBAL ======
+    time_filter = request.GET.get('time_filter', 'mensal')
+    custom_start_date = None
+    custom_end_date = None
+    
+    now_tz = django_timezone.now().astimezone(tz)
+    
+    if time_filter.startswith('custom:'):
+        try:
+            parts = time_filter.split(':')
+            if len(parts) == 3:
+                start_str = parts[1]
+                end_str = parts[2]
+                custom_start_date = django_timezone.make_aware(
+                    datetime.strptime(f"{start_str} 00:00:00", "%Y-%m-%d %H:%M:%S"),
+                    timezone=tz
+                )
+                custom_end_date = django_timezone.make_aware(
+                    datetime.strptime(f"{end_str} 23:59:59", "%Y-%m-%d %H:%M:%S"),
+                    timezone=tz
+                )
+        except (ValueError, IndexError):
+            custom_start_date = now_tz.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            custom_end_date = (custom_start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+    else:
+        custom_start_date = now_tz.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        custom_end_date = (custom_start_date + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+    
+    start_date, end_date = custom_start_date, custom_end_date
+    
+    # Obter filtro de tipo de evento
+    event_type = request.GET.get('type', 'all')
+    
+    # Query base
+    bookings_query = Booking.objects.filter(tenant=tenant)
+    
+    # Aplicar filtro de data
+    if start_date and end_date:
+        bookings_query = bookings_query.filter(
+            scheduled_for__range=(start_date, end_date)
+        ) | bookings_query.filter(
+            updated_at__range=(start_date, end_date)
+        )
+    
+    # Aplicar filtro de tipo de evento
+    if event_type == 'agendamento':
+        # Filtra apenas agendamentos que não são reagendamentos
+        bookings_query = bookings_query.exclude(notes__icontains='Reagendado de')
+    elif event_type == 'reagendamento':
+        bookings_query = bookings_query.filter(notes__icontains='Reagendado de')
+    elif event_type == 'cancelamento':
+        bookings_query = bookings_query.filter(status='cancelled')
+    
+    # Ordenar por data de atualização
+    bookings_history = bookings_query.select_related(
+        'service', 'professional'
+    ).order_by('-updated_at')[:50]
+    
+    # Para exibição, precisamos identificar reagendamentos
+    bookings_with_events = []
+    for booking in bookings_history:
+        event_type_display = 'Agendamento'
+        if booking.notes and 'Reagendado de' in booking.notes:
+            event_type_display = 'Reagendamento'
+        elif booking.status == 'cancelled':
+            event_type_display = 'Cancelamento'
+        
+        bookings_with_events.append({
+            'booking': booking,
+            'event_type': event_type_display,
+            'timestamp': booking.updated_at or booking.created_at,
+        })
+    
+    context = {
+        "tenant": tenant,
+        "bookings_history": bookings_with_events,
+        "event_filter": event_type,
+    }
+    
+    return render(
+        request,
+        "scheduling/dashboard/fragments/history_table.html",
+        context
+    )
