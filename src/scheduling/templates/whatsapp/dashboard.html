@@ -5,12 +5,21 @@
 
 {% block extra_css %}
 <style>
+    /* RESET FORCADO */
+    .content-wrapper .whatsapp-container,
+    .content-wrapper .whatsapp-container * {
+        all: revert !important;
+    }
+
     /* Grid 2 Colunas */
-    .whatsapp-container {
+    .content-wrapper .whatsapp-container {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
         gap: 2rem !important;
-        padding: 2rem 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
     }
 
     .left-column {
@@ -20,6 +29,19 @@
     }
 
     .right-column {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+    }
+
+    /* Aplicar também com seletor mais específico */
+    .content-wrapper .left-column {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+    }
+
+    .content-wrapper .right-column {
         display: flex !important;
         flex-direction: column !important;
         gap: 1.5rem !important;
