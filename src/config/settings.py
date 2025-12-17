@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.gzip.GZipMiddleware",  # ⭐ Gzip compression
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -127,3 +128,10 @@ EVOLUTION_INSTANCE_NAME = env("EVOLUTION_INSTANCE_NAME", default="")
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "dashboard:index"
 LOGOUT_REDIRECT_URL = "accounts:login"
+
+# ⭐⭐⭐ GZIP COMPRESSION CONFIGURATION ⭐⭐⭐
+GZIP_ENABLED = True
+GZIP_MIN_LENGTH_BYTES = 1000  # Only compress responses > 1KB
+# Common MIME types that should be compressed
+GZIP_EXCLUDED_PATHS = []
+# ⭐⭐⭐ END GZIP CONFIGURATION ⭐⭐⭐
