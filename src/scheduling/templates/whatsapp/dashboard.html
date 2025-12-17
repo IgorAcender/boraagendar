@@ -583,15 +583,17 @@ function verificarConexao() {
     .then(data => {
         console.log('📊 Dados de status:', data);
         
-        // Verificar se a conexão foi estabelecida
-        // Aceitar "connected" ou "open" ou is_connected=true
-        const statusValues = ['connected', 'open'];
+        // Aceitar como "conectado" se:
+        // 1. status = "connected" ou "open"
+        // 2. is_connected = true
+        // 3. status = "connecting" (indica que QR foi lido e está processando)
+        const statusValues = ['connected', 'open', 'connecting'];
         const isConnected = statusValues.includes(data.status) || data.is_connected === true;
         
         console.log(`📋 status: "${data.status}", is_connected: ${data.is_connected}, isConnected calculado: ${isConnected}`);
         
         if (isConnected) {
-            console.log('✅✅✅ CONEXÃO ESTABELECIDA! FECHANDO MODAL...');
+            console.log('✅✅✅ CONEXÃO ESTABELECIDA OU EM PROGRESSO! FECHANDO MODAL...');
             monitorarConexao = false;
             
             // Mostrar mensagem de sucesso
@@ -600,8 +602,8 @@ function verificarConexao() {
             document.getElementById('modalQRContent').innerHTML = `
                 <div style="text-align: center; padding: 2rem;">
                     <div style="font-size: 60px; margin-bottom: 1rem;">✅</div>
-                    <h3 style="color: #065f46; margin: 0;">Conectado com Sucesso!</h3>
-                    <p style="color: #64748b; margin-top: 0.5rem;">WhatsApp conectado e pronto para usar.</p>
+                    <h3 style="color: #065f46; margin: 0;">QR Code Lido com Sucesso!</h3>
+                    <p style="color: #64748b; margin-top: 0.5rem;">WhatsApp conectando...</p>
                 </div>
             `;
             
@@ -612,9 +614,14 @@ function verificarConexao() {
                 location.reload(); // Recarregar para atualizar status
             }, 2000);
         } else {
-            // Continuar monitorando...
-            console.log('⏳ Aguardando conexão... Status atual:', data.status);
-            setTimeout(verificarConexao, 3000); // Verificar a cada 3 segundos
+            // Continuar monitorando... mas apenas se status = "qr"
+            if (data.status === 'qr') {
+                console.log('⏳ QR Code aguardando leitura... Status:', data.status);
+                setTimeout(verificarConexao, 2000); // Verificar a cada 2 segundos
+            } else {
+                console.log('⏳ Status desconhecido, aguardando... Status:', data.status);
+                setTimeout(verificarConexao, 3000); // Verificar a cada 3 segundos
+            }
         }
     })
     .catch(e => {
@@ -643,16 +650,16 @@ function reconectarWhatsApp() {
             document.getElementById('modalQRContent').innerHTML = `<div class="modal-qr-image"><img src="${data.qr_code}"></div>`;
             console.log('✅ QR Code exibido. Escaneie com seu celular...');
             
-            // Começar a verificar conexão após 2 segundos (tempo de leitura mínimo)
-            setTimeout(verificarConexao, 2000);
+            // Começar a verificar conexão após 1 segundo
+            setTimeout(verificarConexao, 1000);
             
-            // Timeout: parar de monitorar após 2 minutos se não conectar
+            // Timeout: parar de monitorar após 30 segundos
             setTimeout(() => {
                 if (monitorarConexao) {
                     console.warn('⏱️ Timeout: QR Code expirou. Feche o modal e tente novamente.');
                     monitorarConexao = false;
                 }
-            }, 120000); // 2 minutos
+            }, 30000); // 30 segundos
         } else {
             console.error('❌ Erro ao obter QR Code:', data);
             document.getElementById('modalQRContent').innerHTML = `<div style="color: #991b1b;">❌ Erro ao gerar QR Code</div>`;
