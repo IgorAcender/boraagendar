@@ -365,6 +365,7 @@ let whatsappId = {% if whatsapps %}'{{ whatsapps.0.id }}'{% else %}null{% endif 
 let monitorarConexao = false;
 let isConnectedAnterior = null;
 let tentativas = 0;
+let ultimosEstados = [];
 
 function abrirModal() {
   document.getElementById('qrModal').classList.add('active');
@@ -374,6 +375,7 @@ function fecharModal() {
   document.getElementById('qrModal').classList.remove('active');
   monitorarConexao = false;
   tentativas = 0;
+  ultimosEstados = [];
 }
 
 function verificarConexao() {
@@ -386,9 +388,13 @@ function verificarConexao() {
     .then(data => {
       console.log('Tentativa ' + tentativas + ': is_connected=' + data.is_connected + ', status=' + data.status);
       
+      // Registra últimos 5 estados
+      ultimosEstados.push(data.is_connected);
+      if (ultimosEstados.length > 5) ultimosEstados.shift();
+      
       // SE começou como false (desconectado) e agora está true (conectado)
       if (isConnectedAnterior === false && data.is_connected === true) {
-        console.log('✅ CONECTADO COM SUCESSO!');
+        console.log('✅✅✅ CONECTADO COM SUCESSO!');
         monitorarConexao = false;
         document.getElementById('modalQRContent').innerHTML = '<div class="success-message"><div class="icon">✅</div><h3>Conectado com Sucesso!</h3></div>';
         setTimeout(() => { fecharModal(); location.reload(); }, 2000);
@@ -406,17 +412,18 @@ function verificarConexao() {
       
       isConnectedAnterior = data.is_connected;
       
-      // Se passou de 120 segundos, para
-      if (tentativas > 120) {
+      // Se passou de 240 tentativas (2 minutos), para
+      if (tentativas > 240) {
         console.log('⏱️ TIMEOUT - 2 minutos');
         monitorarConexao = false;
-        document.getElementById('modalQRContent').innerHTML = '<div style="text-align: center;"><p style="color: #666;">Tempo limite atingido. Tente novamente.</p></div>';
+        document.getElementById('modalQRContent').innerHTML = '<div style="text-align: center;"><p style="color: #666;">Tempo limite atingido.</p><p style="font-size: 12px;">Últimos estados: ' + ultimosEstados.join(', ') + '</p></div>';
         setTimeout(() => { fecharModal(); }, 2000);
         return;
       }
       
       if (monitorarConexao) {
-        setTimeout(verificarConexao, 1000);
+        // Polling mais rápido - a cada 500ms
+        setTimeout(verificarConexao, 500);
       }
     })
     .catch(e => {
