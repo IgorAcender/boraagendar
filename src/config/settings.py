@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "notifications.apps.NotificationsConfig",
     "reports.apps.ReportsConfig",
     "raffles.apps.RafflesConfig",
-    "financial.apps.FinancialConfig",
 ]
 
 MIDDLEWARE = [
