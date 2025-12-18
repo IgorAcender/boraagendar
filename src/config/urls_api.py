@@ -20,5 +20,6 @@ router.register(r"financial/commissions", CommissionViewSet, basename="commissio
 urlpatterns = [
     # Dashboard stats endpoint (used by React SPA)
     path("dashboard/stats/", config_api.dashboard_stats, name="dashboard-stats"),
+    path("dashboard/stats/series/", config_api.dashboard_stats_series, name="dashboard-stats-series"),
     path("", include(router.urls)),
 ]

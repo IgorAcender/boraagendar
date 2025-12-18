@@ -49,6 +49,15 @@ def serve_spa(request, path='index.html'):
     print(f"🔍 serve_spa called with path: {path}")
     print(f"📁 BASE_DIR: {BASE_DIR}")
     
+    # Se a rota pedir especificamente pelo Balasis (ex: /app/balasis/*), servir o index do Balasis
+    try:
+        req_path = request.path
+    except Exception:
+        req_path = ''
+
+    if req_path.startswith('/app/balasis') or req_path.startswith('/balasis'):
+        path = 'balasis/index.html'
+
     # Tenta arquivo estático em várias localizações (ordem de prioridade)
     possible_paths = [
         BASE_DIR / 'static' / 'dist' / path,  # Build do Vite para Django static
