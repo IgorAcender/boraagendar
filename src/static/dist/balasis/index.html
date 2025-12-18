@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BoraAgendar — Balasis Dashboard</title>
+  <!-- Ant Design CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/antd@5.11.0/dist/antd.min.css" />
+  <style>
+    body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; margin: 0; background: #f0f2f5; }
+    #root { min-height:100vh; }
+    .logo { color: #fff; font-weight:700; padding-left: 16px }
+    .page-title { font-size:18px; font-weight:700 }
+    .content { padding: 24px; background: transparent }
+    /* Sider and layout colors like Balasis */
+    .ant-layout { background: #f0f2f5 }
+    .ant-layout-sider { background: #001529 !important }
+    .ant-layout-header { background: #fff !important; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .ant-card { border-radius: 8px }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React (UMD) -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Ant Design (UMD) -->
+  <script src="https://unpkg.com/antd@5.11.0/dist/antd.min.js"></script>
+  <!-- Recharts UMD -->
+  <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
+
+  <script>
+    (function () {
+      const React = window.React;
+      const ReactDOM = window.ReactDOM;
+      const antd = window.antd || window.Antd || {};
+      const Recharts = window.Recharts || {};
+      const { useState, useEffect } = React;
+  const { Layout, Menu, Card, Row, Col, Spin, Table, Empty, Typography, Modal, Input, Button } = antd;
+      const { Header, Sider, Content } = Layout;
+      const { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } = Recharts;
+
+      // Fetch helper that includes credentials (session cookie) and handles JSON
+      function getCookie(name){
+        const v = document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');
+        return v ? v.pop() : '';
+      }
+
+      async function ensureCsrf(){
+        // Ensure a CSRF cookie exists by fetching the login page (Django sets csrftoken)
+        if(!getCookie('csrftoken')){
+          try{ await fetch('/accounts/login/',{ credentials:'include' }); }catch(e){}
+        }
+      }
+
+      async function fetchJson(url, opts){
+        const options = Object.assign({}, opts || {});
+        options.credentials = 'include';
+        if(options.method && options.method.toUpperCase() !== 'GET'){
+          await ensureCsrf();
+          const token = getCookie('csrftoken');
+          options.headers = Object.assign({}, options.headers || {}, { 'X-CSRFToken': token });
+        }
+        const res = await fetch(url, options).catch(()=>null);
+        if(!res) return null;
+        // If response is no content
+        if(res.status === 204) return {};
+        const ct = res.headers.get('content-type') || '';
+        if(ct.includes('application/json')) return await res.json();
+        return null;
+      }
+
+      function DashboardPage(){
+        const [stats,setStats] = useState(null);
+        const [series,setSeries] = useState([]);
+        const [loading,setLoading] = useState(true);
+
+        useEffect(()=>{
+          let mounted=true;
+          async function load(){
+            const s = await fetchJson('/api/dashboard/stats/');
+            const se = await fetchJson('/api/dashboard/stats/series/');
+            if(!mounted) return;
+            setStats(s);
+            setSeries((se && se.series) || []);
+            setLoading(false);
+          }
+          load();
+          return ()=> mounted=false;
+        },[]);
+
+        return React.createElement('div', null,
+          React.createElement(Row, { gutter: 16 },
+            ['Total','Confirmados','Pendentes','Cancelados'].map((label, i)=>
+              React.createElement(Col, { span:6, key:i },
+                React.createElement(Card, null,
+                  loading ? React.createElement(Spin) : React.createElement('div', null,
+                    React.createElement(Typography.Title, { level:3, style:{ margin:0 } }, (
+                      label==='Total' ? (stats && stats.total) : label==='Confirmados' ? (stats && stats.confirmed) : label==='Pendentes' ? (stats && stats.pending) : (stats && stats.cancelled)
+                    )),
+                    React.createElement('div', { style:{ color:'#666' } }, label)
+                  )
+                )
+              )
+            )
+          ),
+
+          React.createElement(Card, { title: 'Agendamentos (últimos 30 dias)', style:{ marginTop:16 } },
+            React.createElement('div', { style:{ height: 320 } },
+              !LineChart ? React.createElement(Empty, { description: 'Gráfico indisponível' }) :
+              React.createElement(ResponsiveContainer, null,
+                React.createElement(LineChart, { data: series },
+                  React.createElement(CartesianGrid, { strokeDasharray: '3 3' }),
+                  React.createElement(XAxis, { dataKey: 'date' }),
+                  React.createElement(YAxis, null),
+                  React.createElement(Tooltip, null),
+                  React.createElement(Line, { type: 'monotone', dataKey: 'count', stroke: '#1890ff', strokeWidth: 2, dot: false })
+                )
+              )
+            )
+          )
+        );
+      }
+
+      function AgendamentosPage(){
+        const [data,setData]=useState(null);
+        const [loading,setLoading]=useState(true);
+  useEffect(()=>{ let m=true; fetchJson('/api/bookings/').then(j=>{ if(!m) return; setData((j && (j.results||j)) || []); setLoading(false)}).catch(()=>{if(m)setData([]);setLoading(false)}); return ()=>m=false },[]);
+        const cols = [
+          { title: 'ID', dataIndex: 'id', key:'id' },
+          { title: 'Cliente', dataIndex: 'customer_name', key:'customer_name' },
+          { title: 'Serviço', dataIndex: ['service','name'], key:'service' , render: (v,rec)=> rec.service?rec.service.name:''},
+          { title: 'Agendado para', dataIndex: 'scheduled_for', key:'scheduled_for' },
+          { title: 'Status', dataIndex: 'status', key:'status' }
+        ];
+        return React.createElement(Card, { title: 'Agendamentos' },
+          loading ? React.createElement(Spin) : (data && data.length ? React.createElement(Table, { dataSource: data, columns: cols, rowKey: 'id' }) : React.createElement(Empty, { description: 'Nenhum agendamento encontrado' }))
+        );
+      }
+
+      function TransacoesPage(){
+        const [data,setData]=useState(null);
+        const [loading,setLoading]=useState(true);
+  useEffect(()=>{ let m=true; fetchJson('/api/financial/transactions/').then(j=>{ if(!m) return; setData((j && (j.results||j)) || []); setLoading(false)}).catch(()=>{if(m)setData([]);setLoading(false)}); return ()=>m=false },[]);
+        const cols = [
+          { title: 'ID', dataIndex: 'id', key:'id' },
+          { title: 'Valor', dataIndex: 'amount', key:'amount' },
+          { title: 'Tipo', dataIndex: 'type', key:'type' },
+          { title: 'Criado', dataIndex: 'created_at', key:'created_at' }
+        ];
+        return React.createElement(Card, { title: 'Transações' },
+          loading ? React.createElement(Spin) : (data && data.length ? React.createElement(Table, { dataSource: data, columns: cols, rowKey: 'id' }) : React.createElement(Empty, { description: 'Nenhuma transação encontrada' }))
+        );
+      }
+
+      function RelatoriosPage(){
+        const [series,setSeries]=useState([]);
+        const [loading,setLoading]=useState(true);
+        useEffect(()=>{
+          let m=true;
+          fetchJson('/api/dashboard/stats/series/').then(j=>{ if(!m) return; setSeries((j && j.series) || []); setLoading(false)}).catch(()=>{if(m)setSeries([]);setLoading(false)});
+          return ()=>m=false;
+        },[]);
+
+        return React.createElement(Card, { title: 'Relatórios' },
+          loading ? React.createElement(Spin) : (
+            (series && series.length) ?
+              React.createElement('div', { style:{ height:400 } },
+                React.createElement(ResponsiveContainer, null,
+                  React.createElement(LineChart, { data: series },
+                    React.createElement(CartesianGrid, { strokeDasharray:'3 3' }),
+                    React.createElement(XAxis, { dataKey:'date' }),
+                    React.createElement(YAxis, null),
+                    React.createElement(Tooltip, null),
+                    React.createElement(Line, { type:'monotone', dataKey:'count', stroke:'#52c41a' })
+                  )
+                )
+              ) : React.createElement(Empty, { description: 'Sem dados para relatório' })
+          )
+        );
+      }
+
+      function ConfiguracoesPage(){
+        return React.createElement(Card, { title: 'Configurações' }, React.createElement('div', null, 'Configurações do sistema — personalize aqui.'))
+      }
+
+      function LoginModal({ visible, onClose, onSuccess }){
+        const [user, setUser] = useState('');
+        const [pass, setPass] = useState('');
+        const [loading, setLoading] = useState(false);
+
+        async function submit(e){
+          e && e.preventDefault && e.preventDefault();
+          setLoading(true);
+          try{
+            await ensureCsrf();
+            const body = new URLSearchParams();
+            body.append('username', user);
+            body.append('password', pass);
+            body.append('next', '/');
+            const res = await fetch('/accounts/login/', { method:'POST', body: body.toString(), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, credentials: 'include' });
+            if(res && (res.status === 200 || res.redirected)){
+              onSuccess && onSuccess();
+              onClose && onClose();
+            } else {
+              alert('Login falhou. Verifique usuário/senha');
+            }
+          }catch(e){
+            console.error(e);
+            alert('Erro ao tentar entrar');
+          } finally { setLoading(false); }
+        }
+
+        return React.createElement(Modal, { title: 'Entrar', open: !!visible, onCancel: onClose, onOk: submit, confirmLoading: loading },
+          React.createElement('form', { onSubmit: submit },
+            React.createElement(Input, { placeholder: 'Usuário (email)', value: user, onChange: e=>setUser(e.target.value), style: { marginBottom: 8 } }),
+            React.createElement(Input.Password, { placeholder: 'Senha', value: pass, onChange: e=>setPass(e.target.value) })
+          )
+        );
+      }
+
+      function App(){
+        const [collapsed,setCollapsed] = useState(false);
+        const [route,setRoute] = useState(window.location.hash || '#/dashboard');
+        const [isAuth, setIsAuth] = useState(false);
+        const [loginVisible, setLoginVisible] = useState(false);
+        useEffect(()=>{
+          const onHash = ()=> setRoute(window.location.hash || '#/dashboard');
+          window.addEventListener('hashchange', onHash);
+          return ()=> window.removeEventListener('hashchange', onHash);
+        },[]);
+
+        const selectedKey = (route||'#/dashboard').replace('#/','') || 'dashboard';
+
+        return React.createElement(Layout, { style:{ minHeight:'100vh' } },
+          React.createElement(Sider, { collapsible:true, collapsed:collapsed, onCollapse: val => setCollapsed(val), style:{ background:'#001529' } },
+            React.createElement('div', { style:{ height:48, display:'flex', alignItems:'center' } }, React.createElement('div', { className:'logo' }, React.createElement('img', { src: '/static/dist/balasis/assets/belasis-completo-branco.a0f543df.png', alt: 'BoraAgendar', style: { height:28 } }))),
+            React.createElement(Menu, { theme:'dark', mode:'inline', selectedKeys:[selectedKey] },
+              React.createElement(Menu.Item, { key:'dashboard', onClick: ()=> window.location.hash = '/dashboard' }, 'Dashboard'),
+              React.createElement(Menu.Item, { key:'agendamentos', onClick: ()=> window.location.hash = '/agendamentos' }, 'Agendamentos'),
+              React.createElement(Menu.Item, { key:'transacoes', onClick: ()=> window.location.hash = '/transacoes' }, 'Transações'),
+              React.createElement(Menu.Item, { key:'relatorios', onClick: ()=> window.location.hash = '/relatorios' }, 'Relatórios'),
+              React.createElement(Menu.Item, { key:'configuracoes', onClick: ()=> window.location.hash = '/configuracoes' }, 'Configurações')
+            )
+          ),
+          React.createElement(Layout, null,
+            React.createElement(Header, { style:{ background:'#fff', padding:'0 16px', display:'flex', alignItems:'center', justifyContent:'space-between' } },
+              React.createElement('div', { className:'page-title' }, selectedKey.charAt(0).toUpperCase()+selectedKey.slice(1)),
+              React.createElement('div', { style: { display: 'flex', gap: 12, alignItems: 'center' } },
+                React.createElement('div', null, new Date().toLocaleString()),
+                isAuth ? React.createElement(Button, { type:'link', onClick: async ()=>{ await fetch('/accounts/logout/', { credentials:'include' }); setIsAuth(false); window.location.reload(); } }, 'Sair') : React.createElement(Button, { type:'primary', onClick: ()=> setLoginVisible(true) }, 'Entrar')
+              )
+            ),
+            loginVisible && React.createElement(LoginModal, { visible: loginVisible, onClose: ()=> setLoginVisible(false), onSuccess: ()=> { setIsAuth(true); } }),
+            React.createElement(Content, { className:'content' },
+              route.includes('agendamentos') ? React.createElement(AgendamentosPage) :
+              route.includes('transacoes') ? React.createElement(TransacoesPage) :
+              route.includes('relatorios') ? React.createElement(RelatoriosPage) :
+              route.includes('configuracoes') ? React.createElement(ConfiguracoesPage) : React.createElement(DashboardPage)
+            )
+          )
+        );
+      }
+
+      const root = document.getElementById('root');
+      if(root && React && ReactDOM) ReactDOM.createRoot(root).render(React.createElement(App));
+    })();
+  </script>
+</body>
+</html>
