@@ -94,16 +94,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
-
-# Adicionar pastas de arquivos estáticos
-_STATICFILES_DIRS = [BASE_DIR / "assets"]
-
-# Tentar adicionar src/static se existir
-import os
-if os.path.exists(os.path.join(BASE_DIR, "static")):
-    _STATICFILES_DIRS.append(BASE_DIR / "static")
-
-STATICFILES_DIRS = _STATICFILES_DIRS
+STATICFILES_DIRS = [BASE_DIR / "assets"]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
