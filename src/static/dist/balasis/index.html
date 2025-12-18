@@ -21,6 +21,7 @@
 </head>
 <body>
   <div id="root"></div>
+  <div id="spa-debug" style="position:fixed;right:12px;bottom:12px;background:#001529;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;z-index:9999;opacity:0.9">Carregando SPA...</div>
 
   <!-- React (UMD) -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -31,7 +32,28 @@
   <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
 
   <script>
+    // Global error overlay & handlers to help diagnose blank page in production
+    (function(){
+      function showOverlay(msg){
+        try{
+          var o = document.getElementById('spa-error-overlay');
+          if(!o){ o = document.createElement('div'); o.id='spa-error-overlay'; document.body.appendChild(o); }
+          o.style.position='fixed'; o.style.left='12px'; o.style.right='12px'; o.style.top='12px'; o.style.zIndex=99999;
+          o.style.background='rgba(255,255,255,0.98)'; o.style.border='1px solid #e6e6e6'; o.style.padding='12px'; o.style.borderRadius='8px';
+          o.style.boxShadow='0 6px 20px rgba(0,0,0,0.08)'; o.innerText = 'Erro na SPA: '+msg;
+        }catch(e){ console.error('Falha ao exibir overlay', e); }
+      }
+      window.addEventListener('error', function(ev){
+        try{ showOverlay(ev.message || String(ev.error || ev)); console.error(ev); }catch(e){}
+      });
+      window.addEventListener('unhandledrejection', function(ev){
+        try{ showOverlay('Promise rejection: '+(ev.reason && ev.reason.message || ev.reason)); console.error(ev); }catch(e){}
+      });
+
+    })();
+
     (function () {
+      try{
       const React = window.React;
       const ReactDOM = window.ReactDOM;
       const antd = window.antd || window.Antd || {};
@@ -264,7 +286,22 @@
       }
 
       const root = document.getElementById('root');
-      if(root && React && ReactDOM) ReactDOM.createRoot(root).render(React.createElement(App));
+      // remove debug badge
+      try{ var dbg = document.getElementById('spa-debug'); if(dbg) dbg.style.display='none'; }catch(e){}
+      if(root && React && ReactDOM){
+        try{ ReactDOM.createRoot(root).render(React.createElement(App)); }
+        catch(err){ console.error('Render failed', err); var el = document.getElementById('spa-debug'); if(el) el.innerText='Erro ao renderizar SPA'; throw err; }
+      } else {
+        var missing = [];
+        if(!React) missing.push('React');
+        if(!ReactDOM) missing.push('ReactDOM');
+        if(missing.length){
+          var msg = 'Dependências ausentes: '+missing.join(', ')+'. Verifique se os CDNs carregaram.';
+          console.error(msg);
+          try{ var el = document.getElementById('spa-debug'); if(el) el.innerText = msg; }catch(e){}
+        }
+      }
+      }catch(e){ console.error('Erro no bootstrap da SPA', e); throw e; }
     })();
   </script>
 </body>
