@@ -57,7 +57,17 @@ coverage.xml
 local_settings.py
 db.sqlite3
 media/
-static/
+
+# Allow specific static files
+!src/static/css/tailwind-input.css
+!src/static/css/tailwind.css
+!src/static/js/
+!src/static/admin/
+
+# But ignore node_modules and build artifacts
+src/static/node_modules/
+src/static/**/node_modules/
+node_modules/
 
 # Environments
 .env
