@@ -63,21 +63,41 @@
     (function () {
       // Bootstrap will wait until React, ReactDOM and Antd are available.
       // This allows fallback local vendor scripts (if injected) to load and then retry.
+      var bootstrapRetries = 0;
       function startBootstrap(){
+        bootstrapRetries++;
         try{
           const React = window.React;
           const ReactDOM = window.ReactDOM;
           const antd = window.antd || window.Antd || null;
-          const Recharts = window.Recharts || null;
           
           // If essential libs are missing, retry shortly (gives local fallback time to load)
-          if(!React || !ReactDOM || !antd || !antd.Layout){
+          if(!React || !ReactDOM){
+            console.log(`⏳ Bootstrap retry ${bootstrapRetries}: React/ReactDOM missing`);
+            if(bootstrapRetries > 50) {
+              console.error('❌ Bootstrap failed after 50 retries: React/ReactDOM not available');
+              try{ document.getElementById('spa-error-overlay').innerText = 'Erro: React não carregou. Verifique console.'; }catch(e){}
+              return;
+            }
+            setTimeout(startBootstrap, 400);
+            return;
+          }
+
+          if(!antd || !antd.Layout){
+            console.log(`⏳ Bootstrap retry ${bootstrapRetries}: Ant Design missing or incomplete`);
+            if(bootstrapRetries > 50) {
+              console.error('❌ Bootstrap failed after 50 retries: Ant Design not available');
+              try{ document.getElementById('spa-error-overlay').innerText = 'Erro: Ant Design não carregou. Verifique console.'; }catch(e){}
+              return;
+            }
             // show a short informative overlay while waiting
-            try{ var o = document.getElementById('spa-error-overlay'); if(!o){ o = document.createElement('div'); o.id='spa-error-overlay'; document.body.appendChild(o); } o.style.position='fixed'; o.style.left='12px'; o.style.right='12px'; o.style.top='12px'; o.style.zIndex=99999; o.style.background='rgba(255,255,255,0.98)'; o.style.border='1px solid #e6e6e6'; o.style.padding='12px'; o.style.borderRadius='8px'; o.style.boxShadow='0 6px 20px rgba(0,0,0,0.08)'; o.innerText = 'Aguardando bibliotecas (React / Antd). Se esta mensagem persistir, CDN pode estar bloqueado.'; }catch(e){}
+            try{ var o = document.getElementById('spa-error-overlay'); if(!o){ o = document.createElement('div'); o.id='spa-error-overlay'; document.body.appendChild(o); } o.style.position='fixed'; o.style.left='12px'; o.style.right='12px'; o.style.top='12px'; o.style.zIndex=99999; o.style.background='rgba(255,255,255,0.98)'; o.style.border='1px solid #e6e6e6'; o.style.padding='12px'; o.style.borderRadius='8px'; o.style.boxShadow='0 6px 20px rgba(0,0,0,0.08)'; o.innerText = `Aguardando Ant Design (tentativa ${bootstrapRetries}). Se persistir, verifique console.`; }catch(e){}
             // retry after a short delay (polling)
             setTimeout(startBootstrap, 400);
             return;
           }
+
+          console.log('✅ All libs available, starting SPA...');
 
           // Safe destructure now that we ensured antd exists
           const { Layout, Menu, Card, Row, Col, Spin, Table, Empty, Typography, Modal, Input, Button } = antd;
