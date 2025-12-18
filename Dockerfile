@@ -18,8 +18,8 @@ RUN pip install --upgrade pip && pip install -r /tmp/requirements.txt
 COPY ./src /app
 
 # React SPA via CDN (pré-compilado)
-# Usar arquivos estáticos já prontos
-RUN mkdir -p /app/static/dist
+# Copiar arquivos estáticos prontos (index.html)
+COPY ./src/static/dist /app/static/dist
 
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
