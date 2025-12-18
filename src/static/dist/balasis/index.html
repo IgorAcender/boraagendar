@@ -53,35 +53,31 @@
     })();
 
     (function () {
-      try{
-      const React = window.React;
-      const ReactDOM = window.ReactDOM;
-      // Ant Design and Recharts UMD globals
-      const antd = window.antd || window.Antd || null;
-      const Recharts = window.Recharts || null;
-      const { useState, useEffect } = React;
+      // Bootstrap will wait until React, ReactDOM and Antd are available.
+      // This allows fallback local vendor scripts (if injected) to load and then retry.
+      function startBootstrap(){
+        try{
+          const React = window.React;
+          const ReactDOM = window.ReactDOM;
+          const antd = window.antd || window.Antd || null;
+          const Recharts = window.Recharts || null;
+          
+          // If essential libs are missing, retry shortly (gives local fallback time to load)
+          if(!React || !ReactDOM || !antd || !antd.Layout){
+            // show a short informative overlay while waiting
+            try{ var o = document.getElementById('spa-error-overlay'); if(!o){ o = document.createElement('div'); o.id='spa-error-overlay'; document.body.appendChild(o); } o.style.position='fixed'; o.style.left='12px'; o.style.right='12px'; o.style.top='12px'; o.style.zIndex=99999; o.style.background='rgba(255,255,255,0.98)'; o.style.border='1px solid #e6e6e6'; o.style.padding='12px'; o.style.borderRadius='8px'; o.style.boxShadow='0 6px 20px rgba(0,0,0,0.08)'; o.innerText = 'Aguardando bibliotecas (React / Antd). Se esta mensagem persistir, CDN pode estar bloqueado.'; }catch(e){}
+            // retry after a short delay (polling)
+            setTimeout(startBootstrap, 400);
+            return;
+          }
 
-      // Safety checks: if Antd or Layout isn't available, show a clear overlay and render a small fallback
-      if(!antd || !antd.Layout){
-        console.error('Ant Design não carregou corretamente:', antd);
-        // Expose helpful message in overlay for the earlier debug helper
-        try{ (function(){ var o = document.getElementById('spa-error-overlay'); if(!o){ o = document.createElement('div'); o.id='spa-error-overlay'; document.body.appendChild(o); } o.style.position='fixed'; o.style.left='12px'; o.style.right='12px'; o.style.top='12px'; o.style.zIndex=99999; o.style.background='rgba(255,255,255,0.98)'; o.style.border='1px solid #e6e6e6'; o.style.padding='12px'; o.style.borderRadius='8px'; o.style.boxShadow='0 6px 20px rgba(0,0,0,0.08)'; o.innerText = 'Erro na SPA: Ant Design não carregou (Layout está undefined). Verifique bloqueio de CDN/CSP.'; })(); }catch(e){}
-        // Provide a minimal fallback UI so the page isn't blank
-        const root = document.getElementById('root');
-        if(root){
-          root.innerHTML = '<div style="padding:24px;font-family:Inter,system-ui,Arial;">\n            <h3 style="margin-top:0;color:#c00">Erro: biblioteca Ant Design não carregou</h3>\n            <p>Verifique se os CDNs foram bloqueados ou se há restrições de CSP. Abra o console do navegador para mais detalhes.</p>\n          </div>';
-        }
-        // Stop bootstrapping the SPA to avoid runtime TypeErrors
-        return;
-      }
+          // Safe destructure now that we ensured antd exists
+          const { Layout, Menu, Card, Row, Col, Spin, Table, Empty, Typography, Modal, Input, Button } = antd;
+          const Header = Layout.Header; const Sider = Layout.Sider; const Content = Layout.Content;
+          const { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } = Recharts || {};
 
-      // Safe destructure now that we ensured antd exists
-      const { Layout, Menu, Card, Row, Col, Spin, Table, Empty, Typography, Modal, Input, Button } = antd;
-      const Header = Layout.Header; const Sider = Layout.Sider; const Content = Layout.Content;
-      const { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } = Recharts || {};
-
-      // Fetch helper that includes credentials (session cookie) and handles JSON
-      function getCookie(name){
+          // Fetch helper that includes credentials (session cookie) and handles JSON
+          function getCookie(name){
         const v = document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');
         return v ? v.pop() : '';
       }
@@ -318,7 +314,29 @@
           try{ var el = document.getElementById('spa-debug'); if(el) el.innerText = msg; }catch(e){}
         }
       }
-      }catch(e){ console.error('Erro no bootstrap da SPA', e); throw e; }
+        }catch(e){ console.error('Erro no bootstrap da SPA', e); }
+      }
+      // Start the bootstrap process (will poll until libs present)
+      setTimeout(startBootstrap, 50);
+
+      // If CDNs were blocked, try to inject local vendor scripts after load
+      function injectLocalVendors(){
+        try{
+          if(!window.antd){
+            // local CSS fallback
+            var css = document.createElement('link'); css.rel='stylesheet'; css.href='/static/dist/balasis/vendor/antd.min.css'; document.head.appendChild(css);
+            var s = document.createElement('script'); s.src='/static/dist/balasis/vendor/antd.min.js'; s.async=false; s.crossOrigin='anonymous'; s.onload=function(){ console.log('antd loaded from local fallback'); };
+            s.onerror=function(){ console.warn('failed to load local antd'); };
+            document.body.appendChild(s);
+          }
+          if(!window.Recharts){
+            var s2 = document.createElement('script'); s2.src='/static/dist/balasis/vendor/Recharts.min.js'; s2.async=false; document.body.appendChild(s2);
+          }
+        }catch(e){ console.error('Erro ao injetar vendors locais', e); }
+      }
+
+      // attempt injection shortly after window load (gives CDN time to succeed first)
+      window.addEventListener('load', function(){ setTimeout(injectLocalVendors, 800); });
     })();
   </script>
 </body>
