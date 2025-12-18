@@ -6,43 +6,33 @@
     <title>{% block title %}Painel{% endblock %} - {{ tenant.name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    {% load static %}
     <style>
         :root {
             --brand-primary: {{ tenant.color_primary|default:"#667eea" }};
             --brand-secondary: {{ tenant.color_secondary|default:"#764ba2" }};
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Submenu animations and toggle */
+        .has-submenu.open .submenu {
+            max-height: 500px;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
+        .has-submenu .submenu {
+            transition: max-height 0.3s ease;
         }
 
-        /* ========== SIDEBAR ========== */
-        .sidebar-container {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 280px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            color: #e2e8f0;
-            overflow-y: auto;
-            overflow-x: hidden;
-            z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
+        .has-submenu .submenu-arrow {
+            transition: transform 0.3s;
         }
 
+        .has-submenu.open .submenu-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Sidebar scrollbar */
         .sidebar-container::-webkit-scrollbar {
             width: 6px;
         }
@@ -52,522 +42,39 @@
             border-radius: 3px;
         }
 
-        .sidebar-header {
-            padding: 1.5rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-container {
-            width: 40px;
-            height: 40px;
+        /* Brand gradient from Django template variables */
+        .logo-container,
+        .profile-avatar,
+        .btn-brand,
+        .nav-link.active {
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
         }
 
-        .brand-text .brand-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: white;
-            margin: 0;
-        }
-
-        .brand-text .brand-subtitle {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            margin: 0;
-        }
-
-        .compact-toggle {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .compact-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Navegação */
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
-
-        .nav-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .section-title {
-            padding: 0.5rem 1.5rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .section-indicator {
-            font-size: 0.4rem;
-            color: var(--brand-primary);
-        }
-
-        .nav-menu {
-            list-style: none;
-            padding: 0;
-        }
-
-        .nav-item {
-            margin: 0.25rem 0.75rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: #cbd5e1;
-            text-decoration: none;
-            border-radius: 10px;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-            border: none;
-            background: none;
-            width: 100%;
-            cursor: pointer;
-            text-align: left;
-        }
-
+        /* Hover effects for brand elements */
         .nav-link:hover {
             background: rgba(102, 126, 234, 0.1);
-            color: white;
         }
 
         .nav-link.active {
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            color: white;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .nav-icon {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .nav-link.active .nav-icon {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .nav-text {
-            flex: 1;
-            font-weight: 500;
-        }
-
-        /* Submenu */
-        .has-submenu .submenu-arrow {
-            margin-left: auto;
-            font-size: 0.75rem;
-            transition: transform 0.3s;
-        }
-
-        .has-submenu.open .submenu-arrow {
-            transform: rotate(180deg);
-        }
-
-        .submenu {
-            list-style: none;
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .has-submenu.open .submenu {
-            max-height: 500px;
-        }
-
-        .submenu-item {
-            margin-left: 1rem;
-        }
-
-        .submenu-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.625rem 1rem;
-            color: #94a3b8;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 0.875rem;
         }
 
         .submenu-link:hover {
             background: rgba(255, 255, 255, 0.05);
-            color: #e2e8f0;
         }
 
-        .submenu-icon {
-            font-size: 0.875rem;
-        }
-
-        /* Perfil do usuário */
-        .user-profile {
-            padding: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: auto;
-        }
-
-        .profile-content {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 0.75rem;
-            border-radius: 10px;
-        }
-
-        .profile-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            position: relative;
-        }
-
-        .online-indicator {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 12px;
-            height: 12px;
-            background: #10b981;
-            border: 2px solid #0f172a;
-            border-radius: 50%;
-        }
-
-        .profile-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .profile-name {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: white;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .profile-email {
-            font-size: 0.7rem;
-            color: #64748b;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .profile-actions {
-            display: flex;
-            gap: 0.25rem;
-        }
-
-        .profile-action {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 8px;
-            color: #cbd5e1;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .profile-action:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .logout-form {
-            display: inline;
-        }
-
-        /* ========== MAIN CONTENT ========== */
-        .main-content {
-            margin-left: 280px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: margin-left 0.3s ease;
-        }
-
-        /* Mobile Toggle */
-        .mobile-toggle {
-            display: none;
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 1.25rem;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-            cursor: pointer;
-            z-index: 999;
-            transition: all 0.3s;
-        }
-
-        .mobile-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .hamburger span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: white;
-            border-radius: 2px;
-        }
-
-        /* Sidebar Overlay */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            z-index: 999;
-        }
-
-        /* ========== CONTENT STYLES ========== */
-        .content-wrapper {
-            flex: 1;
-            padding: 2rem;
-        }
-
-        /* Glass Card */
+        /* Glass card effect */
         .glass-card {
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(15px);
-            border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-            padding: 1.5rem;
-            transition: all 0.3s ease;
         }
 
         .glass-card:hover {
-            box-shadow: 0 12px 35px rgba(31, 38, 135, 0.12);
             transform: translateY(-2px);
         }
 
-        /* Messages */
-        .messages {
-            list-style: none;
-            margin-bottom: 1.5rem;
-        }
-
-        .messages li {
-            padding: 1rem 1.25rem;
-            border-radius: 12px;
-            margin-bottom: 0.75rem;
-            background: rgba(34, 197, 94, 0.1);
-            border-left: 4px solid #22c55e;
-            color: #166534;
-            font-weight: 500;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.6s ease-in-out;
-        }
-
-        .animate-slide-up {
-            animation: slideUp 0.5s ease-out;
-        }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 1023px) {
-            .sidebar-container {
-                transform: translateX(-100%);
-            }
-
-            .sidebar-container.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .mobile-toggle {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .sidebar-overlay.show {
-                display: block;
-            }
-
-            .compact-toggle {
-                display: none;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .content-wrapper {
-                padding: 1rem;
-            }
-        }
-
-        /* ========== MODAL GLOBAL ========== */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        .modal-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            cursor: pointer;
-        }
-
-        .modal-content {
-            position: relative;
-            background: white;
-            border-radius: 20px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.3s ease-out;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-            color: white;
-        }
-
-        .modal-header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin: 0;
-        }
-
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            color: white;
-            transition: all 0.2s;
-        }
-
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
-
-        .modal-body {
-            padding: 2rem;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
+        /* Modal animations */
         @keyframes slideUp {
             from {
                 opacity: 0;
@@ -579,120 +86,143 @@
             }
         }
 
+        .modal-content {
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1023px) {
+            .sidebar-container {
+                transform: translateX(-100%);
+            }
+
+            .sidebar-container.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+        }
+
         {% block extra_head %}{% endblock %}
     </style>
 </head>
-<body class="animate-fade-in">
+<body class="font-sans bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen overflow-x-hidden">
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar-container">
+    <aside id="sidebar" class="sidebar-container fixed left-0 top-0 bottom-0 w-72 bg-gradient-to-b from-slate-800 to-slate-950 text-slate-100 overflow-y-auto z-50 shadow-lg transition-all duration-300">
         <!-- Header -->
-        <div class="sidebar-header">
-            <div class="logo-section">
-                <div class="logo-container">
+        <div class="sidebar-header flex items-center justify-between px-4 py-6 border-b border-white/10">
+            <div class="logo-section flex items-center gap-3">
+                <div class="logo-container w-10 h-10 rounded-lg flex items-center justify-center text-2xl font-bold text-white">
                     <i class="fas fa-calendar-check"></i>
                 </div>
                 <div class="brand-text">
-                    <h2 class="brand-name">{{ tenant.name }}</h2>
-                    <p class="brand-subtitle">Sistema de Agendamentos</p>
+                    <h2 class="brand-name text-xl font-bold text-white m-0">{{ tenant.name }}</h2>
+                    <p class="brand-subtitle text-xs text-slate-400 m-0">Sistema de Agendamentos</p>
                 </div>
             </div>
-            <button class="compact-toggle" title="Recolher menu">
+            <button class="compact-toggle hidden lg:flex items-center justify-center w-8 h-8 bg-white/10 hover:bg-white/20 border-none text-white rounded-lg cursor-pointer transition-all duration-200" title="Recolher menu">
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>
 
         <!-- Navegação -->
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav py-4">
             <!-- Seção Principal -->
-            <div class="nav-section">
-                <h3 class="section-title">
-                    <i class="fas fa-circle section-indicator"></i>
+            <div class="nav-section mb-6">
+                <h3 class="section-title px-6 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fas fa-circle section-indicator text-xs" style="color: var(--brand-primary);"></i>
                     <span>Principal</span>
                 </h3>
 
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="{% url 'dashboard:index' %}" class="nav-link">
-                            <div class="nav-icon">
+                <ul class="nav-menu list-none p-0">
+                    <li class="nav-item mx-3 my-1">
+                        <a href="{% url 'dashboard:index' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
+                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
                                 <i class="fas fa-home"></i>
                             </div>
-                            <span class="nav-text">Dashboard</span>
+                            <span class="nav-text flex-1 font-medium">Dashboard</span>
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a href="{% url 'dashboard:calendar' %}" class="nav-link">
-                            <div class="nav-icon">
+                    <li class="nav-item mx-3 my-1">
+                        <a href="{% url 'dashboard:calendar' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
+                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
                                 <i class="fas fa-calendar"></i>
                             </div>
-                            <span class="nav-text">Calendário</span>
+                            <span class="nav-text flex-1 font-medium">Calendário</span>
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a href="{% url 'dashboard:booking_past_list' %}" class="nav-link">
-                            <div class="nav-icon">
+                    <li class="nav-item mx-3 my-1">
+                        <a href="{% url 'dashboard:booking_past_list' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
+                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
                                 <i class="fas fa-clock-rotate-left"></i>
                             </div>
-                            <span class="nav-text">Agendamentos Passados</span>
+                            <span class="nav-text flex-1 font-medium">Agendamentos Passados</span>
                         </a>
                     </li>
                 </ul>
             </div>
 
             <!-- Link de Agendamento -->
-            <div class="nav-section">
-                <h3 class="section-title">
-                    <i class="fas fa-circle section-indicator"></i>
+            <div class="nav-section mb-6">
+                <h3 class="section-title px-6 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fas fa-circle section-indicator text-xs" style="color: var(--brand-primary);"></i>
                     <span>Compartilhar</span>
                 </h3>
 
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <button class="nav-link" onclick="copyBookingLink()" style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
-                            <div class="nav-icon" style="background: rgba(255, 255, 255, 0.2);">
+                <ul class="nav-menu list-none p-0">
+                    <li class="nav-item mx-3 my-1">
+                        <button class="btn-brand nav-link flex items-center gap-3 px-4 py-3 text-white no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none w-full cursor-pointer text-left shadow-lg hover:shadow-xl" onclick="copyBookingLink()" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/20 rounded-lg text-base">
                                 <i class="fas fa-link"></i>
                             </div>
-                            <span class="nav-text">Link de Agendamento</span>
+                            <span class="nav-text flex-1 font-medium">Link de Agendamento</span>
                         </button>
                     </li>
                 </ul>
             </div>
 
             <!-- Seção Gerenciamento -->
-            <div class="nav-section">
-                <h3 class="section-title">
-                    <i class="fas fa-circle section-indicator"></i>
+            <div class="nav-section mb-6">
+                <h3 class="section-title px-6 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fas fa-circle section-indicator text-xs" style="color: var(--brand-primary);"></i>
                     <span>Gerenciamento</span>
                 </h3>
 
-                <ul class="nav-menu">
+                <ul class="nav-menu list-none p-0">
                     <!-- Cadastros -->
-                    <li class="nav-item has-submenu">
-                        <button class="nav-link submenu-toggle">
-                            <div class="nav-icon">
+                    <li class="nav-item mx-3 my-1 has-submenu">
+                        <button class="submenu-toggle nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
+                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
                                 <i class="fas fa-clipboard-list"></i>
                             </div>
-                            <span class="nav-text">Cadastros</span>
-                            <i class="fas fa-chevron-down submenu-arrow"></i>
+                            <span class="nav-text flex-1 font-medium">Cadastros</span>
+                            <i class="fas fa-chevron-down submenu-arrow text-xs ml-auto transition-transform duration-300"></i>
                         </button>
 
-                        <ul class="submenu">
-                            <li class="submenu-item">
-                                <a href="{% url 'dashboard:professional_list' %}" class="submenu-link">
-                                    <i class="fas fa-user-tie submenu-icon"></i>
+                        <ul class="submenu list-none p-0 max-h-0 overflow-hidden transition-all duration-300">
+                            <li class="submenu-item ml-4">
+                                <a href="{% url 'dashboard:professional_list' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
+                                    <i class="fas fa-user-tie submenu-icon text-sm"></i>
                                     <span class="submenu-text">{{ tenant.label_profissional_plural }}</span>
                                 </a>
                             </li>
-                            <li class="submenu-item">
-                                <a href="{% url 'dashboard:service_list' %}" class="submenu-link">
-                                    <i class="fas fa-concierge-bell submenu-icon"></i>
+                            <li class="submenu-item ml-4">
+                                <a href="{% url 'dashboard:service_list' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
+                                    <i class="fas fa-concierge-bell submenu-icon text-sm"></i>
                                     <span class="submenu-text">{{ tenant.label_servico_plural }}</span>
                                 </a>
                             </li>
-                            <li class="submenu-item">
-                                <a href="{% url 'dashboard:default_availability' %}" class="submenu-link">
-                                    <i class="fas fa-business-time submenu-icon"></i>
+                            <li class="submenu-item ml-4">
+                                <a href="{% url 'dashboard:default_availability' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
+                                    <i class="fas fa-business-time submenu-icon text-sm"></i>
                                     <span class="submenu-text">Horário Padrão</span>
                                 </a>
                             </li>
@@ -700,67 +230,67 @@
                     </li>
 
                     <!-- Meus Horários -->
-                    <li class="nav-item">
-                        <a href="{% url 'dashboard:my_schedule' %}" class="nav-link">
-                            <div class="nav-icon">
+                    <li class="nav-item mx-3 my-1">
+                        <a href="{% url 'dashboard:my_schedule' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
+                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
                                 <i class="fas fa-clock"></i>
                             </div>
-                            <span class="nav-text">Meus Horários</span>
+                            <span class="nav-text flex-1 font-medium">Meus Horários</span>
                         </a>
                     </li>
 
                     <!-- Meus Serviços -->
-                    <li class="nav-item">
-                        <a href="{% url 'dashboard:my_services' %}" class="nav-link">
-                            <div class="nav-icon">
+                    <li class="nav-item mx-3 my-1">
+                        <a href="{% url 'dashboard:my_services' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
+                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
                                 <i class="fas fa-briefcase"></i>
                             </div>
-                            <span class="nav-text">Meus {{ tenant.label_servico_plural }} e Preços</span>
+                            <span class="nav-text flex-1 font-medium">Meus {{ tenant.label_servico_plural }} e Preços</span>
                         </a>
                     </li>
 
                     <!-- WhatsApp -->
-                    <li class="nav-item">
-                        <a href="{% url 'whatsapp:dashboard' %}" class="nav-link">
-                            <div class="nav-icon">
+                    <li class="nav-item mx-3 my-1">
+                        <a href="{% url 'whatsapp:dashboard' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
+                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
                                 <i class="fab fa-whatsapp"></i>
                             </div>
-                            <span class="nav-text">Gerenciar WhatsApp</span>
+                            <span class="nav-text flex-1 font-medium">Gerenciar WhatsApp</span>
                         </a>
                     </li>
 
                     <!-- Perfil -->
-                    <li class="nav-item has-submenu">
-                        <button class="nav-link submenu-toggle">
-                            <div class="nav-icon">
+                    <li class="nav-item mx-3 my-1 has-submenu">
+                        <button class="submenu-toggle nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
+                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
                                 <i class="fas fa-user-circle"></i>
                             </div>
-                            <span class="nav-text">Meu Perfil</span>
-                            <i class="fas fa-chevron-down submenu-arrow"></i>
+                            <span class="nav-text flex-1 font-medium">Meu Perfil</span>
+                            <i class="fas fa-chevron-down submenu-arrow text-xs ml-auto transition-transform duration-300"></i>
                         </button>
 
-                        <ul class="submenu">
-                            <li class="submenu-item">
-                                <a href="{% url 'accounts:profile' %}" class="submenu-link">
-                                    <i class="fas fa-edit submenu-icon"></i>
+                        <ul class="submenu list-none p-0 max-h-0 overflow-hidden transition-all duration-300">
+                            <li class="submenu-item ml-4">
+                                <a href="{% url 'accounts:profile' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
+                                    <i class="fas fa-edit submenu-icon text-sm"></i>
                                     <span class="submenu-text">Editar Perfil</span>
                                 </a>
                             </li>
-                            <li class="submenu-item">
-                                <a href="{% url 'dashboard:tenant_settings' %}" class="submenu-link">
-                                    <i class="fas fa-cog submenu-icon"></i>
+                            <li class="submenu-item ml-4">
+                                <a href="{% url 'dashboard:tenant_settings' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
+                                    <i class="fas fa-cog submenu-icon text-sm"></i>
                                     <span class="submenu-text">Configurações da Empresa</span>
                                 </a>
                             </li>
-                            <li class="submenu-item">
-                                <a href="{% url 'dashboard:branding_settings' %}" class="submenu-link">
-                                    <i class="fas fa-palette submenu-icon"></i>
+                            <li class="submenu-item ml-4">
+                                <a href="{% url 'dashboard:branding_settings' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
+                                    <i class="fas fa-palette submenu-icon text-sm"></i>
                                     <span class="submenu-text">Cores e Marca</span>
                                 </a>
                             </li>
-                            <li class="submenu-item">
-                                <a href="{% url 'dashboard:booking_policies' %}" class="submenu-link">
-                                    <i class="fas fa-shield-alt submenu-icon"></i>
+                            <li class="submenu-item ml-4">
+                                <a href="{% url 'dashboard:booking_policies' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
+                                    <i class="fas fa-shield-alt submenu-icon text-sm"></i>
                                     <span class="submenu-text">Políticas de Agendamento</span>
                                 </a>
                             </li>
@@ -771,25 +301,25 @@
         </nav>
 
         <!-- Perfil do Usuário -->
-        <div class="user-profile">
-            <div class="profile-content">
-                <div class="profile-avatar">
+        <div class="user-profile px-4 py-4 border-t border-white/10 mt-auto">
+            <div class="profile-content flex items-center gap-3 bg-white/5 px-3 py-3 rounded-xl">
+                <div class="profile-avatar w-10 h-10 rounded-full flex items-center justify-center font-bold text-white relative">
                     {{ user.full_name|first|upper }}
-                    <div class="online-indicator"></div>
+                    <div class="online-indicator absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full"></div>
                 </div>
 
-                <div class="profile-info">
-                    <h4 class="profile-name">{{ user.full_name }}</h4>
-                    <p class="profile-email">{{ user.email }}</p>
+                <div class="profile-info flex-1 min-w-0">
+                    <h4 class="profile-name text-sm font-semibold text-white m-0 truncate">{{ user.full_name }}</h4>
+                    <p class="profile-email text-xs text-slate-500 m-0 truncate">{{ user.email }}</p>
                 </div>
 
-                <div class="profile-actions">
-                    <a href="{% url 'accounts:profile' %}" class="profile-action" title="Editar Perfil">
+                <div class="profile-actions flex gap-1">
+                    <a href="{% url 'accounts:profile' %}" class="profile-action w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border-none rounded-lg text-slate-300 cursor-pointer transition-all duration-200" title="Editar Perfil">
                         <i class="fas fa-user-edit"></i>
                     </a>
-                    <form action="{% url 'accounts:logout' %}" method="post" class="logout-form">
+                    <form action="{% url 'accounts:logout' %}" method="post" class="logout-form inline">
                         {% csrf_token %}
-                        <button type="submit" class="profile-action" title="Sair">
+                        <button type="submit" class="profile-action w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border-none rounded-lg text-slate-300 cursor-pointer transition-all duration-200" title="Sair">
                             <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </form>
@@ -799,24 +329,24 @@
     </aside>
 
     <!-- Overlay para Mobile -->
-    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden"></div>
 
     <!-- Botão Mobile -->
-    <button id="mobile-toggle" class="mobile-toggle">
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+    <button id="mobile-toggle" class="mobile-toggle hidden lg:flex fixed bottom-6 right-6 w-14 h-14 rounded-full text-white text-xl shadow-lg z-40 transition-all duration-300 hover:scale-110" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
+        <div class="hamburger flex flex-col gap-1">
+            <span class="block w-6 h-0.5 bg-white rounded-sm"></span>
+            <span class="block w-6 h-0.5 bg-white rounded-sm"></span>
+            <span class="block w-6 h-0.5 bg-white rounded-sm"></span>
         </div>
     </button>
 
     <!-- Main Content -->
-    <div class="main-content">
-        <div class="content-wrapper">
+    <div class="main-content ml-72 lg:ml-72 min-h-screen flex flex-col transition-all duration-300">
+        <div class="content-wrapper flex-1 px-8 py-8 lg:px-8 lg:py-8 sm:px-4 sm:py-4">
             {% if messages %}
-            <ul class="messages">
+            <ul class="messages list-none mb-6">
                 {% for message in messages %}
-                    <li>{{ message }}</li>
+                    <li class="px-5 py-4 rounded-xl mb-3 bg-emerald-500/10 border-l-4 border-emerald-500 text-emerald-900 font-medium">{{ message }}</li>
                 {% endfor %}
             </ul>
             {% endif %}
@@ -826,26 +356,25 @@
     </div>
 
     <!-- Modal Global para Novo Agendamento -->
-    <div id="newBookingModal" class="modal" style="display: none;">
-        <div class="modal-overlay" onclick="closeNewBookingModal()"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-plus-circle"></i> Novo Agendamento</h2>
-                <button class="modal-close" onclick="closeNewBookingModal()">
+    <div id="newBookingModal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden" style="display: none;">
+        <div class="modal-overlay absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer" onclick="closeNewBookingModal()"></div>
+        <div class="modal-content relative bg-white rounded-2xl w-11/12 max-w-2xl max-h-screen lg:max-h-90vh overflow-hidden shadow-2xl flex flex-col" style="animation: slideUp 0.3s ease-out;">
+            <div class="modal-header px-8 py-6 border-b border-gray-200 flex justify-between items-center" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)); color: white;">
+                <h2 class="text-xl font-semibold flex items-center gap-2 m-0"><i class="fas fa-plus-circle"></i> Novo Agendamento</h2>
+                <button class="modal-close w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 border-none cursor-pointer flex items-center justify-center text-xl text-white transition-all duration-200" onclick="closeNewBookingModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-body" id="newBookingModalBody">
-                <div style="text-align: center; padding: 3rem;">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
-                    <p style="margin-top: 1rem; color: #64748b;">Carregando...</p>
+            <div class="modal-body px-8 py-8 overflow-y-auto flex-1" id="newBookingModalBody">
+                <div class="text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-2xl" style="color: var(--brand-primary);"></i>
+                    <p class="mt-4 text-slate-500">Carregando...</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
 
     <script>
