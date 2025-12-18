@@ -29,9 +29,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip && pip install -r /tmp/requirements.txt
 
-COPY --from=tailwind_builder /app/src/static/css/tailwind.css /app/src/static/css/tailwind.css
-
 COPY ./src /app
+
+COPY --from=tailwind_builder /app/src/static/css/tailwind.css /app/src/static/css/tailwind.css
 
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
