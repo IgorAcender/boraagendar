@@ -163,6 +163,42 @@
                 pendentes: 6,
                 cancelados: 1
             });
+            const [loadingStats, setLoadingStats] = useState(false);
+            const [statsError, setStatsError] = useState(null);
+
+            useEffect(() => {
+                let cancelled = false;
+
+                async function loadStats(retries = 2) {
+                    setLoadingStats(true);
+                    setStatsError(null);
+                    try {
+                        const res = await fetch('/api/dashboard/stats/');
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        const json = await res.json();
+                        if (!cancelled) {
+                            setStats({
+                                total: json.total ?? 0,
+                                confirmados: json.confirmed ?? 0,
+                                pendentes: json.pending ?? 0,
+                                cancelados: json.cancelled ?? 0,
+                            });
+                        }
+                    } catch (err) {
+                        if (retries > 0) {
+                            setTimeout(() => loadStats(retries - 1), 800);
+                        } else {
+                            console.warn('Falha ao carregar stats:', err);
+                            setStatsError(String(err));
+                        }
+                    } finally {
+                        if (!cancelled) setLoadingStats(false);
+                    }
+                }
+
+                loadStats();
+                return () => { cancelled = true; };
+            }, []);
             
             const menuItems = [
                 { id: 'dashboard', label: '📊 Dashboard', icon: '📊' },
