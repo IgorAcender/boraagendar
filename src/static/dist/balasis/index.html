@@ -56,12 +56,29 @@
       try{
       const React = window.React;
       const ReactDOM = window.ReactDOM;
-      const antd = window.antd || window.Antd || {};
-      const Recharts = window.Recharts || {};
+      // Ant Design and Recharts UMD globals
+      const antd = window.antd || window.Antd || null;
+      const Recharts = window.Recharts || null;
       const { useState, useEffect } = React;
-  const { Layout, Menu, Card, Row, Col, Spin, Table, Empty, Typography, Modal, Input, Button } = antd;
-      const { Header, Sider, Content } = Layout;
-      const { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } = Recharts;
+
+      // Safety checks: if Antd or Layout isn't available, show a clear overlay and render a small fallback
+      if(!antd || !antd.Layout){
+        console.error('Ant Design não carregou corretamente:', antd);
+        // Expose helpful message in overlay for the earlier debug helper
+        try{ (function(){ var o = document.getElementById('spa-error-overlay'); if(!o){ o = document.createElement('div'); o.id='spa-error-overlay'; document.body.appendChild(o); } o.style.position='fixed'; o.style.left='12px'; o.style.right='12px'; o.style.top='12px'; o.style.zIndex=99999; o.style.background='rgba(255,255,255,0.98)'; o.style.border='1px solid #e6e6e6'; o.style.padding='12px'; o.style.borderRadius='8px'; o.style.boxShadow='0 6px 20px rgba(0,0,0,0.08)'; o.innerText = 'Erro na SPA: Ant Design não carregou (Layout está undefined). Verifique bloqueio de CDN/CSP.'; })(); }catch(e){}
+        // Provide a minimal fallback UI so the page isn't blank
+        const root = document.getElementById('root');
+        if(root){
+          root.innerHTML = '<div style="padding:24px;font-family:Inter,system-ui,Arial;">\n            <h3 style="margin-top:0;color:#c00">Erro: biblioteca Ant Design não carregou</h3>\n            <p>Verifique se os CDNs foram bloqueados ou se há restrições de CSP. Abra o console do navegador para mais detalhes.</p>\n          </div>';
+        }
+        // Stop bootstrapping the SPA to avoid runtime TypeErrors
+        return;
+      }
+
+      // Safe destructure now that we ensured antd exists
+      const { Layout, Menu, Card, Row, Col, Spin, Table, Empty, Typography, Modal, Input, Button } = antd;
+      const Header = Layout.Header; const Sider = Layout.Sider; const Content = Layout.Content;
+      const { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } = Recharts || {};
 
       // Fetch helper that includes credentials (session cookie) and handles JSON
       function getCookie(name){
