@@ -55,7 +55,9 @@ def serve_spa(request, path='index.html'):
     except Exception:
         req_path = ''
 
-    if req_path.startswith('/app/balasis') or req_path.startswith('/balasis'):
+    # Se a rota pedir pelo app Balasis (ex: /app, /app/*, /app/balasis/*), servir o index do Balasis
+    # Isso faz com que a interface Balasis seja a aplicação carregada no path /app
+    if req_path.startswith('/app') or req_path.startswith('/app/balasis') or req_path.startswith('/balasis'):
         path = 'balasis/index.html'
 
     # Tenta arquivo estático em várias localizações (ordem de prioridade)
