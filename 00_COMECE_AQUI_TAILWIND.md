@@ -47,50 +47,54 @@
 
 ## 🚀 COMECE AQUI (AGORA!)
 
-### 1️⃣ Instalar Node.js (se não tiver)
+### ⚡ WORKFLOW (SEM Node.js no Mac!)
 
-```bash
-# Verificar se tem
-node --version
+```
+Seu Mac (VS Code)
+├─ Editar templates
+├─ Adicionar classes Tailwind
+└─ git push
 
-# Se não tiver, instalar:
-brew install node
-
-# Ou: https://nodejs.org/
+EasyPanel (VPS) ← Automático!
+├─ Docker instala Node
+├─ npm install
+├─ npm run build ← CSS compilado aqui!
+└─ App online! 🚀
 ```
 
-### 2️⃣ Instalar Tailwind
+### 1️⃣ Editar Templates (no seu Mac)
+
+Abra em VS Code:
+- `src/templates/base_dashboard.html`
+- `src/templates/scheduling/dashboard/index.html`
+- Etc...
+
+Remova Bootstrap, adicione classes Tailwind (veja exemplo em `EXEMPLO_DASHBOARD_TAILWIND.html`)
+
+### 2️⃣ Commit e Push
 
 ```bash
 cd /Users/user/Desktop/Programação/boraagendar
-npm install
+git add .
+git commit -m "✨ Refactor: Tailwind CSS"
+git push origin main
 ```
 
-### 3️⃣ Compilar CSS
+### 3️⃣ EasyPanel Faz o Resto (Automático!)
 
-```bash
-npm run build
-```
-
-Gera: `src/static/css/tailwind.css` (~50KB otimizado)
+- EasyPanel detecta mudança no GitHub
+- Docker instala Node.js automaticamente
+- npm run build compila Tailwind na VPS
+- App fica online com CSS pronto! �
 
 ### 4️⃣ Ver Resultado
 
+Acesse sua VPS:
 ```bash
-open EXEMPLO_DASHBOARD_TAILWIND.html
+https://seu-dominio.com
 ```
 
-Vai abrir no browser e você vê como fica! 🎨
-
-### 5️⃣ Deixar Watch Rodando (IMPORTANTE!)
-
-Abra um terminal NOVO:
-
-```bash
-npm run watch
-```
-
-Deixe aberto enquanto trabalha. CSS atualiza automaticamente!
+CSS vai estar compilado e funcionando! ✨
 
 ---
 

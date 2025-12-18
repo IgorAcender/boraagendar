@@ -62,17 +62,15 @@ npm run watch  # Deixar aberto
 
 ## 📋 CHECKLIST PARA VOCÊ FAZER AGORA
 
-- [ ] Instalar Node.js (`brew install node`)
-- [ ] Rodar `npm install`
-- [ ] Rodar `npm run build`
-- [ ] Abrir `EXEMPLO_DASHBOARD_TAILWIND.html`
-- [ ] Ler `00_COMECE_AQUI_TAILWIND.md`
-- [ ] Ler `TAILWIND_QUICK_START.md`
-- [ ] Ler `TAILWIND_REFACTOR.md`
-- [ ] Rodar `npm run watch`
-- [ ] Começar refatoração
-- [ ] Testar responsivo
-- [ ] Commit e push
+- [ ] Ler `NODE_NA_VPS_CORRETO.md` (entender workflow)
+- [ ] Ler `EXEMPLO_DASHBOARD_TAILWIND.html` (ver exemplo)
+- [ ] Ler `TAILWIND_REFACTOR.md` (começar refatoração)
+- [ ] Editar templates (adicionar classes Tailwind)
+- [ ] Testar localmente (abrir HTML no browser)
+- [ ] Fazer commit e push
+- [ ] Verificar no EasyPanel (CSS compilado)
+- [ ] Testar responsivo na VPS
+- [ ] PRONTO! 🎉
 
 ---
 
