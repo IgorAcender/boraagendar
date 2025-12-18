@@ -73,7 +73,15 @@ def serve_spa(request, path='index.html'):
         if os.path.exists(file_path):
             print(f"  ✅ Encontrado: {file_path}")
             try:
-                return FileResponse(open(file_path, 'rb'), content_type='text/html')
+                # Detect MIME type from file extension to avoid sending HTML for JS/CSS
+                import mimetypes
+                mime, _ = mimetypes.guess_type(str(file_path))
+                if not mime:
+                    mime = 'application/octet-stream'
+                resp = FileResponse(open(file_path, 'rb'), content_type=mime)
+                # Let callers know what we served (helps debugging)
+                print(f"  ➜ Servindo {file_path} como {mime}")
+                return resp
             except Exception as e:
                 print(f"  ❌ Erro ao servir: {e}")
                 pass
