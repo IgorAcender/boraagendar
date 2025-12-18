@@ -23,38 +23,48 @@ export default function AppLayout({ children }) {
 
   const menuItems = [
     {
-      key: '/',
+      key: '/principal',
       icon: <DashboardOutlined />,
-      label: 'Dashboard',
-    },
-    {
-      key: '/agendamentos',
-      icon: <CalendarOutlined />,
-      label: 'Agendamentos',
+      label: 'Principal',
+      children: [
+        { key: '/principal/dashboard', label: 'Dashboard' },
+        { key: '/principal/agendamentos', label: 'Agendamentos' },
+      ],
     },
     {
       key: '/financeiro',
       icon: <DollarOutlined />,
       label: 'Financeiro',
       children: [
-        {
-          key: '/financeiro/contas',
-          label: 'Contas',
-        },
-        {
-          key: '/financeiro/transacoes',
-          label: 'Transações',
-        },
-        {
-          key: '/financeiro/comissoes',
-          label: 'Comissões',
-        },
+        { key: '/financeiro/contas', label: 'Contas' },
+        { key: '/financeiro/transacoes', label: 'Transações' },
+        { key: '/financeiro/comissoes', label: 'Comissões' },
       ],
     },
     {
-      key: '/relatorios',
+      key: '/controle',
       icon: <FileTextOutlined />,
-      label: 'Relatórios',
+      label: 'Controle',
+      children: [
+        { key: '/controle/compras', label: 'Compras' },
+        { key: '/controle/relatorios', label: 'Relatórios' },
+      ],
+    },
+    {
+      key: '/cadastro',
+      icon: <UserOutlined />,
+      label: 'Cadastro',
+      children: [
+        { key: '/cadastro', label: 'Cadastros' },
+      ],
+    },
+    {
+      key: '/marketing',
+      icon: <CalendarOutlined />,
+      label: 'Marketing',
+      children: [
+        { key: '/marketing', label: 'Marketing' },
+      ],
     },
     {
       key: '/configuracoes',

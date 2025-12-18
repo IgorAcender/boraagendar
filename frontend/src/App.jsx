@@ -3,6 +3,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import AppLayout from './components/AppLayout'
 import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
+import Agendamentos from './pages/Agendamentos'
+import Relatorios from './pages/Relatorios'
+import Configuracoes from './pages/Configuracoes'
+import Contas from './pages/Contas'
+import Comissoes from './pages/Comissoes'
+import Compras from './pages/Compras'
+import Cadastros from './pages/Cadastros'
+import Marketing from './pages/Marketing'
 import './App.css'
 
 function App() {
@@ -15,10 +23,17 @@ function App() {
             <AppLayout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
+                <Route path="/principal/dashboard" element={<Dashboard />} />
                 <Route path="/financeiro/transacoes" element={<Transactions />} />
-                <Route path="/agendamentos" element={<div>Agendamentos - Em breve</div>} />
-                <Route path="/relatorios" element={<div>Relatórios - Em breve</div>} />
-                <Route path="/configuracoes" element={<div>Configurações - Em breve</div>} />
+                <Route path="/financeiro/contas" element={<Contas />} />
+                <Route path="/financeiro/comissoes" element={<Comissoes />} />
+                <Route path="/agendamentos" element={<Agendamentos />} />
+                <Route path="/principal/agendamentos" element={<Agendamentos />} />
+                <Route path="/relatorios" element={<Relatorios />} />
+                <Route path="/controle/compras" element={<Compras />} />
+                <Route path="/cadastro" element={<Cadastros />} />
+                <Route path="/marketing" element={<Marketing />} />
+                <Route path="/configuracoes" element={<Configuracoes />} />
               </Routes>
             </AppLayout>
           }
