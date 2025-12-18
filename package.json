@@ -1,0 +1,22 @@
+{
+  "name": "boragendar-frontend",
+  "version": "2.0.0",
+  "description": "Frontend com Tailwind CSS para BoraAgendar",
+  "scripts": {
+    "build": "tailwindcss -i src/static/css/tailwind-input.css -o src/static/css/tailwind.css",
+    "watch": "tailwindcss -i src/static/css/tailwind-input.css -o src/static/css/tailwind.css --watch",
+    "dev": "tailwindcss -i src/static/css/tailwind-input.css -o src/static/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.32",
+    "autoprefixer": "^10.4.16"
+  },
+  "keywords": [
+    "tailwind",
+    "css",
+    "boragendar"
+  ],
+  "author": "Igor Acender",
+  "license": "MIT"
+}
