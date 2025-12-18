@@ -26,18 +26,12 @@
   <!-- React (UMD) -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Ant Design (UMD) - with multi-CDN fallback -->
-  <script src="https://unpkg.com/antd@5.11.0/dist/antd.min.js" onerror="window.__antdLoadFailed=true;"></script>
-  <script>
-    // If primary CDN failed, try jsDelivr
-    if(window.__antdLoadFailed || !window.antd) {
-      var s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/antd@5.11.0/dist/antd.min.js';
-      s.onerror = function(){ window.__jsDelivrFailed=true; };
-      document.head.appendChild(s);
-    }
-  </script>
+  
+  <!-- Day.js (dependência do Ant Design) -->
+  <script src="https://unpkg.com/dayjs@1.11.9/dayjs.min.js"></script>
 
+  <!-- Ant Design (UMD) -->
+  <script src="https://unpkg.com/antd@5.11.0/dist/antd.min.js" onerror="window.__antdLoadFailed=true;"></script>
 
   <script>
     // Global error overlay & handlers to help diagnose blank page in production
@@ -62,21 +56,24 @@
 
     (function () {
       // Bootstrap will wait until React, ReactDOM and Antd are available.
-      // This allows fallback local vendor scripts (if injected) to load and then retry.
       var bootstrapRetries = 0;
+      var maxRetries = 50;
+
       function startBootstrap(){
         bootstrapRetries++;
+        
         try{
           const React = window.React;
           const ReactDOM = window.ReactDOM;
           const antd = window.antd || window.Antd || null;
-          
-          // If essential libs are missing, retry shortly (gives local fallback time to load)
-          if(!React || !ReactDOM){
-            console.log(`⏳ Bootstrap retry ${bootstrapRetries}: React/ReactDOM missing`);
-            if(bootstrapRetries > 50) {
-              console.error('❌ Bootstrap failed after 50 retries: React/ReactDOM not available');
-              try{ document.getElementById('spa-error-overlay').innerText = 'Erro: React não carregou. Verifique console.'; }catch(e){}
+          const dayjs = window.dayjs;
+
+          // If essential libs are missing, retry shortly
+          if(!React || !ReactDOM || !dayjs){
+            console.log(`⏳ Bootstrap retry ${bootstrapRetries}: React/ReactDOM/Dayjs missing`);
+            if(bootstrapRetries > maxRetries) {
+              console.error('❌ Bootstrap failed: React/ReactDOM/Dayjs not available');
+              document.getElementById('spa-error-overlay').innerText = 'Erro: React/Dayjs não carregou. Verifique console.';
               return;
             }
             setTimeout(startBootstrap, 400);
@@ -85,14 +82,19 @@
 
           if(!antd || !antd.Layout){
             console.log(`⏳ Bootstrap retry ${bootstrapRetries}: Ant Design missing or incomplete`);
-            if(bootstrapRetries > 50) {
-              console.error('❌ Bootstrap failed after 50 retries: Ant Design not available');
-              try{ document.getElementById('spa-error-overlay').innerText = 'Erro: Ant Design não carregou. Verifique console.'; }catch(e){}
+            
+            // After a few failed attempts, inject local fallback
+            if(bootstrapRetries === 5){
+              console.log('Ant Design not found, injecting local fallback...');
+              injectLocalVendors();
+            }
+
+            if(bootstrapRetries > maxRetries) {
+              console.error('❌ Bootstrap failed: Ant Design not available');
+              document.getElementById('spa-error-overlay').innerText = 'Erro: Ant Design não carregou. Verifique console.';
               return;
             }
-            // show a short informative overlay while waiting
-            try{ var o = document.getElementById('spa-error-overlay'); if(!o){ o = document.createElement('div'); o.id='spa-error-overlay'; document.body.appendChild(o); } o.style.position='fixed'; o.style.left='12px'; o.style.right='12px'; o.style.top='12px'; o.style.zIndex=99999; o.style.background='rgba(255,255,255,0.98)'; o.style.border='1px solid #e6e6e6'; o.style.padding='12px'; o.style.borderRadius='8px'; o.style.boxShadow='0 6px 20px rgba(0,0,0,0.08)'; o.innerText = `Aguardando Ant Design (tentativa ${bootstrapRetries}). Se persistir, verifique console.`; }catch(e){}
-            // retry after a short delay (polling)
+            
             setTimeout(startBootstrap, 400);
             return;
           }
@@ -102,6 +104,7 @@
           // Safe destructure now that we ensured antd exists
           const { Layout, Menu, Card, Row, Col, Spin, Table, Empty, Typography, Modal, Input, Button } = antd;
           const Header = Layout.Header; const Sider = Layout.Sider; const Content = Layout.Content;
+          const { useState, useEffect } = React;
 
 
           // Fetch helper that includes credentials (session cookie) and handles JSON
@@ -343,22 +346,21 @@
       }
         }catch(e){ console.error('Erro no bootstrap da SPA', e); }
       }
-      // If CDNs were blocked, try to inject local vendor scripts
+      
+      // If CDN was blocked, try to inject local vendor scripts
       function injectLocalVendors(){
         try{
-          if(!window.antd){
-            // local CSS fallback
-            var css = document.createElement('link'); css.rel='stylesheet'; css.href='/static/dist/balasis/vendor/antd.min.css'; document.head.appendChild(css);
-            var s = document.createElement('script'); s.src='/static/dist/balasis/vendor/antd.min.js'; s.async=false; s.crossOrigin='anonymous'; s.onload=function(){ console.log('antd loaded from local fallback'); };
-            s.onerror=function(){ console.warn('failed to load local antd'); };
-            document.body.appendChild(s);
-          }
-        }catch(e){ console.error('Erro ao injetar vendors locais', e); }
+          console.log('Injecting local fallback for Ant Design...');
+          // local CSS fallback
+          var css = document.createElement('link'); css.rel='stylesheet'; css.href='/static/dist/balasis/vendor/antd.min.css'; document.head.appendChild(css);
+          // local JS fallback
+          var s = document.createElement('script'); s.src='/static/dist/balasis/vendor/antd.min.js'; s.async=false;
+          s.onload=function(){ console.log('antd.min.js loaded from local fallback'); };
+          s.onerror=function(){ console.warn('Failed to load local antd.min.js'); };
+          document.body.appendChild(s);
+        }catch(e){ console.error('Error injecting local vendors', e); }
       }
-      // Attempt to inject local vendors immediately (priority) and again after window.load
-      try{ injectLocalVendors(); }catch(e){}
-      window.addEventListener('load', function(){ setTimeout(injectLocalVendors, 800); });
-
+      
       // Start the bootstrap process (will poll until libs present)
       setTimeout(startBootstrap, 50);
     })();
