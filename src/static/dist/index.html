@@ -140,12 +140,19 @@
     <div id="root"></div>
     
     <!-- React via CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
     
     <script>
-        const { useState, useEffect } = React;
-        const e = React.createElement;
+        // Aguardar React estar disponível
+        if (!window.React || !window.ReactDOM) {
+            console.error('React não carregou do CDN!');
+            document.getElementById('root').innerHTML = '<div style="color:red; padding: 20px;">Erro: React não carregou</div>';
+        }
+        
+        const { useState, useEffect } = window.React;
+        const e = window.React.createElement;
+        const root = window.ReactDOM.createRoot(document.getElementById('root'));
         
         // App Component
         function App() {
@@ -242,7 +249,6 @@
         }
         
         // Render
-        const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(e(App));
     </script>
 </body>
