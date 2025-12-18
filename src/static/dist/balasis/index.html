@@ -29,6 +29,8 @@
   
   <!-- Day.js (dependência do Ant Design) -->
   <script src="https://unpkg.com/dayjs@1.11.9/dayjs.min.js"></script>
+  <script src="https://unpkg.com/dayjs@1.11.9/plugin/customParseFormat.js"></script>
+  <script>dayjs.extend(window.dayjs_plugin_customParseFormat);</script>
 
   <!-- Ant Design (UMD) -->
   <script src="https://unpkg.com/antd@5.11.0/dist/antd.min.js" onerror="window.__antdLoadFailed=true;"></script>
