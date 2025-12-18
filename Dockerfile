@@ -19,7 +19,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_CREATE=false
 
-WORKDIR /app
+WORKDIR /app/src
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
@@ -34,11 +34,11 @@ COPY ./src /app/src
 # Copiar CSS compilado para o lugar certo (depois de copiar src/)
 COPY --from=tailwind_builder /app/src/static/css/tailwind.css /app/src/static/css/tailwind.css
 
-COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY ./entrypoint.sh /app/
+RUN chmod +x /app/entrypoint.sh
 
 # Expõe a porta utilizada pelo gunicorn
 EXPOSE 8000
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
