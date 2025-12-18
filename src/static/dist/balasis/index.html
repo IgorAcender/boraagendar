@@ -316,10 +316,7 @@
       }
         }catch(e){ console.error('Erro no bootstrap da SPA', e); }
       }
-      // Start the bootstrap process (will poll until libs present)
-      setTimeout(startBootstrap, 50);
-
-      // If CDNs were blocked, try to inject local vendor scripts after load
+      // If CDNs were blocked, try to inject local vendor scripts
       function injectLocalVendors(){
         try{
           if(!window.antd){
@@ -334,9 +331,12 @@
           }
         }catch(e){ console.error('Erro ao injetar vendors locais', e); }
       }
-
-      // attempt injection shortly after window load (gives CDN time to succeed first)
+      // Attempt to inject local vendors immediately (priority) and again after window.load
+      try{ injectLocalVendors(); }catch(e){}
       window.addEventListener('load', function(){ setTimeout(injectLocalVendors, 800); });
+
+      // Start the bootstrap process (will poll until libs present)
+      setTimeout(startBootstrap, 50);
     })();
   </script>
 </body>
