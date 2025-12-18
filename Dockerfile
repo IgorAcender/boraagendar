@@ -3,7 +3,7 @@ FROM node:18-alpine AS tailwind_builder
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm install
 
 COPY tailwind.config.js postcss.config.js ./
 
