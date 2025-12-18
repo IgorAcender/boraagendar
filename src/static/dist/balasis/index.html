@@ -26,8 +26,18 @@
   <!-- React (UMD) -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Ant Design (UMD) -->
+  <!-- Ant Design (UMD) - with jsDelivr fallback -->
   <script src="https://unpkg.com/antd@5.11.0/dist/antd.min.js"></script>
+  <script>
+    // If unpkg failed, try jsDelivr as fallback
+    if(!window.antd) {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/antd@5.11.0/dist/antd.min.js';
+      script.onload = function(){ console.log('antd loaded from jsDelivr CDN'); };
+      script.onerror = function(){ console.warn('jsDelivr also failed, will try local fallback'); };
+      document.head.appendChild(script);
+    }
+  </script>
 
 
   <script>
