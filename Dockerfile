@@ -6,10 +6,10 @@ COPY package.json package-lock.json* ./
 RUN npm install
 
 COPY tailwind.config.js postcss.config.js ./
+COPY src/static/css/tailwind-input.css ./src/static/css/
 
-# Criar arquivo CSS input com conteúdo padrão se não existir no repo
-RUN mkdir -p ./src/static/css && \
-    (test -f ./src/static/css/tailwind-input.css || (echo "@tailwind base;" > ./src/static/css/tailwind-input.css && echo "@tailwind components;" >> ./src/static/css/tailwind-input.css && echo "@tailwind utilities;" >> ./src/static/css/tailwind-input.css))
+# Copiar templates para Tailwind escanear (content)
+COPY src/templates ./src/templates
 
 RUN npm run build
 
