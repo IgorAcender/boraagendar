@@ -45,8 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # ⭐ Serve static files
-    "django.middleware.gzip.GZipMiddleware",  # ⭐ Gzip compression
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # ⭐ Serve static files + gzip
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -96,6 +95,9 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
 STATICFILES_DIRS = [BASE_DIR / "assets"]
+
+# WhiteNoise configuration
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
