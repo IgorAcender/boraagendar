@@ -6,10 +6,9 @@ COPY package.json package-lock.json* ./
 RUN npm install
 
 COPY tailwind.config.js postcss.config.js ./
-COPY src/static/css/tailwind-input.css ./src/static/css/
 
-# Copiar templates para Tailwind escanear (content)
-COPY src/templates ./src/templates
+# Copiar TUDO de src/ para que Tailwind escaneia todos templates e CSS
+COPY src/ ./src/
 
 RUN npm run build
 
