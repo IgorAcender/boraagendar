@@ -2,6 +2,7 @@
 export default {
   content: [
     "./src/templates/**/*.html",
+    "./src/scheduling/**/*.html",
     "./src/**/*.py",
   ],
   theme: {
