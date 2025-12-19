@@ -1,26 +1,3 @@
-FROM node:18-alpine AS tailwind_builder
-
-WORKDIR /app
-
-COPY package.json package-lock.json* ./
-RUN npm install
-
-COPY tailwind.config.js postcss.config.js ./
-
-# Copiar TUDO de src/ para que Tailwind escaneia todos templates e CSS
-COPY src/ ./src/
-
-# Tentar compilar, mas continue se falhar
-RUN npm run build || echo "WARNING: Tailwind build failed, checking if CSS exists..."
-
-# Se CSS não foi gerado, criar um mínimo
-RUN if [ ! -f ./src/static/css/tailwind.css ] || [ ! -s ./src/static/css/tailwind.css ]; then \
-  echo "Creating minimal Tailwind CSS..."; \
-  cp ./src/static/css/tailwind-input.css ./src/static/css/tailwind.css; \
-fi
-
-RUN ls -lah ./src/static/css/
-
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -38,9 +15,6 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip && pip install -r /tmp/requirements.txt
 
 COPY ./src /app/src
-
-# Copiar CSS compilado para o lugar certo (depois de copiar src/)
-COPY --from=tailwind_builder /app/src/static/css/tailwind.css /app/src/static/css/tailwind.css
 
 COPY ./entrypoint.sh /app/src/
 RUN chmod +x /app/src/entrypoint.sh
