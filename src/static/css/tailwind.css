@@ -28,7 +28,8 @@ body {
   top: 0;
   bottom: 0;
   width: 18rem;
-  background: linear-gradient(to bottom, #1e293b, #0f172a);
+  /* Belasis-like darker sidebar */
+  background: linear-gradient(to bottom, #0b1220, #111827);
   color: #f1f5f9;
   overflow-y: auto;
   z-index: 50;
@@ -60,7 +61,8 @@ body {
   font-size: 1.5rem;
   font-weight: bold;
   color: white;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  /* Belasis red gradient */
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
 }
 
 .brand-text h2 {
@@ -130,9 +132,9 @@ body {
 }
 
 .nav-link.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 6px 18px rgba(185, 28, 28, 0.25);
 }
 
 .nav-icon {
@@ -205,7 +207,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, var(--brand-primary, #667eea), var(--brand-secondary, #764ba2));
+  background: linear-gradient(135deg, var(--brand-primary, #ef4444), var(--brand-secondary, #b91c1c));
   color: white;
 }
 
@@ -236,7 +238,8 @@ body {
 
 /* Buttons */
 .btn-brand {
-  background: linear-gradient(135deg, var(--brand-primary, #667eea), var(--brand-secondary, #764ba2));
+  /* Belasis red primary button */
+  background: linear-gradient(135deg, var(--brand-primary, #ef4444), var(--brand-secondary, #b91c1c));
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -244,11 +247,11 @@ body {
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.16);
 }
 
 .btn-brand:hover {
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 22px rgba(239, 68, 68, 0.28);
   transform: translateY(-2px);
 }
 
@@ -260,7 +263,8 @@ body {
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 9999px;
-  background: linear-gradient(135deg, var(--brand-primary, #667eea), var(--brand-secondary, #764ba2));
+  /* Belasis red floating button */
+  background: linear-gradient(135deg, var(--brand-primary, #ef4444), var(--brand-secondary, #b91c1c));
   color: white;
   border: none;
   cursor: pointer;
