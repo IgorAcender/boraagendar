@@ -34,11 +34,11 @@ COPY ./src /app/src
 # Copiar CSS compilado para o lugar certo (depois de copiar src/)
 COPY --from=tailwind_builder /app/src/static/css/tailwind.css /app/src/static/css/tailwind.css
 
-COPY ./entrypoint.sh /app/
-RUN chmod +x /app/entrypoint.sh
+COPY ./entrypoint.sh /app/src/
+RUN chmod +x /app/src/entrypoint.sh
 
 # Expõe a porta utilizada pelo gunicorn
 EXPOSE 8000
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/app/src/entrypoint.sh"]
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
