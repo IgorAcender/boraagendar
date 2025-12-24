@@ -4,72 +4,22 @@
 {% block title %}Dashboard{% endblock %}
 {% block extra_head %}
 <style>
-    /* Hero Header */
-    .hero-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 20px;
-        padding: 2.5rem 2rem;
+    /* Page Header Styles */
+    .page-header {
         margin-bottom: 2rem;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
     }
 
-    .hero-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="1000,100 1000,0 0,100"/></svg>');
-        background-size: cover;
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-    }
-
-    .hero-text h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
+    .page-title {
+        font-size: 1.875rem;
+        font-weight: 600;
+        color: #1e293b;
         margin: 0 0 0.5rem 0;
     }
 
-    .hero-text p {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        margin: 0;
-    }
-
-    .hero-actions .btn-hero {
-        background: rgba(255, 255, 255, 0.9);
-        color: #667eea;
-        padding: 0.875rem 1.75rem;
-        border: none;
-        border-radius: 12px;
-        font-weight: 600;
+    .page-subtitle {
         font-size: 1rem;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.2s;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        text-decoration: none;
-    }
-
-    .hero-actions .btn-hero:hover {
-        background: white;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        color: #64748b;
+        margin: 0;
     }
 
     /* Stats Grid */
@@ -884,20 +834,10 @@
     }
 </script>
 
-<!-- Hero Header -->
-<div class="hero-header animate-fade-in">
-    <div class="hero-content">
-        <div class="hero-text">
-            <h1>Bem-vindo ao Dashboard</h1>
-            <p>Visão geral do seu sistema de agendamentos</p>
-        </div>
-        <div class="hero-actions">
-            <button onclick="openNewBookingModal()" class="btn-hero">
-                <i class="fas fa-plus"></i>
-                Novo Agendamento
-            </button>
-        </div>
-    </div>
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">Bem-vindo ao Dashboard</h1>
+    <p class="page-subtitle">Visão geral do seu sistema de agendamentos</p>
 </div>
 
 <!-- Seletor de Mês com HTMX -->
