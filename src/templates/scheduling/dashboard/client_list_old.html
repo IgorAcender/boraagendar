@@ -1,0 +1,173 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Clientes{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Clientes</h1>
+    <a href="#" class="btn-primary" onclick="openNewClientModal(); return false;">
+        <i class="fas fa-plus"></i>
+        Novo Cliente
+    </a>
+</div>
+
+<div class="data-card">
+    <div class="data-card-header">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar por nome, e-mail ou telefone..." id="searchInput">
+        </div>
+        <button class="btn-outline" onclick="location.reload()">
+            <i class="fas fa-sync-alt"></i>
+            Atualizar
+        </button>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="sortable">
+                    Cliente
+                    <i class="fas fa-sort" style="font-size: 0.7rem; margin-left: 0.25rem;"></i>
+                </th>
+                <th>Telefone</th>
+                <th>CPF</th>
+                <th>Cidade</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+            <tr>
+                <td>
+                    <div class="client-info">
+                        <span class="client-name">{{ client.name }}</span>
+                        <span class="client-email">{{ client.email }}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="phone-cell">
+                        <i class="fas fa-phone phone-icon"></i>
+                        {{ client.phone|default:"-" }}
+                    </div>
+                </td>
+                <td>{{ client.cpf|default:"-" }}</td>
+                <td>{{ client.city|default:"-" }}</td>
+                <td>
+                    {% if client.is_active %}
+                        <span class="status-badge status-active">Ativo</span>
+                    {% else %}
+                        <span class="status-badge status-inactive">Inativo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" title="Editar">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <button class="btn-action btn-delete" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <!-- Dados de exemplo quando não há clientes -->
+            <tr>
+                <td>
+                    <div class="client-info">
+                        <span class="client-name">Lucas Oliveira</span>
+                        <span class="client-email">lucas@email.com</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="phone-cell">
+                        <i class="fas fa-phone phone-icon"></i>
+                        (11) 96666-6666
+                    </div>
+                </td>
+                <td>-</td>
+                <td>-</td>
+                <td><span class="status-badge status-inactive">Inativo</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="client-info">
+                        <span class="client-name">Marcos Silva</span>
+                        <span class="client-email">marcos@email.com</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="phone-cell">
+                        <i class="fas fa-phone phone-icon"></i>
+                        (11) 95555-5555
+                    </div>
+                </td>
+                <td>-</td>
+                <td>-</td>
+                <td><span class="status-badge status-inactive">Inativo</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="client-info">
+                        <span class="client-name">Pedro Santos</span>
+                        <span class="client-email">pedro@email.com</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="phone-cell">
+                        <i class="fas fa-phone phone-icon"></i>
+                        (11) 97777-7777
+                    </div>
+                </td>
+                <td>-</td>
+                <td>-</td>
+                <td><span class="status-badge status-inactive">Inativo</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="data-card-footer">
+        <div class="pagination-info">
+            Total: <strong>{% if clients %}{{ clients|length }}{% else %}3{% endif %}</strong> clientes
+        </div>
+        <div class="pagination">
+            <button class="pagination-btn" disabled><i class="fas fa-chevron-left"></i></button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Filtro de busca simples
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.data-table tbody tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}
