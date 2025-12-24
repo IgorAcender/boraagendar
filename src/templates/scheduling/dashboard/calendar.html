@@ -432,12 +432,12 @@
     .modal-content {
         position: relative;
         background: white;
-        border-radius: 12px;
-        max-width: 700px;
+        border-radius: 8px;
+        max-width: 600px;
         width: 90%;
         max-height: 85vh;
         overflow-y: auto;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         animation: slideUp 0.3s ease-out;
     }
 
@@ -445,43 +445,39 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1.5rem 2rem;
-        border-bottom: 1px solid #e2e8f0;
+        padding: 1rem 1.5rem;
         background: white;
     }
 
     .modal-header h2 {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 1.125rem;
         font-weight: 600;
         color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
     }
 
     .modal-close {
         background: transparent;
         border: none;
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        color: #64748b;
-        font-size: 1.25rem;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        color: #94a3b8;
+        font-size: 1.125rem;
         cursor: pointer;
         transition: all 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
     }
 
     .modal-close:hover {
-        background: #f1f5f9;
         color: #1e293b;
     }
 
     .modal-body {
-        padding: 2rem;
+        padding: 1.5rem;
     }
 
     @keyframes fadeIn {
