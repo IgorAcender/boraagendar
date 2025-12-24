@@ -3,15 +3,6 @@
 
 {% block extra_head %}
 <style>
-    .hero-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 20px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
-    }
-
     .section-card {
         background: rgba(255, 255, 255, 0.9);
         backdrop-filter: blur(15px);
@@ -187,9 +178,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="hero-header">
-    <h1>Serviços e Preços</h1>
-    <p style="opacity: 0.9; margin: 0.5rem 0 0 0;">Profissional: {{ professional.display_name }}</p>
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-briefcase"></i> Serviços e Preços
+    </h1>
+    <p class="page-subtitle">Profissional: {{ professional.display_name }}</p>
 </div>
 
 <div class="section-card">

@@ -5,49 +5,21 @@
 <style>
     /* Page Container */
     .calendar-page {
-        padding: 1rem;
+        padding: 0;
         max-width: 100%;
     }
 
-    /* Hero Header */
-    .hero-header {
-        background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
-        color: white;
-        border-radius: 20px;
-        padding: 2rem;
+    /* Page Header */
+    .page-header {
         margin-bottom: 1.5rem;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     }
 
-    .hero-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .hero-title {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .hero-icon {
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-    }
-
-    .hero-title h1 {
-        font-size: 1.75rem;
-        font-weight: 700;
+    .page-title {
+        font-size: 1.875rem;
+        font-weight: 600;
+        color: #1e293b;
         margin: 0;
+    }
     }
 
     /* Live Clock */
@@ -538,20 +510,16 @@ console.log('  Booking {{ booking.id }}: {{ booking.customer_name }} em {{ booki
 {% endfor %}
 </script>
 <div class="calendar-page">
-    <!-- Hero Header -->
-    <div class="hero-header">
-        <div class="hero-content">
-            <div class="hero-title">
-                <div class="hero-icon">
-                    <i class="fas fa-calendar-week"></i>
-                </div>
-                <div>
-                    <h1>Calendário Semanal</h1>
-                    <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Visualização de 24 horas</p>
-                </div>
+    <!-- Page Header -->
+    <div class="page-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-calendar-week"></i> Calendário Semanal
+                </h1>
+                <p class="page-subtitle">Visualização de 24 horas</p>
             </div>
-
-            <!-- Actions -->
+            
             <div style="display: flex; align-items: center; gap: 1rem;">
                 <!-- Relógio em Tempo Real -->
                 <div class="live-clock">

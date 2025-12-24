@@ -10,44 +10,6 @@
         max-width: 100%;
         overflow-x: auto;
     }
-
-    /* Hero Header */
-    .hero-header {
-        background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
-        color: white;
-        border-radius: 20px;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    .hero-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .hero-title {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .hero-icon {
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-    }
-
-    .hero-title h1 {
-        font-size: 1.75rem;
         font-weight: 700;
         margin: 0;
     }
@@ -502,20 +464,17 @@
 
 {% block content %}
 <div class="calendar-day-page">
-    <!-- Hero Header -->
-    <div class="hero-header">
-        <div class="hero-content">
-            <div class="hero-title">
-                <div class="hero-icon">
-                    <i class="fas fa-calendar-day"></i>
-                </div>
-                <div>
-                    <h1>Agenda do Dia</h1>
-                    <div class="date-subtitle">
-                        {{ day_name }}, {{ selected_date|date:"d/m/Y" }}
-                        {% if is_today %}(Hoje){% endif %}
-                    </div>
-                </div>
+    <!-- Page Header -->
+    <div class="page-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-calendar-day"></i> Agenda do Dia
+                </h1>
+                <p class="page-subtitle">
+                    {{ day_name }}, {{ selected_date|date:"d/m/Y" }}
+                    {% if is_today %}<span style="margin-left: 0.5rem; background: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem;">(Hoje)</span>{% endif %}
+                </p>
             </div>
 
             <!-- Actions -->

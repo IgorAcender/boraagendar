@@ -4,50 +4,7 @@
 {% block content %}
 
 <style>
-    /* Hero Header com gradiente moderno */
-    .hero-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 20px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 2rem;
-        flex-wrap: wrap;
-        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .hero-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="1000,100 1000,0 0,100"/></svg>');
-        background-size: cover;
-        z-index: 0;
-    }
-
-    .hero-title {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        position: relative;
-        z-index: 1;
-        flex: 1;
-    }
-
-    .hero-icon {
-        width: 60px;
-        height: 60px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 15px;
-        display: flex;
+    /* Form styling */
         align-items: center;
         justify-content: center;
         font-size: 1.75rem;
@@ -332,17 +289,12 @@
     }
 </style>
 
-<!-- Hero Header -->
-<div class="hero-header animate-fade-in">
-    <div class="hero-title">
-        <div class="hero-icon">
-            <i class="fas fa-user-edit"></i>
-        </div>
-        <div>
-            <h1>Editar Profissional</h1>
-            <p class="hero-subtitle">{{ professional.display_name }}</p>
-        </div>
-    </div>
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-user-edit"></i> Editar Profissional
+    </h1>
+    <p class="page-subtitle">{{ professional.display_name }}</p>
 </div>
 
 <!-- Form Card -->
