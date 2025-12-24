@@ -432,41 +432,41 @@
     .modal-content {
         position: relative;
         background: white;
-        border-radius: 20px;
-        max-width: 600px;
+        border-radius: 12px;
+        max-width: 700px;
         width: 90%;
         max-height: 85vh;
         overflow-y: auto;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
         animation: slideUp 0.3s ease-out;
     }
 
     .modal-header {
-        background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-        color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 20px 20px 0 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: white;
     }
 
     .modal-header h2 {
         margin: 0;
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
         display: flex;
         align-items: center;
         gap: 0.75rem;
     }
 
     .modal-close {
-        background: rgba(255, 255, 255, 0.2);
+        background: transparent;
         border: none;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        color: #64748b;
         font-size: 1.25rem;
         cursor: pointer;
         transition: all 0.2s;
@@ -476,8 +476,8 @@
     }
 
     .modal-close:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: scale(1.1);
+        background: #f1f5f9;
+        color: #1e293b;
     }
 
     .modal-body {

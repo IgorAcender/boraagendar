@@ -135,7 +135,7 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(4px);
         z-index: 2000;
         align-items: center;
@@ -148,20 +148,24 @@
 
     .modal-content {
         background: white;
-        border-radius: 20px;
-        max-width: 500px;
+        border-radius: 12px;
+        max-width: 550px;
         width: 90%;
-        padding: 2rem;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     }
 
     .modal-header {
-        margin-bottom: 1.5rem;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .modal-header h3 {
         margin: 0;
-        font-size: 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
         color: #1e293b;
     }
 
@@ -275,7 +279,11 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modalTitle">Editar Serviço</h3>
+            <button type="button" class="modal-close" onclick="closeEditModal()" style="background: transparent; border: none; font-size: 1.5rem; color: #64748b; cursor: pointer; padding: 0; width: auto; height: auto;">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
+        <div style="padding: 2rem;">
         <form method="post" id="editForm">
             {% csrf_token %}
             <input type="hidden" name="action" value="update_service">
