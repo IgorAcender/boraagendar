@@ -1,84 +1,636 @@
-﻿{% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Painel{% endblock %} - {{ tenant.name }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
         :root {
-            --brand-primary: {{ tenant.color_primary|default:"#667eea" }};
-            --brand-secondary: {{ tenant.color_secondary|default:"#764ba2" }};
+            --brand-primary: {{ tenant.color_primary|default:"#6366f1" }};
+            --brand-secondary: {{ tenant.color_secondary|default:"#4f46e5" }};
+            --sidebar-width: 240px;
+        }
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        /* Submenu animations and toggle */
-        .has-submenu.open .submenu {
-            max-height: 500px;
+        body {
+            background-color: #f8fafc;
         }
 
-        .has-submenu .submenu {
-            transition: max-height 0.3s ease;
+        /* Sidebar Styles - Agende AI Design */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #312e81 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 50;
+            transition: transform 0.3s ease;
         }
 
-        .has-submenu .submenu-arrow {
-            transition: transform 0.3s;
-        }
-
-        .has-submenu.open .submenu-arrow {
-            transform: rotate(180deg);
-        }
-
-        /* Sidebar scrollbar */
-        .sidebar-container::-webkit-scrollbar {
+        .sidebar::-webkit-scrollbar {
             width: 6px;
         }
 
-        .sidebar-container::-webkit-scrollbar-thumb {
+        .sidebar::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
         }
 
-        /* Brand gradient from Django template variables */
-        .logo-container,
-        .profile-avatar,
-        .btn-brand,
-        .nav-link.active {
+        .sidebar-header {
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
         }
 
-        /* Hover effects for brand elements */
+        .brand-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+
+        .brand-slug {
+            font-size: 0.75rem;
+            color: #a5b4fc;
+            margin: 0;
+        }
+
+        /* Navigation */
+        .nav-section {
+            padding: 0.5rem 0;
+        }
+
+        .nav-section-title {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #818cf8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            margin: 2px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 1.25rem;
+            color: #c7d2fe;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            width: 100%;
+            cursor: pointer;
+            text-align: left;
+        }
+
         .nav-link:hover {
-            background: rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
         }
 
         .nav-link.active {
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .nav-link .chevron {
+            margin-left: auto;
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+        }
+
+        .has-submenu.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .has-submenu.open .submenu {
+            max-height: 500px;
+        }
+
+        .submenu-link {
+            display: block;
+            padding: 0.5rem 1.25rem 0.5rem 3rem;
+            color: #a5b4fc;
+            text-decoration: none;
+            font-size: 0.8125rem;
+            transition: all 0.2s;
         }
 
         .submenu-link:hover {
+            color: white;
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Glass card effect */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        /* Main Content Area */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
         }
 
-        .glass-card:hover {
-            transform: translateY(-2px);
+        /* Top Header */
+        .top-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 40;
         }
 
-        /* Modal animations */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #64748b;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .datetime-display {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .datetime-display .time {
+            color: var(--brand-primary);
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-btn {
+            background: none;
+            border: none;
+            font-size: 1.125rem;
+            color: #64748b;
+            cursor: pointer;
+            padding: 0.5rem;
+            position: relative;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 1.5rem 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Data Table Styles */
+        .data-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .data-card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box i {
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.875rem;
+            width: 100%;
+        }
+
+        .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 0.875rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table th.sortable {
+            cursor: pointer;
+        }
+
+        .data-table th.sortable:hover {
+            color: #1e293b;
+        }
+
+        .data-table td {
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+            color: #475569;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .data-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .client-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .client-name {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .client-email {
+            font-size: 0.8125rem;
+            color: #94a3b8;
+        }
+
+        .phone-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .phone-icon {
+            color: #10b981;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .btn-edit:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-delete {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .btn-delete:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* Pagination */
+        .data-card-footer {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .pagination-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            color: #64748b;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .pagination-btn.active {
+            background: var(--brand-primary);
+            border-color: var(--brand-primary);
+            color: white;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 1.5rem;
+        }
+
+        .message {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .message-success {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid #22c55e;
+        }
+
+        .message-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .message-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .top-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .content-area {
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -86,430 +638,349 @@
             }
         }
 
-        .modal-content {
-            animation: slideUp 0.3s ease-out;
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
 
         .modal-close:hover {
-            transform: rotate(90deg);
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 1023px) {
-            .sidebar-container {
-                transform: translateX(-100%);
-            }
-
-            .sidebar-container.open {
-                transform: translateX(0);
-            }
-
-            .sidebar-overlay.show {
-                display: block;
-            }
+        .modal-body {
+            padding: 1.5rem;
         }
 
         {% block extra_head %}{% endblock %}
     </style>
 </head>
-<body class="font-sans bg-gradient-to-br from-slate-50 to-slate-200 min-h-screen overflow-x-hidden">
+<body>
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar-container fixed left-0 top-0 bottom-0 w-72 bg-gradient-to-b from-slate-800 to-slate-950 text-slate-100 overflow-y-auto z-50 shadow-lg transition-all duration-300">
+    <aside id="sidebar" class="sidebar">
         <!-- Header -->
-        <div class="sidebar-header flex items-center justify-between px-4 py-6 border-b border-white/10">
-            <div class="logo-section flex items-center gap-3">
-                <div class="logo-container w-10 h-10 rounded-lg flex items-center justify-center text-2xl font-bold text-white">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="brand-text">
-                    <h2 class="brand-name text-xl font-bold text-white m-0">{{ tenant.name }}</h2>
-                    <p class="brand-subtitle text-xs text-slate-400 m-0">Sistema de Agendamentos</p>
-                </div>
+        <div class="sidebar-header">
+            <div class="logo-icon">A</div>
+            <div>
+                <h1 class="brand-name">{{ tenant.name }}</h1>
+                <p class="brand-slug">{{ tenant.slug }}</p>
             </div>
-
-            <!-- Seção Controle -->
-            <div class="nav-section mb-6">
-                <h3 class="section-title px-6 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fas fa-circle section-indicator text-xs" style="color: var(--brand-primary);"></i>
-                    <span>Controle</span>
-                </h3>
-
-                <ul class="nav-menu list-none p-0">
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-bullseye"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Metas</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-chart-pie"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Relatórios</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-notes-medical"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Anamneses</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <button class="compact-toggle hidden lg:flex items-center justify-center w-8 h-8 bg-white/10 hover:bg-white/20 border-none text-white rounded-lg cursor-pointer transition-all duration-200" title="Recolher menu">
-                <i class="fas fa-chevron-left"></i>
-            </button>
         </div>
 
-        <!-- Navegação -->
-        <nav class="sidebar-nav py-4">
-            <!-- Seção Principal -->
-            <div class="nav-section mb-6">
-                <h3 class="section-title px-6 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fas fa-circle section-indicator text-xs" style="color: var(--brand-primary);"></i>
-                    <span>Principal</span>
-                </h3>
-
-                <ul class="nav-menu list-none p-0">
-                    <li class="nav-item mx-3 my-1">
-                        <a href="{% url 'dashboard:index' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-home"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Dashboard</span>
+        <!-- Navigation -->
+        <nav>
+            <!-- Principal -->
+            <div class="nav-section">
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:index' %}" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>Painel</span>
                         </a>
                     </li>
-
-                    <li class="nav-item mx-3 my-1">
-                        <a href="{% url 'dashboard:calendar' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-calendar"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Calendário</span>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:calendar' %}" class="nav-link">
+                            <i class="fas fa-calendar"></i>
+                            <span>Agenda</span>
                         </a>
                     </li>
-
-                    <li class="nav-item mx-3 my-1">
-                        <a href="{% url 'dashboard:booking_past_list' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-clock-rotate-left"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Agendamentos Passados</span>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:booking_past_list' %}" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>Pacotes</span>
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <!-- Link de Agendamento -->
-            <div class="nav-section mb-6">
-                <h3 class="section-title px-6 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fas fa-circle section-indicator text-xs" style="color: var(--brand-primary);"></i>
-                    <span>Compartilhar</span>
-                </h3>
-
-                <ul class="nav-menu list-none p-0">
-                    <li class="nav-item mx-3 my-1">
-                        <button class="btn-brand nav-link flex items-center gap-3 px-4 py-3 text-white no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none w-full cursor-pointer text-left shadow-lg hover:shadow-xl" onclick="copyBookingLink()" style="background: linear-gradient(135deg, #10b981, #059669);">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/20 rounded-lg text-base">
-                                <i class="fas fa-link"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Link de Agendamento</span>
+            <!-- Cadastro -->
+            <div class="nav-section">
+                <div class="nav-section-title">Cadastro</div>
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    <li class="nav-item has-submenu">
+                        <button class="nav-link submenu-toggle">
+                            <i class="fas fa-users"></i>
+                            <span>Clientes</span>
+                            <i class="fas fa-chevron-down chevron"></i>
                         </button>
+                        <div class="submenu">
+                            <a href="#" class="submenu-link">Lista de Clientes</a>
+                        </div>
                     </li>
-                </ul>
-            </div>
-
-            <!-- Seção Extra (Belasis-like) -->
-            <div class="nav-section mb-6">
-                <h3 class="section-title px-6 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fas fa-circle section-indicator text-xs" style="color: var(--brand-primary);"></i>
-                    <span>Painel</span>
-                </h3>
-
-                <ul class="nav-menu list-none p-0">
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-receipt"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Comandas</span>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:professional_list' %}" class="nav-link">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Profissionais</span>
                         </a>
                     </li>
-
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-box"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Pacotes</span>
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:service_list' %}" class="nav-link">
+                            <i class="fas fa-concierge-bell"></i>
+                            <span>Serviços</span>
                         </a>
                     </li>
-
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-box-open"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Pacotes Predefinidos</span>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-tags"></i>
+                            <span>Categorias</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-box-open"></i>
+                            <span>Produtos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-truck"></i>
+                            <span>Fornecedores</span>
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <!-- Seção Gerenciamento -->
-            <div class="nav-section mb-6">
-                <h3 class="section-title px-6 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fas fa-circle section-indicator text-xs" style="color: var(--brand-primary);"></i>
-                    <span>Gerenciamento</span>
-                </h3>
-
-                <ul class="nav-menu list-none p-0">
-                    <!-- Cadastros -->
-                    <li class="nav-item mx-3 my-1 has-submenu">
-                        <button class="submenu-toggle nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-clipboard-list"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Cadastros</span>
-                            <i class="fas fa-chevron-down submenu-arrow text-xs ml-auto transition-transform duration-300"></i>
+            <!-- Financeiro -->
+            <div class="nav-section">
+                <div class="nav-section-title">Financeiro</div>
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    <li class="nav-item has-submenu">
+                        <button class="nav-link submenu-toggle">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Painel Financeiro</span>
+                            <i class="fas fa-chevron-down chevron"></i>
                         </button>
-
-                        <ul class="submenu list-none p-0 max-h-0 overflow-hidden transition-all duration-300">
-                            <li class="submenu-item ml-4">
-                                <a href="{% url 'dashboard:professional_list' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
-                                    <i class="fas fa-user-tie submenu-icon text-sm"></i>
-                                    <span class="submenu-text">{{ tenant.label_profissional_plural }}</span>
-                                </a>
-                            </li>
-                            <li class="submenu-item ml-4">
-                                <a href="{% url 'dashboard:service_list' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
-                                    <i class="fas fa-concierge-bell submenu-icon text-sm"></i>
-                                    <span class="submenu-text">{{ tenant.label_servico_plural }}</span>
-                                </a>
-                            </li>
-                            <li class="submenu-item ml-4">
-                                <a href="{% url 'dashboard:default_availability' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
-                                    <i class="fas fa-business-time submenu-icon text-sm"></i>
-                                    <span class="submenu-text">Horário Padrão</span>
-                                </a>
-                            </li>
-                        </ul>
+                        <div class="submenu">
+                            <a href="#" class="submenu-link">Resumo</a>
+                        </div>
                     </li>
-
-                    <!-- Meus Horários -->
-                    <li class="nav-item mx-3 my-1">
-                        <a href="{% url 'dashboard:my_schedule' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Meus Horários</span>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span>Transações</span>
                         </a>
                     </li>
-
-                    <!-- Meus Serviços -->
-                    <li class="nav-item mx-3 my-1">
-                        <a href="{% url 'dashboard:my_services' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-briefcase"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Meus {{ tenant.label_servico_plural }} e Preços</span>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cash-register"></i>
+                            <span>Caixa</span>
                         </a>
                     </li>
-
-                    <!-- WhatsApp -->
-                    <li class="nav-item mx-3 my-1">
-                        <a href="{% url 'whatsapp:dashboard' %}" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fab fa-whatsapp"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Gerenciar WhatsApp</span>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-percent"></i>
+                            <span>Comissões</span>
                         </a>
-                    </li>
-
-                    <!-- Perfil -->
-                    <li class="nav-item mx-3 my-1 has-submenu">
-                        <button class="submenu-toggle nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-user-circle"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Meu Perfil</span>
-                            <i class="fas fa-chevron-down submenu-arrow text-xs ml-auto transition-transform duration-300"></i>
-                        </button>
-
-                        <ul class="submenu list-none p-0 max-h-0 overflow-hidden transition-all duration-300">
-                            <li class="submenu-item ml-4">
-                                <a href="{% url 'accounts:profile' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
-                                    <i class="fas fa-edit submenu-icon text-sm"></i>
-                                    <span class="submenu-text">Editar Perfil</span>
-                                </a>
-                            </li>
-                            <li class="submenu-item ml-4">
-                                <a href="{% url 'dashboard:tenant_settings' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
-                                    <i class="fas fa-cog submenu-icon text-sm"></i>
-                                    <span class="submenu-text">Configurações da Empresa</span>
-                                </a>
-                            </li>
-                            <li class="submenu-item ml-4">
-                                <a href="{% url 'dashboard:branding_settings' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
-                                    <i class="fas fa-palette submenu-icon text-sm"></i>
-                                    <span class="submenu-text">Cores e Marca</span>
-                                </a>
-                            </li>
-                            <li class="submenu-item ml-4">
-                                <a href="{% url 'dashboard:booking_policies' %}" class="submenu-link flex items-center gap-3 px-4 py-2 text-slate-400 no-underline rounded-lg transition-all duration-200 text-sm hover:text-slate-100 hover:bg-white/5">
-                                    <i class="fas fa-shield-alt submenu-icon text-sm"></i>
-                                    <span class="submenu-text">Políticas de Agendamento</span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 </ul>
             </div>
 
-            <!-- Seção Financeiro (Belasis-like) -->
-            <div class="nav-section mb-6">
-                <h3 class="section-title px-6 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fas fa-circle section-indicator text-xs" style="color: var(--brand-primary);"></i>
-                    <span>Financeiro</span>
-                </h3>
-
-                <ul class="nav-menu list-none p-0">
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Painel Financeiro</span>
-                        </a>
+            <!-- Controle -->
+            <div class="nav-section">
+                <div class="nav-section-title">Controle</div>
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    <li class="nav-item has-submenu">
+                        <button class="nav-link submenu-toggle">
+                            <i class="fas fa-cog"></i>
+                            <span>Controle</span>
+                            <i class="fas fa-chevron-down chevron"></i>
+                        </button>
+                        <div class="submenu">
+                            <a href="{% url 'dashboard:default_availability' %}" class="submenu-link">Horário Padrão</a>
+                            <a href="{% url 'dashboard:my_schedule' %}" class="submenu-link">Meus Horários</a>
+                            <a href="{% url 'dashboard:my_services' %}" class="submenu-link">Meus Serviços</a>
+                        </div>
                     </li>
+                </ul>
+            </div>
 
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-exchange-alt"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Transações</span>
-                        </a>
+            <!-- Marketing -->
+            <div class="nav-section">
+                <div class="nav-section-title">Marketing</div>
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    <li class="nav-item has-submenu">
+                        <button class="nav-link submenu-toggle">
+                            <i class="fas fa-bullhorn"></i>
+                            <span>Marketing</span>
+                            <i class="fas fa-chevron-down chevron"></i>
+                        </button>
+                        <div class="submenu">
+                            <a href="{% url 'whatsapp:dashboard' %}" class="submenu-link">WhatsApp</a>
+                        </div>
                     </li>
+                </ul>
+            </div>
 
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-file-invoice-dollar"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Notas Fiscais</span>
-                        </a>
+            <!-- Configurações -->
+            <div class="nav-section">
+                <div class="nav-section-title">Configurações</div>
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    <li class="nav-item has-submenu">
+                        <button class="nav-link submenu-toggle">
+                            <i class="fas fa-sliders-h"></i>
+                            <span>Configurações</span>
+                            <i class="fas fa-chevron-down chevron"></i>
+                        </button>
+                        <div class="submenu">
+                            <a href="{% url 'dashboard:tenant_settings' %}" class="submenu-link">Empresa</a>
+                            <a href="{% url 'dashboard:branding_settings' %}" class="submenu-link">Cores e Marca</a>
+                            <a href="{% url 'dashboard:booking_policies' %}" class="submenu-link">Políticas</a>
+                            <a href="{% url 'accounts:profile' %}" class="submenu-link">Meu Perfil</a>
+                        </div>
                     </li>
-
-                    <li class="nav-item mx-3 my-1">
-                        <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-300 no-underline rounded-xl transition-all duration-200 text-sm font-medium border-none bg-transparent w-full cursor-pointer text-left hover:text-white hover:bg-white/10">
-                            <div class="nav-icon w-9 h-9 flex items-center justify-center bg-white/5 rounded-lg text-base">
-                                <i class="fas fa-wallet"></i>
-                            </div>
-                            <span class="nav-text flex-1 font-medium">Caixa</span>
-                        </a>
+                    <li class="nav-item">
+                        <form action="{% url 'accounts:logout' %}" method="post" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link" style="width: 100%;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Sair</span>
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
         </nav>
-
-        <!-- Perfil do Usuário -->
-        <div class="user-profile px-4 py-4 border-t border-white/10 mt-auto">
-            <div class="profile-content flex items-center gap-3 bg-white/5 px-3 py-3 rounded-xl">
-                <div class="profile-avatar w-10 h-10 rounded-full flex items-center justify-center font-bold text-white relative">
-                    {{ user.full_name|first|upper }}
-                    <div class="online-indicator absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full"></div>
-                </div>
-
-                <div class="profile-info flex-1 min-w-0">
-                    <h4 class="profile-name text-sm font-semibold text-white m-0 truncate">{{ user.full_name }}</h4>
-                    <p class="profile-email text-xs text-slate-500 m-0 truncate">{{ user.email }}</p>
-                </div>
-
-                <div class="profile-actions flex gap-1">
-                    <a href="{% url 'accounts:profile' %}" class="profile-action w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border-none rounded-lg text-slate-300 cursor-pointer transition-all duration-200" title="Editar Perfil">
-                        <i class="fas fa-user-edit"></i>
-                    </a>
-                    <form action="{% url 'accounts:logout' %}" method="post" class="logout-form inline">
-                        {% csrf_token %}
-                        <button type="submit" class="profile-action w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 border-none rounded-lg text-slate-300 cursor-pointer transition-all duration-200" title="Sair">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
     </aside>
 
-    <!-- Seção Cadastros Rápidos (Belasis-like) no topo do conteúdo para acesso rápido (opcional) -->
-    <!-- Pode ser removido se preferir manter só no sidebar -->
-
-    <!-- Overlay para Mobile -->
-    <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden"></div>
-
-    <!-- Botão Mobile -->
-    <button id="mobile-toggle" class="mobile-toggle hidden lg:flex fixed bottom-6 right-6 w-14 h-14 rounded-full text-white text-xl shadow-lg z-40 transition-all duration-300 hover:scale-110" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
-        <div class="hamburger flex flex-col gap-1">
-            <span class="block w-6 h-0.5 bg-white rounded-sm"></span>
-            <span class="block w-6 h-0.5 bg-white rounded-sm"></span>
-            <span class="block w-6 h-0.5 bg-white rounded-sm"></span>
-        </div>
-    </button>
-
     <!-- Main Content -->
-    <div class="main-content ml-72 lg:ml-72 min-h-screen flex flex-col transition-all duration-300">
-        <div class="content-wrapper flex-1 px-8 py-8 lg:px-8 lg:py-8 sm:px-4 sm:py-4">
+    <div class="main-wrapper">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="datetime-display">
+                    <span id="current-datetime"></span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="user-menu">
+                    <div class="user-avatar">{{ user.full_name|first|upper }}</div>
+                    <span class="user-name">{{ user.full_name }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="content-area">
             {% if messages %}
-            <ul class="messages list-none mb-6">
+            <div class="messages">
                 {% for message in messages %}
-                    <li class="px-5 py-4 rounded-xl mb-3 bg-emerald-500/10 border-l-4 border-emerald-500 text-emerald-900 font-medium">{{ message }}</li>
+                    <div class="message message-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                        {{ message }}
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
             {% endif %}
 
             {% block content %}{% endblock %}
-        </div>
+        </main>
     </div>
 
     <!-- Modal Global para Novo Agendamento -->
-    <div id="newBookingModal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden" style="display: none;">
-        <div class="modal-overlay absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer" onclick="closeNewBookingModal()"></div>
-        <div class="modal-content relative bg-white rounded-2xl w-11/12 max-w-2xl max-h-screen lg:max-h-90vh overflow-hidden shadow-2xl flex flex-col" style="animation: slideUp 0.3s ease-out;">
-            <div class="modal-header px-8 py-6 border-b border-gray-200 flex justify-between items-center" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary)); color: white;">
-                <h2 class="text-xl font-semibold flex items-center gap-2 m-0"><i class="fas fa-plus-circle"></i> Novo Agendamento</h2>
-                <button class="modal-close w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 border-none cursor-pointer flex items-center justify-center text-xl text-white transition-all duration-200" onclick="closeNewBookingModal()">
+    <div id="newBookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-plus-circle"></i> Novo Agendamento</h2>
+                <button class="modal-close" onclick="closeNewBookingModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-body px-8 py-8 overflow-y-auto flex-1" id="newBookingModalBody">
-                <div class="text-center py-12">
-                    <i class="fas fa-spinner fa-spin text-2xl" style="color: var(--brand-primary);"></i>
-                    <p class="mt-4 text-slate-500">Carregando...</p>
+            <div class="modal-body" id="newBookingModalBody">
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
+                    <p style="margin-top: 1rem; color: #64748b;">Carregando...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript -->
     {% block extra_js %}{% endblock %}
 
     <script>
-        // Copiar link de agendamento
+        // Update datetime
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const date = now.toLocaleDateString('pt-BR', options);
+            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('current-datetime').innerHTML = `${date} <span class="time">${time}</span>`;
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Submenu toggle
+        document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const parent = this.closest('.has-submenu');
+                document.querySelectorAll('.has-submenu.open').forEach(item => {
+                    if (item !== parent) item.classList.remove('open');
+                });
+                parent.classList.toggle('open');
+            });
+        });
+
+        // Mark active menu item
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link, .submenu-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+                const parent = link.closest('.has-submenu');
+                if (parent) parent.classList.add('open');
+            }
+        });
+
+        // Copy booking link
         function copyBookingLink() {
             const link = window.location.origin + '/agendar/{{ tenant.slug }}/';
-
-            // Copiar para clipboard
             navigator.clipboard.writeText(link).then(function() {
                 showNotification('Link copiado!', link, 'success');
-            }).catch(function(err) {
-                // Fallback para navegadores antigos
+            }).catch(function() {
                 const textarea = document.createElement('textarea');
                 textarea.value = link;
                 document.body.appendChild(textarea);
@@ -520,7 +991,7 @@
             });
         }
 
-        // Mostrar notificação
+        // Show notification
         function showNotification(title, message, type) {
             const notification = document.createElement('div');
             notification.style.cssText = `
@@ -528,345 +999,76 @@
                 top: 20px;
                 right: 20px;
                 max-width: 400px;
-                padding: 1.25rem 1.5rem;
-                background: ${type === 'success' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #667eea, #764ba2)'};
+                padding: 1rem 1.5rem;
+                background: ${type === 'success' ? '#10b981' : '#6366f1'};
                 color: white;
-                border-radius: 16px;
+                border-radius: 12px;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
                 z-index: 10000;
-                animation: slideInRight 0.3s ease-out;
+                animation: slideIn 0.3s ease-out;
             `;
             notification.innerHTML = `
-                <div style="display: flex; align-items: start; gap: 1rem;">
-                    <div style="font-size: 1.5rem;">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem;">${title}</div>
-                        <div style="font-size: 0.875rem; opacity: 0.95; word-break: break-all;">${message}</div>
+                <div style="display: flex; align-items: start; gap: 0.75rem;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}" style="font-size: 1.25rem;"></i>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">${title}</div>
+                        <div style="font-size: 0.875rem; opacity: 0.9;">${message}</div>
                     </div>
                 </div>
             `;
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
             document.body.appendChild(notification);
 
             setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                notification.style.transform = 'translateX(100%)';
+                notification.style.opacity = '0';
+                notification.style.transition = 'all 0.3s ease';
                 setTimeout(() => notification.remove(), 300);
             }, 4000);
         }
 
-        // Adicionar animações
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(400px); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOutRight {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(400px); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // ========== MODAL DE NOVO AGENDAMENTO (GLOBAL) ==========
-        console.log('DEBUG: Script base_dashboard.html carregado - função openNewBookingModal será definida');
-
+        // Modal functions
         function openNewBookingModal() {
-            console.log('DEBUG: openNewBookingModal() chamado');
             const modal = document.getElementById('newBookingModal');
             const modalBody = document.getElementById('newBookingModalBody');
-
-            if (!modal) {
-                console.error('ERRO: Modal #newBookingModal não encontrado');
-                alert('Erro: Modal não encontrado. Verifique o console.');
-                return;
-            }
-
-            if (!modalBody) {
-                console.error('ERRO: Modal body #newBookingModalBody não encontrado');
-                alert('Erro: Modal body não encontrado. Verifique o console.');
-                return;
-            }
-
-            console.log('DEBUG: Abrindo modal...');
-            modal.style.display = 'flex';
+            modal.classList.add('active');
             document.body.style.overflow = 'hidden';
 
-            modalBody.innerHTML = '<div style="text-align: center; padding: 3rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i><p style="margin-top: 1rem; color: #64748b;">Carregando formulário...</p></div>';
+            modalBody.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i><p style="margin-top: 1rem; color: #64748b;">Carregando...</p></div>';
 
-            const url = '{% url "dashboard:booking_create" %}';
-            console.log('DEBUG: Fazendo fetch para:', url);
-
-            fetch(url, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+            fetch('{% url "dashboard:booking_create" %}', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const form = doc.querySelector('form') || doc.querySelector('.card');
+                if (form) {
+                    modalBody.innerHTML = form.outerHTML;
                 }
             })
-                .then(response => {
-                    console.log('DEBUG: Resposta recebida:', response.status, response.statusText);
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    return response.text();
-                })
-                .then(html => {
-                    console.log('DEBUG: HTML recebido, tamanho:', html.length);
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-
-                    // Buscar o card que contém o formulário
-                    const card = doc.querySelector('.card, .booking-form-card');
-                    const form = doc.querySelector('form');
-
-                    console.log('DEBUG: Card encontrado?', !!card);
-                    console.log('DEBUG: Form encontrado?', !!form);
-
-                    if (card) {
-                        console.log('DEBUG: Usando conteúdo do card');
-                        modalBody.innerHTML = card.outerHTML;
-                        
-                        // Executar scripts que podem estar no conteúdo
-                        const scripts = modalBody.querySelectorAll('script');
-                        scripts.forEach(script => {
-                            const newScript = document.createElement('script');
-                            newScript.textContent = script.textContent;
-                            document.head.appendChild(newScript);
-                            document.head.removeChild(newScript);
-                        });
-                        
-                        // Forçar esconder header do modal
-                        setTimeout(() => {
-                            const modalHeader = document.querySelector('#newBookingModal .modal-header');
-                            if (modalHeader) {
-                                modalHeader.style.display = 'none';
-                            }
-                        }, 50);
-
-                        if (typeof window.initializeDashboardBookingModal === 'function') {
-                            window.initializeDashboardBookingModal(modalBody);
-                        }
-                    } else if (form) {
-                        console.log('DEBUG: Usando form diretamente');
-                        modalBody.innerHTML = form.outerHTML;
-                        if (typeof window.initializeDashboardBookingModal === 'function') {
-                            window.initializeDashboardBookingModal(modalBody);
-                        }
-                    } else {
-                        console.error('ERRO: Nem card nem form encontrado no HTML');
-                        modalBody.innerHTML = `
-                            <div style="padding: 2rem; text-align: center;">
-                                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
-                                <h3 style="color: #ef4444; margin-bottom: 1rem;">Formulário não encontrado</h3>
-                                <p style="color: #64748b;">O formulário de agendamento não pôde ser carregado.</p>
-                                <button onclick="closeNewBookingModal()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                                    Fechar
-                                </button>
-                            </div>
-                        `;
-                        return;
-                    }
-
-                    // Attach form submit handler
-                    const formInModal = modalBody.querySelector('form');
-                    if (!formInModal) {
-                        console.error('ERRO: Form não encontrado após inserir no modal');
-                        return;
-                    }
-
-                    formInModal.addEventListener('submit', function handleSubmit(e) {
-                        e.preventDefault();
-                        console.log('DEBUG: Form submit interceptado');
-
-                        const formData = new FormData(formInModal);
-                        const formActionAttr = formInModal.getAttribute('action');
-                        const submitUrl = formActionAttr ? new URL(formActionAttr, window.location.href).href : url;
-                        console.log('DEBUG: Enviando para:', submitUrl);
-
-                        // Mostrar loading
-                        const submitBtn = formInModal.querySelector('button[type="submit"]');
-                        if (submitBtn) {
-                            submitBtn.disabled = true;
-                            submitBtn.dataset.originalLabel = submitBtn.innerHTML;
-                            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-                        }
-
-                        // Se o submitUrl for o mesmo do GET sem termo "novo", significa que a URL está errada
-                        if (!submitUrl.includes('/agendamentos/novo')) {
-                            console.warn('DEBUG: Corrigindo action do formulário para apontar para /agendamentos/novo/');
-                            formInModal.setAttribute('action', url);
-                        }
-
-                        const renderFormFromHtml = (html) => {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(html, 'text/html');
-                            const card = doc.querySelector('.card, .booking-form-card');
-                            const formElement = doc.querySelector('form');
-
-                            if (card) {
-                                modalBody.innerHTML = card.innerHTML;
-                            } else if (formElement) {
-                                modalBody.innerHTML = formElement.outerHTML;
-                            } else {
-                                modalBody.innerHTML = html;
-                            }
-
-                            if (typeof window.initializeDashboardBookingModal === 'function') {
-                                window.initializeDashboardBookingModal(modalBody);
-                            }
-
-                            const rehydratedForm = modalBody.querySelector('form');
-                            if (rehydratedForm) {
-                                rehydratedForm.addEventListener('submit', handleSubmit);
-                            }
-                        };
-
-                        fetch(submitUrl, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json, text/html;q=0.9'
-                            },
-                            credentials: 'same-origin'
-                        })
-                        .then(async response => {
-                            console.log('DEBUG: Resposta do submit:', response.status);
-                            const contentType = response.headers.get('Content-Type') || '';
-
-                            if (response.ok && contentType.includes('application/json')) {
-                                const data = await response.json();
-                                console.log('DEBUG: JSON recebido:', data);
-                                if (data && data.success) {
-                                    showNotification('Sucesso!', 'Agendamento criado com sucesso', 'success');
-                                    setTimeout(() => window.location.reload(), 1000);
-                                    return;
-                                }
-
-                                console.warn('DEBUG: JSON sem sucesso esperado:', data);
-                                showNotification('Erro', 'Resposta inesperada do servidor ao salvar o agendamento.', 'error');
-                                if (submitBtn) {
-                                    submitBtn.disabled = false;
-                                    submitBtn.innerHTML = submitBtn.dataset.originalLabel || '<i class="fas fa-save"></i> Salvar Agendamento';
-                                }
-                                return;
-                            }
-
-                            const responseText = await response.text();
-
-                            if (!response.ok) {
-                                console.log('DEBUG: Erro no submit, recarregando form com erros');
-                                console.log('DEBUG: HTML de erro retornado:', responseText.substring(0, 500));
-                                renderFormFromHtml(responseText);
-                                return;
-                            }
-
-                            console.warn('DEBUG: Resposta OK porém não JSON. Tentando interpretar como HTML.');
-                            if (responseText.includes('<form')) {
-                                renderFormFromHtml(responseText);
-                            } else {
-                                showNotification('Erro', 'Não foi possível interpretar a resposta do servidor.', 'error');
-                                if (submitBtn) {
-                                    submitBtn.disabled = false;
-                                    submitBtn.innerHTML = submitBtn.dataset.originalLabel || '<i class="fas fa-save"></i> Salvar Agendamento';
-                                }
-                            }
-                        })
-                        .catch(error => {
-                            console.error('ERRO no submit do form:', error);
-                            showNotification('Erro', 'Erro ao criar agendamento: ' + error.message, 'error');
-                            if (submitBtn) {
-                                submitBtn.disabled = false;
-                                submitBtn.innerHTML = submitBtn.dataset.originalLabel || '<i class="fas fa-save"></i> Salvar Agendamento';
-                            }
-                        });
-                    });
-                })
-                .catch(error => {
-                    console.error('ERRO ao carregar form:', error);
-                    modalBody.innerHTML = `
-                        <div style="padding: 2rem; text-align: center;">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
-                            <h3 style="color: #ef4444; margin-bottom: 1rem;">Erro ao carregar formulário</h3>
-                            <p style="color: #64748b; margin-bottom: 0.5rem;">${error.message}</p>
-                            <p style="color: #94a3b8; font-size: 0.875rem;">Verifique o console para mais detalhes.</p>
-                            <button onclick="closeNewBookingModal()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                                Fechar
-                            </button>
-                        </div>
-                    `;
-                });
+            .catch(error => {
+                modalBody.innerHTML = `<div style="text-align: center; padding: 2rem; color: #ef4444;">Erro ao carregar formulário</div>`;
+            });
         }
 
         function closeNewBookingModal() {
-            console.log('DEBUG: closeNewBookingModal() chamado');
             const modal = document.getElementById('newBookingModal');
-            if (modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-            }
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
         }
 
-        // Fechar modal com ESC
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeNewBookingModal();
-            }
-        });
-
-        // Confirmar que função está disponível globalmente
-        console.log('DEBUG: Função openNewBookingModal está disponível?', typeof openNewBookingModal === 'function');
-        console.log('DEBUG: Função closeNewBookingModal está disponível?', typeof closeNewBookingModal === 'function');
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            const mobileToggle = document.getElementById('mobile-toggle');
-            const submenuToggles = document.querySelectorAll('.submenu-toggle');
-
-            // Mobile toggle
-            mobileToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('open');
-                overlay.classList.toggle('show');
-            });
-
-            // Overlay click
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('show');
-            });
-
-            // Submenu toggles
-            submenuToggles.forEach(toggle => {
-                toggle.addEventListener('click', function() {
-                    const parent = this.closest('.has-submenu');
-                    const wasOpen = parent.classList.contains('open');
-
-                    // Fechar outros submenus
-                    document.querySelectorAll('.has-submenu.open').forEach(item => {
-                        if (item !== parent) {
-                            item.classList.remove('open');
-                        }
-                    });
-
-                    // Toggle atual
-                    parent.classList.toggle('open');
-                });
-            });
-
-            // Marcar menu ativo baseado na URL
-            const currentPath = window.location.pathname;
-            document.querySelectorAll('.nav-link, .submenu-link').forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-
-                    // Se for submenu, abrir o pai
-                    const parent = link.closest('.has-submenu');
-                    if (parent) {
-                        parent.classList.add('open');
-                    }
-                }
-            });
+            if (e.key === 'Escape') closeNewBookingModal();
         });
     </script>
 </body>
