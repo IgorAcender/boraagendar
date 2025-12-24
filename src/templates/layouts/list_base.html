@@ -1,0 +1,140 @@
+{% extends "base_dashboard.html" %}
+
+{# 
+    Template padrão para páginas de listagem com tabela
+    Use este template como base para: Clientes, Serviços, Profissionais, etc
+    
+    Variáveis esperadas:
+    - page_title: str (ex: "Serviços")
+    - page_icon: str (ex: "fa-concierge-bell")
+    - btn_label: str (ex: "Novo Serviço")
+    - btn_action: str (ex: "openNewServiceModal")
+    - search_placeholder: str
+    - table_headers: list (ex: ["Serviço", "Categoria", "Duração", "Preço", "Status", "Ações"])
+    - table_rows: list of dicts (dados da tabela)
+    - total_count: int (total de registros)
+    - current_page: int
+#}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas {{ page_icon }}"></i>
+            {{ page_title }}
+        </h1>
+    </div>
+    <button class="btn-primary" onclick="{{ btn_action }}(); return false;">
+        <i class="fas fa-plus"></i>
+        {{ btn_label }}
+    </button>
+</div>
+
+<div class="data-card">
+    <!-- Card Header com Busca -->
+    <div class="data-card-header">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="{{ search_placeholder }}" id="searchInput">
+        </div>
+        <button class="btn-outline" onclick="location.reload()">
+            <i class="fas fa-sync-alt"></i>
+            Atualizar
+        </button>
+    </div>
+
+    <!-- Tabela -->
+    <table class="data-table">
+        <thead>
+            <tr>
+                {% for header in table_headers %}
+                    <th class="{% if header != 'Ações' %}sortable{% endif %}">
+                        {{ header }}
+                        {% if header != 'Ações' %}<i class="fas fa-sort" style="font-size: 0.7rem; margin-left: 0.25rem;"></i>{% endif %}
+                    </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table_rows %}
+            <tr data-row-id="{{ row.id }}">
+                {% for cell in row.cells %}
+                    <td>
+                        {% if cell.type == 'text' %}
+                            {{ cell.value }}
+                        {% elif cell.type == 'info' %}
+                            <div class="client-info">
+                                <span class="client-name">{{ cell.primary }}</span>
+                                <span class="client-email">{{ cell.secondary }}</span>
+                            </div>
+                        {% elif cell.type == 'badge' %}
+                            <span class="status-badge status-{{ cell.value|lower }}">{{ cell.label }}</span>
+                        {% elif cell.type == 'money' %}
+                            <span style="color: #10b981; font-weight: 500;">{{ cell.value }}</span>
+                        {% elif cell.type == 'actions' %}
+                            <div class="action-buttons">
+                                {% if cell.edit_url %}
+                                    <a href="{{ cell.edit_url }}" class="btn-action btn-edit" title="Editar">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                {% endif %}
+                                {% if cell.delete_url %}
+                                    <button class="btn-action btn-delete" title="Excluir" onclick="confirmDelete('{{ cell.delete_url }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="100%" style="text-align: center; padding: 2rem; color: #94a3b8;">
+                    <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                    Nenhum registro encontrado
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Card Footer com Paginação -->
+    <div class="data-card-footer">
+        <div class="pagination-info">
+            Total: <strong>{{ total_count }}</strong> registros
+        </div>
+        <div class="pagination">
+            <button class="pagination-btn" {% if current_page == 1 %}disabled{% endif %}>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="pagination-btn active">{{ current_page }}</button>
+            <button class="pagination-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Filtro de busca simples
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.data-table tbody tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Confirmação de exclusão
+    function confirmDelete(url) {
+        if (confirm('Tem certeza que deseja excluir este registro?')) {
+            window.location.href = url;
+        }
+    }
+</script>
+
+{% block extra_js %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,286 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Serviços{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-concierge-bell"></i>
+            Serviços
+        </h1>
+    </div>
+    <button class="btn-primary" onclick="openNewServiceModal(); return false;">
+        <i class="fas fa-plus"></i>
+        Novo Serviço
+    </button>
+</div>
+
+<div class="data-card">
+    <!-- Card Header com Busca -->
+    <div class="data-card-header">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar por nome..." id="searchInput">
+        </div>
+        <button class="btn-outline" onclick="location.reload()">
+            <i class="fas fa-sync-alt"></i>
+            Atualizar
+        </button>
+    </div>
+
+    <!-- Tabela -->
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="sortable">
+                    Serviço
+                    <i class="fas fa-sort" style="font-size: 0.7rem; margin-left: 0.25rem;"></i>
+                </th>
+                <th>Categoria</th>
+                <th>Duração</th>
+                <th>Preço</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for service in services %}
+            <tr data-row-id="{{ service.id }}">
+                <td>
+                    <div class="service-info" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-concierge-bell" style="color: #6366f1; font-size: 1.25rem;"></i>
+                        <span style="font-weight: 500; color: #1e293b;">{{ service.name }}</span>
+                    </div>
+                </td>
+                <td>{{ service.category|default:"Sem categoria" }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-clock" style="color: #64748b;"></i>
+                        {{ service.duration }}min
+                    </div>
+                </td>
+                <td>
+                    <span style="color: #10b981; font-weight: 500;">R$ {{ service.price }}</span>
+                </td>
+                <td>
+                    {% if service.is_active %}
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked class="toggle-switch" data-id="{{ service.id }}">
+                            <span style="font-size: 0.75rem; color: #64748b;">Ativo</span>
+                        </div>
+                    {% else %}
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" class="toggle-switch" data-id="{{ service.id }}">
+                            <span style="font-size: 0.75rem; color: #64748b;">Inativo</span>
+                        </div>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" title="Editar" onclick="editService({{ service.id }})">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <button class="btn-action btn-delete" title="Excluir" onclick="confirmDelete({{ service.id }})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <!-- Dados de exemplo -->
+            <tr>
+                <td>
+                    <div class="service-info" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-concierge-bell" style="color: #6366f1; font-size: 1.25rem;"></i>
+                        <span style="font-weight: 500; color: #1e293b;">Barba Completa</span>
+                    </div>
+                </td>
+                <td>Sem categoria</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-clock" style="color: #64748b;"></i>
+                        30min
+                    </div>
+                </td>
+                <td><span style="color: #10b981; font-weight: 500;">R$ 0,35</span></td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" checked class="toggle-switch">
+                        <span style="font-size: 0.75rem; color: #64748b;">Ativo</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="service-info" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-concierge-bell" style="color: #6366f1; font-size: 1.25rem;"></i>
+                        <span style="font-weight: 500; color: #1e293b;">Barba Desenho</span>
+                    </div>
+                </td>
+                <td>Sem categoria</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-clock" style="color: #64748b;"></i>
+                        40min
+                    </div>
+                </td>
+                <td><span style="color: #10b981; font-weight: 500;">R$ 0,45</span></td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" class="toggle-switch">
+                        <span style="font-size: 0.75rem; color: #64748b;">Inativo</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="service-info" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-concierge-bell" style="color: #6366f1; font-size: 1.25rem;"></i>
+                        <span style="font-weight: 500; color: #1e293b;">Corte + Barba</span>
+                    </div>
+                </td>
+                <td>Sem categoria</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-clock" style="color: #64748b;"></i>
+                        45min
+                    </div>
+                </td>
+                <td><span style="color: #10b981; font-weight: 500;">R$ 0,70</span></td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" checked class="toggle-switch">
+                        <span style="font-size: 0.75rem; color: #64748b;">Ativo</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="service-info" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-concierge-bell" style="color: #6366f1; font-size: 1.25rem;"></i>
+                        <span style="font-weight: 500; color: #1e293b;">Corte Masculino</span>
+                    </div>
+                </td>
+                <td>Sem categoria</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-clock" style="color: #64748b;"></i>
+                        30min
+                    </div>
+                </td>
+                <td><span style="color: #10b981; font-weight: 500;">R$ 0,45</span></td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" checked class="toggle-switch">
+                        <span style="font-size: 0.75rem; color: #64748b;">Ativo</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-action btn-edit" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Card Footer com Paginação -->
+    <div class="data-card-footer">
+        <div class="pagination-info">
+            Total: <strong>{% if services %}{{ services|length }}{% else %}4{% endif %}</strong> serviços
+        </div>
+        <div class="pagination">
+            <button class="pagination-btn" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .toggle-switch {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 40px;
+        height: 24px;
+        background: #e2e8f0;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        position: relative;
+        transition: background 0.3s;
+    }
+
+    .toggle-switch:checked {
+        background: #10b981;
+    }
+
+    .toggle-switch:before {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: white;
+        top: 2px;
+        left: 2px;
+        transition: left 0.3s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .toggle-switch:checked:before {
+        left: 18px;
+    }
+</style>
+
+<script>
+    // Filtro de busca
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.data-table tbody tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    function openNewServiceModal() {
+        alert('Modal para novo serviço');
+    }
+
+    function editService(id) {
+        alert('Editar serviço ID: ' + id);
+    }
+
+    function confirmDelete(id) {
+        if (confirm('Tem certeza que deseja excluir este serviço?')) {
+            alert('Excluir serviço ID: ' + id);
+        }
+    }
+</script>
+{% endblock %}
