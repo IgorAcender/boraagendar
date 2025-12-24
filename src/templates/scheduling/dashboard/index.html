@@ -11,18 +11,18 @@
 
     .page-title {
         font-size: 1.875rem;
-        font-weight: 600;
-        color: #1e293b;
+        font-weight: 700;
+        color: #111827;
         margin: 0 0 0.5rem 0;
     }
 
     .page-subtitle {
-        font-size: 1rem;
-        color: #64748b;
+        font-size: 0.875rem;
+        color: #6b7280;
         margin: 0;
     }
 
-    /* Stats Grid */
+    /* Stats Grid - Design Clean Institucional */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -31,15 +31,13 @@
     }
 
     .stat-card {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(15px);
-        border-radius: 16px;
-        padding: 1.75rem;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.5rem;
         position: relative;
         overflow: hidden;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        transition: all 0.2s ease;
     }
 
     .stat-card::before {
@@ -48,28 +46,24 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 4px;
+        height: 3px;
     }
 
     .stat-card.primary::before {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--brand-primary);
     }
 
     .stat-card.success::before {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        background: #10b981;
     }
 
     .stat-card.warning::before {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background: #f59e0b;
     }
 
     .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(31, 38, 135, 0.15);
-    }
-
-    .stat-card:hover .stat-icon {
-        transform: scale(1.1) rotate(5deg);
+        border-color: #d1d5db;
+        background: #fafbfc;
     }
 
     .stat-content {
@@ -79,68 +73,67 @@
     }
 
     .stat-info .stat-label {
-        font-size: 0.875rem;
-        color: #64748b;
-        font-weight: 500;
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 600;
         margin-bottom: 0.5rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.05em;
     }
 
     .stat-info .stat-value {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 700;
-        color: #1e293b;
+        color: #111827;
         line-height: 1;
     }
 
     .stat-icon {
-        width: 70px;
-        height: 70px;
-        border-radius: 14px;
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.75rem;
-        transition: all 0.3s ease;
+        font-size: 1.5rem;
+        background: #f3f4f6;
     }
 
     .stat-card.primary .stat-icon {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-        color: #667eea;
+        background: #f0fdf4;
+        color: var(--brand-primary);
     }
 
     .stat-card.success .stat-icon {
-        background: linear-gradient(135deg, rgba(17, 153, 142, 0.1), rgba(56, 239, 125, 0.1));
+        background: #f0fdf4;
         color: #10b981;
     }
 
     .stat-card.warning .stat-icon {
-        background: linear-gradient(135deg, rgba(240, 147, 251, 0.1), rgba(245, 87, 108, 0.1));
+        background: #fffbeb;
         color: #f59e0b;
     }
 
     /* Table Container */
     .table-container {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(15px);
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
         overflow: hidden;
         margin-bottom: 2rem;
     }
 
     .table-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1.5rem 2rem;
-        color: white;
+        background: white;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
     }
 
     .table-header h2 {
         margin: 0;
-        font-size: 1.5rem;
+        font-size: 1.125rem;
         font-weight: 600;
+        color: #111827;
         display: flex;
         align-items: center;
         gap: 0.75rem;
@@ -148,19 +141,18 @@
 
     /* Tabs */
     .tabs-container {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(15px);
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
         overflow: hidden;
         margin-bottom: 2rem;
     }
 
     .tabs-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1.5rem 2rem;
-        color: white;
+        background: white;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        color: #111827;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -170,8 +162,9 @@
 
     .tabs-header h2 {
         margin: 0;
-        font-size: 1.5rem;
+        font-size: 1.125rem;
         font-weight: 600;
+        color: #111827;
         display: flex;
         align-items: center;
         gap: 0.75rem;
@@ -190,36 +183,36 @@
     }
 
     .filter-group label {
-        color: white;
+        color: #6b7280;
         font-weight: 500;
         font-size: 0.875rem;
     }
 
     .filter-group select {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
+        padding: 0.625rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        background: white;
+        color: #111827;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s;
     }
 
     .filter-group select:hover {
-        background: rgba(255, 255, 255, 0.3);
+        border-color: #d1d5db;
     }
 
     .filter-group select option {
-        background: #667eea;
-        color: white;
+        background: white;
+        color: #111827;
     }
 
     .tabs-nav {
         display: flex;
-        border-bottom: 2px solid #e2e8f0;
+        border-bottom: 1px solid #e5e7eb;
         background: white;
-        padding: 0 2rem;
+        padding: 0;
         gap: 0;
     }
 
@@ -227,30 +220,31 @@
         padding: 1rem 1.5rem;
         border: none;
         background: none;
-        color: #64748b;
-        font-weight: 600;
-        font-size: 0.95rem;
+        color: #6b7280;
+        font-weight: 500;
+        font-size: 0.875rem;
         cursor: pointer;
         position: relative;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
 
     .tab-button:hover {
-        color: #667eea;
+        color: #111827;
+        background: #f9fafb;
     }
 
     .tab-button.active {
-        color: #667eea;
+        color: var(--brand-primary);
     }
 
     .tab-button.active::after {
         content: '';
         position: absolute;
-        bottom: -2px;
+        bottom: -1px;
         left: 0;
         right: 0;
         height: 2px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--brand-primary);
     }
 
     .tab-content {
