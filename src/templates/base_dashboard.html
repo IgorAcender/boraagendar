@@ -938,10 +938,12 @@
                 </button>
             </div>
             <div class="modal-body" id="newBookingModalBody">
-                <div style="text-align: center; padding: 2rem;">
+                <!-- Placeholder para carregamento dinâmico -->
+                <div id="booking-loading" style="text-align: center; padding: 2rem;">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i>
                     <p style="margin-top: 1rem; color: #64748b;">Carregando...</p>
                 </div>
+                <div id="booking-form-container" style="display: none;"></div>
             </div>
         </div>
     </div>
@@ -1057,65 +1059,94 @@
         // Modal functions
         function openNewBookingModal() {
             const modal = document.getElementById('newBookingModal');
-            const modalBody = document.getElementById('newBookingModalBody');
+            const loading = document.getElementById('booking-loading');
+            const formContainer = document.getElementById('booking-form-container');
+            
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Mostrar loading
+            loading.style.display = 'block';
+            formContainer.style.display = 'none';
+            formContainer.innerHTML = '';
 
-            modalBody.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i><p style="margin-top: 1rem; color: #64748b;">Carregando...</p></div>';
+            const bookingCreateUrl = window.location.origin + '/dashboard/agendamentos/novo/';
+            console.log('🔍 DEBUG: URL:', bookingCreateUrl);
 
-            fetch('{% url "dashboard:booking_create" %}', {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                controller.abort();
+                console.error('⏱️ TIMEOUT após 15s');
+            }, 15000);
+
+            fetch(bookingCreateUrl, {
                 method: 'GET',
-                headers: { 
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'text/html, application/xhtml+xml'
-                }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                signal: controller.signal
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                clearTimeout(timeoutId);
+                console.log('✅ Response:', response.status);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return response.text();
             })
             .then(html => {
-                // Se a resposta contém o template completo, extrair o formulário
+                console.log('📄 HTML:', html.length, 'bytes');
+                if (!html.trim()) throw new Error('Resposta vazia');
+                
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 
-                // Procurar por .booking-modal primeiro (novo), depois fallback para form
-                let content = doc.querySelector('.booking-modal');
-                if (!content) {
-                    content = doc.querySelector('form');
-                }
-                if (!content) {
-                    content = doc.querySelector('.card');
-                }
+                // Encontrar o conteúdo
+                let content = doc.querySelector('.booking-form-card') 
+                           || doc.querySelector('.booking-modal')
+                           || doc.querySelector('form')
+                           || doc.querySelector('.card')
+                           || doc.body.firstElementChild;
                 
-                if (content) {
-                    modalBody.innerHTML = content.outerHTML;
-                    
-                    // Reexecutar todos os scripts do modal
-                    const scripts = modalBody.querySelectorAll('script');
-                    scripts.forEach(oldScript => {
-                        const newScript = document.createElement('script');
-                        if (oldScript.src) {
-                            newScript.src = oldScript.src;
-                        } else {
-                            newScript.textContent = oldScript.textContent;
-                        }
-                        modalBody.appendChild(newScript);
-                    });
-                    
-                    // Inicializar o modal se a função existir
-                    if (typeof window.initializeDashboardBookingModal === 'function') {
-                        window.initializeDashboardBookingModal(modalBody);
+                if (!content) throw new Error('Nenhum elemento encontrado');
+                
+                console.log('✓ Elemento encontrado');
+                
+                // Inserir
+                formContainer.innerHTML = content.outerHTML;
+                loading.style.display = 'none';
+                formContainer.style.display = 'block';
+                
+                // Executar scripts
+                formContainer.querySelectorAll('script').forEach((oldScript, idx) => {
+                    const newScript = document.createElement('script');
+                    if (oldScript.src) {
+                        newScript.src = oldScript.src;
+                    } else if (oldScript.textContent.trim()) {
+                        newScript.textContent = oldScript.textContent;
                     }
-                } else {
-                    throw new Error('Formulário não encontrado na resposta');
+                    formContainer.appendChild(newScript);
+                    console.log(`📜 Script ${idx} executado`);
+                });
+                
+                // Inicializar
+                if (typeof window.initializeDashboardBookingModal === 'function') {
+                    console.log('🚀 Inicializando...');
+                    window.initializeDashboardBookingModal(formContainer);
                 }
             })
             .catch(error => {
-                console.error('Erro ao carregar formulário:', error);
-                modalBody.innerHTML = `<div style="text-align: center; padding: 2rem; color: #ef4444;"><i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i><p><strong>Erro ao carregar formulário</strong></p><p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">${error.message}</p></div>`;
+                clearTimeout(timeoutId);
+                console.error('❌', error.name, error.message);
+                
+                let msg = error.message;
+                if (error.name === 'AbortError') msg = 'Timeout (15s)';
+                
+                loading.innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: #dc2626;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2.5rem; margin-bottom: 1rem; display: block;"></i>
+                        <p style="font-weight: 600; margin: 0 0 0.5rem 0;">Erro ao carregar</p>
+                        <p style="font-size: 0.9rem; color: #991b1b; margin: 0;">${msg}</p>
+                        <button onclick="closeNewBookingModal()" style="margin-top: 1.5rem; padding: 0.5rem 1rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">Fechar</button>
+                    </div>
+                `;
             });
         }
 
