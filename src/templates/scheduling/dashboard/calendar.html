@@ -406,10 +406,16 @@
         right: 0;
         bottom: 0;
         z-index: 9999;
-        display: flex;
+        display: none; /* Oculto por padrão */
         align-items: center;
         justify-content: center;
         animation: fadeIn 0.2s ease-out;
+    }
+    
+    /* Modal ativo - mostra com flex */
+    .modal.active,
+    .modal[style*="display: flex"] {
+        display: flex;
     }
 
     .modal-overlay {
