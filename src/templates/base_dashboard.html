@@ -1064,19 +1064,58 @@
             modalBody.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--brand-primary);"></i><p style="margin-top: 1rem; color: #64748b;">Carregando...</p></div>';
 
             fetch('{% url "dashboard:booking_create" %}', {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                method: 'GET',
+                headers: { 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html, application/xhtml+xml'
+                }
             })
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
             .then(html => {
+                // Se a resposta contém o template completo, extrair o formulário
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const form = doc.querySelector('form') || doc.querySelector('.card');
-                if (form) {
-                    modalBody.innerHTML = form.outerHTML;
+                
+                // Procurar por .booking-modal primeiro (novo), depois fallback para form
+                let content = doc.querySelector('.booking-modal');
+                if (!content) {
+                    content = doc.querySelector('form');
+                }
+                if (!content) {
+                    content = doc.querySelector('.card');
+                }
+                
+                if (content) {
+                    modalBody.innerHTML = content.outerHTML;
+                    
+                    // Reexecutar todos os scripts do modal
+                    const scripts = modalBody.querySelectorAll('script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        if (oldScript.src) {
+                            newScript.src = oldScript.src;
+                        } else {
+                            newScript.textContent = oldScript.textContent;
+                        }
+                        modalBody.appendChild(newScript);
+                    });
+                    
+                    // Inicializar o modal se a função existir
+                    if (typeof window.initializeDashboardBookingModal === 'function') {
+                        window.initializeDashboardBookingModal(modalBody);
+                    }
+                } else {
+                    throw new Error('Formulário não encontrado na resposta');
                 }
             })
             .catch(error => {
-                modalBody.innerHTML = `<div style="text-align: center; padding: 2rem; color: #ef4444;">Erro ao carregar formulário</div>`;
+                console.error('Erro ao carregar formulário:', error);
+                modalBody.innerHTML = `<div style="text-align: center; padding: 2rem; color: #ef4444;"><i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i><p><strong>Erro ao carregar formulário</strong></p><p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">${error.message}</p></div>`;
             });
         }
 

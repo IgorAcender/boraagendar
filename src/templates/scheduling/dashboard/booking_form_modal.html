@@ -1174,6 +1174,12 @@
         initialiseFromForm();
     };
 
-    window.initializeDashboardBookingModal();
+    // Apenas chamar se não for carregado via AJAX (inicialização automática)
+    if (typeof document !== 'undefined' && document.getElementById('booking-services-data')) {
+        // Se document.body contém .booking-modal, então é uma página completa (não modal)
+        if (document.body.querySelector('.booking-modal') && !document.body.querySelector('#newBookingModal .booking-modal')) {
+            window.initializeDashboardBookingModal();
+        }
+    }
 </script>
 </div>
