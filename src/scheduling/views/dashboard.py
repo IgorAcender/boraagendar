@@ -1984,7 +1984,14 @@ def dashboard_history_fragment(request: HttpRequest) -> HttpResponse:
 @login_required
 def client_list(request):
     """Lista todos os clientes do tenant"""
-    tenant = request.tenant
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff", "professional"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
+    
     clients = Customer.objects.filter(tenant=tenant).order_by('name')
     
     context = {
@@ -1998,7 +2005,13 @@ def client_list(request):
 @login_required
 def client_create(request):
     """Cria um novo cliente"""
-    tenant = request.tenant
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff", "professional"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
     
     if request.method == 'POST':
         try:
@@ -2068,7 +2081,13 @@ def client_create(request):
 @login_required
 def client_edit(request, pk):
     """Edita um cliente existente"""
-    tenant = request.tenant
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff", "professional"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
     
     try:
         client = Customer.objects.get(pk=pk, tenant=tenant)
@@ -2141,7 +2160,13 @@ def client_edit(request, pk):
 @login_required
 def client_delete(request, pk):
     """Exclui um cliente"""
-    tenant = request.tenant
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager"],
+    )
+    if redirect_response:
+        return redirect_response
+    tenant = membership.tenant
     
     try:
         client = Customer.objects.get(pk=pk, tenant=tenant)
