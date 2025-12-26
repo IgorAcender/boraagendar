@@ -638,8 +638,8 @@
         .modal-content {
             background: white;
             border-radius: 16px;
-            max-width: 600px;
-            width: 90%;
+            max-width: 900px;
+            width: 95%;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -1049,8 +1049,114 @@
 
         // Modal functions
         function openNewBookingModal() {
-            // Solução simples: redirecionar para a página de criar agendamento
-            window.location.href = window.location.origin + '/dashboard/agendamentos/novo/';
+            const modal = document.getElementById('newBookingModal');
+            const modalBody = document.getElementById('newBookingModalBody');
+            
+            // Mostrar loading
+            modalBody.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem;">
+                    <div style="width: 50px; height: 50px; border: 3px solid #e2e8f0; border-top-color: var(--brand-primary, #667eea); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p style="margin-top: 1rem; color: #64748b;">Carregando formulário...</p>
+                </div>
+                <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+            `;
+            
+            // Abrir modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Carregar conteúdo via AJAX
+            fetch('/dashboard/agendamentos/novo/?modal=1', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                modalBody.innerHTML = html;
+                // Inicializar scripts do formulário
+                initBookingFormScripts();
+            })
+            .catch(error => {
+                console.error('Erro ao carregar formulário:', error);
+                modalBody.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <p style="color: #64748b;">Erro ao carregar formulário. Tente novamente.</p>
+                        <button onclick="openNewBookingModal()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--brand-primary, #667eea); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Tentar novamente
+                        </button>
+                    </div>
+                `;
+            });
+        }
+        
+        function initBookingFormScripts() {
+            // Inicializar o formulário de agendamento carregado via AJAX
+            console.log('Inicializando formulário de agendamento...');
+            
+            const modalBody = document.getElementById('newBookingModalBody');
+            
+            // Chamar a função de inicialização do modal se existir
+            if (typeof window.initializeDashboardBookingModal === 'function') {
+                window.initializeDashboardBookingModal(modalBody);
+            }
+            
+            // Adicionar handler de submit AJAX
+            const form = modalBody.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+                    
+                    const formData = new FormData(form);
+                    
+                    fetch('/dashboard/agendamentos/novo/', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            return response.json().then(data => ({ type: 'json', data, ok: response.ok }));
+                        } else {
+                            return response.text().then(html => ({ type: 'html', data: html, ok: response.ok }));
+                        }
+                    })
+                    .then(result => {
+                        if (result.type === 'json' && result.data.success) {
+                            closeNewBookingModal();
+                            showNotification('Sucesso!', 'Agendamento criado com sucesso.', 'success');
+                            // Recarregar página para mostrar novo agendamento
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else if (result.type === 'html') {
+                            // Form com erros de validação - renderizar novamente
+                            modalBody.innerHTML = result.data;
+                            initBookingFormScripts();
+                            showNotification('Atenção', 'Verifique os campos do formulário.', 'error');
+                        } else {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalText;
+                            showNotification('Erro', result.data.error || 'Erro ao criar agendamento.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                        showNotification('Erro', 'Erro de conexão. Tente novamente.', 'error');
+                    });
+                });
+            }
         }
 
         function closeNewBookingModal() {

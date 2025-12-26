@@ -2010,8 +2010,11 @@ def client_create(request):
         allowed_roles=["owner", "manager", "staff", "professional"],
     )
     if redirect_response:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Não autorizado'}, status=403)
         return redirect_response
     tenant = membership.tenant
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     if request.method == 'POST':
         try:
@@ -2064,10 +2067,24 @@ def client_create(request):
             
             client.save()
             
+            if is_ajax:
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Cliente criado com sucesso!',
+                    'client': {
+                        'id': client.id,
+                        'name': client.name,
+                        'email': client.email or '',
+                        'phone': client.phone or '',
+                    }
+                })
+            
             messages.success(request, 'Cliente criado com sucesso!')
             return redirect('dashboard:client_list')
             
         except Exception as e:
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': str(e)}, status=400)
             messages.error(request, f'Erro ao criar cliente: {str(e)}')
     
     context = {
@@ -2085,13 +2102,18 @@ def client_edit(request, pk):
         request,
         allowed_roles=["owner", "manager", "staff", "professional"],
     )
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     if redirect_response:
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': 'Não autorizado'}, status=403)
         return redirect_response
     tenant = membership.tenant
     
     try:
         client = Customer.objects.get(pk=pk, tenant=tenant)
     except Customer.DoesNotExist:
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': 'Cliente não encontrado'}, status=404)
         messages.error(request, 'Cliente não encontrado.')
         return redirect('dashboard:client_list')
     
@@ -2143,10 +2165,24 @@ def client_edit(request, pk):
             
             client.save()
             
+            if is_ajax:
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Cliente atualizado com sucesso!',
+                    'client': {
+                        'id': client.id,
+                        'name': client.name,
+                        'email': client.email or '',
+                        'phone': client.phone or '',
+                    }
+                })
+            
             messages.success(request, 'Cliente atualizado com sucesso!')
             return redirect('dashboard:client_list')
             
         except Exception as e:
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': str(e)}, status=400)
             messages.error(request, f'Erro ao atualizar cliente: {str(e)}')
     
     context = {
@@ -2155,6 +2191,53 @@ def client_edit(request, pk):
     }
     
     return render(request, 'scheduling/dashboard/client_form.html', context)
+
+
+@login_required
+def client_data(request, pk):
+    """Retorna os dados de um cliente em JSON para edição no modal"""
+    membership, redirect_response = _membership_or_redirect(
+        request,
+        allowed_roles=["owner", "manager", "staff", "professional"],
+    )
+    if redirect_response:
+        return JsonResponse({'error': 'Não autorizado'}, status=403)
+    tenant = membership.tenant
+    
+    try:
+        client = Customer.objects.get(pk=pk, tenant=tenant)
+        data = {
+            'id': client.id,
+            'name': client.name or '',
+            'nickname': client.nickname or '',
+            'email': client.email or '',
+            'phone': client.phone or '',
+            'telephone': client.telephone or '',
+            'birth_date': client.birth_date.isoformat() if client.birth_date else '',
+            'gender': client.gender or '',
+            'cpf': client.cpf or '',
+            'cnpj': client.cnpj or '',
+            'rg': client.rg or '',
+            'referred_by': client.referred_by or '',
+            'tags': client.tags or '',
+            'cep': client.cep or '',
+            'street': client.street or '',
+            'number': client.number or '',
+            'complement': client.complement or '',
+            'neighborhood': client.neighborhood or '',
+            'city': client.city or '',
+            'state': client.state or '',
+            'is_active': client.is_active,
+            'allow_whatsapp': client.allow_whatsapp,
+            'allow_sms': client.allow_sms,
+            'allow_email': client.allow_email,
+            'notes': client.notes or '',
+        }
+        return JsonResponse(data)
+    except Customer.DoesNotExist:
+        return JsonResponse({'error': 'Cliente não encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 @login_required

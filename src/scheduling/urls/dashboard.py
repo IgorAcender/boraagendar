@@ -22,6 +22,7 @@ urlpatterns = [
     path("clientes/", dashboard_views.client_list, name="client_list"),
     path("clientes/novo/", dashboard_views.client_create, name="client_create"),
     path("clientes/<int:pk>/editar/", dashboard_views.client_edit, name="client_edit"),
+    path("clientes/<int:pk>/dados/", dashboard_views.client_data, name="client_data"),
     path("clientes/<int:pk>/excluir/", dashboard_views.client_delete, name="client_delete"),
     
     path("servicos/", dashboard_views.service_list, name="service_list"),
