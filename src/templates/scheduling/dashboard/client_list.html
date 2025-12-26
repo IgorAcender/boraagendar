@@ -9,7 +9,7 @@
             Clientes
         </h1>
     </div>
-    <a href="#" class="btn-primary" onclick="return false;">
+    <a href="{% url 'client_create' %}" class="btn-primary">
         <i class="fas fa-plus"></i>
         Novo Cliente
     </a>
@@ -67,7 +67,7 @@
                 </td>
                 <td>
                     <div class="action-buttons">
-                        <a href="#" class="btn-action btn-edit" title="Editar">
+                        <a href="{% url 'client_edit' client.id %}" class="btn-action btn-edit" title="Editar">
                             <i class="fas fa-pencil-alt"></i>
                         </a>
                         <button class="btn-action btn-delete" title="Excluir" onclick="confirmDelete({{ client.id }})">
@@ -116,7 +116,7 @@
 
     function confirmDelete(id) {
         if (confirm('Tem certeza que deseja excluir este cliente?')) {
-            window.location.href = '/dashboard/cliente/' + id + '/delete/';
+            window.location.href = '{% url "dashboard:client_delete" 0 %}'.replace('0', id);
         }
     }
 </script>

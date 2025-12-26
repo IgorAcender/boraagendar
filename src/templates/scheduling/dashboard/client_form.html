@@ -1,0 +1,721 @@
+{% extends "base_dashboard.html" %}
+{% block title %}{% if client %}Editar Cliente{% else %}Novo Cliente{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            <i class="fas fa-user"></i>
+            {% if client %}Editar Cliente{% else %}Novo Cliente{% endif %}
+        </h1>
+    </div>
+    <a href="{% url 'client_list' %}" class="btn-outline">
+        <i class="fas fa-arrow-left"></i>
+        Voltar
+    </a>
+</div>
+
+<div class="client-form-container">
+    <form method="POST" enctype="multipart/form-data" class="client-form">
+        {% csrf_token %}
+        
+        <!-- Avatar Section -->
+        <div class="avatar-section">
+            <div class="avatar-preview">
+                {% if client.avatar %}
+                    <img src="{{ client.avatar.url }}" alt="{{ client.name }}" id="avatarPreview">
+                {% else %}
+                    <div class="avatar-placeholder" id="avatarPreview">
+                        <i class="fas fa-user"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="avatar-actions">
+                <input type="file" name="avatar" id="avatarInput" accept="image/*" style="display: none;">
+                <label for="avatarInput" class="btn-change-avatar">
+                    <i class="fas fa-camera"></i>
+                    Alterar
+                </label>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="form-tabs">
+            <button type="button" class="tab-button active" data-tab="cadastro">
+                <i class="fas fa-user-edit"></i>
+                Cadastro
+            </button>
+            <button type="button" class="tab-button" data-tab="endereco">
+                <i class="fas fa-map-marker-alt"></i>
+                Endereço
+            </button>
+            <button type="button" class="tab-button" data-tab="configuracoes">
+                <i class="fas fa-cog"></i>
+                Configurações
+            </button>
+        </div>
+
+        <!-- Tab Content: Cadastro -->
+        <div class="tab-content active" data-content="cadastro">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">
+                        <i class="fas fa-user"></i>
+                        Nome *
+                    </label>
+                    <input type="text" id="name" name="name" value="{{ client.name|default:'' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nickname">
+                        <i class="fas fa-star"></i>
+                        Apelido
+                    </label>
+                    <input type="text" id="nickname" name="nickname" value="{{ client.nickname|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        E-mail
+                    </label>
+                    <input type="email" id="email" name="email" value="{{ client.email|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">
+                        <i class="fas fa-mobile-alt"></i>
+                        Celular *
+                    </label>
+                    <input type="tel" id="phone" name="phone" value="{{ client.phone|default:'' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telephone">
+                        <i class="fas fa-phone"></i>
+                        Telefone
+                    </label>
+                    <input type="tel" id="telephone" name="telephone" value="{{ client.telephone|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="birth_date">
+                        <i class="fas fa-birthday-cake"></i>
+                        Aniversário
+                    </label>
+                    <input type="date" id="birth_date" name="birth_date" value="{{ client.birth_date|date:'Y-m-d'|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">
+                        <i class="fas fa-venus-mars"></i>
+                        Gênero
+                    </label>
+                    <select id="gender" name="gender">
+                        <option value="">Selecione...</option>
+                        <option value="M" {% if client.gender == 'M' %}selected{% endif %}>Masculino</option>
+                        <option value="F" {% if client.gender == 'F' %}selected{% endif %}>Feminino</option>
+                        <option value="O" {% if client.gender == 'O' %}selected{% endif %}>Outro</option>
+                        <option value="N" {% if client.gender == 'N' %}selected{% endif %}>Prefiro não informar</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cpf">
+                        <i class="fas fa-id-card"></i>
+                        CPF
+                    </label>
+                    <input type="text" id="cpf" name="cpf" value="{{ client.cpf|default:'' }}" maxlength="14">
+                </div>
+
+                <div class="form-group">
+                    <label for="cnpj">
+                        <i class="fas fa-building"></i>
+                        CNPJ
+                    </label>
+                    <input type="text" id="cnpj" name="cnpj" value="{{ client.cnpj|default:'' }}" maxlength="18">
+                </div>
+
+                <div class="form-group">
+                    <label for="rg">
+                        <i class="fas fa-address-card"></i>
+                        RG
+                    </label>
+                    <input type="text" id="rg" name="rg" value="{{ client.rg|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="referred_by">
+                        <i class="fas fa-user-friends"></i>
+                        Indicado por
+                    </label>
+                    <input type="text" id="referred_by" name="referred_by" value="{{ client.referred_by|default:'' }}">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="tags">
+                        <i class="fas fa-hashtag"></i>
+                        Hashtags
+                    </label>
+                    <input type="text" id="tags" name="tags" value="{{ client.tags|default:'' }}" placeholder="Ex: vip, fidelidade, primeira-vez">
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Endereço -->
+        <div class="tab-content" data-content="endereco">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="cep">
+                        <i class="fas fa-mail-bulk"></i>
+                        CEP
+                    </label>
+                    <input type="text" id="cep" name="cep" value="{{ client.cep|default:'' }}" maxlength="9">
+                </div>
+
+                <div class="form-group">
+                    <label for="street">
+                        <i class="fas fa-road"></i>
+                        Rua
+                    </label>
+                    <input type="text" id="street" name="street" value="{{ client.street|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="number">
+                        <i class="fas fa-hashtag"></i>
+                        Número
+                    </label>
+                    <input type="text" id="number" name="number" value="{{ client.number|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="complement">
+                        <i class="fas fa-plus"></i>
+                        Complemento
+                    </label>
+                    <input type="text" id="complement" name="complement" value="{{ client.complement|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="neighborhood">
+                        <i class="fas fa-map"></i>
+                        Bairro
+                    </label>
+                    <input type="text" id="neighborhood" name="neighborhood" value="{{ client.neighborhood|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="city">
+                        <i class="fas fa-city"></i>
+                        Cidade
+                    </label>
+                    <input type="text" id="city" name="city" value="{{ client.city|default:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="state">
+                        <i class="fas fa-flag"></i>
+                        Estado
+                    </label>
+                    <select id="state" name="state">
+                        <option value="">Selecione...</option>
+                        <option value="AC" {% if client.state == 'AC' %}selected{% endif %}>Acre</option>
+                        <option value="AL" {% if client.state == 'AL' %}selected{% endif %}>Alagoas</option>
+                        <option value="AP" {% if client.state == 'AP' %}selected{% endif %}>Amapá</option>
+                        <option value="AM" {% if client.state == 'AM' %}selected{% endif %}>Amazonas</option>
+                        <option value="BA" {% if client.state == 'BA' %}selected{% endif %}>Bahia</option>
+                        <option value="CE" {% if client.state == 'CE' %}selected{% endif %}>Ceará</option>
+                        <option value="DF" {% if client.state == 'DF' %}selected{% endif %}>Distrito Federal</option>
+                        <option value="ES" {% if client.state == 'ES' %}selected{% endif %}>Espírito Santo</option>
+                        <option value="GO" {% if client.state == 'GO' %}selected{% endif %}>Goiás</option>
+                        <option value="MA" {% if client.state == 'MA' %}selected{% endif %}>Maranhão</option>
+                        <option value="MT" {% if client.state == 'MT' %}selected{% endif %}>Mato Grosso</option>
+                        <option value="MS" {% if client.state == 'MS' %}selected{% endif %}>Mato Grosso do Sul</option>
+                        <option value="MG" {% if client.state == 'MG' %}selected{% endif %}>Minas Gerais</option>
+                        <option value="PA" {% if client.state == 'PA' %}selected{% endif %}>Pará</option>
+                        <option value="PB" {% if client.state == 'PB' %}selected{% endif %}>Paraíba</option>
+                        <option value="PR" {% if client.state == 'PR' %}selected{% endif %}>Paraná</option>
+                        <option value="PE" {% if client.state == 'PE' %}selected{% endif %}>Pernambuco</option>
+                        <option value="PI" {% if client.state == 'PI' %}selected{% endif %}>Piauí</option>
+                        <option value="RJ" {% if client.state == 'RJ' %}selected{% endif %}>Rio de Janeiro</option>
+                        <option value="RN" {% if client.state == 'RN' %}selected{% endif %}>Rio Grande do Norte</option>
+                        <option value="RS" {% if client.state == 'RS' %}selected{% endif %}>Rio Grande do Sul</option>
+                        <option value="RO" {% if client.state == 'RO' %}selected{% endif %}>Rondônia</option>
+                        <option value="RR" {% if client.state == 'RR' %}selected{% endif %}>Roraima</option>
+                        <option value="SC" {% if client.state == 'SC' %}selected{% endif %}>Santa Catarina</option>
+                        <option value="SP" {% if client.state == 'SP' %}selected{% endif %}>São Paulo</option>
+                        <option value="SE" {% if client.state == 'SE' %}selected{% endif %}>Sergipe</option>
+                        <option value="TO" {% if client.state == 'TO' %}selected{% endif %}>Tocantins</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="address_notes">
+                        <i class="fas fa-comment"></i>
+                        Observações
+                    </label>
+                    <textarea id="address_notes" name="address_notes" rows="3">{{ client.address_notes|default:'' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Configurações -->
+        <div class="tab-content" data-content="configuracoes">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="is_active" {% if client.is_active %}checked{% endif %}>
+                        <span>Cliente Ativo</span>
+                    </label>
+                    <small class="field-hint">Desmarque para desativar o cliente sem excluí-lo</small>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="allow_whatsapp" {% if client.allow_whatsapp %}checked{% endif %}>
+                        <span>Permitir mensagens no WhatsApp</span>
+                    </label>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="allow_sms" {% if client.allow_sms %}checked{% endif %}>
+                        <span>Permitir SMS</span>
+                    </label>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="allow_email" {% if client.allow_email %}checked{% endif %}>
+                        <span>Permitir e-mails</span>
+                    </label>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="notes">
+                        <i class="fas fa-sticky-note"></i>
+                        Observações Gerais
+                    </label>
+                    <textarea id="notes" name="notes" rows="4" placeholder="Anotações sobre o cliente...">{{ client.notes|default:'' }}</textarea>
+                </div>
+
+                {% if client %}
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-calendar-plus"></i>
+                        Cadastrado em
+                    </label>
+                    <input type="text" value="{{ client.created_at|date:'d/m/Y H:i' }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-calendar-check"></i>
+                        Última atualização
+                    </label>
+                    <input type="text" value="{{ client.updated_at|date:'d/m/Y H:i' }}" disabled>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="window.history.back()">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+            <button type="submit" class="btn-save">
+                <i class="fas fa-check"></i>
+                Salvar
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.client-form-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Avatar Section */
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+}
+
+.btn-change-avatar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    background: white;
+    border: 2px solid var(--brand-primary, #3b82f6);
+    color: var(--brand-primary, #3b82f6);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-change-avatar:hover {
+    background: var(--brand-primary, #3b82f6);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Tabs Navigation */
+.form-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.tab-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    color: #64748b;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.tab-button:hover {
+    color: var(--brand-primary, #3b82f6);
+}
+
+.tab-button.active {
+    color: var(--brand-primary, #3b82f6);
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--brand-primary, #3b82f6);
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #334155;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.form-group label i {
+    color: var(--brand-primary, #3b82f6);
+    font-size: 1rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group input:disabled {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+.form-group textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.checkbox-label {
+    display: flex !important;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    margin-bottom: 0 !important;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.checkbox-label span {
+    color: #334155;
+    font-weight: 500;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 0.5rem;
+    color: #64748b;
+    font-size: 0.75rem;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-cancel,
+.btn-save {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.btn-cancel:hover {
+    background: #e2e8f0;
+    transform: translateY(-2px);
+}
+
+.btn-save {
+    background: var(--brand-primary, #3b82f6);
+    color: white;
+}
+
+.btn-save:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .client-form-container {
+        padding: 1.5rem;
+    }
+    
+    .form-tabs {
+        overflow-x: auto;
+    }
+    
+    .tab-button {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+    }
+}
+</style>
+
+<script>
+// Tab Switching
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => {
+        const targetTab = button.dataset.tab;
+        
+        // Remove active class from all tabs and contents
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        button.classList.add('active');
+        document.querySelector(`[data-content="${targetTab}"]`).classList.add('active');
+    });
+});
+
+// Avatar Preview
+document.getElementById('avatarInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('avatarPreview');
+            preview.innerHTML = `<img src="${e.target.result}" alt="Avatar Preview">`;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Phone Masks
+function maskPhone(input) {
+    let value = input.value.replace(/\D/g, '');
+    if (value.length <= 10) {
+        value = value.replace(/(\d{2})(\d)/, '($1) $2');
+        value = value.replace(/(\d{4})(\d)/, '$1-$2');
+    } else {
+        value = value.replace(/(\d{2})(\d)/, '($1) $2');
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+    }
+    input.value = value;
+}
+
+document.getElementById('phone')?.addEventListener('input', function() {
+    maskPhone(this);
+});
+
+document.getElementById('telephone')?.addEventListener('input', function() {
+    maskPhone(this);
+});
+
+// CPF Mask
+document.getElementById('cpf')?.addEventListener('input', function() {
+    let value = this.value.replace(/\D/g, '');
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    this.value = value;
+});
+
+// CNPJ Mask
+document.getElementById('cnpj')?.addEventListener('input', function() {
+    let value = this.value.replace(/\D/g, '');
+    value = value.replace(/(\d{2})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d)/, '$1.$2');
+    value = value.replace(/(\d{3})(\d)/, '$1/$2');
+    value = value.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+    this.value = value;
+});
+
+// CEP Mask and API
+document.getElementById('cep')?.addEventListener('input', function() {
+    let value = this.value.replace(/\D/g, '');
+    value = value.replace(/(\d{5})(\d)/, '$1-$2');
+    this.value = value;
+    
+    if (value.replace(/\D/g, '').length === 8) {
+        fetch(`https://viacep.com.br/ws/${value.replace(/\D/g, '')}/json/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.erro) {
+                    document.getElementById('street').value = data.logradouro || '';
+                    document.getElementById('neighborhood').value = data.bairro || '';
+                    document.getElementById('city').value = data.localidade || '';
+                    document.getElementById('state').value = data.uf || '';
+                }
+            })
+            .catch(error => console.error('Erro ao buscar CEP:', error));
+    }
+});
+
+// Form Validation
+document.querySelector('.client-form').addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    
+    if (!name) {
+        e.preventDefault();
+        alert('Por favor, preencha o nome do cliente.');
+        document.getElementById('name').focus();
+        return false;
+    }
+    
+    if (!phone) {
+        e.preventDefault();
+        alert('Por favor, preencha o celular do cliente.');
+        document.getElementById('phone').focus();
+        return false;
+    }
+});
+</script>
+{% endblock %}

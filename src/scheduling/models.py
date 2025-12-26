@@ -4,6 +4,77 @@ from django.db import models
 from tenants.models import Tenant
 
 
+class Customer(models.Model):
+    """Modelo de Cliente com dados completos"""
+    
+    GENDER_CHOICES = [
+        ('M', 'Masculino'),
+        ('F', 'Feminino'),
+        ('O', 'Outro'),
+        ('N', 'Prefiro não informar'),
+    ]
+    
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="customers")
+    
+    # Dados pessoais
+    name = models.CharField(max_length=150, verbose_name="Nome")
+    nickname = models.CharField(max_length=100, blank=True, verbose_name="Apelido")
+    email = models.EmailField(blank=True, verbose_name="E-mail")
+    phone = models.CharField(max_length=32, verbose_name="Celular")
+    telephone = models.CharField(max_length=32, blank=True, verbose_name="Telefone")
+    birth_date = models.DateField(null=True, blank=True, verbose_name="Aniversário")
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, verbose_name="Gênero")
+    
+    # Documentos
+    cpf = models.CharField(max_length=14, blank=True, verbose_name="CPF")
+    cnpj = models.CharField(max_length=18, blank=True, verbose_name="CNPJ")
+    rg = models.CharField(max_length=20, blank=True, verbose_name="RG")
+    
+    # Marketing
+    referred_by = models.CharField(max_length=150, blank=True, verbose_name="Indicado por")
+    tags = models.CharField(max_length=255, blank=True, verbose_name="Tags", 
+                           help_text="Tags separadas por vírgula")
+    
+    # Endereço
+    cep = models.CharField(max_length=10, blank=True, verbose_name="CEP")
+    street = models.CharField(max_length=255, blank=True, verbose_name="Rua")
+    number = models.CharField(max_length=20, blank=True, verbose_name="Número")
+    complement = models.CharField(max_length=100, blank=True, verbose_name="Complemento")
+    neighborhood = models.CharField(max_length=100, blank=True, verbose_name="Bairro")
+    city = models.CharField(max_length=100, blank=True, verbose_name="Cidade")
+    state = models.CharField(max_length=2, blank=True, verbose_name="Estado")
+    address_notes = models.TextField(blank=True, verbose_name="Observações do endereço")
+    
+    # Configurações
+    avatar = models.ImageField(upload_to='customers/', null=True, blank=True, verbose_name="Avatar")
+    is_active = models.BooleanField(default=True, verbose_name="Ativo")
+    allow_whatsapp = models.BooleanField(default=True, verbose_name="Permitir WhatsApp")
+    allow_sms = models.BooleanField(default=True, verbose_name="Permitir SMS")
+    allow_email = models.BooleanField(default=True, verbose_name="Permitir E-mail")
+    notes = models.TextField(blank=True, verbose_name="Observações")
+    
+    # Auditoria
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Cliente"
+        verbose_name_plural = "Clientes"
+        ordering = ("name",)
+        indexes = [
+            models.Index(fields=("tenant", "name")),
+            models.Index(fields=("tenant", "phone")),
+            models.Index(fields=("tenant", "email")),
+        ]
+    
+    def __str__(self):
+        return self.name
+    
+    def get_display_name(self):
+        """Retorna o nome ou apelido para exibição"""
+        return self.nickname if self.nickname else self.name
+
+
 class Service(models.Model):
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name="services")
     name = models.CharField(max_length=120, verbose_name="Servico")

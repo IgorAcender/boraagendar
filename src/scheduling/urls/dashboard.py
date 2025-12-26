@@ -17,6 +17,13 @@ urlpatterns = [
     path("agendamentos/profissionais-por-servico/", dashboard_views.get_professionals_by_service, name="get_professionals_by_service"),
     path("agendamentos/horarios-disponiveis/", dashboard_views.get_available_times, name="get_available_times"),
     path("agendamentos/<int:pk>/mover/", dashboard_views.booking_move, name="booking_move"),
+    
+    # Clientes
+    path("clientes/", dashboard_views.client_list, name="client_list"),
+    path("clientes/novo/", dashboard_views.client_create, name="client_create"),
+    path("clientes/<int:pk>/editar/", dashboard_views.client_edit, name="client_edit"),
+    path("clientes/<int:pk>/excluir/", dashboard_views.client_delete, name="client_delete"),
+    
     path("servicos/", dashboard_views.service_list, name="service_list"),
     path("servicos/<int:pk>/editar/", dashboard_views.service_update, name="service_update"),
     path("profissionais/", dashboard_views.professional_list, name="professional_list"),

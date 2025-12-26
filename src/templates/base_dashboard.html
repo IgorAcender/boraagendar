@@ -744,15 +744,11 @@
             <div class="nav-section">
                 <div class="nav-section-title">Cadastro</div>
                 <ul style="list-style: none; margin: 0; padding: 0;">
-                    <li class="nav-item has-submenu">
-                        <button class="nav-link submenu-toggle">
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard:client_list' %}" class="nav-link">
                             <i class="fas fa-users"></i>
                             <span>Clientes</span>
-                            <i class="fas fa-chevron-down chevron"></i>
-                        </button>
-                        <div class="submenu">
-                            <a href="#" class="submenu-link">Lista de Clientes</a>
-                        </div>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a href="{% url 'dashboard:professional_list' %}" class="nav-link">

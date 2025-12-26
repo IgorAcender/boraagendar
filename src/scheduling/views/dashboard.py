@@ -18,7 +18,7 @@ from tenants.forms import TeamMemberCreateForm, TeamMemberUpdateForm, TenantUpda
 from tenants.models import TenantMembership, BrandingSettings
 
 from ..forms import BookingForm, ProfessionalForm, ProfessionalUpdateForm, ServiceForm
-from ..models import Booking, Professional, Service
+from ..models import Booking, Customer, Professional, Service
 from ..services.notification_dispatcher import send_booking_confirmation
 from ..services.financial import FinancialAnalytics
 
@@ -1975,3 +1975,182 @@ def dashboard_history_fragment(request: HttpRequest) -> HttpResponse:
         "scheduling/dashboard/fragments/history_table.html",
         context
     )
+
+
+# ============================================================================
+# CLIENT VIEWS (CRUD)
+# ============================================================================
+
+@login_required
+def client_list(request):
+    """Lista todos os clientes do tenant"""
+    tenant = request.tenant
+    clients = Customer.objects.filter(tenant=tenant).order_by('name')
+    
+    context = {
+        'tenant': tenant,
+        'clients': clients,
+    }
+    
+    return render(request, 'scheduling/dashboard/client_list.html', context)
+
+
+@login_required
+def client_create(request):
+    """Cria um novo cliente"""
+    tenant = request.tenant
+    
+    if request.method == 'POST':
+        try:
+            # Criar o cliente
+            client = Customer.objects.create(
+                tenant=tenant,
+                name=request.POST.get('name'),
+                nickname=request.POST.get('nickname', ''),
+                email=request.POST.get('email', ''),
+                phone=request.POST.get('phone'),
+                telephone=request.POST.get('telephone', ''),
+                cpf=request.POST.get('cpf', ''),
+                cnpj=request.POST.get('cnpj', ''),
+                rg=request.POST.get('rg', ''),
+                referred_by=request.POST.get('referred_by', ''),
+                tags=request.POST.get('tags', ''),
+                
+                # Endereço
+                cep=request.POST.get('cep', ''),
+                street=request.POST.get('street', ''),
+                number=request.POST.get('number', ''),
+                complement=request.POST.get('complement', ''),
+                neighborhood=request.POST.get('neighborhood', ''),
+                city=request.POST.get('city', ''),
+                state=request.POST.get('state', ''),
+                address_notes=request.POST.get('address_notes', ''),
+                
+                # Configurações
+                is_active=request.POST.get('is_active') == 'on',
+                allow_whatsapp=request.POST.get('allow_whatsapp') == 'on',
+                allow_sms=request.POST.get('allow_sms') == 'on',
+                allow_email=request.POST.get('allow_email') == 'on',
+                notes=request.POST.get('notes', ''),
+            )
+            
+            # Data de nascimento
+            birth_date = request.POST.get('birth_date')
+            if birth_date:
+                from datetime import datetime
+                client.birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
+            
+            # Gênero
+            gender = request.POST.get('gender')
+            if gender:
+                client.gender = gender
+            
+            # Avatar
+            if 'avatar' in request.FILES:
+                client.avatar = request.FILES['avatar']
+            
+            client.save()
+            
+            messages.success(request, 'Cliente criado com sucesso!')
+            return redirect('dashboard:client_list')
+            
+        except Exception as e:
+            messages.error(request, f'Erro ao criar cliente: {str(e)}')
+    
+    context = {
+        'tenant': tenant,
+        'client': None,
+    }
+    
+    return render(request, 'scheduling/dashboard/client_form.html', context)
+
+
+@login_required
+def client_edit(request, pk):
+    """Edita um cliente existente"""
+    tenant = request.tenant
+    
+    try:
+        client = Customer.objects.get(pk=pk, tenant=tenant)
+    except Customer.DoesNotExist:
+        messages.error(request, 'Cliente não encontrado.')
+        return redirect('dashboard:client_list')
+    
+    if request.method == 'POST':
+        try:
+            # Atualizar dados
+            client.name = request.POST.get('name')
+            client.nickname = request.POST.get('nickname', '')
+            client.email = request.POST.get('email', '')
+            client.phone = request.POST.get('phone')
+            client.telephone = request.POST.get('telephone', '')
+            client.cpf = request.POST.get('cpf', '')
+            client.cnpj = request.POST.get('cnpj', '')
+            client.rg = request.POST.get('rg', '')
+            client.referred_by = request.POST.get('referred_by', '')
+            client.tags = request.POST.get('tags', '')
+            
+            # Endereço
+            client.cep = request.POST.get('cep', '')
+            client.street = request.POST.get('street', '')
+            client.number = request.POST.get('number', '')
+            client.complement = request.POST.get('complement', '')
+            client.neighborhood = request.POST.get('neighborhood', '')
+            client.city = request.POST.get('city', '')
+            client.state = request.POST.get('state', '')
+            client.address_notes = request.POST.get('address_notes', '')
+            
+            # Configurações
+            client.is_active = request.POST.get('is_active') == 'on'
+            client.allow_whatsapp = request.POST.get('allow_whatsapp') == 'on'
+            client.allow_sms = request.POST.get('allow_sms') == 'on'
+            client.allow_email = request.POST.get('allow_email') == 'on'
+            client.notes = request.POST.get('notes', '')
+            
+            # Data de nascimento
+            birth_date = request.POST.get('birth_date')
+            if birth_date:
+                from datetime import datetime
+                client.birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
+            
+            # Gênero
+            gender = request.POST.get('gender')
+            if gender:
+                client.gender = gender
+            
+            # Avatar
+            if 'avatar' in request.FILES:
+                client.avatar = request.FILES['avatar']
+            
+            client.save()
+            
+            messages.success(request, 'Cliente atualizado com sucesso!')
+            return redirect('dashboard:client_list')
+            
+        except Exception as e:
+            messages.error(request, f'Erro ao atualizar cliente: {str(e)}')
+    
+    context = {
+        'tenant': tenant,
+        'client': client,
+    }
+    
+    return render(request, 'scheduling/dashboard/client_form.html', context)
+
+
+@login_required
+def client_delete(request, pk):
+    """Exclui um cliente"""
+    tenant = request.tenant
+    
+    try:
+        client = Customer.objects.get(pk=pk, tenant=tenant)
+        client_name = client.name
+        client.delete()
+        messages.success(request, f'Cliente "{client_name}" excluído com sucesso!')
+    except Customer.DoesNotExist:
+        messages.error(request, 'Cliente não encontrado.')
+    except Exception as e:
+        messages.error(request, f'Erro ao excluir cliente: {str(e)}')
+    
+    return redirect('dashboard:client_list')
