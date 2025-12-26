@@ -9,7 +9,7 @@
             Clientes
         </h1>
     </div>
-    <a href="{% url 'client_create' %}" class="btn-primary">
+    <a href="{% url 'dashboard:client_create' %}" class="btn-primary">
         <i class="fas fa-plus"></i>
         Novo Cliente
     </a>
@@ -67,7 +67,7 @@
                 </td>
                 <td>
                     <div class="action-buttons">
-                        <a href="{% url 'client_edit' client.id %}" class="btn-action btn-edit" title="Editar">
+                        <a href="{% url 'dashboard:client_edit' client.id %}" class="btn-action btn-edit" title="Editar">
                             <i class="fas fa-pencil-alt"></i>
                         </a>
                         <button class="btn-action btn-delete" title="Excluir" onclick="confirmDelete({{ client.id }})">
